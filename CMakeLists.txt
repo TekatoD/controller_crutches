@@ -26,7 +26,6 @@ set(SRC
         include/ImgProcess.h
         include/JointData.h
         include/Kinematics.h
-        include/LinuxActionScript.h
         include/LinuxCamera.h
         include/LinuxCM730.h
         include/LinuxDARwIn.h
@@ -44,7 +43,6 @@ set(SRC
         include/roboplus.h
         include/StatusCheck.h
         include/Vector.h
-        include/VisionMode.h
         include/Walking.h
         src/math/Matrix.cpp
         src/math/Plane.cpp
@@ -69,7 +67,6 @@ set(SRC
         src/vision/Image.cpp
         src/vision/ImgProcess.cpp
         src/CM730.cpp
-        src/LinuxActionScript.cpp
         src/LinuxCamera.cpp
         src/LinuxCM730.cpp
         src/LinuxMotionTimer.cpp
@@ -78,7 +75,7 @@ set(SRC
         src/MX28.cpp
         src/roboplus.cpp
         src/StatusCheck.cpp
-        src/VisionMode.cpp)
+        )
 
 add_executable(soccer ${SRC})
 target_link_libraries(soccer

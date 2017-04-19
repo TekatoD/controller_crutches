@@ -13,6 +13,5 @@
 #include "LinuxCM730.h"
 #include "LinuxCamera.h"
 #include "LinuxNetwork.h"
-#include "LinuxActionScript.h"
 
 #endif

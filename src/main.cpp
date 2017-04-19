@@ -16,7 +16,6 @@
 #include "LinuxDARwIn.h"
 
 #include "../include/StatusCheck.h"
-#include "../include/VisionMode.h"
 
 #define MOTION_FILE_PATH    "res/motion_4096.bin"
 #define INI_FILE_PATH       "res/config.ini"

@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include <string.h>
 #include <libgen.h>
 #include <signal.h>
 #include <memory>
@@ -37,8 +36,11 @@ void change_current_dir() {
 }
 
 
+bool finish = false;
+
+
 void sighandler(int sig) {
-    exit(0);
+    finish = true;
 }
 
 
@@ -51,6 +53,7 @@ int main(void) {
     change_current_dir();
 
     std::unique_ptr<minIni> ini(new minIni(INI_FILE_PATH));
+
     std::unique_ptr<Image> rgb_output(new Image(Camera::WIDTH, Camera::HEIGHT, Image::RGB_PIXEL_SIZE));
 
     LinuxCamera::GetInstance()->Initialize(0);
@@ -62,7 +65,7 @@ int main(void) {
 
     BallTracker tracker = BallTracker();
     BallFollower follower = BallFollower();
-    
+
     //////////////////// Framework Initialize ////////////////////////////
     if (MotionManager::GetInstance()->Initialize(&cm730) == false) {
         linux_cm730.SetPortName(U2D_DEV_NAME1);
@@ -107,31 +110,23 @@ int main(void) {
     Action::GetInstance()->Start(15);
     while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 
-    while (true) {
+    while (!finish) {
         StatusCheck::Check(cm730);
-
-        tracker.Process(ball_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
-
-        for (int i = 0; i < rgb_output->m_NumberOfPixels; i++) {
-            if (ball_finder->m_result->m_ImageData[i] == 1) {
-                rgb_output->m_ImageData[i * rgb_output->m_PixelSize + 0] = 255;
-                rgb_output->m_ImageData[i * rgb_output->m_PixelSize + 1] = 128;
-                rgb_output->m_ImageData[i * rgb_output->m_PixelSize + 2] = 0;
-            }
-        }
 
         if (StatusCheck::m_is_started == 0)
             continue;
 
+        LinuxCamera::GetInstance()->CaptureFrame();
+        memcpy(rgb_output->m_ImageData, LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageData,
+               LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageSize);
+
+        tracker.Process(ball_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
 
         if (Action::GetInstance()->IsRunning() == 0) {
             Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
 
             follower.Process(tracker.ball_position);
-
-            Point2D piunt(100, 100);
-            follower.Process(piunt);
             if (follower.KickBall != 0) {
                 Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
                 Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
@@ -145,12 +140,12 @@ int main(void) {
                 }
             }
         }
-        std::cerr << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_GYRO_X_L) << " "
-                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_GYRO_Y_L) << " "
-                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_GYRO_Z_L) << " "
-                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_ACCEL_X_L) << " "
-                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_ACCEL_Y_L) << " "
-                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_ACCEL_Z_L) << std::endl;
+//        std::cerr << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_GYRO_X_L) << " "
+//                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_GYRO_Y_L) << " "
+//                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_GYRO_Z_L) << " "
+//                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_ACCEL_X_L) << " "
+//                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_ACCEL_Y_L) << " "
+//                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_ACCEL_Z_L) << std::endl;
     }
 
     return 0;

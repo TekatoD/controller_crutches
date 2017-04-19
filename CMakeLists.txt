@@ -37,7 +37,6 @@ set(SRC
         include/MX28.h
         include/Plane.h
         include/Point.h
-        include/roboplus.h
         include/StatusCheck.h
         include/Vector.h
         include/Walking.h
@@ -67,7 +66,6 @@ set(SRC
         src/LinuxNetwork.cpp
         src/main.cpp
         src/MX28.cpp
-        src/roboplus.cpp
         src/StatusCheck.cpp
         )
 

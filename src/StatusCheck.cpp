@@ -14,7 +14,6 @@
 #include "Walking.h"
 #include "MotionStatus.h"
 #include "MotionManager.h"
-#include "../include/roboplus.h"
 
 using namespace Robot;
 

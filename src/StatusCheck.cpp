@@ -17,13 +17,12 @@
 
 using namespace Robot;
 
-int StatusCheck::m_cur_mode = READY;
 int StatusCheck::m_old_btn = 0;
 int StatusCheck::m_is_started = 0;
 
 
 void StatusCheck::Check(CM730& cm730) {
-    if (MotionStatus::FALLEN != STANDUP && m_cur_mode == SOCCER && m_is_started == 1) {
+    if (MotionStatus::FALLEN != STANDUP && m_is_started == 1) {
         Walking::GetInstance()->Stop();
         while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
 
@@ -45,7 +44,18 @@ void StatusCheck::Check(CM730& cm730) {
 
     m_old_btn = MotionStatus::BUTTON;
 
-    if (m_old_btn & BTN_MODE) {
+    if (m_old_btn & BTN_STOP) {
+        if (m_is_started == 1) {
+            m_is_started = 0;
+            Walking::GetInstance()->Stop();
+            Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+
+            while (Action::GetInstance()->Start(15) == false) usleep(8000);
+            while (Action::GetInstance()->IsRunning() == true) usleep(8000);
+        }
+    }
+
+    if (m_old_btn & BTN_START) {
         if (m_is_started == 0) {
             fprintf(stderr, "Start button pressed.. & started is false.. \n");
 

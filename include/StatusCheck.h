@@ -12,18 +12,8 @@
 
 namespace Robot {
     enum {
-        INITIAL,
-        READY,
-        SOCCER,
-        MOTION,
-        VISION,
-        ROBOPLUS,
-        MAX_MODE
-    };
-
-    enum {
-        BTN_MODE = 1,
-        BTN_START = 2
+        BTN_START = 1,
+        BTN_STOP = 2
     };
 
     class StatusCheck {
@@ -31,7 +21,6 @@ namespace Robot {
         static int m_old_btn;
 
     public:
-        static int m_cur_mode;
         static int m_is_started;
 
         static void Check(CM730& cm730);

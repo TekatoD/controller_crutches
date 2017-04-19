@@ -9,6 +9,7 @@
 #define _WALKING_ENGINE_H_
 
 #include <string.h>
+#include <memory>
 
 #include "minIni.h"
 #include "MotionModule.h"
@@ -28,7 +29,7 @@ namespace Robot {
         };
 
     private:
-        static Walking* m_UniqueInstance;
+        static std::unique_ptr<Walking> m_UniqueInstance;
 
         double m_PeriodTime;
         double m_DSP_Ratio;
@@ -146,7 +147,7 @@ namespace Robot {
 
         virtual ~Walking();
 
-        static Walking* GetInstance() { return m_UniqueInstance; }
+        static Walking* GetInstance() { return m_UniqueInstance.get(); }
 
         void Initialize();
 

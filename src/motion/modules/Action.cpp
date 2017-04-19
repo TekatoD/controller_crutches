@@ -6,13 +6,14 @@
  */
 
 #include <string.h>
+#include <memory>
 #include "MotionStatus.h"
 #include "Action.h"
 
 using namespace Robot;
 
 
-Action* Action::m_UniqueInstance = new Action();
+std::unique_ptr<Action> Action::m_UniqueInstance = new Action();
 
 
 Action::Action() {

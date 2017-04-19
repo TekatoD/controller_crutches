@@ -17,7 +17,7 @@ using namespace Robot;
 
 #define PI (3.14159265)
 
-Walking* Walking::m_UniqueInstance = new Walking();
+std::unique_ptr<Walking> Walking::m_UniqueInstance = new Walking();
 
 
 Walking::Walking() {

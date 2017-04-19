@@ -9,6 +9,7 @@
 #define _ACTION_MODULE_H_
 
 #include <stdio.h>
+#include <memory>
 #include "MotionModule.h"
 #include "JointData.h"
 
@@ -67,7 +68,7 @@ namespace Robot {
         } PAGE;
 
     private:
-        static Action* m_UniqueInstance;
+        static std::unique_ptr<Action> m_UniqueInstance;
         FILE* m_ActionFile;
         PAGE m_PlayPage;
         PAGE m_NextPlayPage;
@@ -91,7 +92,7 @@ namespace Robot {
 
         ~Action();
 
-        static Action* GetInstance() { return m_UniqueInstance; }
+        static Action* GetInstance() { return m_UniqueInstance.get(); }
 
         void Initialize();
 

@@ -12,6 +12,5 @@
 #include "LinuxMotionTimer.h"
 #include "LinuxCM730.h"
 #include "LinuxCamera.h"
-#include "LinuxNetwork.h"
 
 #endif

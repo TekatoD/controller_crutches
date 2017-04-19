@@ -27,7 +27,6 @@ set(SRC
         include/LinuxCM730.h
         include/LinuxDARwIn.h
         include/LinuxMotionTimer.h
-        include/LinuxNetwork.h
         include/Matrix.h
         include/minIni.h
         include/mjpg_streamer.h
@@ -63,7 +62,6 @@ set(SRC
         src/LinuxCamera.cpp
         src/LinuxCM730.cpp
         src/LinuxMotionTimer.cpp
-        src/LinuxNetwork.cpp
         src/main.cpp
         src/MX28.cpp
         src/StatusCheck.cpp

@@ -10,9 +10,6 @@ find_package(JPEG REQUIRED)
 include_directories(include/)
 
 set(SRC
-        include/streamer/httpd.h
-        include/streamer/jpeg_utils.h
-        include/streamer/mjpg_streamer.h
         include/Action.h
         include/BallFollower.h
         include/BallTracker.h
@@ -57,9 +54,6 @@ set(SRC
         src/motion/Kinematics.cpp
         src/motion/MotionManager.cpp
         src/motion/MotionStatus.cpp
-        src/streamer/httpd.cpp
-        src/streamer/jpeg_utils.cpp
-        src/streamer/mjpg_streamer.cpp
         src/vision/BallFollower.cpp
         src/vision/BallTracker.cpp
         src/vision/Camera.cpp

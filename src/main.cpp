@@ -12,16 +12,17 @@
 #include <signal.h>
 #include <memory>
 
-#include "mjpg_streamer.h"
 #include "LinuxDARwIn.h"
 
-#include "../include/StatusCheck.h"
+#include "StatusCheck.h"
 
 #define MOTION_FILE_PATH    "res/motion_4096.bin"
 #define INI_FILE_PATH       "res/config.ini"
 
 #define U2D_DEV_NAME0       "/dev/ttyUSB0"
 #define U2D_DEV_NAME1       "/dev/ttyUSB1"
+
+using namespace Robot;
 
 LinuxCM730 linux_cm730(U2D_DEV_NAME0);
 CM730 cm730(&linux_cm730);
@@ -56,29 +57,12 @@ int main(void) {
     LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
     LinuxCamera::GetInstance()->LoadINISettings(ini.get());                   // load from ini
 
-    mjpg_streamer* streamer = new mjpg_streamer(Camera::WIDTH, Camera::HEIGHT);
-
-    ColorFinder* ball_finder = new ColorFinder();
+    std::unique_ptr<ColorFinder> ball_finder(new ColorFinder());
     ball_finder->LoadINISettings(ini.get());
-    httpd::ball_finder = ball_finder;
 
     BallTracker tracker = BallTracker();
     BallFollower follower = BallFollower();
-
-    ColorFinder* red_finder = new ColorFinder(0, 15, 45, 0, 0.3, 50.0);
-    red_finder->LoadINISettings(ini.get(), "RED");
-    httpd::red_finder = red_finder;
-
-    ColorFinder* yellow_finder = new ColorFinder(60, 15, 45, 0, 0.3, 50.0);
-    yellow_finder->LoadINISettings(ini.get(), "YELLOW");
-    httpd::yellow_finder = yellow_finder;
-
-    ColorFinder* blue_finder = new ColorFinder(225, 15, 45, 0, 0.3, 50.0);
-    blue_finder->LoadINISettings(ini.get(), "BLUE");
-    httpd::blue_finder = blue_finder;
-
-    httpd::ini = ini.get();
-
+    
     //////////////////// Framework Initialize ////////////////////////////
     if (MotionManager::GetInstance()->Initialize(&cm730) == false) {
         linux_cm730.SetPortName(U2D_DEV_NAME1);
@@ -125,15 +109,6 @@ int main(void) {
 
     while (true) {
         StatusCheck::Check(cm730);
-
-        Point2D ball_pos, red_pos, yellow_pos, blue_pos;
-
-        if (StatusCheck::m_cur_mode != ROBOPLUS) {
-            LinuxCamera::GetInstance()->CaptureFrame();
-            memcpy(rgb_output->m_ImageData, LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageData,
-                   LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageSize);
-        }
-
 
         tracker.Process(ball_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
 

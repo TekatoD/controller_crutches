@@ -118,3 +118,43 @@ void Robot::GameController::SaveINISettings(minIni* ini, const std::string& sect
 Robot::GameController::~GameController() {
     Disconnect();
 }
+
+
+Robot::GameController::GameController(int playerNumber, int teamNumber)
+        : PlayerNumber(playerNumber),
+          TeamNumber(teamNumber) {
+    Reset();
+}
+
+
+bool Robot::GameController::Send(uint8_t message) {
+    RoboCupGameControlReturnData returnPacket;
+    returnPacket.team = (uint8_t) TeamNumber;
+    returnPacket.player = (uint8_t) PlayerNumber;
+    returnPacket.message = message;
+    return !m_Udp || m_Udp->write((const char*) &returnPacket, sizeof(returnPacket));
+}
+
+
+bool Robot::GameController::Receive() {
+    bool received = false;
+    int size;
+    RoboCupGameControlData buffer;
+    struct sockaddr_in from;
+    while (m_Udp && (size = m_Udp->read((char*) &buffer, sizeof(buffer), from)) > 0) {
+        if (size == sizeof(buffer) &&
+            !std::memcmp(&buffer, GAMECONTROLLER_STRUCT_HEADER, 4) &&
+            buffer.version == GAMECONTROLLER_STRUCT_VERSION &&
+            TeamNumber &&
+            (buffer.teams[0].teamNumber == TeamNumber ||
+             buffer.teams[1].teamNumber == TeamNumber)) {
+            GameCtrlData = buffer;
+            if (memcmp(&m_GameControllerAddress, &from.sin_addr, sizeof(in_addr))) {
+                memcpy(&m_GameControllerAddress, &from.sin_addr, sizeof(in_addr));
+                m_Udp->setTarget(inet_ntoa(m_GameControllerAddress), GAMECONTROLLER_RETURN_PORT);
+            }
+            received = true;
+        }
+    }
+    return received;
+}

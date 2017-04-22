@@ -84,6 +84,20 @@ namespace Robot {
             return (bool) m_Udp;
         }
 
+        void SendPenalise() {
+            using namespace std::chrono;
+            if (Send(GAMECONTROLLER_RETURN_MSG_MAN_PENALISE)) {
+                m_WhenPacketWasSent = steady_clock::now();
+            }
+        }
+
+        void SendUnpenalise() {
+            using namespace std::chrono;
+            if (Send(GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE)) {
+                m_WhenPacketWasSent = steady_clock::now();
+            }
+        }
+
 
     public:
         int PlayerNumber;

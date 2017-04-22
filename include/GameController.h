@@ -16,104 +16,120 @@
 #include <sys/socket.h>
 #include <cstring>
 #include <stdexcept>
+#include <iostream>
+#include <chrono>
 
-#define BUFLEN 512    //Max length of buffer
-#define PORT 3838    //The port on which to listen for incoming data
+static const int GAMECONTROLLER_TIMEOUT = 2000;
+static const int ALIVE_DELAY = 1000;
 
 namespace Robot {
     class GameController {
     public:
-        GameController() {
+        typedef std::chrono::steady_clock::time_point TimePoint;
+
+        GameController(int playerNumber = 0, int teamNumber = 0)
+                : PlayerNumber(playerNumber),
+                  TeamNumber(teamNumber) {
+            Reset();
         }
 
-        void handleOutput() {
-            unsigned now = (unsigned) proxy->getTime(0);
+        void Reset() {
+            using namespace std::chrono;
+            memset(&m_GameControllerAddress, 0, sizeof(m_GameControllerAddress));
+            memset(&GameCtrlData, 0, sizeof(GameCtrlData));
 
-            if (teamNumber && playerNumber &&
-                *playerNumber <= gameCtrlData.playersPerTeam &&
-                (gameCtrlData.teams[0].teamNumber == teamNumber ||
-                 gameCtrlData.teams[1].teamNumber == teamNumber)) {
-                const TeamInfo& team = gameCtrlData.teams[gameCtrlData.teams[0].teamNumber == teamNumber ? 0 : 1];
-                if (gameCtrlData.state != previousState ||
-                    gameCtrlData.secondaryState != previousSecondaryState ||
-                    gameCtrlData.kickOffTeam != previousKickOffTeam ||
-                    team.teamColour != previousTeamColour ||
-                    team.players[*playerNumber - 1].penalty != previousPenalty) {
-                    switch (team.teamColour) {
-                        case TEAM_BLUE:
-                            setLED(leftFootRed, 0.f, 0.f, 1.f);
-                            break;
-                        case TEAM_RED:
-                            setLED(leftFootRed, 1.f, 0.f, 0.f);
-                            break;
-                        case TEAM_YELLOW:
-                            setLED(leftFootRed, 1.f, 1.f, 0.f);
-                            break;
-                        default:
-                            setLED(leftFootRed, 0.f, 0.f, 0.f);
-                    }
+            m_WhenPacketWasReceived = steady_clock::time_point();
+            m_WhenPacketWasSent = steady_clock::time_point();
+        }
 
-                    if (gameCtrlData.state == STATE_INITIAL &&
-                        gameCtrlData.secondaryState == STATE2_PENALTYSHOOT &&
-                        gameCtrlData.kickOffTeam == team.teamNumber)
-                        setLED(rightFootRed, 0.f, 1.f, 0.f);
-                    else if (gameCtrlData.state == STATE_INITIAL &&
-                             gameCtrlData.secondaryState == STATE2_PENALTYSHOOT &&
-                             gameCtrlData.kickOffTeam != team.teamNumber)
-                        setLED(rightFootRed, 1.f, 1.0f, 0.f);
-                    else if (now - whenPacketWasReceived < GAMECONTROLLER_TIMEOUT &&
-                             gameCtrlData.state <= STATE_SET &&
-                             gameCtrlData.kickOffTeam == team.teamNumber)
-                        setLED(rightFootRed, 1.f, 1.f, 1.f);
-                    else
-                        setLED(rightFootRed, 0.f, 0.f, 0.f);
+        void Update() {
+            using namespace std::chrono;
+            TimePoint now = steady_clock::now();
 
-                    if (team.players[*playerNumber - 1].penalty != PENALTY_NONE)
-                        setLED(chestRed, 1.f, 0.f, 0.f);
-                    else
-                        switch (gameCtrlData.state) {
-                            case STATE_READY:
-                                setLED(chestRed, 0.f, 0.f, 1.f);
-                                break;
-                            case STATE_SET:
-                                setLED(chestRed, 1.f, 1.0f, 0.f);
-                                break;
-                            case STATE_PLAYING:
-                                setLED(chestRed, 0.f, 1.f, 0.f);
-                                break;
-                            default:
-                                setLED(chestRed, 0.f, 0.f, 0.f);
-                        }
+            if (Receive()) {
+                m_WhenPacketWasReceived = now;
+            }
 
-                    ledRequest[4][0] = (int) now;
-                    proxy->setAlias(ledRequest);
-
-                    previousState = gameCtrlData.state;
-                    previousSecondaryState = gameCtrlData.secondaryState;
-                    previousKickOffTeam = gameCtrlData.kickOffTeam;
-                    previousTeamColour = team.teamColour;
-                    previousPenalty = team.players[*playerNumber - 1].penalty;
-                }
-
-                if (now - whenPacketWasReceived < GAMECONTROLLER_TIMEOUT &&
-                    now - whenPacketWasSent >= ALIVE_DELAY &&
-                    send(GAMECONTROLLER_RETURN_MSG_ALIVE))
-                    whenPacketWasSent = now;
+            if (now - m_WhenPacketWasReceived < milliseconds(GAMECONTROLLER_TIMEOUT) &&
+                    now - m_WhenPacketWasSent >= milliseconds(ALIVE_DELAY) &&
+                    Send(GAMECONTROLLER_RETURN_MSG_ALIVE)) {
+                m_WhenPacketWasSent = now;
             }
         }
 
+        bool GameControllerNotResponding() const noexcept {
+            using namespace std::chrono;
+            TimePoint now = steady_clock::now();
+            return now - m_WhenPacketWasReceived < milliseconds(GAMECONTROLLER_TIMEOUT);
+        }
+
+
+        void Connect() {
+            if (m_Udp) return;
+            m_Udp = std::make_unique<UdpComm>();
+            if (!m_Udp->setBlocking(false) ||
+                    !m_Udp->setBroadcast(true) ||
+                    !m_Udp->bind("0.0.0.0", GAMECONTROLLER_DATA_PORT) ||
+                    !m_Udp->setLoopback(false)) {
+                m_Udp.release();
+                std::cerr << "ERROR: Can't open UPD port!" << std::endl;
+            }
+        }
+
+        void Disconnect() {
+            if (m_Udp) m_Udp.release();
+        }
+
+        bool Connected() const noexcept {
+            return (bool) m_Udp;
+        }
+
+
     public:
-        int m_number_player;
+        int PlayerNumber;
+        int TeamNumber;
+        RoboCupGameControlData GameCtrlData;
+
 
     private:
-        UdpComm m_comm;
-        int playerNumber;
-        int teamNumberPtr;
-        int defaultTeamColour;
-        in_addr gameControllerAddress;
-        int teamNumber;
-        RoboCupGameControlData gameCtrlData;
-        
+        bool Send(uint8_t message) {
+            RoboCupGameControlReturnData returnPacket;
+            returnPacket.team = (uint8_t) TeamNumber;
+            returnPacket.player = (uint8_t) PlayerNumber;
+            returnPacket.message = message;
+            return !m_Udp || m_Udp->write((const char*) &returnPacket, sizeof(returnPacket));
+        }
+
+        bool Receive() {
+            bool received = false;
+            int size;
+            RoboCupGameControlData buffer;
+            struct sockaddr_in from;
+            while (m_Udp && (size = m_Udp->read((char*) &buffer, sizeof(buffer), from)) > 0) {
+                if (size == sizeof(buffer) &&
+                    !std::memcmp(&buffer, GAMECONTROLLER_STRUCT_HEADER, 4) &&
+                    buffer.version == GAMECONTROLLER_STRUCT_VERSION &&
+                    TeamNumber &&
+                    (buffer.teams[0].teamNumber == TeamNumber ||
+                     buffer.teams[1].teamNumber == TeamNumber)) {
+                    GameCtrlData = buffer;
+                    if (memcmp(&m_GameControllerAddress, &from.sin_addr, sizeof(in_addr))) {
+                        memcpy(&m_GameControllerAddress, &from.sin_addr, sizeof(in_addr));
+                        m_Udp->setTarget(inet_ntoa(m_GameControllerAddress), GAMECONTROLLER_RETURN_PORT);
+                    }
+                    received = true;
+                }
+            }
+            return received;
+        }
+
+
+    private:
+        std::unique_ptr<UdpComm> m_Udp;
+        in_addr m_GameControllerAddress;
+        TimePoint m_WhenPacketWasReceived;
+        TimePoint m_WhenPacketWasSent;
+
     };
 }
 

@@ -29,18 +29,15 @@ set(SRC
         include/LinuxMotionTimer.h
         include/Matrix.h
         include/minIni.h
-        include/mjpg_streamer.h
         include/MotionManager.h
         include/MotionModule.h
         include/MotionStatus.h
         include/MX28.h
-        include/Plane.h
         include/Point.h
         include/StatusCheck.h
         include/Vector.h
         include/Walking.h
         src/math/Matrix.cpp
-        src/math/Plane.cpp
         src/math/Point.cpp
         src/math/Vector.cpp
         include/minIni/minGlue.h
@@ -65,7 +62,14 @@ set(SRC
         src/main.cpp
         src/MX28.cpp
         src/StatusCheck.cpp
-        )
+
+        include/gamecontroller/RoboCupGameControlData.h
+        include/gamecontroller/SPLCoachMessage.h
+        include/gamecontroller/SPLStandardMessage.h
+        src/GameController.cpp include/GameController.h
+
+        include/UdpComm.h
+        src/UdpComm.cpp)
 
 add_executable(soccer ${SRC})
 target_link_libraries(soccer

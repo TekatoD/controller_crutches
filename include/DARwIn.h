@@ -1,6 +1,6 @@
 /*
  *   DARwIn.h
- *   TODO: François: this file seems to be included if you want to use the robot
+ *   TODO: Franï¿½ois: this file seems to be included if you want to use the robot
  This file is crazy!
  *   Author: ROBOTIS
  *
@@ -28,7 +28,6 @@
 #include "Point.h"
 #include "Vector.h"
 #include "Matrix.h"
-#include "Plane.h"
 #include "minIni.h"
 
 #endif

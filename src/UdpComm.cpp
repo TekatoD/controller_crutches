@@ -8,30 +8,26 @@
 
 #include <iostream>
 #include <cassert>
-#include <cerrno>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <netdb.h>
 #include <cstring>
-#include <net/if.h>
 #include <ifaddrs.h>
-#include <string>
+
 
 UdpComm::UdpComm()
-        : sock(socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)),
+        : m_sock(socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)),
           target((struct sockaddr*) (new struct sockaddr_in)) {
-    assert(sock != -1);
+    assert(m_sock != -1);
 }
 
+
 UdpComm::~UdpComm() {
-    close(sock);
+    close(m_sock);
 }
+
 
 bool UdpComm::resolve(const char* addrStr, int port, struct sockaddr_in* addr) {
     memset(addr, 0, sizeof(struct sockaddr_in));
@@ -45,30 +41,34 @@ bool UdpComm::resolve(const char* addrStr, int port, struct sockaddr_in* addr) {
     return true;
 }
 
+
 bool UdpComm::setTarget(const char* addrStr, int port) {
-    struct sockaddr_in* addr = (struct sockaddr_in*) target;
+    struct sockaddr_in* addr = (struct sockaddr_in*) target.get();
     return resolve(addrStr, port, addr);
 }
 
+
 bool UdpComm::setBlocking(bool block) {
     if (block)
-        return fcntl(sock, F_SETFL, 0) != -1;
+        return fcntl(m_sock, F_SETFL, 0) != -1;
     else
-        return fcntl(sock, F_SETFL, O_NONBLOCK) != -1;
+        return fcntl(m_sock, F_SETFL, O_NONBLOCK) != -1;
 }
+
 
 bool UdpComm::setLoopback(bool yesno) {
     char val = yesno ? 1 : 0;
-    if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_LOOP, &val, sizeof(char)) < 0) {
+    if (setsockopt(m_sock, IPPROTO_IP, IP_MULTICAST_LOOP, &val, sizeof(char)) < 0) {
         std::cerr << "could not set ip_multicast_loop to " << val << std::endl;
         return false;
     }
     return true;
 }
 
+
 bool UdpComm::setBroadcast(bool enable) {
     int yes = enable ? 1 : 0;
-    if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST,
+    if (setsockopt(m_sock, SOL_SOCKET, SO_BROADCAST,
                    (const char*) &yes, sizeof(yes)) == 0)
         return true;
     else {
@@ -76,6 +76,7 @@ bool UdpComm::setBroadcast(bool enable) {
         return false;
     }
 }
+
 
 bool UdpComm::bind(const char* addr_str, int port) {
     static const int yes = 1;
@@ -90,34 +91,38 @@ bool UdpComm::bind(const char* addr_str, int port) {
     }
 
 #ifdef SO_REUSEADDR
-    if (-1 == setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char*) &yes, sizeof(yes)))
+    if (-1 == setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR, (const char*) &yes, sizeof(yes)))
         std::cerr << "UdpComm: could not set SO_REUSEADDR" << std::endl;
 #endif
 #ifdef SO_REUSEPORT
-    if (-1 == setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, (const char*) &yes, sizeof(yes)))
+    if (-1 == setsockopt(m_sock, SOL_SOCKET, SO_REUSEPORT, (const char*) &yes, sizeof(yes)))
         std::cerr << "UdpComm: could not set SO_REUSEPORT" << std::endl;
 #endif
-    if (-1 == ::bind(sock, (struct sockaddr*) &addr, sizeof(struct sockaddr_in))) {
-        std::cout << "UdpComm::bind() failed: " << strerror(errno) << std::endl;
+    if (-1 == ::bind(m_sock, (struct sockaddr*) &addr, sizeof(struct sockaddr_in))) {
+        std::cerr << "UdpComm: bind failed: " << strerror(errno) << std::endl;
         return false;
     }
 
     return true;
 }
 
+
 int UdpComm::read(char* data, int len) {
-    return ::recv(sock, data, len, 0);
+    return ::recv(m_sock, data, len, 0);
 }
+
 
 int UdpComm::read(char* data, int len, sockaddr_in& from) {
     socklen_t fromLen = sizeof(from);
-    return ::recvfrom(sock, data, len, 0, (sockaddr*) &from, &fromLen);
+    return ::recvfrom(m_sock, data, len, 0, (sockaddr*) &from, &fromLen);
 }
 
+
 bool UdpComm::write(const char* data, const int len) {
-    return ::sendto(sock, data, len, 0,
-                    target, sizeof(struct sockaddr_in)) == len;
+    return ::sendto(m_sock, data, len, 0,
+                    target.get(), sizeof(struct sockaddr_in)) == len;
 }
+
 
 const char* UdpComm::getWifiBroadcastAddress() {
     struct ifaddrs* ifAddrStruct = nullptr;

@@ -81,7 +81,7 @@ public:
 
 private:
   struct std::unique_ptr<sockaddr> target;
-  int sock;
+  int m_sock;
 
   bool resolve(const char*, int, struct sockaddr_in*);
 };

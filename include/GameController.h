@@ -10,14 +10,16 @@
 #include "gamecontroller/SPLStandardMessage.h"
 #include "gamecontroller/SPLCoachMessage.h"
 #include "UdpComm.h"
-#include <stdio.h>
+#include "minIni.h"
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <cstring>
 #include <stdexcept>
-#include <iostream>
 #include <chrono>
+
+#define GAME_CONTROLLER_SECTION   "Game Controller"
+#define INVALID_VALUE   -1024.0
 
 static const int GAMECONTROLLER_TIMEOUT = 2000;
 static const int ALIVE_DELAY = 1000;
@@ -27,76 +29,44 @@ namespace Robot {
     public:
         typedef std::chrono::steady_clock::time_point TimePoint;
 
-        GameController(int playerNumber = 0, int teamNumber = 0)
-                : PlayerNumber(playerNumber),
-                  TeamNumber(teamNumber) {
-            Reset();
-        }
 
-        void Reset() {
-            using namespace std::chrono;
-            memset(&m_GameControllerAddress, 0, sizeof(m_GameControllerAddress));
-            memset(&GameCtrlData, 0, sizeof(GameCtrlData));
-
-            m_WhenPacketWasReceived = steady_clock::time_point();
-            m_WhenPacketWasSent = steady_clock::time_point();
-        }
-
-        void Update() {
-            using namespace std::chrono;
-            TimePoint now = steady_clock::now();
-
-            if (Receive()) {
-                m_WhenPacketWasReceived = now;
-            }
-
-            if (now - m_WhenPacketWasReceived < milliseconds(GAMECONTROLLER_TIMEOUT) &&
-                    now - m_WhenPacketWasSent >= milliseconds(ALIVE_DELAY) &&
-                    Send(GAMECONTROLLER_RETURN_MSG_ALIVE)) {
-                m_WhenPacketWasSent = now;
-            }
-        }
-
-        bool GameControllerNotResponding() const noexcept {
-            using namespace std::chrono;
-            TimePoint now = steady_clock::now();
-            return now - m_WhenPacketWasReceived < milliseconds(GAMECONTROLLER_TIMEOUT);
-        }
+        static GameController* GetInstance();
 
 
-        void Connect() {
-            if (m_Udp) return;
-            m_Udp = std::make_unique<UdpComm>();
-            if (!m_Udp->setBlocking(false) ||
-                    !m_Udp->setBroadcast(true) ||
-                    !m_Udp->bind("0.0.0.0", GAMECONTROLLER_DATA_PORT) ||
-                    !m_Udp->setLoopback(false)) {
-                m_Udp.release();
-                std::cerr << "ERROR: Can't open UPD port!" << std::endl;
-            }
-        }
+        void Reset();
 
-        void Disconnect() {
-            if (m_Udp) m_Udp.release();
-        }
+        void Update();
 
-        bool Connected() const noexcept {
-            return (bool) m_Udp;
-        }
 
-        void SendPenalise() {
-            using namespace std::chrono;
-            if (Send(GAMECONTROLLER_RETURN_MSG_MAN_PENALISE)) {
-                m_WhenPacketWasSent = steady_clock::now();
-            }
-        }
+        bool GameControllerNotResponding() const noexcept;
 
-        void SendUnpenalise() {
-            using namespace std::chrono;
-            if (Send(GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE)) {
-                m_WhenPacketWasSent = steady_clock::now();
-            }
-        }
+
+        bool Connect();
+
+        void Disconnect();
+
+        bool Connected() const noexcept;
+
+        void SendPenalise();
+
+        void SendUnpenalise();
+
+        void SendAlive();
+
+
+        void LoadINISettings(minIni* ini);
+
+
+        void LoadINISettings(minIni* ini, const std::string& section);
+
+
+        void SaveINISettings(minIni* ini);
+
+
+        void SaveINISettings(minIni* ini, const std::string& section);
+
+
+        ~GameController();
 
 
     public:
@@ -104,8 +74,14 @@ namespace Robot {
         int TeamNumber;
         RoboCupGameControlData GameCtrlData;
 
-
     private:
+        GameController(int playerNumber = 0, int teamNumber = 0)
+                : PlayerNumber(playerNumber),
+                  TeamNumber(teamNumber) {
+            Reset();
+        }
+
+
         bool Send(uint8_t message) {
             RoboCupGameControlReturnData returnPacket;
             returnPacket.team = (uint8_t) TeamNumber;

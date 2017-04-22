@@ -10,6 +10,8 @@
 #include <libgen.h>
 #include <signal.h>
 #include <memory>
+#include <chrono>
+#include <GameController.h>
 
 #include "LinuxDARwIn.h"
 
@@ -52,26 +54,24 @@ int main(void) {
 
     change_current_dir();
 
-    std::unique_ptr<minIni> ini(new minIni(INI_FILE_PATH));
-
-    std::unique_ptr<Image> rgb_output(new Image(Camera::WIDTH, Camera::HEIGHT, Image::RGB_PIXEL_SIZE));
+    auto ini = std::make_unique<minIni>(INI_FILE_PATH);
 
     LinuxCamera::GetInstance()->Initialize(0);
     LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
     LinuxCamera::GetInstance()->LoadINISettings(ini.get());                   // load from ini
 
-    std::unique_ptr<ColorFinder> ball_finder(new ColorFinder());
+    auto ball_finder = std::make_unique<ColorFinder>();
     ball_finder->LoadINISettings(ini.get());
 
     BallTracker tracker = BallTracker();
     BallFollower follower = BallFollower();
 
-    //////////////////// Framework Initialize ////////////////////////////
-    if (MotionManager::GetInstance()->Initialize(&cm730) == false) {
+    //////////////////// Framework Initialize ///////////////////////////
+    if (!MotionManager::GetInstance()->Initialize(&cm730)) {
         linux_cm730.SetPortName(U2D_DEV_NAME1);
-        if (MotionManager::GetInstance()->Initialize(&cm730) == false) {
-            printf("Fail to initialize Motion Manager!\n");
-            return 0;
+        if (!MotionManager::GetInstance()->Initialize(&cm730)) {
+            std::cerr << "Fail to initialize Motion Manager!" << std::endl;
+            return 1;
         }
     }
 
@@ -81,7 +81,7 @@ int main(void) {
     MotionManager::GetInstance()->AddModule((MotionModule*) Head::GetInstance());
     MotionManager::GetInstance()->AddModule((MotionModule*) Walking::GetInstance());
 
-    LinuxMotionTimer* motion_timer = new LinuxMotionTimer(MotionManager::GetInstance());
+    auto motion_timer = std::make_unique<LinuxMotionTimer>(MotionManager::GetInstance());
     motion_timer->Start();
     /////////////////////////////////////////////////////////////////////
 
@@ -89,18 +89,31 @@ int main(void) {
 
     int firm_ver = 0;
     if (cm730.ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0) != CM730::SUCCESS) {
-        fprintf(stderr, "Can't read firmware version from Dynamixel ID %d!! \n\n", JointData::ID_HEAD_PAN);
-        exit(0);
+        std::cerr << "Can't read firmware version from Dynamixel ID " << JointData::ID_HEAD_PAN << "!!\n" << std::endl;
+        return 1;
     }
 
     if (0 < firm_ver && firm_ver < 27) {
-        fprintf(stderr, "MX-28's firmware is not support 4096 resolution!! \n");
-        fprintf(stderr, "Upgrade MX-28's firmware to version 27(0x1B) or higher.\n\n");
-        exit(0);
+        std::cerr << "MX-28's firmware is not support 4096 resolution!! \n"
+                  << "Upgrade MX-28's firmware to version 27(0x1B) or higher.\n"
+                  << std::endl;
+        return 1;
     } else if (27 <= firm_ver) {
         Action::GetInstance()->LoadFile((char*) MOTION_FILE_PATH);
-    } else
+    } else {
+        return 1;
+    }
+
+
+    ///////////////////// Init game controller //////////////////////////
+
+    GameController::GetInstance()->LoadINISettings(ini.get());
+    if (!GameController::GetInstance()->Connect()) {
+        std::cerr << "ERROR: Can't connect to game controller!" << std::endl;
         exit(0);
+    }
+
+    /////////////////////////////////////////////////////////////////////
 
     Action::GetInstance()->m_Joint.SetEnableBody(true, true);
     MotionManager::GetInstance()->SetEnable(true);
@@ -111,42 +124,39 @@ int main(void) {
     while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 
     while (!finish) {
+        // Update game controller
+        GameController::GetInstance()->Update();
+
+        // Update state machine
         StatusCheck::Check(cm730);
 
-        if (StatusCheck::m_is_started == 0)
+        if (StatusCheck::m_is_started == 0) {
             continue;
+        }
 
+        // Update CV
         LinuxCamera::GetInstance()->CaptureFrame();
-        memcpy(rgb_output->m_ImageData, LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageData,
-               LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageSize);
-
         tracker.Process(ball_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
 
         if (Action::GetInstance()->IsRunning() == 0) {
+            // Switch to head and walking after action
             Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-
+            // Follow the ball
             follower.Process(tracker.ball_position);
             if (follower.KickBall != 0) {
                 Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
                 Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-
+                // Kick the ball
                 if (follower.KickBall == -1) {
                     Action::GetInstance()->Start(12);   // RIGHT KICK
-                    fprintf(stderr, "RightKick! \n");
                 } else if (follower.KickBall == 1) {
                     Action::GetInstance()->Start(13);   // LEFT KICK
-                    fprintf(stderr, "LeftKick! \n");
                 }
             }
         }
-//        std::cerr << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_GYRO_X_L) << " "
-//                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_GYRO_Y_L) << " "
-//                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_GYRO_Z_L) << " "
-//                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_ACCEL_X_L) << " "
-//                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_ACCEL_Y_L) << " "
-//                  << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_ACCEL_Z_L) << std::endl;
     }
+
 
     return 0;
 }

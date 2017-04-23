@@ -3,9 +3,12 @@ project(darwin-soccer)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(Boost_USE_STATIC_LIBS ON)
 
+find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED)
+find_package(OpenCV REQUIRED)
 
 include_directories(include/)
 
@@ -65,13 +68,34 @@ set(SRC
         src/main.cpp
         src/MX28.cpp
         src/StatusCheck.cpp
+        src/detectors/AngleDetector.cpp
+        src/detectors/BallDetector.cpp
+        src/detectors/BaseDetector.cpp
+        src/detectors/FieldDetector.cpp
+        src/detectors/LineDetector.cpp
+        src/BaseModule.cpp
+        src/Vision.cpp
+        src/VisionUtils.cpp
+        include/BaseModule.h
+        include/Vision.h
+        include/VisionUtils.h
+        include/detectors/AngleDetector.h
+        include/detectors/BallDetector.h
+        include/detectors/BaseDetector.h
+        include/detectors/FieldDetector.h
+        include/detectors/LineDetector.h
         )
 
 add_executable(soccer ${SRC})
+
 target_link_libraries(soccer
         ${CMAKE_SOURCE_DIR}/lib/darwin.a
         ${CMAKE_THREAD_LIBS_INIT}
         ${JPEG_LIBRARIES}
+        ${Boost_LIBRARIES}
+        ${OpenCV_LIBS}
         dl)
 target_include_directories(soccer PUBLIC
-        ${JPEG_INCLUDE_DIR})
+        ${JPEG_INCLUDE_DIR}
+        ${Boost_INCLUDE_DIRS}
+        ${OpenCV_INCLUDE_DIRS})

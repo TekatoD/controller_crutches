@@ -14,6 +14,9 @@
 #include "LinuxDARwIn.h"
 
 #include "StatusCheck.h"
+#include <opencv2/opencv.hpp>
+#include <Vision.h>
+#include <VisionUtils.h>
 
 #define MOTION_FILE_PATH    "res/motion_4096.bin"
 #define INI_FILE_PATH       "res/config.ini"
@@ -22,6 +25,7 @@
 #define U2D_DEV_NAME1       "/dev/ttyUSB1"
 
 using namespace Robot;
+using namespace ant;
 
 LinuxCM730 linux_cm730(U2D_DEV_NAME0);
 CM730 cm730(&linux_cm730);
@@ -56,9 +60,10 @@ int main(void) {
 
     std::unique_ptr<Image> rgb_output(new Image(Camera::WIDTH, Camera::HEIGHT, Image::RGB_PIXEL_SIZE));
 
-    LinuxCamera::GetInstance()->Initialize(0);
-    LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
-    LinuxCamera::GetInstance()->LoadINISettings(ini.get());                   // load from ini
+//    I think it won't need in future
+//    LinuxCamera::GetInstance()->Initialize(0);
+//    LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
+//    LinuxCamera::GetInstance()->LoadINISettings(ini.get());                   // load from ini
 
     std::unique_ptr<ColorFinder> ball_finder(new ColorFinder());
     ball_finder->LoadINISettings(ini.get());
@@ -99,9 +104,9 @@ int main(void) {
         exit(0);
     } else if (27 <= firm_ver) {
         Action::GetInstance()->LoadFile((char*) MOTION_FILE_PATH);
-    } else
+    } else {
         exit(0);
-
+    }
     Action::GetInstance()->m_Joint.SetEnableBody(true, true);
     MotionManager::GetInstance()->SetEnable(true);
 
@@ -110,15 +115,26 @@ int main(void) {
     Action::GetInstance()->Start(15);
     while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 
+    Vision vision("../res/vision.json"); // config vision
+    cv::VideoCapture cap(0);
+    cv::Mat frame;
     while (!finish) {
         StatusCheck::Check(cm730);
 
         if (StatusCheck::m_is_started == 0)
             continue;
 
-        LinuxCamera::GetInstance()->CaptureFrame();
-        memcpy(rgb_output->m_ImageData, LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageData,
-               LinuxCamera::GetInstance()->fbuffer->m_RGBFrame->m_ImageSize);
+        cap >> frame;
+
+        ant::vision_utils::rot90(frame,0); // free rotation 0, 90, 180 degrees in case of revert camera
+
+        if(frame.empty()) continue;
+        vision.setFrame(std::move(frame));
+
+        cv::Mat field = vision.fieldDetect(); // 1 color mask of field
+        std::vector<cv::Vec4i> lines = vision.lineDetect(); // lines line(0) line(1) - x0,y0;line(2) line(3) - x1,y1
+        cv::Rect ball = vision.ballDetect(); // rect with ball inside
+        std::vector<cv::Vec3d> angles = vision.angleDetect(); // angle(0) - x, angle(1) - y, angle(2) - angle value
 
         tracker.Process(ball_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
 

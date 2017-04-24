@@ -37,7 +37,7 @@ void Robot::GameController::Update() {
 }
 
 
-bool Robot::GameController::GameControllerNotResponding() const {
+bool Robot::GameController::GameControllerNotResponding() const noexcept {
     using namespace std::chrono;
     TimePoint now = steady_clock::now();
     return now - m_WhenPacketWasReceived < milliseconds(GAMECONTROLLER_TIMEOUT);
@@ -63,7 +63,7 @@ void Robot::GameController::Disconnect() {
 }
 
 
-bool Robot::GameController::Connected() const {
+bool Robot::GameController::Connected() const noexcept {
     return (bool) m_Udp;
 }
 

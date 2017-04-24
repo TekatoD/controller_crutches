@@ -69,7 +69,7 @@ set(SRC
         src/GameController.cpp include/GameController.h
 
         include/UdpComm.h
-        src/UdpComm.cpp)
+        src/UdpComm.cpp src/Speech.cpp include/Speech.h)
 
 add_executable(soccer ${SRC})
 target_link_libraries(soccer

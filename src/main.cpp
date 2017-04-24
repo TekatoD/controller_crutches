@@ -11,7 +11,9 @@
 #include <signal.h>
 #include <memory>
 #include <chrono>
+
 #include <GameController.h>
+#include <Speech.h>
 
 #include "LinuxDARwIn.h"
 
@@ -110,10 +112,21 @@ int main(void) {
     GameController::GetInstance()->LoadINISettings(ini.get());
     if (!GameController::GetInstance()->Connect()) {
         std::cerr << "ERROR: Can't connect to game controller!" << std::endl;
-        exit(0);
+        return 1;
     }
 
     /////////////////////////////////////////////////////////////////////
+
+
+
+    ///////////////////////// Init speech ///////////////////////////////
+    if (!Speech::GetInstance()->Start()) {
+        std::cerr << "ERROR: Can't start speech module!" << std::endl;
+        return 1;
+    }
+    /////////////////////////////////////////////////////////////////////
+
+
 
     Action::GetInstance()->m_Joint.SetEnableBody(true, true);
     MotionManager::GetInstance()->SetEnable(true);

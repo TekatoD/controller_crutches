@@ -29,7 +29,6 @@ namespace Robot {
         };
 
     private:
-        static std::unique_ptr<Walking> m_UniqueInstance;
 
         double m_PeriodTime;
         double m_DSP_Ratio;
@@ -147,7 +146,10 @@ namespace Robot {
 
         virtual ~Walking();
 
-        static Walking* GetInstance() { return m_UniqueInstance.get(); }
+        static Walking* GetInstance() {
+            static Walking walking;
+            return &walking;
+        }
 
         void Initialize();
 

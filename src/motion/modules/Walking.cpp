@@ -5,6 +5,7 @@
  *
  */
 #include <math.h>
+#include <iostream>
 #include "Vector.h"
 #include "Matrix.h"
 #include "MX28.h"
@@ -17,7 +18,6 @@ using namespace Robot;
 
 #define PI (3.14159265)
 
-std::unique_ptr<Walking> Walking::m_UniqueInstance = new Walking();
 
 
 Walking::Walking() {
@@ -607,13 +607,13 @@ void Walking::Process() {
     for (int i = 0; i < 14; i++) {
         offset = (double) dir[i] * angle[i] * MX28::RATIO_ANGLE2VALUE;
         if (i == 1) // R_HIP_ROLL
-            offset += (double) dir[i] * (pelvis_offset_r + HIP_PITCH_OFFSET * sin(ep[3]) * MX28::RATIO_ANGLE2VALUE);
+            offset += (double) dir[i] * (pelvis_offset_r - HIP_PITCH_OFFSET * sin(ep[5]) * MX28::RATIO_ANGLE2VALUE);
         else if (i == 7) // L_HIP_ROLL
-            offset += (double) dir[i] * (pelvis_offset_l + HIP_PITCH_OFFSET * sin(ep[9]) * MX28::RATIO_ANGLE2VALUE);
+            offset += (double) dir[i] * (pelvis_offset_l - HIP_PITCH_OFFSET * sin(ep[11]) * MX28::RATIO_ANGLE2VALUE);
         else if (i == 2) // R_HIP_PITCH
-            offset -= (double) dir[i] * HIP_PITCH_OFFSET * cos(ep[3]) * MX28::RATIO_ANGLE2VALUE;
+            offset -= (double) dir[i] * HIP_PITCH_OFFSET * cos(ep[5]) * MX28::RATIO_ANGLE2VALUE;
         else if (i == 8) // L_HIP_PITCH
-            offset -= (double) dir[i] * HIP_PITCH_OFFSET * cos(ep[9]) * MX28::RATIO_ANGLE2VALUE;
+            offset -= (double) dir[i] * HIP_PITCH_OFFSET * cos(ep[11]) * MX28::RATIO_ANGLE2VALUE;
 
         outValue[i] = MX28::Angle2Value(initAngle[i]) + (int) offset;
     }

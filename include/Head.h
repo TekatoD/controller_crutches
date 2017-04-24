@@ -22,7 +22,6 @@ namespace Robot {
     class Head
             : public MotionModule {
     private:
-        static std::unique_ptr<Head> m_UniqueInstance;
         double m_LeftLimit;
         double m_RightLimit;
         double m_TopLimit;
@@ -45,7 +44,10 @@ namespace Robot {
         void CheckLimit();
 
     public:
-        static Head* GetInstance() { return m_UniqueInstance.get(); }
+        static Head* GetInstance() {
+            static Head head;
+            return &head;
+        }
 
         ~Head();
 

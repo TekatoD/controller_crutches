@@ -13,7 +13,6 @@
 using namespace Robot;
 
 /*initialization of the head*/
-std::unique_ptr<Head> Head::m_UniqueInstance = new Head();
 
 
 Head::Head() {

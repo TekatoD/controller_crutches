@@ -13,7 +13,6 @@
 using namespace Robot;
 
 
-std::unique_ptr<Action> Action::m_UniqueInstance = new Action();
 
 
 Action::Action() {

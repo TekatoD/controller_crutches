@@ -44,7 +44,9 @@ set(SRC
         src/minIni/minIni.c
         include/minIni/minIni.h
         include/minIni/wxMinIni.h
-        src/motion/modules
+        src/motion/modules/Walking.cpp
+        src/motion/modules/Head.cpp
+        src/motion/modules/Action.cpp
         src/motion/JointData.cpp
         src/motion/Kinematics.cpp
         src/motion/MotionManager.cpp
@@ -73,7 +75,7 @@ set(SRC
 
 add_executable(soccer ${SRC})
 target_link_libraries(soccer
-        ${CMAKE_SOURCE_DIR}/lib/darwin.a
+#        ${CMAKE_SOURCE_DIR}/lib/darwin.a
         ${CMAKE_THREAD_LIBS_INIT}
         ${JPEG_LIBRARIES}
         dl)

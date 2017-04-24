@@ -120,10 +120,10 @@ int main(void) {
 
 
     ///////////////////////// Init speech ///////////////////////////////
-    if (!Speech::GetInstance()->Start()) {
-        std::cerr << "ERROR: Can't start speech module!" << std::endl;
-        return 1;
-    }
+//    if (!Speech::GetInstance()->Start()) {
+//        std::cerr << "ERROR: Can't start speech module!" << std::endl;
+//        return 1;
+//    }
     /////////////////////////////////////////////////////////////////////
 
 

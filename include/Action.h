@@ -68,7 +68,6 @@ namespace Robot {
         } PAGE;
 
     private:
-        static std::unique_ptr<Action> m_UniqueInstance;
         FILE* m_ActionFile;
         PAGE m_PlayPage;
         PAGE m_NextPlayPage;
@@ -92,7 +91,10 @@ namespace Robot {
 
         ~Action();
 
-        static Action* GetInstance() { return m_UniqueInstance.get(); }
+        static Action* GetInstance() {
+                static Action action;
+                return &action;
+        }
 
         void Initialize();
 

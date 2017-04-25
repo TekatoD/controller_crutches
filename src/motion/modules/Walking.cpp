@@ -51,6 +51,17 @@ Walking::Walking() {
     A_MOVE_AIM_ON = false;
     BALANCE_ENABLE = true;
 
+    m_odo_x = 0.0;
+    m_odo_y = 0.0;
+    m_odo_z = 0.0;
+    m_odo_theta = 0.0;
+    m_odo_x_r = 0.0;
+    m_odo_y_r = 0.0;
+    m_odo_z_r = 0.0;
+    m_odo_theta_r = 0.0;
+    write = false;
+    write_both = false;
+
     m_Joint.SetAngle(JointData::ID_R_SHOULDER_PITCH, -48.345);
     m_Joint.SetAngle(JointData::ID_L_SHOULDER_PITCH, 41.313);
     m_Joint.SetAngle(JointData::ID_R_SHOULDER_ROLL, -17.873);
@@ -362,6 +373,9 @@ void Walking::Process() {
     int dir[14] = {-1, -1, 1, 1, -1, 1, -1, -1, -1, -1, 1, 1, 1, -1};
     double initAngle[14] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -48.345, 41.313};
     int outValue[14];
+    bool left = false;
+    bool right = false;
+    write_both = false;
 
     // Update walk parameters
     if (m_Time == 0) {
@@ -464,6 +478,7 @@ void Walking::Process() {
         pelvis_offset_r = wsin(m_Time, m_Z_Move_PeriodTime,
                                m_Z_Move_Phase_Shift + 2 * PI / m_Z_Move_PeriodTime * m_SSP_Time_Start_L,
                                -m_Pelvis_Offset / 2, -m_Pelvis_Offset / 2);
+        left = true;
     } else if (m_Time <= m_SSP_Time_Start_R) {
         x_move_l = wsin(m_SSP_Time_End_L, m_X_Move_PeriodTime,
                         m_X_Move_Phase_Shift + 2 * PI / m_X_Move_PeriodTime * m_SSP_Time_Start_L, m_X_Move_Amplitude,
@@ -522,6 +537,7 @@ void Walking::Process() {
         pelvis_offset_r = wsin(m_Time, m_Z_Move_PeriodTime,
                                m_Z_Move_Phase_Shift + 2 * PI / m_Z_Move_PeriodTime * m_SSP_Time_Start_R,
                                -m_Pelvis_Swing / 2, -m_Pelvis_Swing / 2);
+        right = true;
     } else {
         x_move_l = wsin(m_SSP_Time_End_R, m_X_Move_PeriodTime,
                         m_X_Move_Phase_Shift + 2 * PI / m_X_Move_PeriodTime * m_SSP_Time_Start_R + PI,
@@ -549,6 +565,7 @@ void Walking::Process() {
                         -m_A_Move_Amplitude, -m_A_Move_Amplitude_Shift);
         pelvis_offset_l = 0;
         pelvis_offset_r = 0;
+        write_both = true;
     }
 
     a_move_l = 0;
@@ -568,6 +585,55 @@ void Walking::Process() {
     ep[9] = a_swap + a_move_l + m_R_Offset / 2;
     ep[10] = b_swap + b_move_l + m_P_Offset;
     ep[11] = c_swap + c_move_l + m_A_Offset / 2;
+
+    if(left) {
+//        std::ofstream out;
+//        out.open("odo.txt", std::ios::app);
+//        double dst = hypot(-ep[6], -ep[7]);
+//        double anngle = atan2(-ep[7], -ep[6]);
+//        m_odo_x += cos(m_odo_theta - anngle) * dst / 1.5;
+//        m_odo_y += sin(m_odo_theta - anngle) * dst;
+//        m_odo_z -= ep[8];
+//        m_odo_theta -= ep[11];
+//        out << m_odo_x << " " << m_odo_y << " " << m_odo_z << " " << m_odo_theta << std::endl;
+        m_odo_x = ep[6];
+        m_odo_y = ep[7];
+        m_odo_z = ep[8];
+        m_odo_theta = ep[11];
+        write = true;
+//        out.close();
+    }
+    else if(right) {
+//        std::ofstream out;
+//        out.open("odo.txt", std::ios::app);
+//        double dst = hypot(-ep[0], ep[1]);
+//        double anngle = atan2(ep[1], -ep[0]);
+//        m_odo_x += cos(m_odo_theta - anngle) * dst / 1.5;
+//        m_odo_y -= sin(m_odo_theta + anngle) * dst;
+//        m_odo_z -= ep[2];
+//        m_odo_theta -= ep[5];
+//        out << m_odo_x << " " << m_odo_y << " " << m_odo_z << " " << m_odo_theta << std::endl;
+        m_odo_x = ep[6];
+        m_odo_y = ep[7];
+        m_odo_z = ep[8];
+        m_odo_theta = ep[11];
+        write = true;
+//        out.close();
+    }
+    else if(write_both) {
+        m_odo_x = ep[0];
+        m_odo_y = ep[1];
+        m_odo_z = ep[2];
+        m_odo_theta = ep[5];
+        m_odo_x_r = ep[0];
+        m_odo_y_r = ep[1];
+        m_odo_z_r = ep[2];
+        m_odo_theta_r = ep[5];
+    }
+    else {
+        write = false;
+        write_both = false;
+    }
 
     // Compute body swing
     if (m_Time <= m_SSP_Time_End_L) {

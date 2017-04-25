@@ -139,16 +139,26 @@ namespace Robot {
         double m_odo_y;
         double m_odo_z;
         double m_odo_theta;
-        double m_odo_x_r;
-        double m_odo_y_r;
-        double m_odo_z_r;
-        double m_odo_theta_r;
-        bool write;
-        bool write_both;
+
+        double m_left_odo_x;
+        double m_left_odo_y;
+        double m_left_odo_z;
+        double m_left_odo_theta;
+
+
+        double m_right_odo_x;
+        double m_right_odo_y;
+        double m_right_odo_z;
+        double m_right_odo_theta;
 
         int P_GAIN;
         int I_GAIN;
         int D_GAIN;
+
+        bool m_left_end;
+        bool m_right_end;
+        bool m_left_start;
+        bool m_right_start;
 
         int GetCurrentPhase() { return m_Phase; }
 
@@ -180,19 +190,6 @@ namespace Robot {
         void SaveINISettings(minIni* ini);
 
         void SaveINISettings(minIni* ini, const std::string& section);
-
-        void write_to_file(std::ofstream& out) {
-            if(write) {
-                out << " " << m_odo_x << " " << m_odo_y << " " << m_odo_z << " " << m_odo_theta << std::endl;
-            }
-            else if(write_both) {
-                out << " " << m_odo_x << " " << m_odo_y << " " << m_odo_z << " " << m_odo_theta <<
-                    m_odo_x_r << " " << m_odo_y_r << " " << m_odo_z_r << " " << m_odo_theta_r << std::endl;
-            }
-            else {
-                out << std::endl;
-            }
-        }
     };
 }
 

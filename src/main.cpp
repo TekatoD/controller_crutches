@@ -14,6 +14,7 @@
 
 #include <GameController.h>
 #include <Speech.h>
+#include <thread>
 
 #include "LinuxDARwIn.h"
 
@@ -157,16 +158,6 @@ int main(void) {
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
             // Follow the ball
             follower.Process(tracker.ball_position);
-            std::ofstream out;
-            out.open("walk_data.txt", std::ios::app);
-            out << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_GYRO_X_L) <<
-                " " << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_GYRO_Y_L) <<
-                " " << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_GYRO_Z_L);
-            out << " " << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_ACCEL_X_L) <<
-                " " << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_ACCEL_Y_L) <<
-                " " << cm730.m_BulkReadData[Robot::CM730::ID_CM].ReadWord(Robot::CM730::P_ACCEL_Z_L);
-            Walking::GetInstance()->write_to_file(out);
-            out.close();
             if (follower.KickBall != 0) {
                 Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
                 Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);

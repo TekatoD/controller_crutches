@@ -72,6 +72,10 @@ Walking::Walking() {
     m_left_start = false;
     m_right_start = false;
 
+    m_prev_Phase = PHASE0;
+
+    step_count = 0;
+
     m_Joint.SetAngle(JointData::ID_R_SHOULDER_PITCH, -48.345);
     m_Joint.SetAngle(JointData::ID_L_SHOULDER_PITCH, 41.313);
     m_Joint.SetAngle(JointData::ID_R_SHOULDER_ROLL, -17.873);
@@ -383,7 +387,6 @@ void Walking::Process() {
     int dir[14] = {-1, -1, 1, 1, -1, 1, -1, -1, -1, -1, 1, 1, 1, -1};
     double initAngle[14] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -48.345, 41.313};
     int outValue[14];
-    bool update = false;
 
     // Update walk parameters
     if (m_Time == 0) {
@@ -575,7 +578,6 @@ void Walking::Process() {
                         -m_A_Move_Amplitude, -m_A_Move_Amplitude_Shift);
         pelvis_offset_l = 0;
         pelvis_offset_r = 0;
-        update = true;
     }
 
     a_move_l = 0;
@@ -596,40 +598,52 @@ void Walking::Process() {
     ep[10] = b_swap + b_move_l + m_P_Offset;
     ep[11] = c_swap + c_move_l + m_A_Offset / 2;
 
-
+    //TODO This must be derived into odometry_analyzer class and into method that provides current odomery output
     if(m_left_end && m_left_start) {
         std::ofstream out;
         out.open("odo.txt", std::ios::app);
         double dst = hypot(m_left_odo_x, m_left_odo_y);
         double anngle = atan2(m_left_odo_y, m_left_odo_x);
-        m_odo_x += cos(anngle) * dst;
-        m_odo_y += sin(anngle) * dst;
+        m_odo_x += cos(m_odo_theta + anngle) * dst;
+        m_odo_y += sin((m_odo_theta + anngle) + m_left_odo_theta) * dst;
         m_odo_theta += m_left_odo_theta;
         out << m_odo_x << " " << m_odo_y << " " << m_odo_theta << std::endl;
+        step_count++;
+        out << "steps: " << step_count << std::endl;
         out.close();
         m_left_end = false;
         m_left_start = false;
+        m_right_end = false;
+        std::cout << "left: " << m_left_odo_x << " " << m_left_odo_y << " " << m_left_odo_theta << " phase: "
+                  << m_prev_Phase << " cur phase: " << m_Phase << " time: " << m_Time << std::endl;
     }
     else if(m_right_end && m_right_start) {
-        std::ofstream out;
-        out.open("odo.txt", std::ios::app);
-        double dst = hypot(m_right_odo_x, m_right_odo_y);
-        double anngle = atan2(m_right_odo_y, m_right_odo_x);
-        m_odo_x += cos(anngle) * dst;
-        m_odo_y += sin(anngle) * dst;
-        m_odo_theta += m_right_odo_theta;
-        out << m_odo_x << " " << m_odo_y << " " << m_odo_theta << std::endl;
-        out.close();
-        m_right_end = false;
-        m_right_start = false;
+            std::ofstream out;
+            out.open("odo.txt", std::ios::app);
+            double dst = hypot(m_right_odo_x, m_right_odo_y);
+            double anngle = atan2(m_right_odo_y, m_right_odo_x);
+            m_odo_x += cos(m_odo_theta + anngle) * dst;
+            m_odo_y += sin((m_odo_theta + anngle) + m_right_odo_theta) * dst;
+            m_odo_theta += m_right_odo_theta;
+            out << m_odo_x << " " << m_odo_y << " " << m_odo_theta << std::endl;
+            step_count++;
+            out << "steps: " << step_count << std::endl;
+            out.close();
+            m_right_end = false;
+            m_right_start = false;
+            m_left_end = false;
+            std::cout << "right: " << m_right_odo_x << " " << m_right_odo_y << " " << m_right_odo_theta << " phase: "
+                      << m_prev_Phase << " cur phase: " << m_Phase << " time: " << m_Time << std::endl;
     } else {
         m_left_odo_x = -ep[6];
         m_left_odo_y = -ep[7];
-        m_left_odo_theta = -ep[11];
+        m_left_odo_theta = ep[11] / -1.4 ;
 
         m_right_odo_x = -ep[0];
         m_right_odo_y = -ep[1];
-        m_right_odo_theta = -ep[5];
+        m_right_odo_theta = ep[5] / -1.4 ;
+
+        m_prev_Phase = m_Phase;
     }
 
     // Compute body swing

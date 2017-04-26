@@ -89,6 +89,7 @@ namespace Robot {
         double m_Time;
 
         int m_Phase;
+        int m_prev_Phase;
         double m_Body_Swing_Y;
         double m_Body_Swing_Z;
 
@@ -159,6 +160,8 @@ namespace Robot {
         bool m_right_end;
         bool m_left_start;
         bool m_right_start;
+
+        int step_count;
 
         int GetCurrentPhase() { return m_Phase; }
 

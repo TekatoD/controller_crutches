@@ -14,6 +14,7 @@
 
 #include "minIni.h"
 #include "MotionModule.h"
+#include "OdoData.h"
 
 #define WALKING_SECTION "Walking Config"
 #define INVALID_VALUE   -1024.0
@@ -89,7 +90,6 @@ namespace Robot {
         double m_Time;
 
         int m_Phase;
-        int m_prev_Phase;
         double m_Body_Swing_Y;
         double m_Body_Swing_Z;
 
@@ -138,18 +138,15 @@ namespace Robot {
 
         double m_odo_x;
         double m_odo_y;
-        double m_odo_z;
         double m_odo_theta;
 
         double m_left_odo_x;
         double m_left_odo_y;
-        double m_left_odo_z;
         double m_left_odo_theta;
 
 
         double m_right_odo_x;
         double m_right_odo_y;
-        double m_right_odo_z;
         double m_right_odo_theta;
 
         int P_GAIN;
@@ -160,8 +157,6 @@ namespace Robot {
         bool m_right_end;
         bool m_left_start;
         bool m_right_start;
-
-        int step_count;
 
         int GetCurrentPhase() { return m_Phase; }
 
@@ -183,6 +178,8 @@ namespace Robot {
         void Stop();
 
         void Process();
+
+        OdoData getOdoOffset();
 
         bool IsRunning();
 

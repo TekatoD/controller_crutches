@@ -15,6 +15,7 @@
 #include <GameController.h>
 #include <Speech.h>
 #include <thread>
+#include "OdometryCollector.h"
 
 #include "LinuxDARwIn.h"
 
@@ -68,6 +69,8 @@ int main(void) {
 
     BallTracker tracker = BallTracker();
     BallFollower follower = BallFollower();
+
+    OdometryCollector odometryCollector;
 
     //////////////////// Framework Initialize ///////////////////////////
     if (!MotionManager::GetInstance()->Initialize(&cm730)) {
@@ -158,6 +161,7 @@ int main(void) {
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
             // Follow the ball
             follower.Process(tracker.ball_position);
+            odometryCollector.odoTranslate(Walking::GetInstance()->getOdoOffset());
             if (follower.KickBall != 0) {
                 Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
                 Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);

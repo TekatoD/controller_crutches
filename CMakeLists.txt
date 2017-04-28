@@ -71,7 +71,13 @@ set(SRC
         src/GameController.cpp include/GameController.h
 
         include/UdpComm.h
-        src/UdpComm.cpp src/Speech.cpp include/Speech.h)
+        src/UdpComm.cpp
+        src/Speech.cpp
+        include/Speech.h
+        src/OdoData.cpp
+        include/OdoData.h
+        src/OdometryCollector.cpp
+        include/OdometryCollector.h)
 
 add_executable(soccer ${SRC})
 target_link_libraries(soccer

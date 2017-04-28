@@ -162,6 +162,12 @@ int main(void) {
             // Follow the ball
             follower.Process(tracker.ball_position);
             odometryCollector.odoTranslate(Walking::GetInstance()->getOdoOffset());
+            ///////////////
+            std::ofstream out;
+            out.open("odo.txt", std::ios::app);
+            out << odometryCollector.getPose() << std::endl;
+            out.close();
+            //////////////
             if (follower.KickBall != 0) {
                 Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
                 Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);

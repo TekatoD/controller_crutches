@@ -607,13 +607,13 @@ void Walking::Process() {
         m_right_start = false;
         m_left_end = false;
     } else {
-        m_left_odo_x = -ep[6];
-        m_left_odo_y = -ep[7];
-        m_left_odo_theta = ep[11] / -1.4 ;
+        m_left_odo_x = -1.1 * ep[6];
+        m_left_odo_y = -1.1 * ep[7];
+        m_left_odo_theta = ep[11] / -1.1 ;
 
-        m_right_odo_x = -ep[0];
-        m_right_odo_y = -ep[1];
-        m_right_odo_theta = ep[5] / -1.4 ;
+        m_right_odo_x = -1.1 * ep[0];
+        m_right_odo_y = -1.1 * ep[1];
+        m_right_odo_theta = ep[5] / -1.1 ;
     }
 
     // Compute body swing

@@ -137,7 +137,7 @@ void BallFollower::Process(Point2D ball_pos) {
     }
 
     if (m_GoalFBStep == 0 && m_GoalRLTurn == 0 && m_FBStep == 0 && m_RLTurn == 0) {
-        if (Walking::GetInstance()->IsRunning() == true)
+        if (Walking::GetInstance()->IsRunning())
             Walking::GetInstance()->Stop();
         else {
             if (m_KickBallCount < m_KickBallMaxCount)
@@ -150,7 +150,7 @@ void BallFollower::Process(Point2D ball_pos) {
         if (DEBUG_PRINT == true)
             fprintf(stderr, " START");
 
-        if (Walking::GetInstance()->IsRunning() == false) {
+        if (!Walking::GetInstance()->IsRunning()) {
             m_FBStep = 0;
             m_RLTurn = 0;
             m_KickBallCount = 0;

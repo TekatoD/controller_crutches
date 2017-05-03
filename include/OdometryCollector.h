@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include "OdoData.h"
+#include "Pose2D.h"
 
 namespace Robot {
     class OdometryCollector {
@@ -12,23 +12,23 @@ namespace Robot {
 
         OdometryCollector();
 
-        OdometryCollector(OdoData initial);
+        OdometryCollector(Pose2D initial);
 
         OdometryCollector(double x, double y, double theta);
 
-        void odoTranslate(OdoData offset);
+        void odoTranslate(Pose2D offset);
 
-        OdoData getPose() const;
+        Pose2D GetPose() const;
 
-        void setPose(OdoData offset);
+        void SetPose(Pose2D offset);
 
-        void setInitial(OdoData offset);
+        void SetInitial(Pose2D offset);
 
-        void reset();
+        void Reset();
 
     private:
-        OdoData m_pose;
-        OdoData m_initial;
+        Pose2D m_pose;
+        Pose2D m_initial;
     };
 }
 

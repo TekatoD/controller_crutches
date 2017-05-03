@@ -74,10 +74,10 @@ set(SRC
         src/UdpComm.cpp
         src/Speech.cpp
         include/Speech.h
-        src/OdoData.cpp
-        include/OdoData.h
+        src/Pose2D.cpp
+        include/Pose2D.h
         src/OdometryCollector.cpp
-        include/OdometryCollector.h)
+        include/OdometryCollector.h src/GoTo.cpp include/GoTo.h)
 
 add_executable(soccer ${SRC})
 target_link_libraries(soccer

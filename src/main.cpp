@@ -162,7 +162,7 @@ int main(void) {
             ///////////////
             std::ofstream out;
             out.open("odo.txt", std::ios::app);
-            out << Walking::GetInstance()->getPose() << std::endl;
+//            out << Walking::GetInstance()->Get() << std::endl;
             out.close();
             //////////////
             if (follower.KickBall != 0) {

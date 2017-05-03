@@ -125,7 +125,7 @@ namespace Robot {
 
         void update_param_balance();
 
-        OdoData getOdoOffset();
+        Pose2D getOdoOffset();
 
 
         void update_param_go_to();
@@ -216,13 +216,11 @@ namespace Robot {
 
         void SaveINISettings(minIni* ini, const std::string& section);
 
-        OdoData getPose();
+        Pose2D GetOdo();
 
-        void resetOdo(OdoData pose);
+        void ResetOdo(Pose2D pose);
 
-        void setInitialPose(OdoData pose);
-
-        void setPose(OdoData pose);
+        void SetPose(Pose2D pose);
     };
 }
 

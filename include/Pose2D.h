@@ -8,12 +8,12 @@
 #include <ostream>
 
 namespace Robot {
-    class OdoData {
+    class Pose2D {
     public:
 
-        OdoData();
+        Pose2D();
 
-        OdoData(double x, double y, double theta);
+        Pose2D(double x, double y, double theta);
 
         double getX() const;
 
@@ -29,7 +29,7 @@ namespace Robot {
 
         void normalizeTheta();
 
-        friend std::ostream& operator << (std::ostream& os, const OdoData& data);
+        friend std::ostream& operator << (std::ostream& os, const Pose2D& data);
 
     private:
         double m_x;

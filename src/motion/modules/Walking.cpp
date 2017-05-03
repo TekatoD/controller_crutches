@@ -711,8 +711,8 @@ void Walking::Process() {
     }
 }
 
-OdoData Walking::getOdoOffset() {
-    OdoData offset(m_odo_x, m_odo_y, m_odo_theta);
+Pose2D Walking::getOdoOffset() {
+    Pose2D offset(m_odo_x, m_odo_y, m_odo_theta);
     m_odo_x = 0;
     m_odo_y = 0;
     m_odo_theta = 0;
@@ -761,18 +761,14 @@ double Walking::GetBodySwingY() { return m_Body_Swing_Y; }
 
 double Walking::GetBodySwingZ() { return m_Body_Swing_Z; }
 
-OdoData Walking::getPose() {
-    return m_odometry_collector.getPose();
+Pose2D Walking::GetOdo() {
+    return m_odometry_collector.GetPose();
 }
 
-void Walking::resetOdo(OdoData pose) {
-    m_odometry_collector.reset();
+void Walking::ResetOdo(Pose2D pose) {
+    m_odometry_collector.Reset();
 }
 
-void Walking::setInitialPose(OdoData pose) {
-    m_odometry_collector.setInitial(pose);
-}
-
-void Walking::setPose(OdoData pose) {
-    m_odometry_collector.setPose(pose);
+void Walking::SetPose(Pose2D pose) {
+    m_odometry_collector.SetPose(pose);
 }

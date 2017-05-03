@@ -14,7 +14,7 @@
 
 #include "minIni.h"
 #include "MotionModule.h"
-#include "OdoData.h"
+#include "OdometryCollector.h"
 
 #define WALKING_SECTION "Walking Config"
 #define INVALID_VALUE   -1024.0
@@ -93,6 +93,26 @@ namespace Robot {
         double m_Body_Swing_Y;
         double m_Body_Swing_Z;
 
+        double m_odo_x;
+        double m_odo_y;
+        double m_odo_theta;
+
+        double m_left_odo_x;
+        double m_left_odo_y;
+        double m_left_odo_theta;
+
+
+        double m_right_odo_x;
+        double m_right_odo_y;
+        double m_right_odo_theta;
+
+        bool m_left_end;
+        bool m_right_end;
+        bool m_left_start;
+        bool m_right_start;
+
+        OdometryCollector m_odometry_collector;
+
         Walking();
 
         double wsin(double time, double period, double period_shift, double mag, double mag_shift);
@@ -104,6 +124,9 @@ namespace Robot {
         void update_param_move();
 
         void update_param_balance();
+
+        OdoData getOdoOffset();
+
 
         void update_param_go_to();
 
@@ -143,26 +166,10 @@ namespace Robot {
         double PELVIS_OFFSET;
         double HIP_PITCH_OFFSET;
 
-        double m_odo_x;
-        double m_odo_y;
-        double m_odo_theta;
-
-        double m_left_odo_x;
-        double m_left_odo_y;
-        double m_left_odo_theta;
-
-        double m_right_odo_x;
-        double m_right_odo_y;
-        double m_right_odo_theta;
-
         int P_GAIN;
         int I_GAIN;
         int D_GAIN;
 
-        bool m_left_end;
-        bool m_right_end;
-        bool m_left_start;
-        bool m_right_start;
 
         double GetXMoveAmplitude() const;
 
@@ -199,8 +206,6 @@ namespace Robot {
 
         void Process();
 
-        OdoData getOdoOffset();
-
         bool IsRunning();
 
         void LoadINISettings(minIni* ini);
@@ -210,6 +215,14 @@ namespace Robot {
         void SaveINISettings(minIni* ini);
 
         void SaveINISettings(minIni* ini, const std::string& section);
+
+        OdoData getPose();
+
+        void resetOdo(OdoData pose);
+
+        void setInitialPose(OdoData pose);
+
+        void setPose(OdoData pose);
     };
 }
 

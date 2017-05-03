@@ -20,8 +20,15 @@ namespace Robot {
 
         OdoData getPose() const;
 
+        void setPose(OdoData offset);
+
+        void setInitial(OdoData offset);
+
+        void reset();
+
     private:
         OdoData m_pose;
+        OdoData m_initial;
     };
 }
 

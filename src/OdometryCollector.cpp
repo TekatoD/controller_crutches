@@ -5,11 +5,11 @@
 #include "OdometryCollector.h"
 #include <math.h>
 
-Robot::OdometryCollector::OdometryCollector() : m_pose(0, 0, 0) { }
+Robot::OdometryCollector::OdometryCollector() : m_initial(0, 0, 0), m_pose(0, 0, 0) { }
 
-Robot::OdometryCollector::OdometryCollector(OdoData initial) : m_pose(initial) { }
+Robot::OdometryCollector::OdometryCollector(OdoData initial) : m_initial(initial), m_pose(initial) { }
 
-Robot::OdometryCollector::OdometryCollector(double x, double y, double theta) : m_pose(x, y, theta) { }
+Robot::OdometryCollector::OdometryCollector(double x, double y, double theta) : m_initial(x, y, theta), m_pose(x, y, theta) { }
 
 void Robot::OdometryCollector::odoTranslate(OdoData offset) {
     double dst = hypot(offset.getX(), offset.getY());
@@ -22,4 +22,16 @@ void Robot::OdometryCollector::odoTranslate(OdoData offset) {
 
 Robot::OdoData Robot::OdometryCollector::getPose() const {
     return m_pose;
+}
+
+void Robot::OdometryCollector::setPose(Robot::OdoData offset) {
+    m_pose = offset;
+}
+
+void Robot::OdometryCollector::setInitial(Robot::OdoData offset) {
+    m_initial = offset;
+}
+
+void Robot::OdometryCollector::reset() {
+    m_pose = m_initial;
 }

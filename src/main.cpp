@@ -70,8 +70,6 @@ int main(void) {
     BallTracker tracker = BallTracker();
     BallFollower follower = BallFollower();
 
-    OdometryCollector odometryCollector;
-
     //////////////////// Framework Initialize ///////////////////////////
     if (!MotionManager::GetInstance()->Initialize(&cm730)) {
         linux_cm730.SetPortName(U2D_DEV_NAME1);
@@ -161,11 +159,10 @@ int main(void) {
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
             // Follow the ball
             follower.Process(tracker.ball_position);
-            odometryCollector.odoTranslate(Walking::GetInstance()->getOdoOffset());
             ///////////////
             std::ofstream out;
             out.open("odo.txt", std::ios::app);
-            out << odometryCollector.getPose() << std::endl;
+            out << Walking::GetInstance()->getPose() << std::endl;
             out.close();
             //////////////
             if (follower.KickBall != 0) {

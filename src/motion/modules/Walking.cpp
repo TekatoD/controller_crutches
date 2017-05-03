@@ -616,6 +616,8 @@ void Walking::Process() {
         m_right_odo_theta = -ep[5];
     }
 
+    m_odometry_collector.odoTranslate(this->getOdoOffset());
+
     // Compute body swing
     if (m_Time <= m_SSP_Time_End_L) {
         m_Body_Swing_Y = -ep[7];
@@ -711,4 +713,20 @@ OdoData Walking::getOdoOffset() {
     m_odo_y = 0;
     m_odo_theta = 0;
     return std::move(offset);
+}
+
+OdoData Walking::getPose() {
+    return m_odometry_collector.getPose();
+}
+
+void Walking::resetOdo(OdoData pose) {
+    m_odometry_collector.reset();
+}
+
+void Walking::setInitialPose(OdoData pose) {
+    m_odometry_collector.setInitial(pose);
+}
+
+void Walking::setPose(OdoData pose) {
+    m_odometry_collector.setPose(pose);
 }

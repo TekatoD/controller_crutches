@@ -323,6 +323,10 @@ void Walking::update_param_balance() {
 }
 
 
+void Walking::update_param_go_to() {
+}
+
+
 void Walking::Initialize() {
     X_MOVE_AMPLITUDE = 0;
     Y_MOVE_AMPLITUDE = 0;
@@ -712,3 +716,45 @@ OdoData Walking::getOdoOffset() {
     m_odo_theta = 0;
     return std::move(offset);
 }
+
+double Walking::GetXMoveAmplitude() const {
+    return X_MOVE_AMPLITUDE;
+}
+
+double Walking::GetYMoveAmplitude() const {
+    return Y_MOVE_AMPLITUDE;
+}
+
+double Walking::GetAMoveAmplitude() const {
+    return A_MOVE_AMPLITUDE;
+}
+
+bool Walking::IsAimMode() const {
+    return A_MOVE_AIM_ON;
+}
+
+bool Walking::IsGoToMode() const {
+    return GO_TO_MODE_ON;
+}
+
+void Walking::SetMoveAmplitude(double x, double y, double a, bool aim_mode) {
+    X_MOVE_AMPLITUDE = x;
+    Y_MOVE_AMPLITUDE = y;
+    A_MOVE_AMPLITUDE = a;
+    A_MOVE_AIM_ON = aim_mode;
+    GO_TO_MODE_ON = false;
+}
+
+void Walking::GoTo(double x, double y, double a) {
+    A_MOVE_AIM_ON = false;
+    GO_TO_MODE_ON = true;
+    GO_TO_X = x;
+    GO_TO_Y = y;
+    GO_TO_A = a;
+}
+
+int Walking::GetCurrentPhase() { return m_Phase; }
+
+double Walking::GetBodySwingY() { return m_Body_Swing_Y; }
+
+double Walking::GetBodySwingZ() { return m_Body_Swing_Z; }

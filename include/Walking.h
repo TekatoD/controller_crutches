@@ -105,6 +105,8 @@ namespace Robot {
 
         void update_param_balance();
 
+        void update_param_go_to();
+
     public:
         // Walking initial pose
         double X_OFFSET;
@@ -123,6 +125,11 @@ namespace Robot {
         double Z_MOVE_AMPLITUDE;
         double A_MOVE_AMPLITUDE;
         bool A_MOVE_AIM_ON;
+
+        bool GO_TO_MODE_ON;
+        double GO_TO_X;
+        double GO_TO_Y;
+        double GO_TO_A;
 
         // Balance control
         bool BALANCE_ENABLE;
@@ -144,7 +151,6 @@ namespace Robot {
         double m_left_odo_y;
         double m_left_odo_theta;
 
-
         double m_right_odo_x;
         double m_right_odo_y;
         double m_right_odo_theta;
@@ -158,11 +164,25 @@ namespace Robot {
         bool m_left_start;
         bool m_right_start;
 
-        int GetCurrentPhase() { return m_Phase; }
+        double GetXMoveAmplitude() const;
 
-        double GetBodySwingY() { return m_Body_Swing_Y; }
+        double GetYMoveAmplitude() const;
 
-        double GetBodySwingZ() { return m_Body_Swing_Z; }
+        double GetAMoveAmplitude() const;
+
+        bool IsAimMode() const;
+
+        bool IsGoToMode() const;
+
+        void SetMoveAmplitude(double x, double y, double a, bool aim_mode = false);
+
+        void GoTo(double x, double y, double a);
+
+        int GetCurrentPhase();
+
+        double GetBodySwingY();
+
+        double GetBodySwingZ();
 
         virtual ~Walking();
 

@@ -119,14 +119,7 @@ void Robot::GoTo::LoadINISettings(minIni *ini) {
 
 void Robot::GoTo::LoadINISettings(minIni *ini, const std::string &section) {
     int value = -2;
-    m_MaxSpeed = 20.0;
-    m_MaxTurn = 35.0;
-    m_StepAccel = 1.0;
-    m_TurnAccel = 1.0;
 
-    m_FitDistance = 200.0;
-    m_DistanceVar = 50.0;
-    m_AngleVar = 10.0;
     if ((value = ini->geti(section, "max_speed", INVALID_VALUE)) != INVALID_VALUE) m_MaxSpeed = value;
     if ((value = ini->geti(section, "max_turn", INVALID_VALUE)) != INVALID_VALUE) m_MaxTurn = value;
     if ((value = ini->geti(section, "fit_speed", INVALID_VALUE)) != INVALID_VALUE) m_FitSpeed = value;

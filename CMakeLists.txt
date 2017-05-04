@@ -34,7 +34,7 @@ set(SRC
         include/MotionStatus.h
         include/MX28.h
         include/Point.h
-        include/StatusCheck.h
+        include/StateMachine.h
         include/Vector.h
         include/Walking.h
         src/math/Matrix.cpp
@@ -63,7 +63,7 @@ set(SRC
         src/LinuxMotionTimer.cpp
         src/main.cpp
         src/MX28.cpp
-        src/StatusCheck.cpp
+        src/StateMachine.cpp
 
         include/gamecontroller/RoboCupGameControlData.h
         include/gamecontroller/SPLCoachMessage.h

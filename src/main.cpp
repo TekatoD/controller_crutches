@@ -20,7 +20,7 @@
 
 #include "LinuxDARwIn.h"
 
-#include "StatusCheck.h"
+#include "StateMachine.h"
 
 #define MOTION_FILE_PATH    "res/motion_4096.bin"
 #define INI_FILE_PATH       "res/config.ini"
@@ -94,6 +94,7 @@ int main(void) {
     /////////////////////////////////////////////////////////////////////
 
     MotionManager::GetInstance()->LoadINISettings(ini.get());
+    StateMachine::LoadINISettings(ini.get());
 
     int firm_ver = 0;
     if (cm730.ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0) != CM730::SUCCESS) {
@@ -147,9 +148,9 @@ int main(void) {
         GameController::GetInstance()->Update();
 
         // Update state machine
-        StatusCheck::Check(cm730);
+        StateMachine::Check(cm730);
 
-        if (StatusCheck::m_is_started == 0) {
+        if (StateMachine::IsStarted() == 0) {
             continue;
         }
 

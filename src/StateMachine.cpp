@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "../include/StatusCheck.h"
+#include "StateMachine.h"
 #include "Head.h"
 #include "Action.h"
 #include "Walking.h"
@@ -17,11 +17,14 @@
 
 using namespace Robot;
 
-int StatusCheck::m_old_btn = 0;
-int StatusCheck::m_is_started = 0;
+int StateMachine::m_old_btn = 0;
+int StateMachine::m_is_started = 0;
+int StateMachine::m_role = ROLE_UNKNOWN;
+Pose2D StateMachine::m_spawn_pos;
+Pose2D StateMachine::m_starting_pos;
 
 
-void StatusCheck::Check(CM730& cm730) {
+void StateMachine::Check(CM730& cm730) {
     if (MotionStatus::FALLEN != STANDUP && m_is_started == 1) {
         Walking::GetInstance()->Stop();
         while (Walking::GetInstance()->IsRunning() == 1) usleep(8000);
@@ -84,4 +87,59 @@ void StatusCheck::Check(CM730& cm730) {
             fprintf(stderr, "Start button pressed.. & started is true.. \n");
         }
     }
+}
+
+
+void StateMachine::LoadINISettings(minIni *ini) {
+    LoadINISettings(ini, CNTRL_SECTION);
+}
+
+
+void StateMachine::LoadINISettings(minIni *ini, const std::string &section) {
+    int value = -2;
+    if ((value = ini->geti(section, "role", INVALID_VALUE)) != INVALID_VALUE) {
+        switch (value) {
+            case (ROLE_SOCCER):
+            case (ROLE_GOALKEEPER):
+                m_role = value;
+                break;
+            default:
+                m_role = ROLE_UNKNOWN;
+        }
+    }
+    if ((value = ini->geti(section, "spawn_x", INVALID_VALUE)) != INVALID_VALUE) m_spawn_pos.setX(value);
+    if ((value = ini->geti(section, "spawn_y", INVALID_VALUE)) != INVALID_VALUE) m_spawn_pos.setY(value);
+    if ((value = ini->geti(section, "spawn_theta", INVALID_VALUE)) != INVALID_VALUE) m_spawn_pos.setTheta(value / 180 * M_PI);
+
+    if ((value = ini->geti(section, "starting_x", INVALID_VALUE)) != INVALID_VALUE) m_starting_pos.setX(value);
+    if ((value = ini->geti(section, "starting_y", INVALID_VALUE)) != INVALID_VALUE) m_starting_pos.setY(value);
+    if ((value = ini->geti(section, "starting_theta", INVALID_VALUE)) != INVALID_VALUE) m_starting_pos.setTheta(value / 180 * M_PI);
+}
+
+
+void StateMachine::SaveINISettings(minIni *ini) {
+    SaveINISettings(ini, CNTRL_SECTION);
+}
+
+
+void StateMachine::SaveINISettings(minIni *ini, const std::string &section) {
+    ini->put(section, "role", m_role);
+    ini->put(section, "spawn_x", m_spawn_pos.X());
+    ini->put(section, "spawn_y", m_spawn_pos.Y());
+    ini->put(section, "spawn_theta", m_spawn_pos.Theta());
+    ini->put(section, "starting_x", m_starting_pos.X());
+    ini->put(section, "starting_y", m_starting_pos.Y());
+    ini->put(section, "starting_theta", m_starting_pos.Theta());
+}
+
+int StateMachine::IsStarted() {
+    return m_is_started;
+}
+
+const Pose2D& StateMachine::SpawnPosition() {
+    return m_spawn_pos;
+}
+
+const Pose2D& StateMachine::StartingPosition() {
+    return m_starting_pos;
 }

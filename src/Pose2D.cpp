@@ -64,6 +64,10 @@ Robot::Pose2D& Robot::Pose2D::operator-=(const Robot::Pose2D &rhs) {
     return *this;
 }
 
+void Robot::Pose2D::normalizeThetaInPi() {
+    m_theta = atan2(sin(m_theta), cos(m_theta));
+}
+
 namespace Robot {
     std::ostream &operator<<(std::ostream &os, const Robot::Pose2D &data) {
         os << " " << data.m_x << " " << data.m_y << " " << data.m_theta;

@@ -69,9 +69,9 @@ void Robot::Pose2D::normalizeThetaInPi() {
 }
 
 
-void Robot::Pose2D::rotateAround(const Robot::Pose2D& pose, double angle) {
-    double c = cos(angle);
-    double s = sin(angle);
+void Robot::Pose2D::rotateAround(const Robot::Pose2D& pose) {
+    double c = cos(pose.Theta());
+    double s = sin(pose.Theta());
     double d_x = m_x - pose.X();
     double d_y = m_y - pose.Y();
     m_x = c * (d_x) - s * (d_y) + pose.X();

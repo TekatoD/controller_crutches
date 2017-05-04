@@ -35,6 +35,7 @@ namespace Robot {
         double m_MaxTurn;
         double m_StepAccel;
         double m_TurnAccel;
+        double m_DodeAngle;
 
         double m_FitDistance;
         double m_DistanceVar;

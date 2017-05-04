@@ -29,6 +29,8 @@ namespace Robot {
 
         void normalizeTheta();
 
+        void normalizeThetaInPi();
+
         Pose2D operator+(const Pose2D& rhs) const;
 
         Pose2D& operator+=(const Pose2D& rhs);

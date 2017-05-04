@@ -38,6 +38,32 @@ void Robot::Pose2D::normalizeTheta() {
     m_theta = m_theta - twoPi * floor( m_theta / twoPi );
 }
 
+Robot::Pose2D Robot::Pose2D::operator+(const Robot::Pose2D &rhs) const {
+    Pose2D result(*this);
+    result += rhs;
+    return result;
+}
+
+Robot::Pose2D& Robot::Pose2D::operator+=(const Robot::Pose2D &rhs) {
+    m_x += rhs.m_x;
+    m_y += rhs.m_y;
+    m_theta += rhs.m_theta;
+    return *this;
+}
+
+Robot::Pose2D Robot::Pose2D::operator-(const Robot::Pose2D &rhs) const {
+    Pose2D result(*this);
+    result -= rhs;
+    return result;
+}
+
+Robot::Pose2D& Robot::Pose2D::operator-=(const Robot::Pose2D &rhs) {
+    m_x -= rhs.m_x;
+    m_y -= rhs.m_y;
+    m_theta -= rhs.m_theta;
+    return *this;
+}
+
 namespace Robot {
     std::ostream &operator<<(std::ostream &os, const Robot::Pose2D &data) {
         os << " " << data.m_x << " " << data.m_y << " " << data.m_theta;

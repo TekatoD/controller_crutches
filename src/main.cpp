@@ -15,6 +15,7 @@
 #include <GameController.h>
 #include <Speech.h>
 #include <thread>
+#include <GoTo.h>
 #include "OdometryCollector.h"
 
 #include "LinuxDARwIn.h"
@@ -69,6 +70,7 @@ int main(void) {
 
     BallTracker tracker = BallTracker();
     BallFollower follower = BallFollower();
+    GoTo goTo = GoTo();
 
     //////////////////// Framework Initialize ///////////////////////////
     if (!MotionManager::GetInstance()->Initialize(&cm730)) {
@@ -158,12 +160,16 @@ int main(void) {
             Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
             // Follow the ball
-            follower.Process(tracker.ball_position);
+            Pose2D odo = Walking::GetInstance()->GetOdo();
+            Pose2D target(500, 300);
+            goTo.Process(target - odo);
+
+//            follower.Process(tracker.ball_position);
             ///////////////
-            std::ofstream out;
-            out.open("odo.txt", std::ios::app);
+//            std::ofstream out;
+//            out.open("odo.txt", std::ios::app);
 //            out << Walking::GetInstance()->Get() << std::endl;
-            out.close();
+//            out.close();
             //////////////
             if (follower.KickBall != 0) {
                 Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);

@@ -13,7 +13,7 @@ namespace Robot {
 
         Pose2D();
 
-        Pose2D(double x, double y, double theta);
+        Pose2D(double x, double y, double theta = 0);
 
         double getX() const;
 
@@ -28,6 +28,14 @@ namespace Robot {
         void setTheta(double theta);
 
         void normalizeTheta();
+
+        Pose2D operator+(const Pose2D& rhs) const;
+
+        Pose2D& operator+=(const Pose2D& rhs);
+
+        Pose2D operator-(const Pose2D& rhs) const;
+
+        Pose2D& operator-=(const Pose2D& rhs);
 
         friend std::ostream& operator << (std::ostream& os, const Pose2D& data);
 

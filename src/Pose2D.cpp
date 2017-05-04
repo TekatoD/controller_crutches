@@ -70,7 +70,7 @@ void Robot::Pose2D::normalizeThetaInPi() {
 
 namespace Robot {
     std::ostream &operator<<(std::ostream &os, const Robot::Pose2D &data) {
-        os << " " << data.m_x << " " << data.m_y << " " << data.m_theta;
+        os << " " << data.m_x << " " << data.m_y << " " << data.m_theta / M_PI * 180;
         return os;
     }
 }

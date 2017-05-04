@@ -23,22 +23,25 @@
 #include <cmath>
 #include "Point.h"
 #include "Pose2D.h"
+#include "minIni.h"
+
+#define GOTO_SECTION ("goto")
 
 namespace Robot {
     class GoTo {
     private:
         double m_MaxSpeed;
-        double m_FitMaxSpeed;
+        double m_FitSpeed;
         double m_MaxTurn;
-        double m_UnitFBStep;
-        double m_UnitRLTurn;
+        double m_StepAccel;
+        double m_TurnAccel;
 
         double m_FitDistance;
         double m_DistanceVar;
         double m_AngleVar;
 
         double m_GoalMaxSpeed;
-        double m_GoalRLTurn;
+        double m_GoalTurn;
         double m_X;
         double m_Y;
         double m_A;
@@ -52,6 +55,14 @@ namespace Robot {
         ~GoTo() {}
 
         bool IsDone() const;
+
+        void LoadINISettings(minIni* ini);
+
+        void LoadINISettings(minIni* ini, const std::string& section);
+
+        void SaveINISettings(minIni* ini);
+
+        void SaveINISettings(minIni* ini, const std::string& section);
 
         void Process(Pose2D pos);
     };

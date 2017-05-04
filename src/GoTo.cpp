@@ -29,8 +29,7 @@ bool Robot::GoTo::IsDone() const {
 
 void Robot::GoTo::Process(Robot::Pose2D pos) {
     m_Done = true;
-    double dist = hypot(pos.getX(), pos.getY());
-    double angle = atan2(pos.getY(), pos.getX()) / PI * 180.0;
+    double dist = hypot(pos.X(), pos.Y());
 
     if (!Walking::GetInstance()->IsRunning() ||
         Walking::GetInstance()->X_MOVE_AMPLITUDE != m_X ||
@@ -42,13 +41,22 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
     }
 
     if (dist > m_DistanceVar) {
-        m_GoalMaxSpeed = (dist < m_FitDistance) ? m_FitMaxSpeed : m_MaxSpeed;
+        m_GoalMaxSpeed = (dist < m_FitDistance) ? m_FitSpeed : m_MaxSpeed;
 
-        double x_speed = pos.getX() / dist * m_GoalMaxSpeed;
-        double y_speed = pos.getY() / dist * m_GoalMaxSpeed;
+        double x_factor = pos.X() / dist;
+        double x_speed = x_factor * m_GoalMaxSpeed;
+        double y_factor = pos.Y() / dist;
+        double y_speed = y_factor * m_GoalMaxSpeed;
 
-        m_X += (m_X - x_speed > 0 ? -m_UnitFBStep : m_UnitFBStep);
-        m_Y += (m_Y - y_speed > 0 ? -m_UnitFBStep : m_UnitFBStep);
+        m_X += m_StepAccel * x_factor;
+        if (x_speed > 0 && m_X > x_speed || x_speed <= 0 && m_X < x_speed) {
+            m_X = x_speed;
+        }
+
+        m_Y += m_StepAccel * y_factor;
+        if (y_speed > 0 && m_Y > y_speed || y_speed <= 0 && m_Y < y_speed) {
+            m_Y = y_speed;
+        }
 
         m_Done = false;
     } else {
@@ -56,11 +64,17 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
         m_Y = 0;
     }
 
-    if (angle > 0 && angle > m_AngleVar ||
-            angle < 0 && angle < -m_AngleVar) {
-        m_GoalRLTurn = m_MaxTurn;
-        double a_speed = (angle > 0) ? m_GoalRLTurn : -m_GoalRLTurn;
-        m_A += ((m_A - a_speed) > 0) ? -m_UnitRLTurn : m_UnitRLTurn;
+    double deg = pos.Theta() / PI * 180;
+    if (deg > 0 && deg > m_AngleVar ||
+        deg < 0 && deg < -m_AngleVar) {
+        m_GoalTurn = m_MaxTurn;
+        if (deg > 0) {
+            m_A -= m_TurnAccel;
+            if (m_A < -m_GoalTurn) m_A = -m_GoalTurn;
+        } else {
+            m_A += m_TurnAccel;
+            if (m_A > m_GoalTurn) m_A = m_GoalTurn;
+        }
         m_Done = false;
     } else {
         m_A = 0;
@@ -70,6 +84,7 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
     if (!m_Done) {
         Walking::GetInstance()->X_MOVE_AMPLITUDE = m_X;
         Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_Y;
+        Walking::GetInstance()->A_MOVE_AMPLITUDE = m_A;
         Walking::GetInstance()->Start();
     } else {
         Walking::GetInstance()->Stop();
@@ -77,21 +92,66 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
 }
 
 Robot::GoTo::GoTo() {
-    m_MaxSpeed = 30.0;
+    m_MaxSpeed = 20.0;
+    m_FitSpeed = 3.0;
     m_MaxTurn = 35.0;
-    m_UnitFBStep = 0.3;
-    m_UnitRLTurn = 1.0;
+    m_StepAccel = 1.0;
+    m_TurnAccel = 1.0;
 
     m_FitDistance = 200.0;
     m_DistanceVar = 50.0;
     m_AngleVar = 10.0;
 
     m_GoalMaxSpeed = 0.0;
-    m_GoalRLTurn = 0.0;
+    m_GoalTurn = 0.0;
 
     m_X = 0.0;
     m_Y = 0.0;
     m_A = 0.0;
 
     m_Done = false;
+}
+
+void Robot::GoTo::LoadINISettings(minIni *ini) {
+    LoadINISettings(ini, GOTO_SECTION);
+}
+
+
+void Robot::GoTo::LoadINISettings(minIni *ini, const std::string &section) {
+    int value = -2;
+    m_MaxSpeed = 20.0;
+    m_MaxTurn = 35.0;
+    m_StepAccel = 1.0;
+    m_TurnAccel = 1.0;
+
+    m_FitDistance = 200.0;
+    m_DistanceVar = 50.0;
+    m_AngleVar = 10.0;
+    if ((value = ini->geti(section, "max_speed", INVALID_VALUE)) != INVALID_VALUE) m_MaxSpeed = value;
+    if ((value = ini->geti(section, "max_turn", INVALID_VALUE)) != INVALID_VALUE) m_MaxTurn = value;
+    if ((value = ini->geti(section, "fit_speed", INVALID_VALUE)) != INVALID_VALUE) m_FitSpeed = value;
+    if ((value = ini->geti(section, "step_accel", INVALID_VALUE)) != INVALID_VALUE) m_StepAccel = value;
+    if ((value = ini->geti(section, "turn_accel", INVALID_VALUE)) != INVALID_VALUE) m_TurnAccel = value;
+
+    if ((value = ini->geti(section, "distance_variance", INVALID_VALUE)) != INVALID_VALUE) m_DistanceVar = value;
+    if ((value = ini->geti(section, "angle_variance", INVALID_VALUE)) != INVALID_VALUE) m_AngleVar = value;
+    if ((value = ini->geti(section, "fit_distance", INVALID_VALUE)) != INVALID_VALUE) m_FitDistance = value;
+}
+
+
+void Robot::GoTo::SaveINISettings(minIni *ini) {
+    SaveINISettings(ini, GOTO_SECTION);
+}
+
+
+void Robot::GoTo::SaveINISettings(minIni *ini, const std::string &section) {
+    ini->put(section, "max_speed", m_MaxSpeed);
+    ini->put(section, "max_turn", m_MaxTurn);
+    ini->put(section, "fit_speed", m_FitSpeed);
+    ini->put(section, "step_accel", m_StepAccel);
+    ini->put(section, "turn_accel", m_TurnAccel);
+
+    ini->put(section, "distance_variance", m_DistanceVar);
+    ini->put(section, "angle_variance", m_AngleVar);
+    ini->put(section, "fit_distance", m_FitDistance);
 }

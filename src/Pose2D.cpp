@@ -65,7 +65,7 @@ Robot::Pose2D& Robot::Pose2D::operator-=(const Robot::Pose2D &rhs) {
 }
 
 void Robot::Pose2D::normalizeThetaInPi() {
-    m_theta = remainder(m_theta, M_PI);
+    m_theta = atan2(sin(m_theta), cos(m_theta));
 }
 
 namespace Robot {

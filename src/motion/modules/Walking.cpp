@@ -596,16 +596,20 @@ void Walking::Process() {
     ep[11] = c_swap + c_move_l + m_A_Offset / 2;
 
     if(m_left_end && m_left_start) {
-        m_odo_x += m_left_odo_x;
-        m_odo_y += m_left_odo_y;
+        if(X_MOVE_AMPLITUDE != 0 || Y_MOVE_AMPLITUDE != 0) {
+            m_odo_x += m_left_odo_x;
+            m_odo_y += m_left_odo_y;
+        }
         m_odo_theta += m_left_odo_theta;
         m_left_end = false;
         m_left_start = false;
         m_right_end = false;
     }
     else if(m_right_end && m_right_start) {
-        m_odo_x += m_right_odo_x;
-        m_odo_y += m_right_odo_y;
+        if(X_MOVE_AMPLITUDE != 0 || Y_MOVE_AMPLITUDE != 0) {
+            m_odo_x += m_right_odo_x;
+            m_odo_y += m_right_odo_y;
+        }
         m_odo_theta += m_right_odo_theta;
         m_right_end = false;
         m_right_start = false;

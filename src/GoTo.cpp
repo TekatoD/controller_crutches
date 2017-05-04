@@ -58,7 +58,6 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
             m_Y = y_speed;
         }
 
-        m_A = 0;
         m_Done = false;
     } else {
         m_X = 0;
@@ -70,7 +69,7 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
         if (deg > 0 && deg > m_AngleVar ||
             deg < 0 && deg < -m_AngleVar) {
             m_GoalTurn = m_MaxTurn;
-            if (deg > 0) {
+            if (deg < 0) {
                 m_A -= m_TurnAccel;
                 if (m_A < -m_GoalTurn) m_A = -m_GoalTurn;
             } else {
@@ -81,6 +80,8 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
         } else {
             m_A = 0;
         }
+    } else {
+        m_A = 0;
     }
 
 

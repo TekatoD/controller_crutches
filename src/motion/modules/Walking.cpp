@@ -69,6 +69,10 @@ Walking::Walking() {
     m_left_start = false;
     m_right_start = false;
 
+    m_odo_x_factor = 2.0;
+    m_odo_y_factor = 2.0;
+    m_odo_a_factor = 0.8;
+
     m_Joint.SetAngle(JointData::ID_R_SHOULDER_PITCH, -48.345);
     m_Joint.SetAngle(JointData::ID_L_SHOULDER_PITCH, 41.313);
     m_Joint.SetAngle(JointData::ID_R_SHOULDER_ROLL, -17.873);
@@ -99,6 +103,9 @@ void Walking::LoadINISettings(minIni* ini) {
 void Walking::LoadINISettings(minIni* ini, const std::string& section) {
     double value = INVALID_VALUE;
 
+    if ((value = ini->getd(section, "odo_x_factor", INVALID_VALUE)) != INVALID_VALUE) m_odo_x_factor = value;
+    if ((value = ini->getd(section, "odo_y_factor", INVALID_VALUE)) != INVALID_VALUE) m_odo_y_factor = value;
+    if ((value = ini->getd(section, "odo_a_factor", INVALID_VALUE)) != INVALID_VALUE) m_odo_a_factor = value;
     if ((value = ini->getd(section, "x_offset", INVALID_VALUE)) != INVALID_VALUE) X_OFFSET = value;
     if ((value = ini->getd(section, "y_offset", INVALID_VALUE)) != INVALID_VALUE) Y_OFFSET = value;
     if ((value = ini->getd(section, "z_offset", INVALID_VALUE)) != INVALID_VALUE) Z_OFFSET = value;
@@ -616,22 +623,22 @@ void Walking::Process() {
         m_left_end = false;
     } else {
         if(X_MOVE_AMPLITUDE > 0) {
-            m_left_odo_x = -2 * ep[6];
+            m_left_odo_x = -m_odo_x_factor * ep[6];
         }
         else {
-            m_left_odo_x = 2 * ep[6];
+            m_left_odo_x = m_odo_x_factor * ep[6];
         }
-        m_left_odo_y = -2 * ep[7];
-        m_left_odo_theta = -ep[11];
+        m_left_odo_y = -m_odo_y_factor * ep[7];
+        m_left_odo_theta = -m_odo_a_factor * ep[11];
 
         if(X_MOVE_AMPLITUDE > 0) {
-            m_right_odo_x = -2* ep[6];
+            m_right_odo_x = -m_odo_x_factor * ep[6];
         }
         else {
-            m_right_odo_x = 2 * ep[6];
+            m_right_odo_x = m_odo_x_factor * ep[6];
         }
-        m_right_odo_y = -2 * ep[1];
-        m_right_odo_theta = -ep[5];
+        m_right_odo_y = -m_odo_y_factor * ep[1];
+        m_right_odo_theta = -m_odo_a_factor * ep[5];
     }
 
     m_odometry_collector.odoTranslate(this->getOdoOffset());

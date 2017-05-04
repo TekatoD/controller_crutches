@@ -111,6 +111,10 @@ namespace Robot {
         bool m_left_start;
         bool m_right_start;
 
+        double m_odo_x_factor;
+        double m_odo_y_factor;
+        double m_odo_a_factor;
+
         OdometryCollector m_odometry_collector;
 
         Walking();

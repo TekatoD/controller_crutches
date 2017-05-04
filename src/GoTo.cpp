@@ -41,44 +41,27 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
         m_A = Walking::GetInstance()->A_MOVE_AMPLITUDE;
     }
 
-    if (angle >= 0 && angle > m_DodeAngle ||
-            angle < 0 && angle < -m_DodeAngle) {
-        m_GoalTurn = m_MaxTurn;
-        if (angle < 0) {
-            m_A -= m_TurnAccel;
-            if (m_A < -m_GoalTurn) m_A = -m_GoalTurn;
-        } else {
-            m_A += m_TurnAccel;
-            if (m_A > m_GoalTurn) m_A = m_GoalTurn;
+
+    if (dist > m_DistanceVar) {
+        m_A = 0;
+        m_GoalMaxSpeed = (dist < m_FitDistance) ? m_FitSpeed : m_MaxSpeed;
+
+        double x_factor = pos.X() / dist;
+        double x_speed = x_factor * m_GoalMaxSpeed;
+        double y_factor = pos.Y() / dist;
+        double y_speed = y_factor * m_GoalMaxSpeed;
+
+        m_X += m_StepAccel * x_factor;
+        if (x_speed > 0 && m_X > x_speed || x_speed <= 0 && m_X < x_speed) {
+            m_X = x_speed;
         }
+
+        m_Y += m_StepAccel * y_factor;
+        if (y_speed > 0 && m_Y > y_speed || y_speed <= 0 && m_Y < y_speed) {
+            m_Y = y_speed;
+        }
+
         m_Done = false;
-    }
-
-    if (m_Done) {
-        if (dist > m_DistanceVar) {
-            m_A = 0;
-            m_GoalMaxSpeed = (dist < m_FitDistance) ? m_FitSpeed : m_MaxSpeed;
-
-            double x_factor = pos.X() / dist;
-            double x_speed = x_factor * m_GoalMaxSpeed;
-            double y_factor = pos.Y() / dist;
-            double y_speed = y_factor * m_GoalMaxSpeed;
-
-            m_X += m_StepAccel * x_factor;
-            if (x_speed > 0 && m_X > x_speed || x_speed <= 0 && m_X < x_speed) {
-                m_X = x_speed;
-            }
-
-            m_Y += m_StepAccel * y_factor;
-            if (y_speed > 0 && m_Y > y_speed || y_speed <= 0 && m_Y < y_speed) {
-                m_Y = y_speed;
-            }
-
-            m_Done = false;
-        } else {
-            m_X = 0;
-            m_Y = 0;
-        }
     } else {
         m_X = 0;
         m_Y = 0;

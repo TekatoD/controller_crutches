@@ -58,26 +58,29 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
             m_Y = y_speed;
         }
 
+        m_A = 0;
         m_Done = false;
     } else {
         m_X = 0;
         m_Y = 0;
     }
 
-    double deg = pos.Theta() / PI * 180;
-    if (deg > 0 && deg > m_AngleVar ||
-        deg < 0 && deg < -m_AngleVar) {
-        m_GoalTurn = m_MaxTurn;
-        if (deg > 0) {
-            m_A -= m_TurnAccel;
-            if (m_A < -m_GoalTurn) m_A = -m_GoalTurn;
+    if (m_Done) {
+        double deg = pos.Theta() / PI * 180;
+        if (deg > 0 && deg > m_AngleVar ||
+            deg < 0 && deg < -m_AngleVar) {
+            m_GoalTurn = m_MaxTurn;
+            if (deg > 0) {
+                m_A -= m_TurnAccel;
+                if (m_A < -m_GoalTurn) m_A = -m_GoalTurn;
+            } else {
+                m_A += m_TurnAccel;
+                if (m_A > m_GoalTurn) m_A = m_GoalTurn;
+            }
+            m_Done = false;
         } else {
-            m_A += m_TurnAccel;
-            if (m_A > m_GoalTurn) m_A = m_GoalTurn;
+            m_A = 0;
         }
-        m_Done = false;
-    } else {
-        m_A = 0;
     }
 
 

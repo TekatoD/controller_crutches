@@ -164,7 +164,7 @@ int main(void) {
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
             // Follow the ball
             Pose2D odo = Walking::GetInstance()->GetOdo();
-            Pose2D target(300, 0.0, 0.0);
+            Pose2D target(300, 300.0, 1.57);
             goTo.Process(target - odo);
 
             std::cout << "odo: " << odo << "; t: " << target << "; d: " << target - odo << std::endl;

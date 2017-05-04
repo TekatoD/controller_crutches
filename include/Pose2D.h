@@ -15,11 +15,11 @@ namespace Robot {
 
         Pose2D(double x, double y, double theta = 0);
 
-        double getX() const;
+        double X() const;
 
-        double getY() const;
+        double Y() const;
 
-        double getTheta() const;
+        double Theta() const;
 
         void setX(double x);
 

@@ -9,15 +9,15 @@ Robot::Pose2D::Pose2D() : m_x(0), m_y(0), m_theta(0) { }
 
 Robot::Pose2D::Pose2D(double x, double y, double theta) : m_x(x), m_y(y), m_theta(theta) { }
 
-double Robot::Pose2D::getX() const {
+double Robot::Pose2D::X() const {
     return m_x;
 }
 
-double Robot::Pose2D::getY() const {
+double Robot::Pose2D::Y() const {
     return m_y;
 }
 
-double Robot::Pose2D::getTheta() const {
+double Robot::Pose2D::Theta() const {
     return m_theta;
 }
 

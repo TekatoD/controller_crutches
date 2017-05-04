@@ -12,11 +12,11 @@ Robot::OdometryCollector::OdometryCollector(Pose2D initial) : m_initial(initial)
 Robot::OdometryCollector::OdometryCollector(double x, double y, double theta) : m_initial(x, y, theta), m_pose(x, y, theta) { }
 
 void Robot::OdometryCollector::odoTranslate(Pose2D offset) {
-    double dst = hypot(offset.getX(), offset.getY());
-    double angle = atan2(offset.getY(), offset.getX());
-    m_pose.setX(m_pose.getX() + (cos(m_pose.getTheta() + angle) * dst));
-    m_pose.setY(m_pose.getY() + (sin(m_pose.getTheta() + angle + offset.getTheta()) * dst));
-    m_pose.setTheta(m_pose.getTheta() + offset.getTheta());
+    double dst = hypot(offset.X(), offset.Y());
+    double angle = atan2(offset.Y(), offset.X());
+    m_pose.setX(m_pose.X() + (cos(m_pose.Theta() + angle) * dst));
+    m_pose.setY(m_pose.Y() + (sin(m_pose.Theta() + angle + offset.Theta()) * dst));
+    m_pose.setTheta(m_pose.Theta() + offset.Theta());
     m_pose.normalizeTheta();
 }
 

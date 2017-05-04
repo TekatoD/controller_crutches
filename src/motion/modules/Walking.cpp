@@ -611,12 +611,22 @@ void Walking::Process() {
         m_right_start = false;
         m_left_end = false;
     } else {
-        m_left_odo_x = -1.1 * ep[6];
-        m_left_odo_y = -1.5 * ep[7];
+        if(X_MOVE_AMPLITUDE > 0) {
+            m_left_odo_x = -2 * ep[6];
+        }
+        else {
+            m_left_odo_x = 2 * ep[6];
+        }
+        m_left_odo_y = -2 * ep[7];
         m_left_odo_theta = -ep[11];
 
-        m_right_odo_x = -1.1 * ep[0];
-        m_right_odo_y = -1.5 * ep[1];
+        if(X_MOVE_AMPLITUDE > 0) {
+            m_right_odo_x = -2* ep[6];
+        }
+        else {
+            m_right_odo_x = 2 * ep[6];
+        }
+        m_right_odo_y = -2 * ep[1];
         m_right_odo_theta = -ep[5];
     }
 

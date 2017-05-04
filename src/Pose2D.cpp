@@ -68,6 +68,16 @@ void Robot::Pose2D::normalizeThetaInPi() {
     m_theta = atan2(sin(m_theta), cos(m_theta));
 }
 
+
+void Robot::Pose2D::rotateAround(const Robot::Pose2D& pose, double angle) {
+    double c = cos(angle);
+    double s = sin(angle);
+    double d_x = m_x - pose.X();
+    double d_y = m_y - pose.Y();
+    m_x = c * (d_x) - s * (d_y) + pose.X();
+    m_y = s * (d_x) + c * (d_y) + pose.Y();
+}
+
 namespace Robot {
     std::ostream &operator<<(std::ostream &os, const Robot::Pose2D &data) {
         os << " " << data.m_x << " " << data.m_y << " " << data.m_theta / M_PI * 180;

@@ -31,6 +31,8 @@ namespace Robot {
 
         void normalizeThetaInPi();
 
+        void rotateAround(const Pose2D& pose, double angle);
+
         Pose2D operator+(const Pose2D& rhs) const;
 
         Pose2D& operator+=(const Pose2D& rhs);

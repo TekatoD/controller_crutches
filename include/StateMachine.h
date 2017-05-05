@@ -5,8 +5,7 @@
  *      Author: zerom
  */
 
-#ifndef STATUSCHECK_H_
-#define STATUSCHECK_H_
+#pragma once
 
 #include "CM730.h"
 #include "minIni.h"
@@ -16,42 +15,61 @@
 
 namespace Robot {
     enum {
-        BTN_START = 1,
-        BTN_STOP = 2
+        BTN_STATE = 1,
+        BTN_START = 2
     };
 
-    enum {
-        ROLE_UNKNOWN = 0,
+    enum Role {
+        ROLE_IDLE = 0,
         ROLE_SOCCER = 1,
-        ROLE_GOALKEEPER = 2
+        ROLE_PENALTY = 2,
+        ROLE_GOALKEEPER = 3,
+        ROLES_COUNT
     };
 
     class StateMachine {
     private:
-        static int m_old_btn;
-        static int m_is_started;
-        static int m_role;
+        StateMachine();
 
-        static Pose2D m_spawn_pos;
-        static Pose2D m_starting_pos;
+        int m_old_btn;
+        Role m_role;
+        bool m_manual_penalty;
+        bool m_is_started;
+
+        Pose2D m_spawn_pos;
+        Pose2D m_starting_pos;
 
     public:
-        static int IsStarted();
+        static StateMachine* GetInstance() {
+            static StateMachine instance;
+            return &instance;
+        }
 
-        static const Pose2D &SpawnPosition();
+        int IsStarted();
 
-        static const Pose2D &StartingPosition();
+        const Pose2D& SpawnPosition();
 
-        static void Check(CM730& cm730);
+        const Pose2D& StartingPosition();
 
-        static void LoadINISettings(minIni* ini);
+        Role GetRole() const;
 
-        static void LoadINISettings(minIni* ini, const std::string& section);
+        void SetRole(Role role);
 
-        static void SaveINISettings(minIni* ini);
+        void Check(CM730& cm730);
 
-        static void SaveINISettings(minIni* ini, const std::string& section);
+        void LoadINISettings(minIni* ini);
+
+        void LoadINISettings(minIni* ini, const std::string& section);
+
+        void SaveINISettings(minIni* ini);
+
+        void SaveINISettings(minIni* ini, const std::string& section);
+
+        void Disable();
+
+        void Enable();
+
+        void UpdateLeds(CM730 &cm730) const;
     };
 }
 
-#endif /* STATUSCHECK_H_ */

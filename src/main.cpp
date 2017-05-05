@@ -153,41 +153,6 @@ int main(void) {
         if (StateMachine::GetInstance()->IsStarted() == 0) {
             continue;
         }
-
-        // Update CV
-        LinuxCamera::GetInstance()->CaptureFrame();
-        tracker.Process(ball_finder->GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
-
-        if (Action::GetInstance()->IsRunning() == 0) {
-            // Switch to head and walking after action
-            Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-            // Follow the ball
-            Pose2D odo = Walking::GetInstance()->GetOdo();
-            Pose2D target(300, 300.0, 1.57);
-            target.rotateAround(odo);
-            goTo.Process(target - odo);
-
-            std::cout << "odo: " << odo << "; t: " << target << "; d: " << target - odo << std::endl;
-
-//            follower.Process(tracker.ball_position);
-            ///////////////
-//            std::ofstream out;
-//            out.open("odo.txt", std::ios::app);
-//            out << Walking::GetInstance()->Get() << std::endl;
-//            out.close();
-            //////////////
-            if (follower.KickBall != 0) {
-                Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-                Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-                // Kick the ball
-                if (follower.KickBall == -1) {
-                    Action::GetInstance()->Start(12);   // RIGHT KICK
-                } else if (follower.KickBall == 1) {
-                    Action::GetInstance()->Start(13);   // LEFT KICK
-                }
-            }
-        }
     }
 
 

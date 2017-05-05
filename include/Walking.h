@@ -224,7 +224,7 @@ namespace Robot {
 
         void ResetOdo(Pose2D pose);
 
-        void SetPose(Pose2D pose);
+        void SetOdo(Pose2D pose);
     };
 }
 

@@ -194,11 +194,11 @@ int StateMachine::IsStarted() {
     return m_is_started;
 }
 
-const Pose2D& StateMachine::SpawnPosition() {
+const Pose2D& StateMachine::GetSpawnPosition() const {
     return m_spawn_pos;
 }
 
-const Pose2D& StateMachine::StartingPosition() {
+const Pose2D& StateMachine::GetStartingPosition() const {
     return m_starting_pos;
 }
 
@@ -208,4 +208,12 @@ Role StateMachine::GetRole() const {
 
 void StateMachine::SetRole(Role role) {
     m_role = role;
+}
+
+void StateMachine::SetSpawnPosition(const Pose2D& pos) {
+    m_spawn_pos = pos;
+}
+
+void StateMachine::SetStartingPosition(const Pose2D& pos) {
+    m_starting_pos = pos;
 }

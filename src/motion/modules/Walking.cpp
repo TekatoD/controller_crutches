@@ -790,6 +790,6 @@ void Walking::ResetOdo(Pose2D pose) {
     m_odometry_collector.Reset();
 }
 
-void Walking::SetPose(Pose2D pose) {
+void Walking::SetOdo(Pose2D pose) {
     m_odometry_collector.SetPose(pose);
 }

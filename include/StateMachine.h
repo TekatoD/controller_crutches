@@ -47,9 +47,13 @@ namespace Robot {
 
         int IsStarted();
 
-        const Pose2D& SpawnPosition();
+        const Pose2D& GetSpawnPosition() const;
 
-        const Pose2D& StartingPosition();
+        const Pose2D& GetStartingPosition() const;
+
+        void SetSpawnPosition(const Pose2D& pos);
+
+        void SetStartingPosition(const Pose2D& pos);
 
         Role GetRole() const;
 

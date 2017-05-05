@@ -86,6 +86,7 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
 
 
     if (!m_Done) {
+        Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
         Walking::GetInstance()->X_MOVE_AMPLITUDE = m_X;
         Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_Y;
         Walking::GetInstance()->A_MOVE_AMPLITUDE = m_A;

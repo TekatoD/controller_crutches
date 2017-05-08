@@ -11,6 +11,8 @@
 #include "math/Point.h"
 #include "BallTracker.h"
 
+#define FOLLOWER_SECTION ("Ball Follower")
+
 
 namespace Robot {
     class BallFollower {
@@ -41,8 +43,9 @@ namespace Robot {
         double m_FBStep;
         double m_RLTurn;
 
-    protected:
+        double m_TiltOffset;
 
+    protected:
     public:
         bool DEBUG_PRINT;
         int KickBall;        // 0: No ball 1:Left -1:Right
@@ -52,6 +55,14 @@ namespace Robot {
         ~BallFollower();
 
         void Process(Point2D ball_pos);
+
+        void LoadINISettings(minIni* ini);
+
+        void LoadINISettings(minIni* ini, const std::string& section);
+
+        void SaveINISettings(minIni* ini);
+
+        void SaveINISettings(minIni* ini, const std::string& section);
     };
 }
 

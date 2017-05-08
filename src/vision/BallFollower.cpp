@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <iostream>
 #include "ImgProcess.h"
 #include "MX28.h"
 #include "motion/modules/Head.h"
@@ -39,7 +40,7 @@ BallFollower::BallFollower() {
     m_GoalRLTurn = 0;
     m_FBStep = 0;
     m_RLTurn = 0;
-    DEBUG_PRINT = false;
+    m_TiltOffset = MX28::RATIO_VALUE2ANGLE;
     KickBall = 0;
 }
 
@@ -49,9 +50,6 @@ BallFollower::~BallFollower() {
 
 
 void BallFollower::Process(Point2D ball_pos) {
-    if (DEBUG_PRINT == true)
-        fprintf(stderr, "\r                                                                               \r");
-
     if (ball_pos.X == -1.0 || ball_pos.Y == -1.0) {
         KickBall = 0;
 
@@ -60,13 +58,8 @@ void BallFollower::Process(Point2D ball_pos) {
             m_GoalFBStep = 0;
             m_GoalRLTurn = 0;
             Head::GetInstance()->MoveToHome();
-
-            if (DEBUG_PRINT == true)
-                fprintf(stderr, "[NO BALL]");
         } else {
             m_NoBallCount++;
-            if (DEBUG_PRINT == true)
-                fprintf(stderr, "[NO BALL COUNTING(%d/%d)]", m_NoBallCount, m_NoBallMaxCount);
         }
     } else {
         m_NoBallCount = 0;
@@ -83,7 +76,8 @@ void BallFollower::Process(Point2D ball_pos) {
             tilt_percent = -tilt_percent;
 
         if (pan > m_KickRightAngle && pan < m_KickLeftAngle) {
-            if (tilt <= (tilt_min + MX28::RATIO_VALUE2ANGLE)) {
+            std::cout << tilt << " " << tilt_min << " " << m_TiltOffset << std::endl;
+            if (tilt <= (tilt_min + m_TiltOffset)) {
                 if (ball_pos.Y < m_KickTopAngle) {
                     m_GoalFBStep = 0;
                     m_GoalRLTurn = 0;
@@ -91,30 +85,20 @@ void BallFollower::Process(Point2D ball_pos) {
                     if (m_KickBallCount >= m_KickBallMaxCount) {
                         m_FBStep = 0;
                         m_RLTurn = 0;
-                        if (DEBUG_PRINT == true)
-                            fprintf(stderr, "[KICK]");
 
                         if (pan > 0) {
                             KickBall = 1; // Left
-                            if (DEBUG_PRINT == true)
-                                fprintf(stderr, " Left");
                         } else {
                             KickBall = -1; // Right
-                            if (DEBUG_PRINT == true)
-                                fprintf(stderr, " Right");
                         }
                     } else {
                         KickBall = 0;
-                        if (DEBUG_PRINT == true)
-                            fprintf(stderr, "[KICK COUNTING(%d/%d)]", m_KickBallCount, m_KickBallMaxCount);
                     }
                 } else {
                     m_KickBallCount = 0;
                     KickBall = 0;
                     m_GoalFBStep = m_FitFBStep;
                     m_GoalRLTurn = m_FitMaxRLTurn * pan_percent;
-                    if (DEBUG_PRINT == true)
-                        fprintf(stderr, "[FIT(P:%.2f T:%.2f>%.2f)]", pan, ball_pos.Y, m_KickTopAngle);
                 }
             } else {
                 m_KickBallCount = 0;
@@ -123,16 +107,13 @@ void BallFollower::Process(Point2D ball_pos) {
                 if (m_GoalFBStep < m_FollowMinFBStep)
                     m_GoalFBStep = m_FollowMinFBStep;
                 m_GoalRLTurn = m_FollowMaxRLTurn * pan_percent;
-                if (DEBUG_PRINT == true)
-                    fprintf(stderr, "[FOLLOW(P:%.2f T:%.2f>%.2f]", pan, tilt, tilt_min);
             }
         } else {
             m_KickBallCount = 0;
+            
             KickBall = 0;
             m_GoalFBStep = 0;
             m_GoalRLTurn = m_FollowMaxRLTurn * pan_percent;
-            if (DEBUG_PRINT == true)
-                fprintf(stderr, "[FOLLOW(P:%.2f T:%.2f>%.2f]", pan, tilt, tilt_min);
         }
     }
 
@@ -143,18 +124,13 @@ void BallFollower::Process(Point2D ball_pos) {
             if (m_KickBallCount < m_KickBallMaxCount)
                 m_KickBallCount++;
         }
-
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, " STOP");
     } else {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, " START");
-
         if (!Walking::GetInstance()->IsRunning()) {
             m_FBStep = 0;
             m_RLTurn = 0;
             m_KickBallCount = 0;
             KickBall = 0;
+            
             Walking::GetInstance()->X_MOVE_AMPLITUDE = m_FBStep;
             Walking::GetInstance()->A_MOVE_AMPLITUDE = m_RLTurn;
             Walking::GetInstance()->Start();
@@ -170,9 +146,53 @@ void BallFollower::Process(Point2D ball_pos) {
             else if (m_RLTurn > m_GoalRLTurn)
                 m_RLTurn -= m_UnitRLTurn;
             Walking::GetInstance()->A_MOVE_AMPLITUDE = m_RLTurn;
-
-            if (DEBUG_PRINT == true)
-                fprintf(stderr, " (FB:%.1f RL:%.1f)", m_FBStep, m_RLTurn);
         }
     }
+}
+
+
+void BallFollower::LoadINISettings(minIni* ini) {
+    LoadINISettings(ini, FOLLOWER_SECTION);
+}
+
+
+void BallFollower::LoadINISettings(minIni* ini, const std::string& section) {
+    int value = -2;
+    if ((value = ini->geti(section, "no_ball_max_count", INVALID_VALUE)) != INVALID_VALUE) m_NoBallMaxCount = value;
+    if ((value = ini->geti(section, "kick_ball_max_count", INVALID_VALUE)) != INVALID_VALUE) m_KickBallMaxCount = value;
+
+    double dvalue = -2.0;
+    if ((dvalue = ini->getd(section, "kick_top_angle", INVALID_VALUE)) != INVALID_VALUE) m_KickTopAngle = dvalue;
+    if ((dvalue = ini->getd(section, "kick_right_angle", INVALID_VALUE)) != INVALID_VALUE) m_KickRightAngle = dvalue;
+    if ((dvalue = ini->getd(section, "kick_left_angle", INVALID_VALUE)) != INVALID_VALUE) m_KickLeftAngle = dvalue;
+    if ((dvalue = ini->getd(section, "follow_max_fb_step", INVALID_VALUE)) != INVALID_VALUE) m_FollowMaxFBStep = dvalue;
+    if ((dvalue = ini->getd(section, "follow_min_fb_step", INVALID_VALUE)) != INVALID_VALUE) m_FollowMinFBStep = dvalue;
+    if ((dvalue = ini->getd(section, "follow_max_rl_turn", INVALID_VALUE)) != INVALID_VALUE) m_FollowMaxRLTurn = dvalue;
+    if ((dvalue = ini->getd(section, "fit_fb_step", INVALID_VALUE)) != INVALID_VALUE) m_FitFBStep = dvalue;
+    if ((dvalue = ini->getd(section, "fit_max_rl_turn", INVALID_VALUE)) != INVALID_VALUE) m_FitMaxRLTurn = dvalue;
+    if ((dvalue = ini->getd(section, "unit_fb_step", INVALID_VALUE)) != INVALID_VALUE) m_UnitFBStep = dvalue;
+    if ((dvalue = ini->getd(section, "unit_rl_turn", INVALID_VALUE)) != INVALID_VALUE) m_UnitRLTurn = dvalue;
+    if ((dvalue = ini->getd(section, "tilt_offset", INVALID_VALUE)) != INVALID_VALUE) m_TiltOffset = dvalue;
+}
+
+
+void BallFollower::SaveINISettings(minIni* ini) {
+    SaveINISettings(ini, FOLLOWER_SECTION);
+}
+
+
+void BallFollower::SaveINISettings(minIni* ini, const std::string& section) {
+    ini->put(section, "no_ball_max_count", m_NoBallMaxCount);
+    ini->put(section, "kick_ball_max_count", m_KickBallMaxCount);
+    ini->put(section, "kick_top_angle", m_KickTopAngle);
+    ini->put(section, "kick_right_angle", m_KickRightAngle);
+    ini->put(section, "kick_left_angle", m_KickLeftAngle);
+    ini->put(section, "follow_max_fb_step", m_FollowMaxFBStep);
+    ini->put(section, "follow_min_fb_step", m_FollowMinFBStep);
+    ini->put(section, "follow_max_rl_turn", m_FollowMaxRLTurn);
+    ini->put(section, "fit_fb_step", m_FitFBStep);
+    ini->put(section, "fit_max_rl_turn", m_FitMaxRLTurn);
+    ini->put(section, "unit_fb_step", m_UnitFBStep);
+    ini->put(section, "unit_rl_turn", m_UnitRLTurn);
+    ini->put(section, "tilt_offset", m_TiltOffset);
 }

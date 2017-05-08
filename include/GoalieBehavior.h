@@ -7,6 +7,7 @@
 #include "math/Point.h"
 #include "BallTracker.h"
 #include "ColorFinder.h"
+#include "Field.h"
 
 #define GOALIE_SECTION ("Goalie")
 
@@ -47,6 +48,8 @@ namespace Robot {
         double m_left_y;
         BallTracker m_BallTracker;
         ColorFinder m_BallFinder;
+
+        Field m_Field;
 
     protected:
 

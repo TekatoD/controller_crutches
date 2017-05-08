@@ -123,18 +123,18 @@ void Robot::GoTo::LoadINISettings(minIni *ini) {
 
 
 void Robot::GoTo::LoadINISettings(minIni *ini, const std::string &section) {
-    int value = -2;
+    double value = -2;
 
-    if ((value = ini->geti(section, "max_speed", INVALID_VALUE)) != INVALID_VALUE) m_MaxSpeed = value;
-    if ((value = ini->geti(section, "max_turn", INVALID_VALUE)) != INVALID_VALUE) m_MaxTurn = value;
-    if ((value = ini->geti(section, "fit_speed", INVALID_VALUE)) != INVALID_VALUE) m_FitSpeed = value;
-    if ((value = ini->geti(section, "step_accel", INVALID_VALUE)) != INVALID_VALUE) m_StepAccel = value;
-    if ((value = ini->geti(section, "turn_accel", INVALID_VALUE)) != INVALID_VALUE) m_TurnAccel = value;
+    if ((value = ini->getd(section, "max_speed", INVALID_VALUE)) != INVALID_VALUE) m_MaxSpeed = value;
+    if ((value = ini->getd(section, "max_turn", INVALID_VALUE)) != INVALID_VALUE) m_MaxTurn = value;
+    if ((value = ini->getd(section, "fit_speed", INVALID_VALUE)) != INVALID_VALUE) m_FitSpeed = value;
+    if ((value = ini->getd(section, "step_accel", INVALID_VALUE)) != INVALID_VALUE) m_StepAccel = value;
+    if ((value = ini->getd(section, "turn_accel", INVALID_VALUE)) != INVALID_VALUE) m_TurnAccel = value;
 
-    if ((value = ini->geti(section, "distance_variance", INVALID_VALUE)) != INVALID_VALUE) m_DistanceVar = value;
-    if ((value = ini->geti(section, "angle_variance", INVALID_VALUE)) != INVALID_VALUE) m_AngleVar = value;
-    if ((value = ini->geti(section, "fit_distance", INVALID_VALUE)) != INVALID_VALUE) m_FitDistance = value;
-    if ((value = ini->geti(section, "dode_angle", INVALID_VALUE)) != INVALID_VALUE) m_DodeAngle = value;
+    if ((value = ini->getd(section, "distance_variance", INVALID_VALUE)) != INVALID_VALUE) m_DistanceVar = value;
+    if ((value = ini->getd(section, "angle_variance", INVALID_VALUE)) != INVALID_VALUE) m_AngleVar = value;
+    if ((value = ini->getd(section, "fit_distance", INVALID_VALUE)) != INVALID_VALUE) m_FitDistance = value;
+    if ((value = ini->getd(section, "dode_angle", INVALID_VALUE)) != INVALID_VALUE) m_DodeAngle = value;
 }
 
 

@@ -87,7 +87,6 @@ set(SRC
 
 add_executable(soccer ${SRC})
 target_link_libraries(soccer
-#        ${CMAKE_SOURCE_DIR}/lib/darwin.a
         ${CMAKE_THREAD_LIBS_INIT}
         ${JPEG_LIBRARIES}
         dl)

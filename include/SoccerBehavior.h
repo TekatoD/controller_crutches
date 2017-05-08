@@ -27,7 +27,7 @@
 #include "GoTo.h"
 
 
-#define SOCCER_SECTION "soccer"
+#define SOCCER_SECTION "Soccer"
 
 namespace Robot {
     class SoccerBehavior {

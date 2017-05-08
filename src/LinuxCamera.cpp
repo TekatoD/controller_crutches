@@ -233,22 +233,22 @@ void LinuxCamera::LoadINISettings(minIni* ini) {
     int value = -2;
     CameraSettings newset = GetCameraSettings();
 
-    if ((value = ini->geti("Camera", "Brightness", -2)) != -2) newset.brightness = value;
-    if ((value = ini->geti("Camera", "Contrast", -2)) != -2) newset.contrast = value;
-    if ((value = ini->geti("Camera", "Saturation", -2)) != -2) newset.saturation = value;
-    if ((value = ini->geti("Camera", "Gain", -2)) != -2) newset.gain = value;
-    if ((value = ini->geti("Camera", "Exposure", -2)) != -2) newset.exposure = value;
+    if ((value = ini->geti("Camera", "brightness", -2)) != -2) newset.brightness = value;
+    if ((value = ini->geti("Camera", "contrast", -2)) != -2) newset.contrast = value;
+    if ((value = ini->geti("Camera", "saturation", -2)) != -2) newset.saturation = value;
+    if ((value = ini->geti("Camera", "gain", -2)) != -2) newset.gain = value;
+    if ((value = ini->geti("Camera", "exposure", -2)) != -2) newset.exposure = value;
 
     SetCameraSettings(newset);
 }
 
 
 void LinuxCamera::SaveINISettings(minIni* ini) {
-    ini->put("Camera", "Brightness", settings.brightness);
-    ini->put("Camera", "Contrast", settings.contrast);
-    ini->put("Camera", "Saturation", settings.saturation);
-    ini->put("Camera", "Gain", settings.gain);
-    ini->put("Camera", "Exposure", settings.exposure);
+    ini->put("Camera", "brightness", settings.brightness);
+    ini->put("Camera", "contrast", settings.contrast);
+    ini->put("Camera", "saturation", settings.saturation);
+    ini->put("Camera", "gain", settings.gain);
+    ini->put("Camera", "exposure", settings.exposure);
 }
 
 

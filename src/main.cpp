@@ -16,6 +16,8 @@
 #include <Speech.h>
 #include <thread>
 #include <GoTo.h>
+#include <SoccerBehavior.h>
+#include <GoalieBehavior.h>
 #include "OdometryCollector.h"
 
 #include "LinuxDARwIn.h"
@@ -59,20 +61,20 @@ int main(void) {
 
     change_current_dir();
 
-    auto ini = std::make_unique<minIni>(INI_FILE_PATH);
+    minIni ini(INI_FILE_PATH);
 
     LinuxCamera::GetInstance()->Initialize(0);
     LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
-    LinuxCamera::GetInstance()->LoadINISettings(ini.get());                   // load from ini
+    LinuxCamera::GetInstance()->LoadINISettings(&ini);                   // load from ini
 
-    auto ball_finder = std::make_unique<ColorFinder>();
-    ball_finder->LoadINISettings(ini.get());
+//    auto ball_finder = std::make_unique<ColorFinder>();
+//    ball_finder->LoadINISettings(ini.get());
 
-    BallTracker tracker = BallTracker();
-    BallFollower follower = BallFollower();
-    GoTo goTo = GoTo();
+//    BallTracker tracker = BallTracker();
+//    BallFollower follower = BallFollower();
+//    GoTo goTo = GoTo();
 
-    goTo.LoadINISettings(ini.get());
+//    goTo.LoadINISettings(ini.get());
 
     //////////////////// Framework Initialize ///////////////////////////
     if (!MotionManager::GetInstance()->Initialize(&cm730)) {
@@ -83,7 +85,7 @@ int main(void) {
         }
     }
 
-    Walking::GetInstance()->LoadINISettings(ini.get());
+    Walking::GetInstance()->LoadINISettings(&ini);
 
     MotionManager::GetInstance()->AddModule((MotionModule*) Action::GetInstance());
     MotionManager::GetInstance()->AddModule((MotionModule*) Head::GetInstance());
@@ -93,8 +95,8 @@ int main(void) {
     motion_timer->Start();
     /////////////////////////////////////////////////////////////////////
 
-    MotionManager::GetInstance()->LoadINISettings(ini.get());
-    StateMachine::GetInstance()->LoadINISettings(ini.get());
+    MotionManager::GetInstance()->LoadINISettings(&ini);
+    StateMachine::GetInstance()->LoadINISettings(&ini);
 
     int firm_ver = 0;
     if (cm730.ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0) != CM730::SUCCESS) {
@@ -116,7 +118,7 @@ int main(void) {
 
     ///////////////////// Init game controller //////////////////////////
 
-    GameController::GetInstance()->LoadINISettings(ini.get());
+    GameController::GetInstance()->LoadINISettings(&ini);
     if (!GameController::GetInstance()->Connect()) {
         std::cerr << "ERROR: Can't connect to game controller!" << std::endl;
         return 1;
@@ -140,6 +142,12 @@ int main(void) {
 
     cm730.WriteByte(CM730::P_LED_PANNEL, 0x01 | 0x02 | 0x04, NULL);
 
+    SoccerBehavior soccer(cm730);
+    GoalieBehavior goalie;
+
+    soccer.LoadINISettings(&ini);
+    goalie.LoadINISettings(&ini);
+
     Action::GetInstance()->Start(15);
     while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 
@@ -152,6 +160,18 @@ int main(void) {
 
         if (StateMachine::GetInstance()->IsStarted() == 0) {
             continue;
+        }
+
+        switch (StateMachine::GetInstance()->GetRole()) {
+            case ROLE_IDLE:break;
+            case ROLE_SOCCER:
+                soccer.Process();
+                break;
+            case ROLE_PENALTY:break;
+            case ROLE_GOALKEEPER:
+                goalie.Process();
+                break;
+            case ROLES_COUNT:break;
         }
     }
 

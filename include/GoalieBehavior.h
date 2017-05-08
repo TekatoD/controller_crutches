@@ -8,7 +8,7 @@
 #include "BallTracker.h"
 #include "ColorFinder.h"
 
-#define GOALIE_SECTION ("goalie")
+#define GOALIE_SECTION ("Goalie")
 
 namespace Robot {
     class GoalieBehavior {

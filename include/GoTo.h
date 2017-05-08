@@ -25,7 +25,7 @@
 #include "Pose2D.h"
 #include "minIni.h"
 
-#define GOTO_SECTION ("goto")
+#define GOTO_SECTION ("Goto")
 
 namespace Robot {
     class GoTo {

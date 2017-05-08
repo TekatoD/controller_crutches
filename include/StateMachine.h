@@ -11,7 +11,7 @@
 #include "minIni.h"
 #include "Pose2D.h"
 
-#define CNTRL_SECTION "controller"
+#define CNTRL_SECTION "State Machine"
 
 namespace Robot {
     enum {

@@ -83,7 +83,7 @@ set(SRC
         include/SoccerBehavior.h
         src/SoccerBehavior.cpp
         include/GoalieBehavior.h
-        src/GoalieBehavior.cpp)
+        src/GoalieBehavior.cpp src/Field.cpp include/Field.h)
 
 add_executable(soccer ${SRC})
 target_link_libraries(soccer

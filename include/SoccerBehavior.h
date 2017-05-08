@@ -25,6 +25,7 @@
 #include "BallTracker.h"
 #include "BallFollower.h"
 #include "GoTo.h"
+#include "Field.h"
 
 
 #define SOCCER_SECTION "Soccer"
@@ -50,6 +51,8 @@ namespace Robot {
         BallTracker m_BallTracker;
         BallFollower m_BallFollower;
         GoTo m_GoTo;
+
+        Field m_Field;
     };
 }
 

@@ -182,6 +182,7 @@ void GoalieBehavior::LoadINISettings(minIni* ini, const std::string& section) {
     if ((value = ini->geti(section, "left_y", INVALID_VALUE)) != INVALID_VALUE) m_left_y = value;
 
     m_BallFinder.LoadINISettings(ini);
+    m_Field.LoadINISettings(ini);
 }
 
 void GoalieBehavior::SaveINISettings(minIni* ini) {
@@ -198,4 +199,5 @@ void GoalieBehavior::SaveINISettings(minIni* ini, const std::string& section) {
     ini->put(section, "left_y", m_left_y);
 
     m_BallFinder.SaveINISettings(ini);
+    m_Field.SaveINISettings(ini);
 }

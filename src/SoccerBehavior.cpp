@@ -44,12 +44,14 @@ void SoccerBehavior::Process() {
     }
 
     if (State.state == STATE_READY) {
+        Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
+        Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+
         const Pose2D& Spawn = StateMachine::GetInstance()->GetSpawnPosition();
         const Pose2D& Starting = StateMachine::GetInstance()->GetStartingPosition();
         const Pose2D& Odo = Walking::GetInstance()->GetOdo();
 
         auto pos = Starting - Spawn - Odo;
-        std::cout << "s: " << Starting << " sp: " << Spawn << " odo: " << Odo << " p: " <<  pos << std::endl;
         m_GoTo.Process(pos);
         return;
     }
@@ -68,6 +70,9 @@ void SoccerBehavior::Process() {
             // Follow the ball
             m_BallFollower.Process(m_BallTracker.ball_position);
 
+            if (m_BallFollower.KickBall != 0) {
+                std::cout << "Balls!" << std::endl;
+            }
             // Kicking the ball
             if (m_BallFollower.KickBall != 0) {
                 Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
@@ -90,6 +95,8 @@ void SoccerBehavior::LoadINISettings(minIni *ini) {
 void SoccerBehavior::LoadINISettings(minIni *ini, const std::string& section) {
     m_BallFinder.LoadINISettings(ini);
     m_GoTo.LoadINISettings(ini);
+    m_Field.LoadINISettings(ini);
+    m_BallFollower.LoadINISettings(ini);
 }
 
 
@@ -101,4 +108,6 @@ void SoccerBehavior::SaveINISettings(minIni *ini) {
 void SoccerBehavior::SaveINISettings(minIni *ini, const std::string& section) {
     m_BallFinder.SaveINISettings(ini);
     m_GoTo.SaveINISettings(ini);
+    m_Field.SaveINISettings(ini);
+    m_BallFollower.LoadINISettings(ini);
 }

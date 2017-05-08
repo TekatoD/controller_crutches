@@ -14,18 +14,17 @@ using namespace Robot;
 
 
 ColorFinder::ColorFinder()
-        :
-        m_center_point(Point2D()),
-        m_hue(356),
-        m_hue_tolerance(15),
-        m_min_saturation(50),
-        m_max_saturation(100),
-        m_min_value(10),
-        m_max_value(100),
-        m_min_percent(0.07),
-        m_max_percent(30.0),
-        color_section(""),
-        m_result(0) {}
+        : m_center_point(Point2D()),
+          m_hue(356),
+          m_hue_tolerance(15),
+          m_min_saturation(50),
+          m_max_saturation(100),
+          m_min_value(10),
+          m_max_value(100),
+          m_min_percent(0.07),
+          m_max_percent(30.0),
+          color_section(""),
+          m_result(0) {}
 
 
 ColorFinder::ColorFinder(int hue, int hue_tol, int min_sat, int min_val, double min_per, double max_per)

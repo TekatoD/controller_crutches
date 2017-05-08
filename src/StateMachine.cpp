@@ -169,15 +169,17 @@ void StateMachine::LoadINISettings(minIni *ini, const std::string& section) {
                 m_role = ROLE_IDLE;
         }
     }
-    if ((value = ini->geti(section, "spawn_x", INVALID_VALUE)) != INVALID_VALUE) m_spawn_pos.setX(value);
-    if ((value = ini->geti(section, "spawn_y", INVALID_VALUE)) != INVALID_VALUE) m_spawn_pos.setY(value);
-    if ((value = ini->geti(section, "spawn_theta", INVALID_VALUE)) != INVALID_VALUE)
-        m_spawn_pos.setTheta(value / 180.0 * M_PI);
 
-    if ((value = ini->geti(section, "starting_x", INVALID_VALUE)) != INVALID_VALUE) m_starting_pos.setX(value);
-    if ((value = ini->geti(section, "starting_y", INVALID_VALUE)) != INVALID_VALUE) m_starting_pos.setY(value);
-    if ((value = ini->geti(section, "starting_theta", INVALID_VALUE)) != INVALID_VALUE)
-        m_starting_pos.setTheta(value / 180.0 * M_PI);
+    double dvalue = -2;
+    if ((dvalue = ini->getd(section, "spawn_x", INVALID_VALUE)) != INVALID_VALUE) m_spawn_pos.setX(dvalue);
+    if ((dvalue = ini->getd(section, "spawn_y", INVALID_VALUE)) != INVALID_VALUE) m_spawn_pos.setY(dvalue);
+    if ((dvalue = ini->getd(section, "spawn_theta", INVALID_VALUE)) != INVALID_VALUE)
+        m_spawn_pos.setTheta(dvalue / 180.0 * M_PI);
+
+    if ((dvalue = ini->getd(section, "starting_x", INVALID_VALUE)) != INVALID_VALUE) m_starting_pos.setX(dvalue);
+    if ((dvalue = ini->getd(section, "starting_y", INVALID_VALUE)) != INVALID_VALUE) m_starting_pos.setY(dvalue);
+    if ((dvalue = ini->getd(section, "starting_theta", INVALID_VALUE)) != INVALID_VALUE)
+        m_starting_pos.setTheta(dvalue / 180.0 * M_PI);
 }
 
 

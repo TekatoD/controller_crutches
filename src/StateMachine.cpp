@@ -10,11 +10,11 @@
 #include <GameController.h>
 
 #include "StateMachine.h"
-#include "Head.h"
-#include "Action.h"
-#include "Walking.h"
-#include "MotionStatus.h"
-#include "MotionManager.h"
+#include "motion/modules/Head.h"
+#include "motion/modules/Action.h"
+#include "motion/modules/Walking.h"
+#include "motion/MotionStatus.h"
+#include "motion/MotionManager.h"
 
 using namespace Robot;
 

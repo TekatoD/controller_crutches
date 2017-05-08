@@ -6,7 +6,7 @@
  */
 
 #include <math.h>
-#include "Point.h"
+#include "math/Point.h"
 
 using namespace Robot;
 

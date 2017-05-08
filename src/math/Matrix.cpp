@@ -6,7 +6,7 @@
  */
 
 #include <math.h>
-#include "Matrix.h"
+#include "math/Matrix.h"
 
 using namespace Robot;
 

@@ -6,9 +6,9 @@
  */
 
 #include "MX28.h"
-#include "Kinematics.h"
-#include "MotionStatus.h"
-#include "Head.h"
+#include "motion/Kinematics.h"
+#include "motion/MotionStatus.h"
+#include "motion/modules/Head.h"
 
 using namespace Robot;
 

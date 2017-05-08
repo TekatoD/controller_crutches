@@ -8,7 +8,7 @@
 #ifndef _MOTION_MODULE_H_
 #define _MOTION_MODULE_H_
 
-#include "JointData.h"
+#include "motion/JointData.h"
 
 namespace Robot {
 

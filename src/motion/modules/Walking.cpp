@@ -6,12 +6,12 @@
  */
 #include <math.h>
 #include <iostream>
-#include "Vector.h"
-#include "Matrix.h"
+#include "math/Vector.h"
+#include "math/Matrix.h"
 #include "MX28.h"
-#include "MotionStatus.h"
-#include "Kinematics.h"
-#include "Walking.h"
+#include "motion/MotionStatus.h"
+#include "motion/Kinematics.h"
+#include "motion/modules/Walking.h"
 #include <thread>
 
 using namespace Robot;

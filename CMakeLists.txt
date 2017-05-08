@@ -10,7 +10,7 @@ find_package(JPEG REQUIRED)
 include_directories(include/)
 
 set(SRC
-        include/Action.h
+        include/motion/modules/Action.h
         include/BallFollower.h
         include/BallTracker.h
         include/Camera.h
@@ -18,25 +18,25 @@ set(SRC
         include/ColorFinder.h
         include/DARwIn.h
         include/FSR.h
-        include/Head.h
+        include/motion/modules/Head.h
         include/Image.h
         include/ImgProcess.h
-        include/JointData.h
-        include/Kinematics.h
+        include/motion/JointData.h
+        include/motion/Kinematics.h
         include/LinuxCamera.h
         include/LinuxCM730.h
         include/LinuxDARwIn.h
         include/LinuxMotionTimer.h
-        include/Matrix.h
+        include/math/Matrix.h
         include/minIni.h
-        include/MotionManager.h
+        include/motion/MotionManager.h
         include/MotionModule.h
-        include/MotionStatus.h
+        include/motion/MotionStatus.h
         include/MX28.h
-        include/Point.h
+        include/math/Point.h
         include/StateMachine.h
-        include/Vector.h
-        include/Walking.h
+        include/math/Vector.h
+        include/motion/modules/Walking.h
         src/math/Matrix.cpp
         src/math/Point.cpp
         src/math/Vector.cpp

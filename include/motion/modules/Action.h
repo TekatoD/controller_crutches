@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <memory>
 #include "MotionModule.h"
-#include "JointData.h"
+#include "motion/JointData.h"
 
 
 namespace Robot {

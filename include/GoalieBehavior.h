@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include "Point.h"
+#include "math/Point.h"
 #include "BallTracker.h"
 #include "ColorFinder.h"
 

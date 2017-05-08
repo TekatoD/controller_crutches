@@ -10,7 +10,7 @@
 
 #include <string.h>
 
-#include "Point.h"
+#include "math/Point.h"
 #include "minIni.h"
 
 namespace Robot {

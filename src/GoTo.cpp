@@ -18,7 +18,7 @@
  */
 
 #include "GoTo.h"
-#include "Walking.h"
+#include "motion/modules/Walking.h"
 
 #define PI (3.14159265)
 

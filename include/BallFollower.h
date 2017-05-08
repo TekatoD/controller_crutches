@@ -8,7 +8,7 @@
 #ifndef _BALL_FOLLOWER_H_
 #define _BALL_FOLLOWER_H_
 
-#include "Point.h"
+#include "math/Point.h"
 #include "BallTracker.h"
 
 

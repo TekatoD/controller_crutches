@@ -11,7 +11,7 @@
 
 #include <string>
 
-#include "Point.h"
+#include "math/Point.h"
 #include "Image.h"
 #include "minIni.h"
 

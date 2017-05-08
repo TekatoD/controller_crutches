@@ -5,14 +5,14 @@
 
 #include <stdio.h>
 #include <iostream>
-#include <Action.h>
+#include <motion/modules/Action.h>
 #include <LinuxCamera.h>
 #include "ImgProcess.h"
 #include "MX28.h"
-#include "Head.h"
-#include "Walking.h"
+#include "motion/modules/Head.h"
+#include "motion/modules/Walking.h"
 #include "GoalieBehavior.h"
-#include "MotionStatus.h"
+#include "motion/MotionStatus.h"
 
 
 using namespace Robot;

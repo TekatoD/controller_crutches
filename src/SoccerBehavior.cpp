@@ -18,9 +18,9 @@
  */
 
 #include <LinuxCamera.h>
-#include <Action.h>
-#include <Head.h>
-#include <Walking.h>
+#include <motion/modules/Action.h>
+#include <motion/modules/Head.h>
+#include <motion/modules/Walking.h>
 #include <GameController.h>
 #include <StateMachine.h>
 #include "SoccerBehavior.h"

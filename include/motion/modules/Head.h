@@ -13,7 +13,7 @@
 
 #include "minIni.h"
 #include "MotionModule.h"
-#include "Point.h"
+#include "math/Point.h"
 
 #define HEAD_SECTION    "Head Pan/Tilt"
 #define INVALID_VALUE   -1024.0

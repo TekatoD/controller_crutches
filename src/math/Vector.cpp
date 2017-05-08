@@ -6,7 +6,7 @@
  */
 
 #include <math.h>
-#include "Vector.h"
+#include "math/Vector.h"
 
 using namespace Robot;
 

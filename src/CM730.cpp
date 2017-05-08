@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include "FSR.h"
 #include "CM730.h"
-#include "MotionStatus.h"
-#include "Kinematics.h"
+#include "motion/MotionStatus.h"
+#include "motion/Kinematics.h"
 
 using namespace Robot;
 

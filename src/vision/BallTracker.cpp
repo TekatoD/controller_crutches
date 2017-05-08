@@ -5,7 +5,7 @@
  *
  */
 
-#include "Head.h"
+#include "motion/modules/Head.h"
 #include "Camera.h"
 #include "BallTracker.h"
 

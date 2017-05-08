@@ -5,7 +5,7 @@
  *
  */
 
-#include "MotionStatus.h"
+#include "motion/MotionStatus.h"
 
 using namespace Robot;
 

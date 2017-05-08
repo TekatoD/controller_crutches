@@ -5,7 +5,7 @@
  *
  */
 
-#include "Kinematics.h"
+#include "motion/Kinematics.h"
 
 
 using namespace Robot;

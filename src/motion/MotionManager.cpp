@@ -9,7 +9,7 @@
 #include <math.h>
 #include "FSR.h"
 #include "MX28.h"
-#include "MotionManager.h"
+#include "motion/MotionManager.h"
 
 using namespace Robot;
 

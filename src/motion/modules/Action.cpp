@@ -7,8 +7,8 @@
 
 #include <string.h>
 #include <memory>
-#include "MotionStatus.h"
-#include "Action.h"
+#include "motion/MotionStatus.h"
+#include "motion/modules/Action.h"
 
 using namespace Robot;
 

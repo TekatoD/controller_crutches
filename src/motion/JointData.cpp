@@ -6,8 +6,8 @@
  */
 
 #include "MX28.h"
-#include "JointData.h"
-#include "MotionManager.h"
+#include "motion/JointData.h"
+#include "motion/MotionManager.h"
 
 using namespace Robot;
 

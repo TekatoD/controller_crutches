@@ -8,7 +8,7 @@
 #ifndef _KINEMATICS_H_
 #define _KINEMATICS_H_
 
-#include "Matrix.h"
+#include "math/Matrix.h"
 #include "JointData.h"
 
 namespace Robot {

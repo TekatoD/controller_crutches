@@ -88,7 +88,6 @@ set(SRC
 add_executable(soccer ${SRC})
 target_link_libraries(soccer
         ${CMAKE_THREAD_LIBS_INIT}
-        ${JPEG_LIBRARIES}
-        dl)
+        ${JPEG_LIBRARIES})
 target_include_directories(soccer PUBLIC
         ${JPEG_INCLUDE_DIR})

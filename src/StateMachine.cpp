@@ -58,17 +58,19 @@ void StateMachine::Check(CM730& cm730) {
 
     if (m_old_btn & BTN_STATE) {
         if (!m_is_started) {
+            bool penalize_switched = false;
             switch (m_role) {
                 case ROLE_IDLE:
                     m_role = ROLE_SOCCER;
+                    penalize_switched = false;
                     break;
                 case ROLE_SOCCER:
                     m_role = ROLE_PENALTY;
-                    GameController::GetInstance()->SendPenalise();
+                    penalize_switched = true;
                     break;
                 case ROLE_PENALTY:
                     m_role = ROLE_GOALKEEPER;
-                    GameController::GetInstance()->SendUnpenalise();
+                    penalize_switched = true;
                     break;
                 case ROLE_GOALKEEPER:
                 default:
@@ -78,8 +80,12 @@ void StateMachine::Check(CM730& cm730) {
 
             usleep(10000);
 
-            if (m_role == ROLE_PENALTY) {
-                GameController::GetInstance()->SendPenalise();
+            if (penalize_switched) {
+                if (m_role == ROLE_PENALTY) {
+                    GameController::GetInstance()->SendPenalise();
+                } else {
+                    GameController::GetInstance()->SendUnpenalise();
+                }
             }
 
             UpdateLeds(cm730);
@@ -166,12 +172,12 @@ void StateMachine::LoadINISettings(minIni *ini, const std::string& section) {
     if ((value = ini->geti(section, "spawn_x", INVALID_VALUE)) != INVALID_VALUE) m_spawn_pos.setX(value);
     if ((value = ini->geti(section, "spawn_y", INVALID_VALUE)) != INVALID_VALUE) m_spawn_pos.setY(value);
     if ((value = ini->geti(section, "spawn_theta", INVALID_VALUE)) != INVALID_VALUE)
-        m_spawn_pos.setTheta(value / 180 * M_PI);
+        m_spawn_pos.setTheta(value / 180.0 * M_PI);
 
     if ((value = ini->geti(section, "starting_x", INVALID_VALUE)) != INVALID_VALUE) m_starting_pos.setX(value);
     if ((value = ini->geti(section, "starting_y", INVALID_VALUE)) != INVALID_VALUE) m_starting_pos.setY(value);
     if ((value = ini->geti(section, "starting_theta", INVALID_VALUE)) != INVALID_VALUE)
-        m_starting_pos.setTheta(value / 180 * M_PI);
+        m_starting_pos.setTheta(value / 180.0 * M_PI);
 }
 
 
@@ -184,10 +190,10 @@ void StateMachine::SaveINISettings(minIni *ini, const std::string& section) {
     ini->put(section, "role", m_role);
     ini->put(section, "spawn_x", m_spawn_pos.X());
     ini->put(section, "spawn_y", m_spawn_pos.Y());
-    ini->put(section, "spawn_theta", m_spawn_pos.Theta());
+    ini->put(section, "spawn_theta", m_spawn_pos.Theta() / M_PI * 180.0);
     ini->put(section, "starting_x", m_starting_pos.X());
     ini->put(section, "starting_y", m_starting_pos.Y());
-    ini->put(section, "starting_theta", m_starting_pos.Theta());
+    ini->put(section, "starting_theta", m_starting_pos.Theta() / M_PI * 180.0);
 }
 
 int StateMachine::IsStarted() {

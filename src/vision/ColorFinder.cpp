@@ -29,32 +29,30 @@ ColorFinder::ColorFinder()
 
 
 ColorFinder::ColorFinder(int hue, int hue_tol, int min_sat, int min_val, double min_per, double max_per)
-        :
-        m_hue(hue),
-        m_hue_tolerance(hue_tol),
-        m_min_saturation(min_sat),
-        m_max_saturation(100),
-        m_min_value(min_val),
-        m_max_value(100),
-        m_min_percent(min_per),
-        m_max_percent(max_per),
-        color_section(""),
-        m_result(0) {}
+        : m_hue(hue),
+          m_hue_tolerance(hue_tol),
+          m_min_saturation(min_sat),
+          m_max_saturation(100),
+          m_min_value(min_val),
+          m_max_value(100),
+          m_min_percent(min_per),
+          m_max_percent(max_per),
+          color_section(""),
+          m_result(0) {}
 
 
 ColorFinder::ColorFinder(int hue, int hue_tol, int min_sat, int max_sat, int min_val, int max_val, double min_per,
                          double max_per)
-        :
-        m_hue(hue),
-        m_hue_tolerance(hue_tol),
-        m_min_saturation(min_sat),
-        m_max_saturation(max_sat),
-        m_min_value(min_val),
-        m_max_value(max_val),
-        m_min_percent(min_per),
-        m_max_percent(max_per),
-        color_section(""),
-        m_result(0) {}
+        : m_hue(hue),
+          m_hue_tolerance(hue_tol),
+          m_min_saturation(min_sat),
+          m_max_saturation(max_sat),
+          m_min_value(min_val),
+          m_max_value(max_val),
+          m_min_percent(min_per),
+          m_max_percent(max_per),
+          color_section(""),
+          m_result(0) {}
 
 
 ColorFinder::~ColorFinder() {

@@ -23,6 +23,7 @@
 #include <motion/modules/Walking.h>
 #include <GameController.h>
 #include <StateMachine.h>
+#include <iostream>
 #include "SoccerBehavior.h"
 
 using namespace Robot;
@@ -46,7 +47,10 @@ void SoccerBehavior::Process() {
         const Pose2D& Spawn = StateMachine::GetInstance()->GetSpawnPosition();
         const Pose2D& Starting = StateMachine::GetInstance()->GetStartingPosition();
         const Pose2D& Odo = Walking::GetInstance()->GetOdo();
-        m_GoTo.Process(Spawn - Starting - Odo);
+
+        auto pos = Starting - Spawn - Odo;
+        std::cout << "s: " << Starting << " sp: " << Spawn << " odo: " << Odo << " p: " <<  pos << std::endl;
+        m_GoTo.Process(pos);
         return;
     }
 

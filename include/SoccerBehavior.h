@@ -51,8 +51,9 @@ namespace Robot {
         BallTracker m_BallTracker;
         BallFollower m_BallFollower;
         GoTo m_GoTo;
-
         Field m_Field;
+        double m_AimAAmplitude;
+        double m_AimRLAmplitude;
     };
 }
 

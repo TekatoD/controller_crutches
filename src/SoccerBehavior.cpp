@@ -29,16 +29,25 @@
 using namespace Robot;
 
 SoccerBehavior::SoccerBehavior(CM730& cm730)
-        : m_CM730(cm730) {}
+        : m_CM730(cm730) {
+    m_AimAAmplitude = 20;
+    m_AimRLAmplitude = 20;
+}
 
 void SoccerBehavior::Process() {
     // Update CV
+    Walking::GetInstance()->A_MOVE_AIM_ON = false;
+    const Pose2D& Spawn = StateMachine::GetInstance()->GetSpawnPosition();
+    const Pose2D& Starting = StateMachine::GetInstance()->GetStartingPosition();
+    const Pose2D& Odo = Walking::GetInstance()->GetOdo();
+
     LinuxCamera::GetInstance()->CaptureFrame();
     m_BallTracker.Process(m_BallFinder.GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
 
     const RoboCupGameControlData& State = GameController::GetInstance()->GameCtrlData;
 
     if (State.state == STATE_INITIAL || State.state == STATE_FINISHED) {
+        Walking::GetInstance()->SetOdo(Spawn);
         Walking::GetInstance()->Stop();
         return;
     }
@@ -46,19 +55,15 @@ void SoccerBehavior::Process() {
     if (State.state == STATE_READY) {
         Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
         Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-
-        const Pose2D& Spawn = StateMachine::GetInstance()->GetSpawnPosition();
-        const Pose2D& Starting = StateMachine::GetInstance()->GetStartingPosition();
-        const Pose2D& Odo = Walking::GetInstance()->GetOdo();
-
-        auto pos = Starting - Spawn - Odo;
+        auto pos = Starting - Odo;
         m_GoTo.Process(pos);
         return;
     }
 
     if (State.state == STATE_SET) {
         const Pose2D& Spawn = StateMachine::GetInstance()->GetSpawnPosition();
-        Walking::GetInstance()->SetOdo(Spawn);
+        Walking::GetInstance()->SetOdo(Starting);
+        Walking::GetInstance()->Stop();
         return;
     }
 
@@ -70,11 +75,30 @@ void SoccerBehavior::Process() {
             // Follow the ball
             m_BallFollower.Process(m_BallTracker.ball_position);
 
-            if (m_BallFollower.KickBall != 0) {
-                std::cout << "Balls!" << std::endl;
-            }
             // Kicking the ball
             if (m_BallFollower.KickBall != 0) {
+                auto free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
+                double y_top = m_Field.GetWidth() - free_space;
+                double y_bot = y_top - m_Field.GetGateWidth();
+
+                double angle_top = atan2(y_top - Odo.Y(), Odo.X() - m_Field.GetLength()) - Odo.Theta();
+                double angle_bot = atan2(y_bot - Odo.Y(), Odo.X() - m_Field.GetLength()) - Odo.Theta();
+
+                if (angle_top > 0) {
+                    Walking::GetInstance()->A_MOVE_AIM_ON = true;
+                    Walking::GetInstance()->A_MOVE_AMPLITUDE = m_AimAAmplitude;
+                    Walking::GetInstance()->Y_MOVE_AMPLITUDE = -m_AimRLAmplitude;
+                    Walking::GetInstance()->Start();
+                    return;
+                } else if (angle_bot < 0) {
+                    Walking::GetInstance()->A_MOVE_AIM_ON = true;
+                    Walking::GetInstance()->A_MOVE_AMPLITUDE = -m_AimAAmplitude;
+                    Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_AimRLAmplitude;
+                    Walking::GetInstance()->Start();
+                    return;
+                }
+                Walking::GetInstance()->Stop();
+
                 Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
                 Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
                 // Kick the ball
@@ -93,6 +117,11 @@ void SoccerBehavior::LoadINISettings(minIni *ini) {
 }
 
 void SoccerBehavior::LoadINISettings(minIni *ini, const std::string& section) {
+    double dvalue;
+    if ((dvalue = ini->getd(section, "aim_rl_amplitude", INVALID_VALUE)) != INVALID_VALUE) m_AimRLAmplitude = dvalue;
+    if ((dvalue = ini->getd(section, "aim_a_amplitude", INVALID_VALUE)) != INVALID_VALUE) m_AimAAmplitude = dvalue;
+
+
     m_BallFinder.LoadINISettings(ini);
     m_GoTo.LoadINISettings(ini);
     m_Field.LoadINISettings(ini);
@@ -110,4 +139,6 @@ void SoccerBehavior::SaveINISettings(minIni *ini, const std::string& section) {
     m_GoTo.SaveINISettings(ini);
     m_Field.SaveINISettings(ini);
     m_BallFollower.LoadINISettings(ini);
+
+
 }

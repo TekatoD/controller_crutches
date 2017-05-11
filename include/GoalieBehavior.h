@@ -9,6 +9,7 @@
 #include "ColorFinder.h"
 #include "Field.h"
 #include "GoTo.h"
+#include "BallSearcher.h"
 
 #define GOALIE_SECTION ("Goalie")
 
@@ -32,8 +33,6 @@ namespace Robot {
 
     protected:
 
-        int m_NoBallMaxCount;
-        int m_NoBallCount;
         int m_KickBallMaxCount;
         int m_KickBallCount;
         int m_PreviousState;
@@ -49,8 +48,9 @@ namespace Robot {
         double m_GoalRLTurn;
         double m_RLTurn;
         double m_EdgeDistThreshhold;
-
         double m_FollowThreshhold;
+
+        BallSearcher m_BallSearcher;
         BallTracker m_BallTracker;
         ColorFinder m_BallFinder;
         Field m_Field;

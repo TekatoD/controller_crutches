@@ -18,8 +18,6 @@ using namespace Robot;
 
 
 GoalieBehavior::GoalieBehavior() {
-    m_NoBallMaxCount = 10;
-    m_NoBallCount = m_NoBallMaxCount;
     m_KickBallMaxCount = 10;
     m_KickBallCount = 0;
 
@@ -106,17 +104,12 @@ void GoalieBehavior::Process() {
             m_BallTracker.Process(m_BallFinder.GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
 
             if (m_BallTracker.GetBallPosition().X == -1.0 || m_BallTracker.GetBallPosition().Y == -1.0) {
-
-                if (m_NoBallCount > m_NoBallMaxCount) {
-                    // can not find a ball
-                    m_GoalRLTurn = 0;
-                    Head::GetInstance()->MoveToHome();
-
-                } else {
-                    m_NoBallCount++;
+                if (m_BallTracker.IsNoBall()) {
+                    m_BallSearcher.Process();
+                    return;
                 }
             } else {
-                m_NoBallCount = 0;
+                m_BallSearcher.SetLastPosition(m_BallTracker.GetBallPosition());
 
                 double pan_range = Head::GetInstance()->GetLeftLimitAngle();
                 double pan_percent = pan / pan_range;

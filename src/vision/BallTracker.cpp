@@ -61,3 +61,11 @@ void BallTracker::SaveINISettings(minIni* ini) {
 void BallTracker::SaveINISettings(minIni* ini, const std::string& section) {
     ini->put(section, "no_ball_max_count", m_NoBallCount);
 }
+
+const Point2D& BallTracker::GetBallPosition() const {
+    return BallPosition;
+}
+
+bool BallTracker::IsNoBall() const {
+    return m_NoBallCount >= m_NoBallMaxCount;
+}

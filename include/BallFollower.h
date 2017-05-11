@@ -15,6 +15,12 @@
 
 
 namespace Robot {
+    enum Kicking {
+        NO_KICKING,
+        LEFT_LEG_KICK,
+        RIGHT_LEG_KICK
+    };
+
     class BallFollower {
     private:
         int m_NoBallMaxCount;
@@ -45,10 +51,9 @@ namespace Robot {
 
         double m_TiltOffset;
 
-    protected:
+        Kicking m_KickBall;
+
     public:
-        bool DEBUG_PRINT;
-        int KickBall;        // 0: No ball 1:Left -1:Right
 
         BallFollower();
 
@@ -63,6 +68,10 @@ namespace Robot {
         void SaveINISettings(minIni* ini);
 
         void SaveINISettings(minIni* ini, const std::string& section);
+
+        bool IsNoBall() const;
+
+        Kicking GetKickingLeg() const;
     };
 }
 

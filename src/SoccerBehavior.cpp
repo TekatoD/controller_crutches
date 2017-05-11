@@ -84,10 +84,10 @@ void SoccerBehavior::Process() {
             Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
             // Follow the ball
-            m_BallFollower.Process(m_BallTracker.BallPosition);
+            m_BallFollower.Process(m_BallTracker.GetBallPosition());
 
             // Kicking the ball
-            if (m_BallFollower.KickBall != 0) {
+            if (m_BallFollower.GetKickingLeg() != NO_KICKING) {
                 auto free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
                 double x_top = m_Field.GetWidth() - free_space;
                 double x_bot = x_top - m_Field.GetGateWidth();
@@ -116,9 +116,9 @@ void SoccerBehavior::Process() {
                 Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
                 Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
                 // Kick the ball
-                if (m_BallFollower.KickBall == -1) {
+                if (m_BallFollower.GetKickingLeg() == RIGHT_LEG_KICK) {
                     Action::GetInstance()->Start(12);   // RIGHT KICK
-                } else if (m_BallFollower.KickBall == 1) {
+                } else if (m_BallFollower.GetKickingLeg() == LEFT_LEG_KICK) {
                     Action::GetInstance()->Start(13);   // LEFT KICK
                 }
             }

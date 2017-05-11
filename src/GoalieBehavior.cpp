@@ -61,7 +61,7 @@ void GoalieBehavior::Process() {
     LinuxCamera::GetInstance()->CaptureFrame();
     m_BallTracker.Process(m_BallFinder.GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
 
-    if (m_BallTracker.BallPosition.X == -1.0 || m_BallTracker.BallPosition.Y == -1.0) {
+    if (m_BallTracker.GetBallPosition().X == -1.0 || m_BallTracker.GetBallPosition().Y == -1.0) {
         KickBall = 0;
 
         if (m_NoBallCount > m_NoBallMaxCount) {
@@ -89,7 +89,7 @@ void GoalieBehavior::Process() {
 
         if (pan > m_KickRightAngle && pan < m_KickLeftAngle) {
             if (tilt <= (tilt_min + MX28::RATIO_VALUE2ANGLE)) {
-                if (m_BallTracker.BallPosition.Y < m_KickTopAngle) {
+                if (m_BallTracker.GetBallPosition().Y < m_KickTopAngle) {
                     m_GoalFBStep = 0;
                     m_GoalRLTurn = 0;
 

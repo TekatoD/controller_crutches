@@ -41,7 +41,7 @@ BallFollower::BallFollower() {
     m_FBStep = 0;
     m_RLTurn = 0;
     m_TiltOffset = MX28::RATIO_VALUE2ANGLE;
-    KickBall = 0;
+    m_KickBall = NO_KICKING;
 }
 
 
@@ -51,7 +51,7 @@ BallFollower::~BallFollower() {
 
 void BallFollower::Process(Point2D ball_pos) {
     if (ball_pos.X == -1.0 || ball_pos.Y == -1.0) {
-        KickBall = 0;
+        m_KickBall = NO_KICKING;
 
         if (m_NoBallCount > m_NoBallMaxCount) {
             // can not find a ball
@@ -86,22 +86,22 @@ void BallFollower::Process(Point2D ball_pos) {
                         m_RLTurn = 0;
 
                         if (pan > 0) {
-                            KickBall = 1; // Left
+                            m_KickBall = LEFT_LEG_KICK; // Left
                         } else {
-                            KickBall = -1; // Right
+                            m_KickBall = RIGHT_LEG_KICK; // Right
                         }
                     } else {
-                        KickBall = 0;
+                        m_KickBall = NO_KICKING;
                     }
                 } else {
                     m_KickBallCount = 0;
-                    KickBall = 0;
+                    m_KickBall = NO_KICKING;
                     m_GoalFBStep = m_FitFBStep;
                     m_GoalRLTurn = m_FitMaxRLTurn * pan_percent;
                 }
             } else {
                 m_KickBallCount = 0;
-                KickBall = 0;
+                m_KickBall = NO_KICKING;
                 m_GoalFBStep = m_FollowMaxFBStep * tilt_percent;
                 if (m_GoalFBStep < m_FollowMinFBStep)
                     m_GoalFBStep = m_FollowMinFBStep;
@@ -110,7 +110,7 @@ void BallFollower::Process(Point2D ball_pos) {
         } else {
             m_KickBallCount = 0;
             
-            KickBall = 0;
+            m_KickBall = NO_KICKING;
             m_GoalFBStep = 0;
             m_GoalRLTurn = m_FollowMaxRLTurn * pan_percent;
         }
@@ -128,7 +128,7 @@ void BallFollower::Process(Point2D ball_pos) {
             m_FBStep = 0;
             m_RLTurn = 0;
             m_KickBallCount = 0;
-            KickBall = 0;
+            m_KickBall = NO_KICKING;
             
             Walking::GetInstance()->X_MOVE_AMPLITUDE = m_FBStep;
             Walking::GetInstance()->A_MOVE_AMPLITUDE = m_RLTurn;
@@ -194,4 +194,12 @@ void BallFollower::SaveINISettings(minIni* ini, const std::string& section) {
     ini->put(section, "unit_fb_step", m_UnitFBStep);
     ini->put(section, "unit_rl_turn", m_UnitRLTurn);
     ini->put(section, "tilt_offset", m_TiltOffset);
+}
+
+bool BallFollower::IsNoBall() const {
+    return m_NoBallCount >= m_NoBallCount;
+}
+
+Kicking BallFollower::GetKickingLeg() const {
+    return m_KickBall;
 }

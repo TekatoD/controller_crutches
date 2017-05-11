@@ -3,12 +3,11 @@
  *  @date 5/5/17
  */
 
-#include <stdio.h>
 #include <iostream>
 #include <motion/modules/Action.h>
 #include <LinuxCamera.h>
-#include "ImgProcess.h"
-#include "MX28.h"
+#include <GameController.h>
+#include <StateMachine.h>
 #include "motion/modules/Head.h"
 #include "motion/modules/Walking.h"
 #include "GoalieBehavior.h"
@@ -28,26 +27,15 @@ GoalieBehavior::GoalieBehavior() {
     m_KickRightAngle = -30.0;
     m_KickLeftAngle = 30.0;
 
-    m_FollowMaxFBStep = 30.0;
-    m_FollowMinFBStep = 5.0;
-    m_FollowMaxRLTurn = 30.0;
-    m_FitFBStep = 3.0;
+    m_FollowMaxRL = 30.0;
     m_FitMaxRLTurn = 30.0;
-    m_UnitFBStep = 0.3;
     m_UnitRLTurn = 1.0;
 
-    m_GoalFBStep = 0;
     m_GoalRLTurn = 0;
-    m_FBStep = 0;
     m_RLTurn = 0;
-    DEBUG_PRINT = false;
-    KickBall = 0;
-    m_edge_dist_threshhold = 80.0;
-    m_follow_threshhold = 2;
-    m_right_x = 0;
-    m_right_y = 0;
-    m_left_x = 0;
-    m_left_y = 0;
+    m_EdgeDistThreshhold = 80.0;
+    m_FollowThreshhold = 2;
+    m_PreviousState = STATE_INITIAL;
 }
 
 
@@ -56,112 +44,142 @@ GoalieBehavior::~GoalieBehavior() {
 
 
 void GoalieBehavior::Process() {
-    Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-    Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+    // Update CV
+    Walking::GetInstance()->A_MOVE_AIM_ON = false;
+    const Pose2D& Spawn = StateMachine::GetInstance()->GetSpawnPosition();
+    const Pose2D& Starting = StateMachine::GetInstance()->GetStartingPosition();
+    const Pose2D& Odo = Walking::GetInstance()->GetOdo();
+
     LinuxCamera::GetInstance()->CaptureFrame();
     m_BallTracker.Process(m_BallFinder.GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
 
-    if (m_BallTracker.GetBallPosition().X == -1.0 || m_BallTracker.GetBallPosition().Y == -1.0) {
-        KickBall = 0;
+    const RoboCupGameControlData& State = GameController::GetInstance()->GameCtrlData;
 
-        if (m_NoBallCount > m_NoBallMaxCount) {
-            // can not find a ball
-            m_GoalFBStep = 0;
-            m_GoalRLTurn = 0;
-            Head::GetInstance()->MoveToHome();
+    if (State.state == STATE_INITIAL || State.state == STATE_FINISHED) {
+        Walking::GetInstance()->SetOdo(Spawn);
+        Walking::GetInstance()->Stop();
+        return;
+    }
 
-        } else {
-            m_NoBallCount++;
+    if (State.state == STATE_READY) {
+        if (m_PreviousState != STATE_INITIAL) {
+            m_PreviousState = STATE_INITIAL;
+            Walking::GetInstance()->SetOdo(Spawn);
         }
-    } else {
-        m_NoBallCount = 0;
+        Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
+        Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+        auto pos = Starting - Odo;
+        m_GoTo.Process(pos);
+        return;
+    }
 
+    if (State.state == STATE_SET) {
+        const Pose2D& Spawn = StateMachine::GetInstance()->GetSpawnPosition();
+        if (m_BallTracker.IsNoBall()) {
+            Head::GetInstance()->MoveToHome();
+        }
+        Walking::GetInstance()->SetOdo(Starting);
+        Walking::GetInstance()->Stop();
+        return;
+    }
+
+    if (State.state == STATE_PLAYING) {
+        if (m_PreviousState != STATE_SET) {
+            m_PreviousState = STATE_SET;
+            Walking::GetInstance()->SetOdo(Starting);
+        }
         double pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
-        double pan_range = Head::GetInstance()->GetLeftLimitAngle();
-        double pan_percent = pan / pan_range;
+        auto free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
+        double x_top = m_Field.GetWidth() - free_space;
+        double x_bot = x_top - m_Field.GetGateWidth();
+        double diff = 0;
+        if(pan < 0) {
+            diff = abs(Walking::GetInstance()->GetOdo().X() - x_top);
+        } else {
+            diff = abs(Walking::GetInstance()->GetOdo().X() - x_bot);
+        }
 
-        double tilt = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_TILT);
-        double tilt_min = Head::GetInstance()->GetBottomLimitAngle();
-        double tilt_range = Head::GetInstance()->GetTopLimitAngle() - tilt_min;
-        double tilt_percent = (tilt - tilt_min) / tilt_range;
-        if (tilt_percent < 0)
-            tilt_percent = -tilt_percent;
+        if (Action::GetInstance()->IsRunning() == 0 && diff > m_EdgeDistThreshhold) {
+            Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
+            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+            LinuxCamera::GetInstance()->CaptureFrame();
+            m_BallTracker.Process(m_BallFinder.GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
 
-        if (pan > m_KickRightAngle && pan < m_KickLeftAngle) {
-            if (tilt <= (tilt_min + MX28::RATIO_VALUE2ANGLE)) {
-                if (m_BallTracker.GetBallPosition().Y < m_KickTopAngle) {
-                    m_GoalFBStep = 0;
+            if (m_BallTracker.GetBallPosition().X == -1.0 || m_BallTracker.GetBallPosition().Y == -1.0) {
+
+                if (m_NoBallCount > m_NoBallMaxCount) {
+                    // can not find a ball
                     m_GoalRLTurn = 0;
+                    Head::GetInstance()->MoveToHome();
 
-                    if (m_KickBallCount >= m_KickBallMaxCount) {
-                        m_FBStep = 0;
-                        m_RLTurn = 0;
-                        Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-                        Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+                } else {
+                    m_NoBallCount++;
+                }
+            } else {
+                m_NoBallCount = 0;
 
-                        if (pan > 0) {
-                            KickBall = 1; // Left
-                            Action::GetInstance()->Start(13);
+                double pan_range = Head::GetInstance()->GetLeftLimitAngle();
+                double pan_percent = pan / pan_range;
+
+                double tilt = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_TILT);
+                double tilt_min = Head::GetInstance()->GetBottomLimitAngle();
+
+                if (pan > m_KickRightAngle && pan < m_KickLeftAngle) {
+                    if (tilt <= (tilt_min + MX28::RATIO_VALUE2ANGLE)) {
+                        if (m_BallTracker.GetBallPosition().Y < m_KickTopAngle) {
+                            m_GoalRLTurn = 0;
+
+                            if (m_KickBallCount >= m_KickBallMaxCount) {
+                                m_RLTurn = 0;
+                                Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
+                                Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+
+                                if (pan > 0) {// left
+                                    Action::GetInstance()->Start(13);
+                                } else {// Right
+                                    Action::GetInstance()->Start(12);
+                                }
+                            }
                         } else {
-                            KickBall = -1; // Right
-                            Action::GetInstance()->Start(12);
+                            m_KickBallCount = 0;
+                            m_GoalRLTurn = m_FitMaxRLTurn * pan_percent;
                         }
                     } else {
-                        KickBall = 0;
+                        m_KickBallCount = 0;
+                        m_GoalRLTurn = m_FollowMaxRL * pan_percent;
                     }
                 } else {
                     m_KickBallCount = 0;
-                    KickBall = 0;
-                    m_GoalFBStep = m_FitFBStep;
-                    m_GoalRLTurn = m_FitMaxRLTurn * pan_percent;
+                    m_GoalRLTurn = m_FollowMaxRL * pan_percent;
                 }
-            } else {
-                m_KickBallCount = 0;
-                KickBall = 0;
-                m_GoalFBStep = m_FollowMaxFBStep * tilt_percent;
-                if (m_GoalFBStep < m_FollowMinFBStep)
-                    m_GoalFBStep = m_FollowMinFBStep;
-                m_GoalRLTurn = m_FollowMaxRLTurn * pan_percent;
             }
-        } else {
-            m_KickBallCount = 0;
-            KickBall = 0;
-            m_GoalFBStep = 0;
-            m_GoalRLTurn = m_FollowMaxRLTurn * pan_percent;
-        }
-    }
-    if (abs(m_GoalRLTurn) < m_follow_threshhold) {
-        if (Walking::GetInstance()->IsRunning())
-            Walking::GetInstance()->Stop();
-        else {
-            if (m_KickBallCount < m_KickBallMaxCount)
-                m_KickBallCount++;
-        }
+            if (abs(m_GoalRLTurn) < m_FollowThreshhold) {
+                if (Walking::GetInstance()->IsRunning())
+                    Walking::GetInstance()->Stop();
+                else {
+                    if (m_KickBallCount < m_KickBallMaxCount)
+                        m_KickBallCount++;
+                }
 
-    } else {
+            } else {
 
-        if (!Walking::GetInstance()->IsRunning()) {
-            m_FBStep = 0;
-            m_RLTurn = 0;
-            m_KickBallCount = 0;
-            KickBall = 0;
-            Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_RLTurn;
-            Walking::GetInstance()->X_MOVE_AMPLITUDE = 0;
-            Walking::GetInstance()->A_MOVE_AMPLITUDE = 0;
-            Walking::GetInstance()->Start();
-        } else {
-            if (m_FBStep < m_GoalFBStep)
-                m_FBStep += m_UnitFBStep;
-            else if (m_FBStep > m_GoalFBStep)
-                m_FBStep = m_GoalFBStep;
-
-            if (m_RLTurn < m_GoalRLTurn)
-                m_RLTurn += m_UnitRLTurn;
-            else if (m_RLTurn > m_GoalRLTurn)
-                m_RLTurn -= m_UnitRLTurn;
-            Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_RLTurn;
-            Walking::GetInstance()->X_MOVE_AMPLITUDE = 0;
-            Walking::GetInstance()->A_MOVE_AMPLITUDE = 0;
+                if (!Walking::GetInstance()->IsRunning()) {
+                    m_RLTurn = 0;
+                    m_KickBallCount = 0;
+                    Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_RLTurn;
+                    Walking::GetInstance()->X_MOVE_AMPLITUDE = 0;
+                    Walking::GetInstance()->A_MOVE_AMPLITUDE = 0;
+                    Walking::GetInstance()->Start();
+                } else {
+                    if (m_RLTurn < m_GoalRLTurn)
+                        m_RLTurn += m_UnitRLTurn;
+                    else if (m_RLTurn > m_GoalRLTurn)
+                        m_RLTurn -= m_UnitRLTurn;
+                    Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_RLTurn;
+                    Walking::GetInstance()->X_MOVE_AMPLITUDE = 0;
+                    Walking::GetInstance()->A_MOVE_AMPLITUDE = 0;
+                }
+            }
         }
     }
 }
@@ -171,15 +189,11 @@ void GoalieBehavior::LoadINISettings(minIni* ini) {
 }
 
 void GoalieBehavior::LoadINISettings(minIni* ini, const std::string& section) {
-    int value = -2;
+    double value = -2;
 
-    if ((value = ini->geti(section, "follow_threshhold", INVALID_VALUE)) != INVALID_VALUE) m_follow_threshhold = value;
-    if ((value = ini->geti(section, "edge_dist_threshhold", INVALID_VALUE)) != INVALID_VALUE) m_edge_dist_threshhold = value;
-    if ((value = ini->geti(section, "max_speed", INVALID_VALUE)) != INVALID_VALUE) m_FollowMaxRLTurn = value;
-    if ((value = ini->geti(section, "right_x", INVALID_VALUE)) != INVALID_VALUE) m_right_x = value;
-    if ((value = ini->geti(section, "right_y", INVALID_VALUE)) != INVALID_VALUE) m_right_y = value;
-    if ((value = ini->geti(section, "left_x", INVALID_VALUE)) != INVALID_VALUE) m_left_x = value;
-    if ((value = ini->geti(section, "left_y", INVALID_VALUE)) != INVALID_VALUE) m_left_y = value;
+    if ((value = ini->getd(section, "follow_threshhold", INVALID_VALUE)) != INVALID_VALUE) m_FollowThreshhold = value;
+    if ((value = ini->getd(section, "edge_dist_threshhold", INVALID_VALUE)) != INVALID_VALUE) m_EdgeDistThreshhold = value;
+    if ((value = ini->getd(section, "max_speed", INVALID_VALUE)) != INVALID_VALUE) m_FollowMaxRL = value;
 
     m_BallFinder.LoadINISettings(ini);
     m_Field.LoadINISettings(ini);
@@ -190,13 +204,9 @@ void GoalieBehavior::SaveINISettings(minIni* ini) {
 }
 
 void GoalieBehavior::SaveINISettings(minIni* ini, const std::string& section) {
-    ini->put(section, "follow_threshhold", m_follow_threshhold);
-    ini->put(section, "edge_dist_threshhold", m_edge_dist_threshhold);
-    ini->put(section, "max_speed", m_FollowMaxRLTurn);
-    ini->put(section, "right_x", m_right_x);
-    ini->put(section, "right_y", m_right_y);
-    ini->put(section, "left_x", m_left_x);
-    ini->put(section, "left_y", m_left_y);
+    ini->put(section, "follow_threshhold", m_FollowThreshhold);
+    ini->put(section, "edge_dist_threshhold", m_EdgeDistThreshhold);
+    ini->put(section, "max_speed", m_FollowMaxRL);
 
     m_BallFinder.SaveINISettings(ini);
     m_Field.SaveINISettings(ini);

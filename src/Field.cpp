@@ -58,3 +58,9 @@ void Field::SaveINISettings(minIni *ini, const std::string &section) {
     ini->put(section, "field_length", m_FieldLength);
     ini->put(section, "gate_width", m_GateWidth);
 }
+
+std::ostream& operator<<(std::ostream& os, const Field& field) {
+    os << "field width: " << field.m_FieldWidth << " field length: " << field.m_FieldLength << " gate width: "
+       << field.m_GateWidth;
+    return os;
+}

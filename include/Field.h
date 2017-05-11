@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <ostream>
 #include "minIni.h"
 
 #define FIELD_SECTION ("Field")
@@ -31,6 +32,8 @@ public:
     void SaveINISettings(minIni* ini);
 
     void SaveINISettings(minIni* ini, const std::string& section);
+
+    friend std::ostream& operator<<(std::ostream& os, const Field& field);
 
 private:
     double m_FieldWidth;

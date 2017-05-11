@@ -632,10 +632,10 @@ void Walking::Process() {
         m_left_odo_theta = -m_odo_a_factor * ep[11];
 
         if(X_MOVE_AMPLITUDE > 0) {
-            m_right_odo_x = -m_odo_x_factor * ep[6];
+            m_right_odo_x = -m_odo_x_factor * ep[0];
         }
         else {
-            m_right_odo_x = m_odo_x_factor * ep[6];
+            m_right_odo_x = m_odo_x_factor * ep[0];
         }
         m_right_odo_y = -m_odo_y_factor * ep[1];
         m_right_odo_theta = -m_odo_a_factor * ep[5];

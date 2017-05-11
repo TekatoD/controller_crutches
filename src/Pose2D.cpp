@@ -7,7 +7,9 @@
 
 Robot::Pose2D::Pose2D() : m_x(0), m_y(0), m_theta(0) { }
 
-Robot::Pose2D::Pose2D(double x, double y, double theta) : m_x(x), m_y(y), m_theta(theta) { }
+Robot::Pose2D::Pose2D(double x, double y, double theta) : m_x(x), m_y(y), m_theta(theta) {
+    this->normalizeTheta();
+}
 
 double Robot::Pose2D::X() const {
     return m_x;
@@ -31,11 +33,11 @@ void Robot::Pose2D::setY(double y) {
 
 void Robot::Pose2D::setTheta(double theta) {
     m_theta = theta;
+    this->normalizeTheta();
 }
 
 void Robot::Pose2D::normalizeTheta() {
-    double twoPi = 2 * M_PI;
-    m_theta = m_theta - twoPi * floor( m_theta / twoPi );
+    m_theta = fmod(m_theta, M_PI);
 }
 
 Robot::Pose2D Robot::Pose2D::operator+(const Robot::Pose2D &rhs) const {
@@ -48,6 +50,7 @@ Robot::Pose2D& Robot::Pose2D::operator+=(const Robot::Pose2D &rhs) {
     m_x += rhs.m_x;
     m_y += rhs.m_y;
     m_theta += rhs.m_theta;
+    this->normalizeTheta();
     return *this;
 }
 
@@ -61,11 +64,8 @@ Robot::Pose2D& Robot::Pose2D::operator-=(const Robot::Pose2D &rhs) {
     m_x -= rhs.m_x;
     m_y -= rhs.m_y;
     m_theta -= rhs.m_theta;
+    this->normalizeTheta();
     return *this;
-}
-
-void Robot::Pose2D::normalizeThetaInPi() {
-    m_theta = atan2(sin(m_theta), cos(m_theta));
 }
 
 

@@ -52,14 +52,9 @@ void BallSearcher::Process() {
     const double pan_min = Head::GetInstance()->GetRightLimitAngle();
     const double pan_diff = pan_max - pan_min;
 
-
-
     double pan = sin(m_PanPhase / m_PhaseSize * M_2_PI) * pan_diff - pan_min;
     double tilt = sin(m_TiltPhase / m_PhaseSize * M_2_PI) * tilt_diff - tilt_min;
     Head::GetInstance()->MoveByAngle(pan, tilt);
-
-    std::cout << m_PanPhase << " " << m_PanPhaseStep << " " << m_PhaseSize << std::endl;
-    std::cout << pan << " " << pan_min << " " << pan_max << std::endl;
 
     if (m_WalkingEnabled) {
         m_TurnSpeed = Walking::GetInstance()->A_MOVE_AMPLITUDE;
@@ -67,8 +62,6 @@ void BallSearcher::Process() {
         if (fabs(m_TurnSpeed) > m_MaxTurn) {
             m_TurnSpeed = m_MaxTurn * m_TurnDirection;
         }
-
-        std::cout << "T: " << m_TurnSpeed << " M:" << m_MaxTurn << std::endl;
 
         Walking::GetInstance()->X_MOVE_AMPLITUDE = 0;
         Walking::GetInstance()->Y_MOVE_AMPLITUDE = 0;

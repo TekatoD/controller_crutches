@@ -4,6 +4,7 @@
  */
 #include "Pose2D.h"
 #include <math.h>
+#include <iostream>
 
 Robot::Pose2D::Pose2D() : m_x(0), m_y(0), m_theta(0) { }
 
@@ -37,7 +38,14 @@ void Robot::Pose2D::setTheta(double theta) {
 }
 
 void Robot::Pose2D::normalizeTheta() {
-    m_theta = fmod(m_theta, M_PI);
+//    while (m_theta < 0) m_theta += 2 * M_PI;
+//    m_theta = fmod(m_theta, 2 * M_PI) - M_PI;
+    while (m_theta > M_PI) {
+        m_theta -= 2 * M_PI;
+    }
+    while (m_theta < -M_PI) {
+        m_theta += 2 * M_PI;
+    }
 }
 
 Robot::Pose2D Robot::Pose2D::operator+(const Robot::Pose2D &rhs) const {

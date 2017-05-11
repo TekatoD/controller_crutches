@@ -42,6 +42,8 @@ void SoccerBehavior::Process() {
     const Pose2D& Starting = StateMachine::GetInstance()->GetStartingPosition();
     const Pose2D& Odo = Walking::GetInstance()->GetOdo();
 
+//    std::cout << "Odo: " << Odo << std::endl;
+
     LinuxCamera::GetInstance()->CaptureFrame();
     m_BallTracker.Process(m_BallFinder.GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
 
@@ -82,7 +84,6 @@ void SoccerBehavior::Process() {
         }
 
         if (Action::GetInstance()->IsRunning() == 0) {
-//            std::cout << "odo: " << Odo << std::endl;
             // Switch to head and walking after action
             Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
@@ -104,8 +105,6 @@ void SoccerBehavior::Process() {
 
                 double angle_top = (atan2(m_Field.GetLength() - Odo.Y(), x_top - Odo.X()) - Odo.Theta()) / M_PI * 180.0;
                 double angle_bot = (atan2(m_Field.GetLength() - Odo.Y(), x_bot - Odo.X()) - Odo.Theta()) / M_PI * 180.0;
-
-                std::cout << std::endl;
 
                 if (angle_top > 0) {
                     Walking::GetInstance()->A_MOVE_AIM_ON = true;

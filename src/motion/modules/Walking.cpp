@@ -791,5 +791,6 @@ void Walking::ResetOdo(Pose2D pose) {
 }
 
 void Walking::SetOdo(Pose2D pose) {
+    std::cout << "Reset: " << pose << std::endl;
     m_odometry_collector.SetPose(pose);
 }

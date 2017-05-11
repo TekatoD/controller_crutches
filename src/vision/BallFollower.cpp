@@ -76,7 +76,6 @@ void BallFollower::Process(Point2D ball_pos) {
             tilt_percent = -tilt_percent;
 
         if (pan > m_KickRightAngle && pan < m_KickLeftAngle) {
-            std::cout << tilt << " " << tilt_min << " " << m_TiltOffset << std::endl;
             if (tilt <= (tilt_min + m_TiltOffset)) {
                 if (ball_pos.Y < m_KickTopAngle) {
                     m_GoalFBStep = 0;

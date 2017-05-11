@@ -32,6 +32,7 @@ SoccerBehavior::SoccerBehavior(CM730& cm730)
         : m_CM730(cm730) {
     m_AimAAmplitude = 20;
     m_AimRLAmplitude = 20;
+    m_PreviousState = STATE_INITIAL;
 }
 
 void SoccerBehavior::Process() {
@@ -53,6 +54,10 @@ void SoccerBehavior::Process() {
     }
 
     if (State.state == STATE_READY) {
+        if (m_PreviousState != STATE_INITIAL) {
+            m_PreviousState = STATE_INITIAL;
+            Walking::GetInstance()->SetOdo(Spawn);
+        }
         Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
         Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
         auto pos = Starting - Odo;
@@ -68,7 +73,13 @@ void SoccerBehavior::Process() {
     }
 
     if (State.state == STATE_PLAYING) {
+        if (m_PreviousState != STATE_SET) {
+            m_PreviousState = STATE_SET;
+            Walking::GetInstance()->SetOdo(Starting);
+        }
+
         if (Action::GetInstance()->IsRunning() == 0) {
+            std::cout << "odo: " << Odo << std::endl;
             // Switch to head and walking after action
             Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
@@ -78,11 +89,14 @@ void SoccerBehavior::Process() {
             // Kicking the ball
             if (m_BallFollower.KickBall != 0) {
                 auto free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
-                double y_top = m_Field.GetWidth() - free_space;
-                double y_bot = y_top - m_Field.GetGateWidth();
+                double x_top = m_Field.GetWidth() - free_space;
+                double x_bot = x_top - m_Field.GetGateWidth();
 
-                double angle_top = atan2(y_top - Odo.Y(), Odo.X() - m_Field.GetLength()) - Odo.Theta();
-                double angle_bot = atan2(y_bot - Odo.Y(), Odo.X() - m_Field.GetLength()) - Odo.Theta();
+                double angle_top = (atan2(m_Field.GetLength() - Odo.Y(), x_top - Odo.X()) - Odo.Theta()) / M_PI * 180.0;
+                double angle_bot = (atan2(m_Field.GetLength() - Odo.Y(), x_bot - Odo.X()) - Odo.Theta()) / M_PI * 180.0;
+
+                std::cout << "top: " << angle_top << " bot: " << angle_bot << std::endl;
+                std::cout << std::endl;
 
                 if (angle_top > 0) {
                     Walking::GetInstance()->A_MOVE_AIM_ON = true;
@@ -112,11 +126,11 @@ void SoccerBehavior::Process() {
     }
 }
 
-void SoccerBehavior::LoadINISettings(minIni *ini) {
+void SoccerBehavior::LoadINISettings(minIni* ini) {
     LoadINISettings(ini, SOCCER_SECTION);
 }
 
-void SoccerBehavior::LoadINISettings(minIni *ini, const std::string& section) {
+void SoccerBehavior::LoadINISettings(minIni* ini, const std::string& section) {
     double dvalue;
     if ((dvalue = ini->getd(section, "aim_rl_amplitude", INVALID_VALUE)) != INVALID_VALUE) m_AimRLAmplitude = dvalue;
     if ((dvalue = ini->getd(section, "aim_a_amplitude", INVALID_VALUE)) != INVALID_VALUE) m_AimAAmplitude = dvalue;
@@ -130,12 +144,12 @@ void SoccerBehavior::LoadINISettings(minIni *ini, const std::string& section) {
 }
 
 
-void SoccerBehavior::SaveINISettings(minIni *ini) {
+void SoccerBehavior::SaveINISettings(minIni* ini) {
     SaveINISettings(ini, SOCCER_SECTION);
 }
 
 
-void SoccerBehavior::SaveINISettings(minIni *ini, const std::string& section) {
+void SoccerBehavior::SaveINISettings(minIni* ini, const std::string& section) {
     ini->put(section, "aim_rl_amplitude", m_AimRLAmplitude);
     ini->put(section, "aim_a_amplitude", m_AimAAmplitude);
 

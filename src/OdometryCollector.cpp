@@ -17,7 +17,7 @@ void Robot::OdometryCollector::odoTranslate(Pose2D offset) {
     m_pose.setX(m_pose.X() + (cos(m_pose.Theta() + angle) * dst));
     m_pose.setY(m_pose.Y() + (sin(m_pose.Theta() + angle + offset.Theta()) * dst));
     m_pose.setTheta(m_pose.Theta() + offset.Theta());
-    m_pose.normalizeThetaInPi();
+    m_pose.normalizeTheta();
 }
 
 Robot::Pose2D Robot::OdometryCollector::GetPose() const {

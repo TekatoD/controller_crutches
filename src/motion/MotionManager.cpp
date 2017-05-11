@@ -17,14 +17,13 @@ MotionManager* MotionManager::m_UniqueInstance = new MotionManager();
 
 
 MotionManager::MotionManager()
-        :
-        m_CM730(0),
-        m_ProcessEnable(false),
-        m_Enabled(false),
-        m_IsRunning(false),
-        m_IsThreadRunning(false),
-        m_IsLogging(false),
-        DEBUG_PRINT(false) {
+        : m_CM730(0),
+          m_ProcessEnable(false),
+          m_Enabled(false),
+          m_IsRunning(false),
+          m_IsThreadRunning(false),
+          m_IsLogging(false),
+          DEBUG_PRINT(false) {
     for (int i = 0; i < JointData::NUMBER_OF_JOINTS; i++)
         m_Offset[i] = 0;
 }

@@ -54,6 +54,7 @@ namespace Robot {
         Field m_Field;
         double m_AimAAmplitude;
         double m_AimRLAmplitude;
+        int m_PreviousState;
     };
 }
 

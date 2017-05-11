@@ -73,7 +73,7 @@ void SoccerBehavior::Process() {
             Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
             // Follow the ball
-            m_BallFollower.Process(m_BallTracker.ball_position);
+            m_BallFollower.Process(m_BallTracker.BallPosition);
 
             // Kicking the ball
             if (m_BallFollower.KickBall != 0) {
@@ -123,6 +123,7 @@ void SoccerBehavior::LoadINISettings(minIni *ini, const std::string& section) {
 
 
     m_BallFinder.LoadINISettings(ini);
+    m_BallTracker.LoadINISettings(ini);
     m_GoTo.LoadINISettings(ini);
     m_Field.LoadINISettings(ini);
     m_BallFollower.LoadINISettings(ini);
@@ -135,7 +136,11 @@ void SoccerBehavior::SaveINISettings(minIni *ini) {
 
 
 void SoccerBehavior::SaveINISettings(minIni *ini, const std::string& section) {
+    ini->put(section, "aim_rl_amplitude", m_AimRLAmplitude);
+    ini->put(section, "aim_a_amplitude", m_AimAAmplitude);
+
     m_BallFinder.SaveINISettings(ini);
+    m_BallTracker.SaveINISettings(ini);
     m_GoTo.SaveINISettings(ini);
     m_Field.SaveINISettings(ini);
     m_BallFollower.LoadINISettings(ini);

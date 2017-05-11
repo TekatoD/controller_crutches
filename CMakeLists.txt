@@ -51,8 +51,8 @@ set(SRC
         src/motion/Kinematics.cpp
         src/motion/MotionManager.cpp
         src/motion/MotionStatus.cpp
-        src/vision/BallFollower.cpp
-        src/vision/BallTracker.cpp
+        src/BallFollower.cpp
+        src/BallTracker.cpp
         src/vision/Camera.cpp
         src/vision/ColorFinder.cpp
         src/vision/Image.cpp
@@ -83,7 +83,7 @@ set(SRC
         include/SoccerBehavior.h
         src/SoccerBehavior.cpp
         include/GoalieBehavior.h
-        src/GoalieBehavior.cpp src/Field.cpp include/Field.h)
+        src/GoalieBehavior.cpp src/Field.cpp include/Field.h src/BallSearcher.cpp include/BallSearcher.h)
 
 add_executable(soccer ${SRC})
 target_link_libraries(soccer

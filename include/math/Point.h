@@ -30,11 +30,11 @@ namespace Robot {
         /*compute the euclidean distance between pt1 and pt2*/
         static double Distance(Point2D& pt1, Point2D& pt2);
 
-        Point2D& operator=(Point2D& point);
+        Point2D& operator=(const Point2D& point);
 
-        Point2D& operator+=(Point2D& point);
+        Point2D& operator+=(const Point2D& point);
 
-        Point2D& operator-=(Point2D& point);
+        Point2D& operator-=(const Point2D& point);
 
         Point2D& operator+=(double value);
 
@@ -44,9 +44,9 @@ namespace Robot {
 
         Point2D& operator/=(double value);
 
-        Point2D operator+(Point2D& point);
+        Point2D operator+(const Point2D& point);
 
-        Point2D operator-(Point2D& point);
+        Point2D operator-(const Point2D& point);
 
         Point2D operator+(double value);
 
@@ -76,13 +76,13 @@ namespace Robot {
         ~Point3D();
 
         /*compute the euclidean distance between pt1 and pt2*/
-        static double Distance(Point3D& pt1, Point3D& pt2);
+        static double Distance(const Point3D& pt1, const Point3D& pt2);
 
-        Point3D& operator=(Point3D& point);
+        Point3D& operator=(const Point3D& point);
 
-        Point3D& operator+=(Point3D& point);
+        Point3D& operator+=(const Point3D& point);
 
-        Point3D& operator-=(Point3D& point);
+        Point3D& operator-=(const Point3D& point);
 
         Point3D& operator+=(double value);
 
@@ -92,9 +92,9 @@ namespace Robot {
 
         Point3D& operator/=(double value);
 
-        Point3D operator+(Point3D& point);
+        Point3D operator+(const Point3D& point);
 
-        Point3D operator-(Point3D& point);
+        Point3D operator-(const Point3D& point);
 
         Point3D operator+(double value);
 

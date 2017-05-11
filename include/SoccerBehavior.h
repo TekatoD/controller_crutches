@@ -26,6 +26,7 @@
 #include "BallFollower.h"
 #include "GoTo.h"
 #include "Field.h"
+#include "BallSearcher.h"
 
 
 #define SOCCER_SECTION "Soccer"
@@ -50,6 +51,7 @@ namespace Robot {
         ColorFinder m_BallFinder;
         BallTracker m_BallTracker;
         BallFollower m_BallFollower;
+        BallSearcher m_BallSearcher;
         GoTo m_GoTo;
         Field m_Field;
         double m_AimAAmplitude;

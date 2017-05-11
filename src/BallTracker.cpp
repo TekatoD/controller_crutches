@@ -30,8 +30,9 @@ void BallTracker::Process(Point2D pos) {
         if (m_NoBallCount < m_NoBallMaxCount) {
             Head::GetInstance()->MoveTracking();
             m_NoBallCount++;
-        } else
-            Head::GetInstance()->InitTracking();
+        }
+//        else
+//            Head::GetInstance()->InitTracking();
     } else {
         m_NoBallCount = 0;
         Point2D center = Point2D(Camera::WIDTH / 2, Camera::HEIGHT / 2);

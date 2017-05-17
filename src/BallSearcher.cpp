@@ -58,8 +58,8 @@ void BallSearcher::Process() {
     double tilt = sin(m_TiltPhase / m_PhaseSize * M_2_PI) * tilt_diff - tilt_min;
     Head::GetInstance()->MoveByAngle(pan, tilt);
 
-    std::cout << m_PanPhase << " " << m_PanPhaseStep << " " << m_PhaseSize << std::endl;
-    std::cout << pan << " " << pan_min << " " << pan_max << std::endl;
+//    std::cout << m_PanPhase << " " << m_PanPhaseStep << " " << m_PhaseSize << std::endl;
+//    std::cout << pan << " " << pan_min << " " << pan_max << std::endl;
 
     if (m_WalkingEnabled) {
         m_TurnSpeed = Walking::GetInstance()->A_MOVE_AMPLITUDE;

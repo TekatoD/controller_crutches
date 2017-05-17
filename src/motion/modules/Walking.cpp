@@ -680,16 +680,29 @@ void Walking::Process() {
     for (int i = 0; i < 14; i++) {
         offset = (double) dir[i] * angle[i] * MX28::RATIO_ANGLE2VALUE;
         if (i == 1) // R_HIP_ROLL
-            offset += (double) dir[i] * (pelvis_offset_r - HIP_PITCH_OFFSET * sin(ep[5]) * MX28::RATIO_ANGLE2VALUE);
+            offset += (double) dir[i] * (pelvis_offset_r /** cos(ep[5])*/ - HIP_PITCH_OFFSET * sin(ep[5]) * MX28::RATIO_ANGLE2VALUE);
         else if (i == 7) // L_HIP_ROLL
-            offset += (double) dir[i] * (pelvis_offset_l - HIP_PITCH_OFFSET * sin(ep[11]) * MX28::RATIO_ANGLE2VALUE);
+            offset += (double) dir[i] * (pelvis_offset_l /** cos(ep[11])*/ - HIP_PITCH_OFFSET * sin(ep[11]) * MX28::RATIO_ANGLE2VALUE);
         else if (i == 2) // R_HIP_PITCH
-            offset -= (double) dir[i] * HIP_PITCH_OFFSET * cos(ep[5]) * MX28::RATIO_ANGLE2VALUE;
+            offset += (double) dir[i] * (/*-pelvis_offset_r * sin(ep[5])*/ - HIP_PITCH_OFFSET * cos(ep[5]) ) * MX28::RATIO_ANGLE2VALUE;
         else if (i == 8) // L_HIP_PITCH
-            offset -= (double) dir[i] * HIP_PITCH_OFFSET * cos(ep[11]) * MX28::RATIO_ANGLE2VALUE;
+            offset += (double) dir[i] * (/*-pelvis_offset_l * sin(ep[11])*/ - HIP_PITCH_OFFSET * cos(ep[11])) * MX28::RATIO_ANGLE2VALUE;
 
         outValue[i] = MX28::Angle2Value(initAngle[i]) + (int) offset;
     }
+
+//    // Compute motor value
+//    for (int i = 0; i < 14; i++) {
+//        offset = (double) dir[i] * angle[i] * MX28::RATIO_ANGLE2VALUE;
+//        if (i == 1) // R_HIP_ROLL
+//            offset += (double) dir[i] * pelvis_offset_r;
+//        else if (i == 7) // L_HIP_ROLL
+//            offset += (double) dir[i] * pelvis_offset_l;
+//        else if (i == 2 || i == 8) // R_HIP_PITCH or L_HIP_PITCH
+//            offset -= (double) dir[i] * HIP_PITCH_OFFSET * MX28::RATIO_ANGLE2VALUE;
+//
+//        outValue[i] = MX28::Angle2Value(initAngle[i]) + (int) offset;
+//    }
 
     // adjust balance offset
     if (BALANCE_ENABLE == true) {

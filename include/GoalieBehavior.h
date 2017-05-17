@@ -55,5 +55,8 @@ namespace Robot {
         ColorFinder m_BallFinder;
         Field m_Field;
         GoTo m_GoTo;
+
+        double m_XCrutch;
+        double m_ACrutch;
     };
 }

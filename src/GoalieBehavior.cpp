@@ -35,6 +35,9 @@ GoalieBehavior::GoalieBehavior() {
     m_FollowThreshhold = 2;
     m_PreviousState = STATE_INITIAL;
     m_BallSearcher.DisableWalking();
+
+    m_XCrutch = -2;
+    m_ACrutch = 2;
 }
 
 
@@ -54,6 +57,12 @@ void GoalieBehavior::Process() {
 
     const RoboCupGameControlData& State = GameController::GetInstance()->GameCtrlData;
 
+//    int index = State.teams[0].teamNumber == 2 ? 0 : 1;
+//    for (int i = 0; i < MAX_NUM_PLAYERS; ++i) {
+//        const RobotInfo& info = State.teams[index].players[i];
+//        std::cout << " " << (int) info.penalty << " " << (int) info.secsTillUnpenalised << std::endl;
+//    }
+    
     if (State.state == STATE_INITIAL || State.state == STATE_FINISHED) {
         Walking::GetInstance()->SetOdo(Spawn);
         Walking::GetInstance()->Stop();
@@ -164,8 +173,8 @@ void GoalieBehavior::Process() {
                     m_RLTurn = 0;
                     m_KickBallCount = 0;
                     Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_RLTurn;
-                    Walking::GetInstance()->X_MOVE_AMPLITUDE = 0;
-                    Walking::GetInstance()->A_MOVE_AMPLITUDE = 0;
+                    Walking::GetInstance()->X_MOVE_AMPLITUDE = m_XCrutch;
+                    Walking::GetInstance()->A_MOVE_AMPLITUDE = -m_ACrutch;
                     Walking::GetInstance()->Start();
                 } else {
                     if (m_RLTurn < m_GoalRLTurn)
@@ -173,8 +182,8 @@ void GoalieBehavior::Process() {
                     else if (m_RLTurn > m_GoalRLTurn)
                         m_RLTurn -= m_UnitRLTurn;
                     Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_RLTurn;
-                    Walking::GetInstance()->X_MOVE_AMPLITUDE = 0;
-                    Walking::GetInstance()->A_MOVE_AMPLITUDE = 0;
+                    Walking::GetInstance()->X_MOVE_AMPLITUDE = m_XCrutch;
+                    Walking::GetInstance()->A_MOVE_AMPLITUDE = m_ACrutch;
                 }
             }
         }
@@ -191,6 +200,8 @@ void GoalieBehavior::LoadINISettings(minIni* ini, const std::string& section) {
     if ((value = ini->getd(section, "follow_threshhold", INVALID_VALUE)) != INVALID_VALUE) m_FollowThreshhold = value;
     if ((value = ini->getd(section, "edge_dist_threshhold", INVALID_VALUE)) != INVALID_VALUE) m_EdgeDistThreshhold = value;
     if ((value = ini->getd(section, "max_speed", INVALID_VALUE)) != INVALID_VALUE) m_FollowMaxRL = value;
+    if ((value = ini->getd(section, "x_crutch", INVALID_VALUE)) != INVALID_VALUE) m_XCrutch = value;
+    if ((value = ini->getd(section, "a_crutch", INVALID_VALUE)) != INVALID_VALUE) m_ACrutch = value;
 
     m_BallFinder.LoadINISettings(ini);
     m_BallTracker.LoadINISettings(ini);
@@ -206,6 +217,8 @@ void GoalieBehavior::SaveINISettings(minIni* ini, const std::string& section) {
     ini->put(section, "follow_threshhold", m_FollowThreshhold);
     ini->put(section, "edge_dist_threshhold", m_EdgeDistThreshhold);
     ini->put(section, "max_speed", m_FollowMaxRL);
+    ini->put(section, "x_crutch", m_XCrutch);
+    ini->put(section, "a_crutch", m_ACrutch);
 
     m_BallFinder.SaveINISettings(ini);
     m_BallTracker.SaveINISettings(ini);

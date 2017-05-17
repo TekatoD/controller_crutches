@@ -12,6 +12,7 @@
 #include "motion/modules/Walking.h"
 #include "GoalieBehavior.h"
 #include "motion/MotionStatus.h"
+#include "../include/GoalieBehavior.h"
 
 
 using namespace Robot;
@@ -207,6 +208,7 @@ void GoalieBehavior::LoadINISettings(minIni* ini, const std::string& section) {
     m_BallTracker.LoadINISettings(ini);
     m_BallSearcher.LoadINISettings(ini);
     m_Field.LoadINISettings(ini);
+    m_GoTo.LoadINISettings(ini);
 }
 
 void GoalieBehavior::SaveINISettings(minIni* ini) {
@@ -224,4 +226,5 @@ void GoalieBehavior::SaveINISettings(minIni* ini, const std::string& section) {
     m_BallTracker.SaveINISettings(ini);
     m_BallSearcher.SaveINISettings(ini);
     m_Field.SaveINISettings(ini);
+    m_GoTo.SaveINISettings(ini);
 }

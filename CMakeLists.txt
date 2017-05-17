@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(darwin-soccer)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 98)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 find_package(Threads REQUIRED)
@@ -72,8 +72,8 @@ set(SRC
 
         include/UdpComm.h
         src/UdpComm.cpp
-        src/Speech.cpp
-        include/Speech.h
+#        src/Speech.cpp
+#        include/Speech.h
         src/Pose2D.cpp
         include/Pose2D.h
         src/OdometryCollector.cpp

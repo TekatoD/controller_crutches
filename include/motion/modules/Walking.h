@@ -129,7 +129,7 @@ namespace Robot {
 
         void update_param_balance();
 
-        Pose2D getOdoOffset();
+        Pose2D GetOdoOffset();
 
 
         void update_param_go_to();

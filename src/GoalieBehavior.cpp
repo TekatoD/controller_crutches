@@ -12,7 +12,6 @@
 #include "motion/modules/Walking.h"
 #include "GoalieBehavior.h"
 #include "motion/MotionStatus.h"
-#include "../include/GoalieBehavior.h"
 
 
 using namespace Robot;
@@ -35,6 +34,7 @@ GoalieBehavior::GoalieBehavior() {
     m_EdgeDistThreshhold = 80.0;
     m_FollowThreshhold = 2;
     m_PreviousState = STATE_INITIAL;
+    m_BallSearcher.DisableWalking();
 }
 
 
@@ -67,7 +67,7 @@ void GoalieBehavior::Process() {
         }
         Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
         Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-        auto pos = Starting - Odo;
+        Pose2D pos = Starting - Odo;
         m_GoTo.Process(pos);
         return;
     }
@@ -88,7 +88,7 @@ void GoalieBehavior::Process() {
             Walking::GetInstance()->SetOdo(Starting);
         }
         double pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
-        auto free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
+        double free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
         double x_top = m_Field.GetWidth() - free_space;
         double x_bot = x_top - m_Field.GetGateWidth();
         bool near_edge = false;
@@ -109,11 +109,9 @@ void GoalieBehavior::Process() {
             LinuxCamera::GetInstance()->CaptureFrame();
             m_BallTracker.Process(m_BallFinder.GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
 
-            if (m_BallTracker.GetBallPosition().X == -1.0 || m_BallTracker.GetBallPosition().Y == -1.0) {
-                if (m_BallTracker.IsNoBall()) {
-                    m_BallSearcher.Process();
-                    return;
-                }
+            if (m_BallTracker.IsNoBall()) {
+                m_BallSearcher.Process();
+                return;
             } else {
                 m_BallSearcher.SetLastPosition(m_BallTracker.GetBallPosition());
 
@@ -195,6 +193,8 @@ void GoalieBehavior::LoadINISettings(minIni* ini, const std::string& section) {
     if ((value = ini->getd(section, "max_speed", INVALID_VALUE)) != INVALID_VALUE) m_FollowMaxRL = value;
 
     m_BallFinder.LoadINISettings(ini);
+    m_BallTracker.LoadINISettings(ini);
+    m_BallSearcher.LoadINISettings(ini);
     m_Field.LoadINISettings(ini);
 }
 
@@ -208,5 +208,7 @@ void GoalieBehavior::SaveINISettings(minIni* ini, const std::string& section) {
     ini->put(section, "max_speed", m_FollowMaxRL);
 
     m_BallFinder.SaveINISettings(ini);
+    m_BallTracker.SaveINISettings(ini);
+    m_BallSearcher.SaveINISettings(ini);
     m_Field.SaveINISettings(ini);
 }

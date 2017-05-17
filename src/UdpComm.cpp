@@ -15,6 +15,7 @@
 #include <arpa/inet.h>
 #include <cstring>
 #include <ifaddrs.h>
+#include <errno.h>
 
 
 UdpComm::UdpComm()
@@ -43,7 +44,7 @@ bool UdpComm::resolve(const char* addrStr, int port, struct sockaddr_in* addr) {
 
 
 bool UdpComm::setTarget(const char* addrStr, int port) {
-    struct sockaddr_in* addr = (struct sockaddr_in*) target.get();
+    struct sockaddr_in* addr = (struct sockaddr_in*) target;
     return resolve(addrStr, port, addr);
 }
 
@@ -120,19 +121,19 @@ int UdpComm::read(char* data, int len, sockaddr_in& from) {
 
 bool UdpComm::write(const char* data, const int len) {
     return ::sendto(m_sock, data, len, 0,
-                    target.get(), sizeof(struct sockaddr_in)) == len;
+                    target, sizeof(struct sockaddr_in)) == len;
 }
 
 
 const char* UdpComm::getWifiBroadcastAddress() {
-    struct ifaddrs* ifAddrStruct = nullptr;
-    struct ifaddrs* ifa = nullptr;
+    struct ifaddrs* ifAddrStruct = NULL;
+    struct ifaddrs* ifa = NULL;
 
     //determine ip address
     getifaddrs(&ifAddrStruct);
-    for (ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next) {
+    for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
         // manpage getifaddrs    // check it is IP4
-        if (ifa->ifa_addr != nullptr && ifa->ifa_addr->sa_family == AF_INET) {
+        if (ifa->ifa_addr != NULL && ifa->ifa_addr->sa_family == AF_INET) {
             std::string interfaceName(ifa->ifa_name);
             if (interfaceName.find("wlan") != std::string::npos) {
                 in_addr_t mask = ((struct sockaddr_in*) ifa->ifa_netmask)->sin_addr.s_addr;

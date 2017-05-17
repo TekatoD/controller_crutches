@@ -12,7 +12,6 @@
 #include "motion/MotionStatus.h"
 #include "motion/Kinematics.h"
 #include "motion/modules/Walking.h"
-#include <thread>
 
 using namespace Robot;
 
@@ -641,7 +640,7 @@ void Walking::Process() {
         m_right_odo_theta = -m_odo_a_factor * ep[5];
     }
 
-    m_odometry_collector.odoTranslate(this->getOdoOffset());
+    m_odometry_collector.odoTranslate(GetOdoOffset());
 
     // Compute body swing
     if (m_Time <= m_SSP_Time_End_L) {
@@ -732,12 +731,12 @@ void Walking::Process() {
     }
 }
 
-Pose2D Walking::getOdoOffset() {
+Pose2D Walking::GetOdoOffset() {
     Pose2D offset(m_odo_x, m_odo_y, m_odo_theta);
     m_odo_x = 0;
     m_odo_y = 0;
     m_odo_theta = 0;
-    return std::move(offset);
+    return offset;
 }
 
 double Walking::GetXMoveAmplitude() const {

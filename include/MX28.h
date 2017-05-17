@@ -24,11 +24,11 @@ namespace Robot {
 
         static const int PARAM_BYTES;
 
-        static constexpr double RATIO_VALUE2SPEED = 0.053;
-        static constexpr double RATIO_SPEED2VALUE = 18.87;
+        static const double RATIO_VALUE2SPEED = 0.053;
+        static const double RATIO_SPEED2VALUE = 18.87;
 
-        static constexpr double RATIO_VALUE2TORQUE = 0.01;
-        static constexpr double RATIO_TORQUE2VALUE = 100;
+        static const double RATIO_VALUE2TORQUE = 0.01;
+        static const double RATIO_TORQUE2VALUE = 100;
 
         static int GetMirrorValue(int value) { return MAX_VALUE + 1 - value; }
 

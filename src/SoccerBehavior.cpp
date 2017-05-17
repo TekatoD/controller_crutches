@@ -60,7 +60,7 @@ void SoccerBehavior::Process() {
         }
         Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
         Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-        auto pos = Starting - Odo;
+        Pose2D pos = Starting - Odo;
         m_GoTo.Process(pos);
         return;
     }
@@ -98,7 +98,7 @@ void SoccerBehavior::Process() {
 
             // Kicking the ball
             if (m_BallFollower.GetKickingLeg() != NO_KICKING) {
-                auto free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
+                double free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
                 double x_top = m_Field.GetWidth() - free_space;
                 double x_bot = x_top - m_Field.GetGateWidth();
 

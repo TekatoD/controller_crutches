@@ -19,7 +19,7 @@ namespace Robot {
     class BallTracker {
     private:
         int m_NoBallCount;
-        int m_NoBallMaxCount = 15;
+        int m_NoBallMaxCount;
 
         Point2D BallPosition;
 

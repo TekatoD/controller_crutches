@@ -10,15 +10,11 @@
 #include <libgen.h>
 #include <signal.h>
 #include <memory>
-#include <chrono>
 
 #include <GameController.h>
-#include <Speech.h>
-#include <thread>
 #include <GoTo.h>
 #include <SoccerBehavior.h>
 #include <GoalieBehavior.h>
-#include "OdometryCollector.h"
 
 #include "LinuxDARwIn.h"
 
@@ -91,8 +87,8 @@ int main(void) {
     MotionManager::GetInstance()->AddModule((MotionModule*) Head::GetInstance());
     MotionManager::GetInstance()->AddModule((MotionModule*) Walking::GetInstance());
 
-    auto motion_timer = std::make_unique<LinuxMotionTimer>(MotionManager::GetInstance());
-    motion_timer->Start();
+    LinuxMotionTimer motion_timer(MotionManager::GetInstance());
+    motion_timer.Start();
     /////////////////////////////////////////////////////////////////////
 
     MotionManager::GetInstance()->LoadINISettings(&ini);

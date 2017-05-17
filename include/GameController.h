@@ -16,32 +16,29 @@
 #include <sys/socket.h>
 #include <cstring>
 #include <stdexcept>
-#include <chrono>
 
 #define GAME_CONTROLLER_SECTION   "Game Controller"
 #define INVALID_VALUE   -1024.0
 
-static const int GAMECONTROLLER_TIMEOUT = 2000;
-static const int ALIVE_DELAY = 1000;
+static const int GAMECONTROLLER_TIMEOUT = 2000000;
+static const int ALIVE_DELAY = 1000000;
 
 namespace Robot {
     class GameController {
     public:
-        typedef std::chrono::steady_clock::time_point TimePoint;
-
         static GameController* GetInstance();
 
         void Reset();
 
         void Update();
 
-        bool GameControllerNotResponding() const noexcept;
+        bool GameControllerNotResponding() const;
 
         bool Connect();
 
         void Disconnect();
 
-        bool Connected() const noexcept;
+        bool Connected() const;
 
         void SendPenalise();
 
@@ -74,10 +71,10 @@ namespace Robot {
 
 
     private:
-        std::unique_ptr<UdpComm> m_Udp;
+        UdpComm* m_Udp;
         in_addr m_GameControllerAddress;
-        TimePoint m_WhenPacketWasReceived;
-        TimePoint m_WhenPacketWasSent;
+        clock_t m_WhenPacketWasReceived;
+        clock_t m_WhenPacketWasSent;
 
     };
 }

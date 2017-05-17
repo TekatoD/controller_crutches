@@ -12,6 +12,7 @@
 #include "motion/modules/Walking.h"
 #include "GoalieBehavior.h"
 #include "motion/MotionStatus.h"
+#include "../include/GoalieBehavior.h"
 
 
 using namespace Robot;
@@ -90,14 +91,19 @@ void GoalieBehavior::Process() {
         auto free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
         double x_top = m_Field.GetWidth() - free_space;
         double x_bot = x_top - m_Field.GetGateWidth();
-        double diff = 0;
+        bool near_edge = false;
         if(pan < 0) {
-            diff = abs(Walking::GetInstance()->GetOdo().X() - x_top);
+            if (Walking::GetInstance()->GetOdo().X() >= x_top - m_EdgeDistThreshhold) {
+                Walking::GetInstance()->Stop();
+                near_edge = true;
+            }
         } else {
-            diff = abs(Walking::GetInstance()->GetOdo().X() - x_bot);
+            if (Walking::GetInstance()->GetOdo().X() <= x_bot + m_EdgeDistThreshhold) {
+                Walking::GetInstance()->Stop();
+                near_edge = true;
+            }
         }
-
-        if (Action::GetInstance()->IsRunning() == 0 && diff > m_EdgeDistThreshhold) {
+        if (Action::GetInstance()->IsRunning() == 0 && !near_edge) {
             Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
             LinuxCamera::GetInstance()->CaptureFrame();

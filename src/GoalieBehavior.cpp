@@ -63,26 +63,26 @@ void GoalieBehavior::Process() {
 //        const RobotInfo& info = State.teams[index].players[i];
 //        std::cout << " " << (int) info.penalty << " " << (int) info.secsTillUnpenalised << std::endl;
 //    }
-    
-    if (State.state == STATE_INITIAL || State.state == STATE_FINISHED) {
-        Walking::GetInstance()->SetOdo(Spawn);
-        Walking::GetInstance()->Stop();
-        return;
-    }
+//
+//    if (State.state == STATE_INITIAL || State.state == STATE_FINISHED) {
+//        Walking::GetInstance()->SetOdo(Spawn);
+//        Walking::GetInstance()->Stop();
+//        return;
+//    }
+//
+//    if (State.state == STATE_READY) {
+//        if (m_PreviousState != STATE_INITIAL) {
+//            m_PreviousState = STATE_INITIAL;
+//            Walking::GetInstance()->SetOdo(Spawn);
+//        }
+//        Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
+//        Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+//        Pose2D pos = Starting - Odo;
+//        m_GoTo.Process(pos);
+//        return;
+//    }
 
-    if (State.state == STATE_READY) {
-        if (m_PreviousState != STATE_INITIAL) {
-            m_PreviousState = STATE_INITIAL;
-            Walking::GetInstance()->SetOdo(Spawn);
-        }
-        Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-        Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-        Pose2D pos = Starting - Odo;
-        m_GoTo.Process(pos);
-        return;
-    }
-
-    if (State.state == STATE_SET) {
+    if (State.state == STATE_SET || State.state == STATE_READY || State.state == STATE_INITIAL) {
         const Pose2D& Spawn = StateMachine::GetInstance()->GetSpawnPosition();
         if (m_BallTracker.IsNoBall()) {
             Head::GetInstance()->MoveToHome();

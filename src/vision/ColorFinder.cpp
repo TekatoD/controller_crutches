@@ -6,6 +6,7 @@
  */
 
 #include <stdlib.h>
+#include <iostream>
 
 #include "ColorFinder.h"
 #include "ImgProcess.h"

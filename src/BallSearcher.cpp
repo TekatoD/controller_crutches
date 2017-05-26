@@ -29,6 +29,7 @@ BallSearcher::BallSearcher() {
 
 void BallSearcher::Process() {
    if (!m_Active) {
+       // TODO Pan checking
         Point2D center = Point2D(Camera::WIDTH / 2, Camera::HEIGHT / 2);
         Point2D offset = m_LastPosition - center;
 
@@ -58,17 +59,12 @@ void BallSearcher::Process() {
     double tilt = sin(m_TiltPhase / m_PhaseSize * M_2_PI) * tilt_diff - tilt_min;
     Head::GetInstance()->MoveByAngle(pan, tilt);
 
-//    std::cout << m_PanPhase << " " << m_PanPhaseStep << " " << m_PhaseSize << std::endl;
-//    std::cout << pan << " " << pan_min << " " << pan_max << std::endl;
-
     if (m_WalkingEnabled) {
         m_TurnSpeed = Walking::GetInstance()->A_MOVE_AMPLITUDE;
         m_TurnSpeed += m_TurnStep * m_TurnDirection;
         if (fabs(m_TurnSpeed) > m_MaxTurn) {
             m_TurnSpeed = m_MaxTurn * m_TurnDirection;
         }
-
-        std::cout << "T: " << m_TurnSpeed << " M:" << m_MaxTurn << std::endl;
 
         Walking::GetInstance()->X_MOVE_AMPLITUDE = 0;
         Walking::GetInstance()->Y_MOVE_AMPLITUDE = 0;

@@ -4,7 +4,6 @@
  */
 #include "Pose2D.h"
 #include <math.h>
-#include <iostream>
 
 Robot::Pose2D::Pose2D() : m_x(0), m_y(0), m_theta(0) { }
 

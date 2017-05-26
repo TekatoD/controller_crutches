@@ -54,9 +54,9 @@ namespace Robot {
         BallSearcher m_BallSearcher;
         GoTo m_GoTo;
         Field m_Field;
-        double m_AimAAmplitude;
-        double m_AimRLAmplitude;
         int m_PreviousState;
+
+        void normalize(double& m_theta) const;
     };
 }
 

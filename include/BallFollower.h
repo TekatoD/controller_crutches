@@ -42,14 +42,21 @@ namespace Robot {
         double m_FitFBStep;
         double m_FitMaxRLTurn;
         double m_UnitFBStep;
+        double m_UnitRLStep;
         double m_UnitRLTurn;
 
         double m_GoalFBStep;
+        double m_GoalRLStep;
         double m_GoalRLTurn;
         double m_FBStep;
+        double m_RLStep;
         double m_RLTurn;
 
         double m_TiltOffset;
+
+        double m_AimTiltOffset;
+        double m_AimRLStep;
+        double m_AimRLTurn;
 
         Kicking m_KickBall;
 
@@ -59,7 +66,7 @@ namespace Robot {
 
         ~BallFollower();
 
-        void Process(Point2D ball_pos);
+        void Process(Point2D ball_pos, double angle_top, double angle_bot);
 
         void LoadINISettings(minIni* ini);
 
@@ -72,6 +79,7 @@ namespace Robot {
         bool IsNoBall() const;
 
         Kicking GetKickingLeg() const;
+
     };
 }
 

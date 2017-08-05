@@ -86,6 +86,33 @@ set(SRC
         include/detectors/LineDetector.h
         )
 
+set(VISION_SRC
+    src/ros_nodes/field_node.cpp
+    src/detectors/AngleDetector.cpp
+    src/detectors/BallDetector.cpp
+    src/detectors/BaseDetector.cpp
+    src/detectors/FieldDetector.cpp
+    src/detectors/LineDetector.cpp
+    src/Vision.cpp
+    src/VisionUtils.cpp
+)
+
+add_executable(vision_node ${VISION_SRC})
+
+target_link_libraries(vision_node
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${JPEG_LIBRARIES}
+    ${Boost_LIBRARIES}
+    ${OpenCV_LIBS}
+)
+
+target_include_directories(vision_node PUBLIC
+        ${JPEG_INCLUDE_DIR}
+        ${Boost_INCLUDE_DIRS}
+        ${OpenCV_INCLUDE_DIRS}
+)
+
+#[[
 add_executable(soccer ${SRC})
 
 target_link_libraries(soccer
@@ -94,8 +121,9 @@ target_link_libraries(soccer
         ${JPEG_LIBRARIES}
         ${Boost_LIBRARIES}
         ${OpenCV_LIBS}
-        dl)
+)
 target_include_directories(soccer PUBLIC
         ${JPEG_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS}
         ${OpenCV_INCLUDE_DIRS})
+]]

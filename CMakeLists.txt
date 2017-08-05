@@ -1,16 +1,40 @@
 cmake_minimum_required(VERSION 3.0)
-project(darwin-soccer)
+project(darwin_soccer)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(Boost_USE_STATIC_LIBS ON)
 
 find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 3 REQUIRED)
 
-include_directories(include/)
+#[[
+find_package(catkin QUIET COMPONENTS
+    roscpp
+    sensor_msgs
+    std_msgs
+    nav_msgs
+    tf
+)
+
+if(${roscpp_FOUND})
+    message(STATUS "ROS found")
+    set(ROS_FOUND YES)
+else()
+    message(WARNING "ROS NOT FOUND")
+    set(ROS_FOUND NO)
+endif()
+
+catkin_package(
+	INCLUDE_DIRS src
+	CATKIN_DEPENDS roscpp sensor_msgs std_msgs nav_msgs tf
+)
+]]
+
+include_directories(
+	include/)
 
 set(SRC
         include/Action.h
@@ -99,17 +123,17 @@ set(VISION_SRC
 
 add_executable(vision_node ${VISION_SRC})
 
+target_include_directories(vision_node PUBLIC
+        ${JPEG_INCLUDE_DIR}
+        ${Boost_INCLUDE_DIRS}
+        ${OpenCV_INCLUDE_DIRS}
+)
+
 target_link_libraries(vision_node
     ${CMAKE_THREAD_LIBS_INIT}
     ${JPEG_LIBRARIES}
     ${Boost_LIBRARIES}
     ${OpenCV_LIBS}
-)
-
-target_include_directories(vision_node PUBLIC
-        ${JPEG_INCLUDE_DIR}
-        ${Boost_INCLUDE_DIRS}
-        ${OpenCV_INCLUDE_DIRS}
 )
 
 #[[

@@ -24,6 +24,8 @@ namespace Robot {
         static Matrix4x4f ComputeLegForwardKinematics(float pelvis, float tight_roll, float tight_pitch,
                                                       float knee_pitch, float ankle_pitch, float ankle_roll);
 
+        static Matrix4x4f ComputeHeadForwardKinematics(float pan, float tilt);
+
     public:
         static const float CAMERA_DISTANCE; //mm
         static const float EYE_TILT_OFFSET_ANGLE; //degree

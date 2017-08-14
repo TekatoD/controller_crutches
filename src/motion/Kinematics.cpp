@@ -190,3 +190,34 @@ Matrix4x4f Kinematics::ComputeLegForwardKinematics(float pelvis, float tight_rol
             0.0, 0.0, 0.0, 1.0;
     return res;
 }
+
+Matrix4x4f Kinematics::ComputeHeadForwardKinematics(float pan, float tilt) {
+    // todo check order of angles
+    const float s1 = sinf(pan);
+    const float c1 = cosf(pan);
+    const float s2 = sinf(tilt);
+    const float c2 = cosf(tilt);
+
+    const float r11 = c1 * c2;
+    const float r12 = -c1 * s2;
+    const float r13 = -s1;
+
+    const float r21 = s1 * c2;
+    const float r22 = -s1 * s2;
+    const float r23 = c1;
+
+    const float r31 = -s2;
+    const float r32 = -c2;
+    const float r33 = 0.0f;
+
+    const float px = r11 * CAMERA_DISTANCE;
+    const float py = r12 * CAMERA_DISTANCE;
+    const float pz = r13 * CAMERA_DISTANCE;
+
+    Matrix4x4f res;
+    res << r11, r12, r13, px,
+            r21, r22, r23, py,
+            r31, r32, r33, pz,
+            0.0, 0.0, 0.0, 1.0;
+    return res;
+}

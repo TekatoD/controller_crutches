@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.0)
 project(darwin-soccer)
 
-set(CMAKE_CXX_STANDARD 98)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 include_directories(include/)
 
@@ -64,16 +65,12 @@ set(SRC
         src/main.cpp
         src/MX28.cpp
         src/StateMachine.cpp
-
         include/gamecontroller/RoboCupGameControlData.h
         include/gamecontroller/SPLCoachMessage.h
         include/gamecontroller/SPLStandardMessage.h
         src/GameController.cpp include/GameController.h
-
         include/UdpComm.h
         src/UdpComm.cpp
-#        src/Speech.cpp
-#        include/Speech.h
         src/Pose2D.cpp
         include/Pose2D.h
         src/OdometryCollector.cpp
@@ -83,11 +80,18 @@ set(SRC
         include/SoccerBehavior.h
         src/SoccerBehavior.cpp
         include/GoalieBehavior.h
-        src/GoalieBehavior.cpp src/Field.cpp include/Field.h src/BallSearcher.cpp include/BallSearcher.h)
+        src/GoalieBehavior.cpp
+        src/Field.cpp
+        include/Field.h
+        src/BallSearcher.cpp
+        include/BallSearcher.h
+        include/math/AngleTools.h
+        include/math/Eigen.h src/math/AngleTools.cpp)
 
 add_executable(soccer ${SRC})
 target_link_libraries(soccer
         ${CMAKE_THREAD_LIBS_INIT}
-        ${JPEG_LIBRARIES})
+        ${JPEG_LIBRARIES}
+        Eigen3::Eigen)
 target_include_directories(soccer PUBLIC
         ${JPEG_INCLUDE_DIR})

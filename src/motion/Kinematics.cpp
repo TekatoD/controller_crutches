@@ -132,12 +132,12 @@ void Kinematics::ComputeLegForwardKinematics(Matrix4x4f& out, float pelvis, floa
     const float r22 = r13 * r31 - r11 * r33;
     const float r23 = r11 * r32 - r12 * r31;
 
-    const float px = (c1c2c3 - s1s3) * (c4 * CALF_LENGTH + THIGH_LENGTH) +
-                     (-s3c1c2 - s1c3) * (s4 * CALF_LENGTH) + r11 * ANKLE_LENGTH;
-    const float py = (s1 * c2 * c3 + c1 * s3) * (c4 * CALF_LENGTH + THIGH_LENGTH) +
-                     (-s3 * s1 * c2 + c1 * c3) * (s4 * CALF_LENGTH) + r12 * ANKLE_LENGTH;
-    const float pz = s2c3 * (c4 * CALF_LENGTH + THIGH_LENGTH) -
+    const float px = s2c3 * (c4 * CALF_LENGTH + THIGH_LENGTH) -
                      s2s3 * (s4 * CALF_LENGTH) + r13 * ANKLE_LENGTH;
+    const float py = (c1c2c3 - s1s3) * (c4 * CALF_LENGTH + THIGH_LENGTH) +
+                     (-s3c1c2 - s1c3) * (s4 * CALF_LENGTH) + r11 * ANKLE_LENGTH;
+    const float pz = (s1 * c2 * c3 + c1 * s3) * (c4 * CALF_LENGTH + THIGH_LENGTH) +
+                     (-s3 * s1 * c2 + c1 * c3) * (s4 * CALF_LENGTH) + r12 * ANKLE_LENGTH;
 
     out << r11, r12, r13, px,
            r21, r22, r23, py,
@@ -156,17 +156,17 @@ void Kinematics::ComputeHeadForwardKinematics(Matrix4x4f& out, float pan, float 
     const float r12 = -c1 * s2;
     const float r13 = -s1;
 
-    const float r21 = s1 * c2;
-    const float r22 = -s1 * s2;
-    const float r23 = c1;
+    const float r21 = -s2;
+    const float r22 = -c2;
+    const float r23 = 0.0f;
 
-    const float r31 = -s2;
-    const float r32 = -c2;
-    const float r33 = 0.0f;
+    const float r31 = s1 * c2;
+    const float r32 = -s1 * s2;
+    const float r33 = c1;
 
-    const float px = r11 * CAMERA_DISTANCE;
-    const float py = r12 * CAMERA_DISTANCE;
-    const float pz = r13 * CAMERA_DISTANCE;
+    const float px = r11 * CAMERA_OFFSET_X + r13 * CAMERA_OFFSET_Z;
+    const float py = r21 * CAMERA_OFFSET_X + r23 * CAMERA_OFFSET_Z;
+    const float pz = r31 * CAMERA_OFFSET_X + r33 * CAMERA_OFFSET_Z;
 
     out << r11, r12, r13, px,
            r21, r22, r23, py,

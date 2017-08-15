@@ -27,7 +27,8 @@ namespace Robot {
         static void ComputeHeadForwardKinematics(Matrix4x4f& out, float pan, float tilt);
 
     public:
-        static constexpr float CAMERA_DISTANCE = 33.2f; //mm
+        static constexpr float CAMERA_OFFSET_X = 33.2f; //mm
+        static constexpr float CAMERA_OFFSET_Z = 34.4f; //mm
         static constexpr float EYE_TILT_OFFSET_ANGLE = 40.0f; //degree
         static constexpr float LEG_SIDE_OFFSET = 37.0f; //mm
         static constexpr float THIGH_LENGTH = 93.0f; //mm

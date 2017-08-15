@@ -1,14 +1,23 @@
 cmake_minimum_required(VERSION 3.0)
 project(darwin-soccer)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+option(CROSSCOMPILE "Compile for real Darwin-OP (V-REP build by default)" OFF)
+
 find_package(Threads REQUIRED)
-find_package(JPEG REQUIRED)
+find_package(JPEG REQUIRED) # This lib is used by the linux camera
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 include_directories(include/)
+
+if (CROSSCOMPILE)
+    add_definitions(-DCROSSCOMPILE) # This definition is used during the initialization in the main
+    set(CROSSCOMPILE_FLAGS "-m32 -march=atom -mtune=atom -mfpmath=sse -flto -ffast-math")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++")
+endif (CROSSCOMPILE)
 
 set(SRC
         include/motion/modules/Action.h
@@ -86,12 +95,15 @@ set(SRC
         src/BallSearcher.cpp
         include/BallSearcher.h
         include/math/AngleTools.h
-        include/math/Eigen.h src/math/AngleTools.cpp)
+        include/math/Eigen.h
+        src/math/AngleTools.cpp)
 
-add_executable(soccer ${SRC})
-target_link_libraries(soccer
+add_executable(controller ${SRC})
+
+target_link_libraries(controller
         ${CMAKE_THREAD_LIBS_INIT}
         ${JPEG_LIBRARIES}
         Eigen3::Eigen)
-target_include_directories(soccer PUBLIC
+
+target_include_directories(controller PUBLIC
         ${JPEG_INCLUDE_DIR})

@@ -17,7 +17,7 @@ Point2D::Point2D() {
 }
 
 
-Point2D::Point2D(double x, double y) {
+Point2D::Point2D(float x, float y) {
     X = x;
     Y = y;
 }
@@ -34,9 +34,9 @@ Point2D::~Point2D() {
 
 
 /*returns the euclidian distance between pt1 and pt2*/
-double Point2D::Distance(Point2D& pt1, Point2D& pt2) {
-    double x = pt1.X - pt2.X;
-    double y = pt1.Y - pt2.Y;
+float Point2D::Distance(Point2D& pt1, Point2D& pt2) {
+    float x = pt1.X - pt2.X;
+    float y = pt1.Y - pt2.Y;
     return sqrt(x * x + y * y);
 }
 
@@ -62,28 +62,28 @@ Point2D& Point2D::operator-=(const Point2D& point) {
 }
 
 
-Point2D& Point2D::operator+=(double value) {
+Point2D& Point2D::operator+=(float value) {
     X += value;
     Y += value;
     return *this;
 }
 
 
-Point2D& Point2D::operator-=(double value) {
+Point2D& Point2D::operator-=(float value) {
     X -= value;
     Y -= value;
     return *this;
 }
 
 
-Point2D& Point2D::operator*=(double value) {
+Point2D& Point2D::operator*=(float value) {
     X *= value;
     Y *= value;
     return *this;
 }
 
 
-Point2D& Point2D::operator/=(double value) {
+Point2D& Point2D::operator/=(float value) {
     X /= value;
     Y /= value;
     return *this;
@@ -100,22 +100,22 @@ Point2D Point2D::operator-(const Point2D& point) {
 }
 
 
-Point2D Point2D::operator+(double value) {
+Point2D Point2D::operator+(float value) {
     return Point2D(X + value, Y + value);
 }
 
 
-Point2D Point2D::operator-(double value) {
+Point2D Point2D::operator-(float value) {
     return Point2D(X - value, Y - value);
 }
 
 
-Point2D Point2D::operator*(double value) {
+Point2D Point2D::operator*(float value) {
     return Point2D(X * value, Y * value);
 }
 
 
-Point2D Point2D::operator/(double value) {
+Point2D Point2D::operator/(float value) {
     return Point2D(X / value, Y / value);
 }
 
@@ -127,7 +127,7 @@ Point3D::Point3D() {
 }
 
 
-Point3D::Point3D(double x, double y, double z) {
+Point3D::Point3D(float x, float y, float z) {
     X = x;
     Y = y;
     Z = z;
@@ -145,10 +145,10 @@ Point3D::~Point3D() {
 }
 
 
-double Point3D::Distance(const Point3D& pt1, const Point3D& pt2) {
-    double x = pt1.X - pt2.X;
-    double y = pt1.Y - pt2.Y;
-    double z = pt1.Z - pt2.Z;
+float Point3D::Distance(const Point3D& pt1, const Point3D& pt2) {
+    float x = pt1.X - pt2.X;
+    float y = pt1.Y - pt2.Y;
+    float z = pt1.Z - pt2.Z;
     return sqrt(x * x + y * y + z * z);
 }
 
@@ -177,7 +177,7 @@ Point3D& Point3D::operator-=(const Point3D& point) {
 }
 
 
-Point3D& Point3D::operator+=(double value) {
+Point3D& Point3D::operator+=(float value) {
     X += value;
     Y += value;
     Z += value;
@@ -185,7 +185,7 @@ Point3D& Point3D::operator+=(double value) {
 }
 
 
-Point3D& Point3D::operator-=(double value) {
+Point3D& Point3D::operator-=(float value) {
     X -= value;
     Y -= value;
     Z -= value;
@@ -193,7 +193,7 @@ Point3D& Point3D::operator-=(double value) {
 }
 
 
-Point3D& Point3D::operator*=(double value) {
+Point3D& Point3D::operator*=(float value) {
     X *= value;
     Y *= value;
     Z *= value;
@@ -201,7 +201,7 @@ Point3D& Point3D::operator*=(double value) {
 }
 
 
-Point3D& Point3D::operator/=(double value) {
+Point3D& Point3D::operator/=(float value) {
     X /= value;
     Y /= value;
     Z /= value;
@@ -219,21 +219,21 @@ Point3D Point3D::operator-(const Point3D& point) {
 }
 
 
-Point3D Point3D::operator+(double value) {
+Point3D Point3D::operator+(float value) {
     return Point3D(X + value, Y + value, Z + value);
 }
 
 
-Point3D Point3D::operator-(double value) {
+Point3D Point3D::operator-(float value) {
     return Point3D(X - value, Y - value, Z - value);
 }
 
 
-Point3D Point3D::operator*(double value) {
+Point3D Point3D::operator*(float value) {
     return Point3D(X * value, Y * value, Z * value);
 }
 
 
-Point3D Point3D::operator/(double value) {
+Point3D Point3D::operator/(float value) {
     return Point3D(X / value, Y / value, Z / value);
 }

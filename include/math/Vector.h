@@ -17,13 +17,13 @@ namespace Robot {
     protected:
 
     public:
-        double X;
-        double Y;
-        double Z;
+        float X;
+        float Y;
+        float Z;
 
         Vector3D();
 
-        Vector3D(double x, double y, double z);
+        Vector3D(float x, float y, float z);
 
         Vector3D(const Point3D& pt1, const Point3D& pt2);
 
@@ -31,17 +31,17 @@ namespace Robot {
 
         ~Vector3D();
 
-        double Length();
+        float Length();
 
         void Normalize();
 
-        double Dot(const Vector3D& vector);
+        float Dot(const Vector3D& vector);
 
         Vector3D Cross(const Vector3D& vector);
 
-        double AngleBetween(Vector3D& vector);
+        float AngleBetween(Vector3D& vector);
 
-        double AngleBetween(Vector3D& vector, Vector3D& axis);
+        float AngleBetween(Vector3D& vector, Vector3D& axis);
 
         Vector3D& operator=(const Vector3D& vector);
 
@@ -49,25 +49,25 @@ namespace Robot {
 
         Vector3D& operator-=(const Vector3D& vector);
 
-        Vector3D& operator+=(const double value);
+        Vector3D& operator+=(const float value);
 
-        Vector3D& operator-=(const double value);
+        Vector3D& operator-=(const float value);
 
-        Vector3D& operator*=(const double value);
+        Vector3D& operator*=(const float value);
 
-        Vector3D& operator/=(const double value);
+        Vector3D& operator/=(const float value);
 
         Vector3D operator+(const Vector3D& vector);
 
         Vector3D operator-(const Vector3D& vector);
 
-        Vector3D operator+(const double value);
+        Vector3D operator+(const float value);
 
-        Vector3D operator-(const double value);
+        Vector3D operator-(const float value);
 
-        Vector3D operator*(const double value);
+        Vector3D operator*(const float value);
 
-        Vector3D operator/(const double value);
+        Vector3D operator/(const float value);
     };
 }
 

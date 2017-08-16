@@ -16,7 +16,7 @@
 namespace Robot {
     class Kinematics {
     private:
-        Kinematics();
+        Kinematics() = default;
 
     public:
         static bool ComputeLegInverseKinematics(float* out, float x, float y, float z, float a, float b, float c);

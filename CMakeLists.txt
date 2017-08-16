@@ -3,12 +3,16 @@ project(darwin-soccer)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(Boost_USE_STATIC_LIBS ON)
 
 option(CROSSCOMPILE "Compile for real Darwin-OP (V-REP build by default)" OFF)
 
 find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED) # This lib is used by the linux camera
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+# Path to Boost and OpenCV needs to be set manually when crosscompiling
+find_package(Boost REQUIRED)
+find_package(OpenCV REQUIRED)
 
 include_directories(include/)
 
@@ -103,7 +107,11 @@ add_executable(controller ${SRC})
 target_link_libraries(controller
         ${CMAKE_THREAD_LIBS_INIT}
         ${JPEG_LIBRARIES}
+        ${BOOST_LIBRARIES}
+        ${OpenCV_LIBRARIES}
         Eigen3::Eigen)
 
 target_include_directories(controller PUBLIC
-        ${JPEG_INCLUDE_DIR})
+        ${BOOST_INCLUDE_DIR}
+        ${JPEG_INCLUDE_DIR}
+        ${OpenCV_INCLUDE_DIR})

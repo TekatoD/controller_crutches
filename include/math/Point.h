@@ -16,19 +16,19 @@ namespace Robot {
     protected:
 
     public:
-        double X;
-        double Y;
+        float X;
+        float Y;
 
         Point2D();
 
-        Point2D(double x, double y);
+        Point2D(float x, float y);
 
         Point2D(const Point2D& point);
 
         ~Point2D();
 
         /*compute the euclidean distance between pt1 and pt2*/
-        static double Distance(Point2D& pt1, Point2D& pt2);
+        static float Distance(Point2D& pt1, Point2D& pt2);
 
         Point2D& operator=(const Point2D& point);
 
@@ -36,25 +36,25 @@ namespace Robot {
 
         Point2D& operator-=(const Point2D& point);
 
-        Point2D& operator+=(double value);
+        Point2D& operator+=(float value);
 
-        Point2D& operator-=(double value);
+        Point2D& operator-=(float value);
 
-        Point2D& operator*=(double value);
+        Point2D& operator*=(float value);
 
-        Point2D& operator/=(double value);
+        Point2D& operator/=(float value);
 
         Point2D operator+(const Point2D& point);
 
         Point2D operator-(const Point2D& point);
 
-        Point2D operator+(double value);
+        Point2D operator+(float value);
 
-        Point2D operator-(double value);
+        Point2D operator-(float value);
 
-        Point2D operator*(double value);
+        Point2D operator*(float value);
 
-        Point2D operator/(double value);
+        Point2D operator/(float value);
     };
 
     class Point3D {
@@ -63,20 +63,20 @@ namespace Robot {
     protected:
 
     public:
-        double X;
-        double Y;
-        double Z;
+        float X;
+        float Y;
+        float Z;
 
         Point3D();
 
-        Point3D(double x, double y, double z);
+        Point3D(float x, float y, float z);
 
         Point3D(const Point3D& point);
 
         ~Point3D();
 
         /*compute the euclidean distance between pt1 and pt2*/
-        static double Distance(const Point3D& pt1, const Point3D& pt2);
+        static float Distance(const Point3D& pt1, const Point3D& pt2);
 
         Point3D& operator=(const Point3D& point);
 
@@ -84,25 +84,25 @@ namespace Robot {
 
         Point3D& operator-=(const Point3D& point);
 
-        Point3D& operator+=(double value);
+        Point3D& operator+=(float value);
 
-        Point3D& operator-=(double value);
+        Point3D& operator-=(float value);
 
-        Point3D& operator*=(double value);
+        Point3D& operator*=(float value);
 
-        Point3D& operator/=(double value);
+        Point3D& operator/=(float value);
 
         Point3D operator+(const Point3D& point);
 
         Point3D operator-(const Point3D& point);
 
-        Point3D operator+(double value);
+        Point3D operator+(float value);
 
-        Point3D operator-(double value);
+        Point3D operator-(float value);
 
-        Point3D operator*(double value);
+        Point3D operator*(float value);
 
-        Point3D operator/(double value);
+        Point3D operator/(float value);
     };
 }
 

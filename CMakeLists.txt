@@ -100,7 +100,7 @@ set(SRC
         include/BallSearcher.h
         include/math/AngleTools.h
         include/math/Eigen.h
-        src/math/AngleTools.cpp)
+        src/math/AngleTools.cpp src/ServiceLocator.cpp include/ServiceLocator.h src/ServiceInterface.cpp include/ServiceInterface.h include/Singleton.h src/PropertyReader.cpp include/PropertyReader.h)
 
 add_executable(controller ${SRC})
 

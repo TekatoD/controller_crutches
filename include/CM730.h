@@ -70,15 +70,15 @@ For instance, LinuxCM730 is a concretisation of this class.
 
         virtual bool IsPacketTimeout() = 0;
 
-        virtual double GetPacketTime() = 0;
+        virtual float GetPacketTime() = 0;
 
         virtual void SetUpdateTimeout(int msec) = 0;
 
         virtual bool IsUpdateTimeout() = 0;
 
-        virtual double GetUpdateTime() = 0;
+        virtual float GetUpdateTime() = 0;
 
-        virtual void Sleep(double msec) = 0;
+        virtual void Sleep(float msec) = 0;
         //////////////////////////////////////////////////////////////////////////////
     };
 

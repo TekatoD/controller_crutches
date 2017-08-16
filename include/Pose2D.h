@@ -13,19 +13,19 @@ namespace Robot {
 
         Pose2D();
 
-        Pose2D(double x, double y, double theta = 0);
+        Pose2D(float x, float y, float theta = 0);
 
-        double X() const;
+        float X() const;
 
-        double Y() const;
+        float Y() const;
 
-        double Theta() const;
+        float Theta() const;
 
-        void setX(double x);
+        void setX(float x);
 
-        void setY(double y);
+        void setY(float y);
 
-        void setTheta(double theta);
+        void setTheta(float theta);
 
         void normalizeTheta();
 
@@ -42,9 +42,9 @@ namespace Robot {
         friend std::ostream& operator << (std::ostream& os, const Pose2D& data);
 
     private:
-        double m_x;
-        double m_y;
-        double m_theta;
+        float m_x;
+        float m_y;
+        float m_theta;
     };
 }
 

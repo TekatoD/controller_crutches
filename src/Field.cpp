@@ -5,30 +5,30 @@
 
 #include "Field.h"
 
-double Field::GetWidth() const {
+float Field::GetWidth() const {
     return m_FieldWidth;
 }
 
-void Field::SetWidth(double field_width) {
+void Field::SetWidth(float field_width) {
     if (field_width < 0) field_width = 0;
     if (m_GateWidth > field_width) m_GateWidth = field_width;
     m_FieldWidth = field_width;
 }
 
-double Field::GetLength() const {
+float Field::GetLength() const {
     return m_FieldLength;
 }
 
-void Field::SetLength(double field_height) {
+void Field::SetLength(float field_height) {
     if (field_height < 0) field_height = 0;
     m_FieldLength = field_height;
 }
 
-double Field::GetGateWidth() const {
+float Field::GetGateWidth() const {
     return m_GateWidth;
 }
 
-void Field::SetGateWidth(double gate_width) {
+void Field::SetGateWidth(float gate_width) {
     if (gate_width < 0) gate_width = 0;
     if (gate_width > m_FieldWidth) m_FieldLength = gate_width;
     m_GateWidth = gate_width;
@@ -40,7 +40,7 @@ void Field::LoadINISettings(minIni *ini) {
 
 
 void Field::LoadINISettings(minIni *ini, const std::string &section) {
-    double value = -2;
+    float value = -2;
 
     if ((value = ini->getd(section, "field_width", INVALID_VALUE)) != INVALID_VALUE) SetWidth(value);
     if ((value = ini->getd(section, "field_length", INVALID_VALUE)) != INVALID_VALUE) SetLength(value);

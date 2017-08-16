@@ -30,22 +30,22 @@
 namespace Robot {
     class GoTo {
     private:
-        double m_MaxSpeed;
-        double m_FitSpeed;
-        double m_MaxTurn;
-        double m_StepAccel;
-        double m_TurnAccel;
-        double m_DodeAngle;
+        float m_MaxSpeed;
+        float m_FitSpeed;
+        float m_MaxTurn;
+        float m_StepAccel;
+        float m_TurnAccel;
+        float m_DodeAngle;
 
-        double m_FitDistance;
-        double m_DistanceVar;
-        double m_AngleVar;
+        float m_FitDistance;
+        float m_DistanceVar;
+        float m_AngleVar;
 
-        double m_GoalMaxSpeed;
-        double m_GoalTurn;
-        double m_X;
-        double m_Y;
-        double m_A;
+        float m_GoalMaxSpeed;
+        float m_GoalTurn;
+        float m_X;
+        float m_Y;
+        float m_A;
 
 
         bool m_Done;

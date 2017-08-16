@@ -12,8 +12,8 @@
 namespace Robot {
     class Camera {
     public:
-        static constexpr double VIEW_V_ANGLE = 46.0; //degree
-        static constexpr double VIEW_H_ANGLE = 58.0; //degree
+        static constexpr float VIEW_V_ANGLE = 46.0; //degree
+        static constexpr float VIEW_H_ANGLE = 58.0; //degree
 
         static int WIDTH;
         static int HEIGHT;

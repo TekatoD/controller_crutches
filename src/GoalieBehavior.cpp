@@ -11,8 +11,6 @@
 #include "motion/modules/Head.h"
 #include "motion/modules/Walking.h"
 #include "GoalieBehavior.h"
-#include "motion/MotionStatus.h"
-#include "../include/GoalieBehavior.h"
 
 
 using namespace Robot;
@@ -97,10 +95,10 @@ void GoalieBehavior::Process() {
             m_PreviousState = STATE_SET;
             Walking::GetInstance()->SetOdo(Starting);
         }
-        double pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
-        double free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
-        double x_top = m_Field.GetWidth() - free_space;
-        double x_bot = x_top - m_Field.GetGateWidth();
+        float pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
+        float free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
+        float x_top = m_Field.GetWidth() - free_space;
+        float x_bot = x_top - m_Field.GetGateWidth();
         bool near_edge = false;
         if(pan < 0) {
             if (Walking::GetInstance()->GetOdo().X() >= x_top - m_EdgeDistThreshhold) {
@@ -125,11 +123,11 @@ void GoalieBehavior::Process() {
             } else {
                 m_BallSearcher.SetLastPosition(m_BallTracker.GetBallPosition());
 
-                double pan_range = Head::GetInstance()->GetLeftLimitAngle();
-                double pan_percent = pan / pan_range;
+                float pan_range = Head::GetInstance()->GetLeftLimitAngle();
+                float pan_percent = pan / pan_range;
 
-                double tilt = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_TILT);
-                double tilt_min = Head::GetInstance()->GetBottomLimitAngle();
+                float tilt = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_TILT);
+                float tilt_min = Head::GetInstance()->GetBottomLimitAngle();
 
                 if (pan > m_KickRightAngle && pan < m_KickLeftAngle) {
                     if (tilt <= (tilt_min + MX28::RATIO_VALUE2ANGLE)) {
@@ -196,7 +194,7 @@ void GoalieBehavior::LoadINISettings(minIni* ini) {
 }
 
 void GoalieBehavior::LoadINISettings(minIni* ini, const std::string& section) {
-    double value = -2;
+    float value = -2;
 
     if ((value = ini->getd(section, "follow_threshhold", INVALID_VALUE)) != INVALID_VALUE) m_FollowThreshhold = value;
     if ((value = ini->getd(section, "edge_dist_threshhold", INVALID_VALUE)) != INVALID_VALUE) m_EdgeDistThreshhold = value;

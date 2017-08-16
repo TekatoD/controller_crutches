@@ -14,7 +14,7 @@ namespace Robot {
 
         OdometryCollector(Pose2D initial);
 
-        OdometryCollector(double x, double y, double theta);
+        OdometryCollector(float x, float y, float theta);
 
         void odoTranslate(Pose2D offset);
 

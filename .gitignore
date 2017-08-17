@@ -1,3 +1,27 @@
+<<<<<<< Updated upstream
+=======
+# Kdevelop
+apidocs
+.kdev4
+build
+*~
+*.orig
+*.rej
+doxygen.log
+Doxyfile
+*.kdevelop
+*.kdevelop.filelist
+*.kdevelop.pcs
+*.kdevses
+.*kate-swp
+*.kdev4
+build/
+
+# User defined rules
+.idea
+cmake-build-*
+
+>>>>>>> Stashed changes
 # Created by .ignore support plugin (hsz.mobi)
 ### JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm

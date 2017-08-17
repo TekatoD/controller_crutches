@@ -2,13 +2,14 @@ cmake_minimum_required(VERSION 3.0)
 project(darwin_soccer)
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules")
 set(Boost_USE_STATIC_LIBS ON)
 
 find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED)
 find_package(OpenCV 3 REQUIRED)
+find_package(VREP REQUIRED)
 
 #[[
 find_package(catkin QUIET COMPONENTS
@@ -35,6 +36,8 @@ catkin_package(
 
 include_directories(
 	include/)
+include_directories(${VREP_INCLUDE})
+include_directories(${VREP_REMOTE})
 
 set(SRC
         include/Action.h
@@ -121,19 +124,36 @@ set(VISION_SRC
     src/VisionUtils.cpp
 )
 
-add_executable(vision_node ${VISION_SRC})
+add_executable(vision_vrep ${VISION_SRC})
 
-target_include_directories(vision_node PUBLIC
+target_include_directories(vision_vrep PUBLIC
         ${JPEG_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS}
         ${OpenCV_INCLUDE_DIRS}
 )
 
-target_link_libraries(vision_node
+target_link_libraries(vision_vrep
     ${CMAKE_THREAD_LIBS_INIT}
     ${JPEG_LIBRARIES}
     ${Boost_LIBRARIES}
     ${OpenCV_LIBS}
+    ${VREP_LIBRARIES}
+)
+
+add_executable(vrep_node src/vrep_node.cpp)
+
+target_include_directories(vrep_node PUBLIC
+        ${JPEG_INCLUDE_DIR}
+        ${Boost_INCLUDE_DIRS}
+        ${OpenCV_INCLUDE_DIRS}
+)
+
+target_link_libraries(vrep_node
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${JPEG_LIBRARIES}
+    ${Boost_LIBRARIES}
+    ${OpenCV_LIBS}
+    ${VREP_LIBRARIES}
 )
 
 #[[

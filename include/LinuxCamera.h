@@ -13,6 +13,7 @@
 #include <sys/time.h>
 
 #include "Image.h"
+#include "BaseCamera.h"
 #include "minIni.h"
 
 namespace Robot {
@@ -37,7 +38,7 @@ namespace Robot {
                 exposure(1000) {}
     };
 
-    class LinuxCamera {
+    class LinuxCamera : public BaseCamera {
     private:
         static LinuxCamera* uniqueInstance;
 
@@ -92,6 +93,12 @@ namespace Robot {
         void CaptureFrame();
 
         void CaptureFrameWb(); // for Webots only
+        
+        FrameBuffer* getFrameBuffer();
+        Image* getYUVFrame();
+        Image* getRGBFrame();
+        Image* getHSVFFrame();
+        Image* getBGRAFrame();
     };
 }
 

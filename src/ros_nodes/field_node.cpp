@@ -1,3 +1,14 @@
+#define MAX_EXT_API_CONNECTIONS 255
+#define NON_MATLAB_PARSING
+
+extern "C" {
+    #include "extApi.h"
+    #include "extApi.c"
+    #include "extApiPlatform.h"
+    #include "extApiPlatform.c"
+}
+
+
 #include <iostream>
 #include <memory>
 #include <opencv2/opencv.hpp>

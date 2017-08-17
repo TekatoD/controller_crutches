@@ -556,3 +556,23 @@ void LinuxCamera::CaptureFrameWb() {
     }
 }
 
+FrameBuffer* LinuxCamera::getFrameBuffer()
+{
+    return fbuffer;
+}
+Image* LinuxCamera::getYUVFrame()
+{
+    return fbuffer->m_YUVFrame;
+}
+Image* LinuxCamera::getRGBFrame()
+{
+    return fbuffer->m_RGBFrame;
+}
+Image* LinuxCamera::getHSVFrame()
+{
+    return fbuffer->m_HSVFrame;
+}
+Image* LinuxCamera::getBGRAFrame()
+{
+    return fbuffer->m_BGRAFrame;
+}

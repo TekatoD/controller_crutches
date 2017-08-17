@@ -30,6 +30,8 @@ namespace Robot {
         static void HFlipYUV(Image* img);
 
         static void VFlipYUV(Image* img);
+        
+        static void VFlipRGB(Image* img);
 
 // ***   WEBOTS PART  *** //
 

@@ -74,15 +74,14 @@ void VREPCamera::cameraStreamInit(int w, int h, const char* sensorName)
 
 void VREPCamera::CaptureFrame()
 {
-    // TODO: Convert from RGB to BGR
-    // TODO: Flip image
     int visStream = simxGetVisionSensorImage(
         m_clientId, m_sensorHandle, m_res, &m_imageBuffer, 0, simx_opmode_buffer
     );
     
     if (visStream == simx_return_ok) {
-        // Put image to framebuffer;
+        // Put image to framebuffer, flip it vertically and convert to BGR
         m_fbuffer->m_RGBFrame->m_ImageData = (unsigned char*)m_imageBuffer;
+        ImgProcess::VFlipRGB(m_fbuffer->m_RGBFrame);
         ImgProcess::RGBtoBGR(m_fbuffer);
     }
     

@@ -235,6 +235,20 @@ void ImgProcess::VFlipYUV(Image* img) {
     }
 }
 
+void ImgProcess::VFlipRGB(Image* img)
+{
+    int sizeline = img->m_Width * 3;
+    unsigned char line1[sizeline - 1];/*line1 buffer*/
+    unsigned char line2[sizeline - 1];/*line2 buffer*/
+    for (int h = 0; h < img->m_Height / 2; h++) {   /*line iterator*/
+        memcpy(line1, img->m_ImageData + h * sizeline, sizeline);
+        memcpy(line2, img->m_ImageData + (img->m_Height - 1 - h) * sizeline, sizeline);
+
+        memcpy(img->m_ImageData + h * sizeline, line2, sizeline);
+        memcpy(img->m_ImageData + (img->m_Height - 1 - h) * sizeline, line1, sizeline);
+    }
+}
+
 // ***   WEBOTS PART  *** //
 
 void ImgProcess::BGRAtoHSV(FrameBuffer* buf) {

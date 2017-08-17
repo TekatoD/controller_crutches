@@ -19,7 +19,7 @@ int main(int argc, char** argv)
     while (true) {
         camera.CaptureFrame();
         
-        unsigned char* imgBuff = camera.getRGBFrame()->m_ImageData;
+        unsigned char* imgBuff = camera.getBGRFrame()->m_ImageData;
         
         if (imgBuff) {
             cv::Mat cv_image(cv::Size(w, h), CV_8UC3, imgBuff, cv::Mat::AUTO_STEP);

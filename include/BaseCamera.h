@@ -14,6 +14,7 @@ namespace Robot {
         virtual Image* getYUVFrame() = 0;
         virtual Image* getRGBFrame() = 0;
         virtual Image* getHSVFrame() = 0;
+        virtual Image* getBGRFrame() = 0;
         virtual Image* getBGRAFrame() = 0;
     };
 }

@@ -26,6 +26,7 @@ namespace Robot {
         Image* getYUVFrame();
         Image* getRGBFrame();
         Image* getHSVFrame();
+        Image* getBGRFrame();
         Image* getBGRAFrame();
         
         // TODO: Debug

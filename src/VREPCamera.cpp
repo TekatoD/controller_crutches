@@ -83,6 +83,7 @@ void VREPCamera::CaptureFrame()
     if (visStream == simx_return_ok) {
         // Put image to framebuffer;
         m_fbuffer->m_RGBFrame->m_ImageData = (unsigned char*)m_imageBuffer;
+        ImgProcess::RGBtoBGR(m_fbuffer);
     }
     
     // TODO: Debug?, sleep for some time
@@ -107,6 +108,11 @@ Image* VREPCamera::getRGBFrame()
 Image* VREPCamera::getHSVFrame()
 {
     return m_fbuffer->m_HSVFrame;
+}
+
+Image* VREPCamera::getBGRFrame()
+{
+    return m_fbuffer->m_BGRFrame;
 }
 
 Image* VREPCamera::getBGRAFrame()

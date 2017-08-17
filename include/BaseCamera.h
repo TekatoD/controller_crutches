@@ -7,11 +7,14 @@ namespace Robot {
 
     class BaseCamera {
     public:
-        virtual FrameBuffer* getFrameBuffer();
-        virtual Image* getYUVFrame();
-        virtual Image* getRGBFrame();
-        virtual Image* getHSVFrame();
-        virtual Image* getBGRAFrame();
+        
+        virtual void CaptureFrame() = 0;
+        
+        virtual FrameBuffer* getFrameBuffer() = 0;
+        virtual Image* getYUVFrame() = 0;
+        virtual Image* getRGBFrame() = 0;
+        virtual Image* getHSVFrame() = 0;
+        virtual Image* getBGRAFrame() = 0;
     };
 }
 

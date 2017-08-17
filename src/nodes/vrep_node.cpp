@@ -1,42 +1,33 @@
-#define MAX_EXT_API_CONNECTIONS 255
-#define NON_MATLAB_PARSING
-
-extern "C" {
-    #include "extApi.h"
-    #include "extApi.c"
-    #include "extApiPlatform.h"
-    #include "extApiPlatform.c"
-}
+#include "VREPCamera.h"
 
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <opencv2/opencv.hpp>
 
-cv::Mat vrep_to_opencv(simxUChar* img, simxInt res[2])
-{
-    //Upside down
-    //TODO: V-rep row-major? column-major?
-    
-    simxUChar* ptr = img;
-    
-    int i = 0;
-    
-    while (*(ptr++) != '\0') {
-        ++i;
-    }
-    
-    std::cout << i << std::endl;
-    
-    return cv::Mat(cv::Size(res[0], res[1]), CV_8UC3, img, cv::Mat::AUTO_STEP);
-}
-
 int main(int argc, char** argv)
 {
     int portNb = 19997;
-    int clientID = simxStart((simxChar*)"127.0.0.1", portNb, true, true, 2000, 5);
     const char* visionSensorName = "Vision_sensor";
     
+    Robot::VREPCamera camera(256, 256, visionSensorName, "127.0.0.1", portNb);
+    int w = camera.getWidth();
+    int h = camera.getHeight();
+    
+    cv::namedWindow("camera_image", cv::WINDOW_AUTOSIZE);
+    while (true) {
+        camera.CaptureFrame();
+        
+        unsigned char* imgBuff = camera.getRGBFrame()->m_ImageData;
+        
+        if (imgBuff) {
+            cv::Mat cv_image(cv::Size(w, h), CV_8UC3, imgBuff, cv::Mat::AUTO_STEP);
+            cv::imshow("camera_image", cv_image);
+            cv::waitKey(1);
+        }
+    }
+    
+    /*
     if (clientID != -1) {
         std::cout << "Connection to V-Rep successful!" << std::endl;
         simxInt visionSensor = 0;
@@ -78,6 +69,7 @@ int main(int argc, char** argv)
         
         simxFinish(clientID);
     }
+    */
     
     return 0;
 }

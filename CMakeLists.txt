@@ -33,9 +33,7 @@ catkin_package(
 	CATKIN_DEPENDS roscpp sensor_msgs std_msgs nav_msgs tf
 )
 ]]
-
-include_directories(
-	include/)
+include_directories(include)
 include_directories(${VREP_INCLUDE})
 include_directories(${VREP_REMOTE})
 
@@ -114,7 +112,7 @@ set(SRC
         )
 
 set(VISION_SRC
-    src/ros_nodes/field_node.cpp
+    src/nodes/vrep_node.cpp
     src/detectors/AngleDetector.cpp
     src/detectors/BallDetector.cpp
     src/detectors/BaseDetector.cpp
@@ -122,6 +120,9 @@ set(VISION_SRC
     src/detectors/LineDetector.cpp
     src/Vision.cpp
     src/VisionUtils.cpp
+    src/VREPCamera.cpp
+    src/vision/Image.cpp
+    src/vision/ImgProcess.cpp
 )
 
 add_executable(vision_vrep ${VISION_SRC})
@@ -133,22 +134,6 @@ target_include_directories(vision_vrep PUBLIC
 )
 
 target_link_libraries(vision_vrep
-    ${CMAKE_THREAD_LIBS_INIT}
-    ${JPEG_LIBRARIES}
-    ${Boost_LIBRARIES}
-    ${OpenCV_LIBS}
-    ${VREP_LIBRARIES}
-)
-
-add_executable(vrep_node src/vrep_node.cpp)
-
-target_include_directories(vrep_node PUBLIC
-        ${JPEG_INCLUDE_DIR}
-        ${Boost_INCLUDE_DIRS}
-        ${OpenCV_INCLUDE_DIRS}
-)
-
-target_link_libraries(vrep_node
     ${CMAKE_THREAD_LIBS_INIT}
     ${JPEG_LIBRARIES}
     ${Boost_LIBRARIES}

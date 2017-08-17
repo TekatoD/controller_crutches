@@ -3,6 +3,10 @@
  *  @date 5/11/17
  */
 
+#include <Camera.h>
+#include <motion/modules/Head.h>
+#include <cmath>
+#include <motion/modules/Walking.h>
 #include "BallSearcher.h"
 
 using namespace Robot;
@@ -55,8 +59,8 @@ void BallSearcher::Process() {
 
 
 
-    float pan = sin(m_PanPhase / m_PhaseSize * M_2_PI) * pan_diff - pan_min;
-    float tilt = sin(m_TiltPhase / m_PhaseSize * M_2_PI) * tilt_diff - tilt_min;
+    float pan = sinf(m_PanPhase / m_PhaseSize * M_2_PI) * pan_diff - pan_min;
+    float tilt = sinf(m_TiltPhase / m_PhaseSize * M_2_PI) * tilt_diff - tilt_min;
     Head::GetInstance()->MoveByAngle(pan, tilt);
 
     if (m_WalkingEnabled) {

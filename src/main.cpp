@@ -15,8 +15,14 @@
 #include <GoTo.h>
 #include <SoccerBehavior.h>
 #include <GoalieBehavior.h>
+#include <LinuxCM730.h>
+#include <LinuxCamera.h>
+#include <motion/MotionManager.h>
+#include <motion/modules/Walking.h>
+#include <LinuxMotionTimer.h>
+#include <motion/modules/Action.h>
+#include <motion/modules/Head.h>
 
-#include "LinuxDARwIn.h"
 
 #include "StateMachine.h"
 

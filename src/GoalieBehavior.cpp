@@ -8,6 +8,7 @@
 #include <LinuxCamera.h>
 #include <GameController.h>
 #include <StateMachine.h>
+#include <motion/MotionStatus.h>
 #include "motion/modules/Head.h"
 #include "motion/modules/Walking.h"
 #include "GoalieBehavior.h"

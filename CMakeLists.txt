@@ -1,20 +1,13 @@
 cmake_minimum_required(VERSION 3.0)
 project(darwin-soccer)
 
+#### Project options ####
+option(CROSSCOMPILE "Compile for real Darwin-OP (V-REP build by default)" OFF)
+
+#### Compile properties ####
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(Boost_USE_STATIC_LIBS ON)
-
-option(CROSSCOMPILE "Compile for real Darwin-OP (V-REP build by default)" OFF)
-
-find_package(Threads REQUIRED)
-find_package(JPEG REQUIRED) # This lib is used by the linux camera
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-# Path to Boost and OpenCV needs to be set manually when crosscompiling
-find_package(Boost REQUIRED)
-find_package(OpenCV REQUIRED)
-
-include_directories(include/)
 
 if (CROSSCOMPILE)
     add_definitions(-DCROSSCOMPILE) # This definition is used during the initialization in the main
@@ -23,6 +16,19 @@ if (CROSSCOMPILE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++")
 endif (CROSSCOMPILE)
 
+include_directories(include/)
+
+#### External libraries and packages ####
+find_package(Threads REQUIRED)
+find_package(JPEG REQUIRED) # This lib is used by the linux camera
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+# Path to Boost and OpenCV needs to be set manually when crosscompiling
+find_package(Boost REQUIRED)
+find_package(OpenCV REQUIRED)
+
+#### Sources ####
+# All sources of the project. Insert one file per line.
+# Don't forget include header files
 set(SRC
         include/motion/modules/Action.h
         include/BallFollower.h
@@ -30,7 +36,6 @@ set(SRC
         include/Camera.h
         include/CM730.h
         include/ColorFinder.h
-        include/DARwIn.h
         include/FSR.h
         include/motion/modules/Head.h
         include/Image.h
@@ -39,7 +44,6 @@ set(SRC
         include/motion/Kinematics.h
         include/LinuxCamera.h
         include/LinuxCM730.h
-        include/LinuxDARwIn.h
         include/LinuxMotionTimer.h
         include/math/Matrix.h
         include/minIni.h
@@ -109,6 +113,7 @@ set(SRC
         src/PropertyReader.cpp
         include/PropertyReader.h)
 
+#### Build targets #####
 add_executable(controller ${SRC})
 
 target_link_libraries(controller

@@ -24,6 +24,7 @@
 #include <GameController.h>
 #include <StateMachine.h>
 #include <iostream>
+#include <motion/MotionStatus.h>
 #include "SoccerBehavior.h"
 
 using namespace Robot;

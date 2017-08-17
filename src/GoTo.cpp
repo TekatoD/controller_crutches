@@ -29,8 +29,8 @@ bool Robot::GoTo::IsDone() const {
 
 void Robot::GoTo::Process(Robot::Pose2D pos) {
     m_Done = true;
-    double dist = hypot(pos.X(), pos.Y());
-    double angle = atan2(pos.Y(), pos.X()) / M_PI * 180.0;
+    float dist = hypot(pos.X(), pos.Y());
+    float angle = atan2(pos.Y(), pos.X()) / M_PI * 180.0;
 
     if (!Walking::GetInstance()->IsRunning() ||
         Walking::GetInstance()->X_MOVE_AMPLITUDE != m_X ||
@@ -46,10 +46,10 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
         m_A = 0;
         m_GoalMaxSpeed = (dist < m_FitDistance) ? m_FitSpeed : m_MaxSpeed;
 
-        double x_factor = pos.X() / dist;
-        double x_speed = x_factor * m_GoalMaxSpeed;
-        double y_factor = pos.Y() / dist;
-        double y_speed = y_factor * m_GoalMaxSpeed;
+        float x_factor = pos.X() / dist;
+        float x_speed = x_factor * m_GoalMaxSpeed;
+        float y_factor = pos.Y() / dist;
+        float y_speed = y_factor * m_GoalMaxSpeed;
 
         m_X += m_StepAccel * x_factor;
         if (x_speed > 0 && m_X > x_speed || x_speed <= 0 && m_X < x_speed) {
@@ -68,7 +68,7 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
     }
 
     if (m_Done) {
-        double deg = pos.Theta() / PI * 180;
+        float deg = pos.Theta() / PI * 180;
         if (deg > 0 && deg > m_AngleVar || deg < 0 && deg < -m_AngleVar) {
             m_GoalTurn = m_MaxTurn;
             if (deg < 0) {
@@ -123,7 +123,7 @@ void Robot::GoTo::LoadINISettings(minIni *ini) {
 
 
 void Robot::GoTo::LoadINISettings(minIni *ini, const std::string &section) {
-    double value = -2;
+    float value = -2;
 
     if ((value = ini->getd(section, "max_speed", INVALID_VALUE)) != INVALID_VALUE) m_MaxSpeed = value;
     if ((value = ini->getd(section, "max_turn", INVALID_VALUE)) != INVALID_VALUE) m_MaxTurn = value;

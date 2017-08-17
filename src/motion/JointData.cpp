@@ -173,7 +173,7 @@ int JointData::GetValue(int id) {
 }
 
 
-void JointData::SetAngle(int id, double angle) {
+void JointData::SetAngle(int id, float angle) {
     if (angle < MX28::MIN_ANGLE)
         angle = MX28::MIN_ANGLE;
     else if (angle > MX28::MAX_ANGLE)
@@ -184,17 +184,17 @@ void JointData::SetAngle(int id, double angle) {
 }
 
 
-double JointData::GetAngle(int id) {
+float JointData::GetAngle(int id) {
     return m_Angle[id];
 }
 
 
-void JointData::SetRadian(int id, double radian) {
+void JointData::SetRadian(int id, float radian) {
     SetAngle(id, radian * (180.0 / 3.141592));
 }
 
 
-double JointData::GetRadian(int id) {
+float JointData::GetRadian(int id) {
     return GetAngle(id) * (180.0 / 3.141592);
 }
 

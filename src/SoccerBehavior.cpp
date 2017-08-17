@@ -100,13 +100,13 @@ void SoccerBehavior::Process() {
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
 
             // Calculate angles to gate
-            double free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
-            double x_top = m_Field.GetWidth() - free_space;
-            double x_bot = x_top - m_Field.GetGateWidth();
+            float free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
+            float x_top = m_Field.GetWidth() - free_space;
+            float x_bot = x_top - m_Field.GetGateWidth();
 
-            double pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
-            double angle_top = (atan2(m_Field.GetLength() - Odo.Y(), x_top - Odo.X()) - Odo.Theta()) / M_PI * 180.0;
-            double angle_bot = (atan2(m_Field.GetLength() - Odo.Y(), x_bot - Odo.X()) - Odo.Theta()) / M_PI * 180.0;
+            float pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
+            float angle_top = (atan2(m_Field.GetLength() - Odo.Y(), x_top - Odo.X()) - Odo.Theta()) / M_PI * 180.0;
+            float angle_bot = (atan2(m_Field.GetLength() - Odo.Y(), x_bot - Odo.X()) - Odo.Theta()) / M_PI * 180.0;
             angle_bot -= pan;
             angle_top -= pan;
             this->normalize(angle_bot);
@@ -138,7 +138,7 @@ void SoccerBehavior::Process() {
     }
 }
 
-void SoccerBehavior::normalize(double& m_theta) const {
+void SoccerBehavior::normalize(float& m_theta) const {
     while (m_theta < -180.0) m_theta += 2.0 * 180.0;
     while (m_theta > 180.0) m_theta -= 2.0 * 180.0;
 }

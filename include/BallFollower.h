@@ -28,35 +28,35 @@ namespace Robot {
         int m_KickBallMaxCount;
         int m_KickBallCount;
 
-        double m_MaxFBStep;
-        double m_MaxRLStep;
-        double m_MaxDirAngle;
+        float m_MaxFBStep;
+        float m_MaxRLStep;
+        float m_MaxDirAngle;
 
-        double m_KickTopAngle;
-        double m_KickRightAngle;
-        double m_KickLeftAngle;
+        float m_KickTopAngle;
+        float m_KickRightAngle;
+        float m_KickLeftAngle;
 
-        double m_FollowMaxFBStep;
-        double m_FollowMinFBStep;
-        double m_FollowMaxRLTurn;
-        double m_FitFBStep;
-        double m_FitMaxRLTurn;
-        double m_UnitFBStep;
-        double m_UnitRLStep;
-        double m_UnitRLTurn;
+        float m_FollowMaxFBStep;
+        float m_FollowMinFBStep;
+        float m_FollowMaxRLTurn;
+        float m_FitFBStep;
+        float m_FitMaxRLTurn;
+        float m_UnitFBStep;
+        float m_UnitRLStep;
+        float m_UnitRLTurn;
 
-        double m_GoalFBStep;
-        double m_GoalRLStep;
-        double m_GoalRLTurn;
-        double m_FBStep;
-        double m_RLStep;
-        double m_RLTurn;
+        float m_GoalFBStep;
+        float m_GoalRLStep;
+        float m_GoalRLTurn;
+        float m_FBStep;
+        float m_RLStep;
+        float m_RLTurn;
 
-        double m_TiltOffset;
+        float m_TiltOffset;
 
-        double m_AimTiltOffset;
-        double m_AimRLStep;
-        double m_AimRLTurn;
+        float m_AimTiltOffset;
+        float m_AimRLStep;
+        float m_AimRLTurn;
 
         Kicking m_KickBall;
 
@@ -66,7 +66,7 @@ namespace Robot {
 
         ~BallFollower();
 
-        void Process(Point2D ball_pos, double angle_top, double angle_bot);
+        void Process(Point2D ball_pos, float angle_top, float angle_bot);
 
         void LoadINISettings(minIni* ini);
 

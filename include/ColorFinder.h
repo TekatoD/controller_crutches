@@ -34,8 +34,8 @@ namespace Robot {
         int m_max_saturation;  /* 0 ~ 100 */
         int m_min_value;       /* 0 ~ 100 */
         int m_max_value;       /* 0 ~ 100 */
-        double m_min_percent;  /* 0.0 ~ 100.0 */
-        double m_max_percent;  /* 0.0 ~ 100.0 */
+        float m_min_percent;  /* 0.0 ~ 100.0 */
+        float m_max_percent;  /* 0.0 ~ 100.0 */
 
         std::string color_section; /*TODO: ?*/
 
@@ -48,10 +48,10 @@ namespace Robot {
         Create an object to detect a color in an image
         The color is given according to the HSV model (hue, saturation and value)
         */
-        ColorFinder(int hue, int hue_tol, int min_sat, int min_val, double min_per, double max_per);
+        ColorFinder(int hue, int hue_tol, int min_sat, int min_val, float min_per, float max_per);
 
-        ColorFinder(int hue, int hue_tol, int min_sat, int max_sat, int min_val, int max_val, double min_per,
-                    double max_per);
+        ColorFinder(int hue, int hue_tol, int min_sat, int max_sat, int min_val, int max_val, float min_per,
+                    float max_per);
 
         virtual ~ColorFinder();
 

@@ -48,7 +48,7 @@ namespace Robot {
         /*the values*/
         bool m_Enable[NUMBER_OF_JOINTS];
         int m_Value[NUMBER_OF_JOINTS];
-        double m_Angle[NUMBER_OF_JOINTS];
+        float m_Angle[NUMBER_OF_JOINTS];
         int m_PGain[NUMBER_OF_JOINTS];
         int m_IGain[NUMBER_OF_JOINTS];
         int m_DGain[NUMBER_OF_JOINTS];
@@ -106,13 +106,13 @@ namespace Robot {
         int GetValue(int id);
 
         /*setter/getter angle of articulation id (in degrees)*/
-        void SetAngle(int id, double angle);
+        void SetAngle(int id, float angle);
 
-        double GetAngle(int id);
+        float GetAngle(int id);
 
-        void SetRadian(int id, double radian);
+        void SetRadian(int id, float radian);
 
-        double GetRadian(int id);
+        float GetRadian(int id);
 
         void SetPGain(int id, int pgain) { m_PGain[id] = pgain; }
 

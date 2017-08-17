@@ -183,10 +183,10 @@ void MotionManager::Process() {
                 buf_idx++;
             }
         } else {
-            double fb_sum = 0.0, rl_sum = 0.0;
-            double fb_sd = 0.0, rl_sd = 0.0;
-            double fb_diff, rl_diff;
-            double fb_mean = 0.0, rl_mean = 0.0;
+            float fb_sum = 0.0, rl_sum = 0.0;
+            float fb_sd = 0.0, rl_sd = 0.0;
+            float fb_diff, rl_diff;
+            float fb_mean = 0.0, rl_mean = 0.0;
 
             buf_idx = 0;
 

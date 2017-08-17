@@ -11,8 +11,6 @@
 
 using namespace Robot;
 
-Kinematics::Kinematics() {}
-
 bool Kinematics::ComputeLegInverseKinematics(float* out, float x, float y, float z, float a, float b, float c) {
     Matrix3D Tad, Tda, Tcd, Tdc, Tac;
     Vector3D vec;
@@ -32,7 +30,7 @@ bool Kinematics::ComputeLegInverseKinematics(float* out, float x, float y, float
     _Rac = vec.Length();
     _Acos = acosf((_Rac * _Rac - THIGH_LENGTH * THIGH_LENGTH - CALF_LENGTH * CALF_LENGTH) /
                     (2 * THIGH_LENGTH * CALF_LENGTH));
-    if (std::isnan(_Acos) == 1)
+    if (std::isnan(_Acos))
         return false;
     out[3] = _Acos;
 
@@ -48,7 +46,7 @@ bool Kinematics::ComputeLegInverseKinematics(float* out, float x, float y, float
     else if (_m < -1.0)
         _m = -1.0f;
     _Acos = acosf(_m);
-    if (std::isnan(_Acos) == 1)
+    if (std::isnan(_Acos))
         return false;
     if (Tda.m[7] < 0.0)
         out[5] = -_Acos;
@@ -61,30 +59,30 @@ bool Kinematics::ComputeLegInverseKinematics(float* out, float x, float y, float
     if (!Tdc.Inverse())
         return false;
     Tac = Tad * Tdc;
-    _Atan = atan2(-Tac.m[1], Tac.m[5]);
-    if (std::isinf(_Atan) == 1)
+    _Atan = atan2f(-Tac.m[1], Tac.m[5]);
+    if (std::isinf(_Atan))
         return false;
-    *(out) = _Atan;
+    out[0] = _Atan;
 
     // Get Hip Roll
-    _Atan = atan2(Tac.m[9], -Tac.m[1] * sinf(*(out)) + Tac.m[5] * cosf(*(out)));
-    if (std::isinf(_Atan) == 1)
+    _Atan = atan2f(Tac.m[9], -Tac.m[1] * sinf(out[0]) + Tac.m[5] * cosf(out[0]));
+    if (std::isinf(_Atan))
         return false;
-    *(out + 1) = _Atan;
+    out[1] = _Atan;
 
     // Get Hip Pitch and Ankle Pitch
-    _Atan = atan2f(Tac.m[2] * cosf(*(out)) + Tac.m[6] * sinf(*(out)), Tac.m[0] * cosf(*(out)) + Tac.m[4] * sinf(*(out)));
-    if (std::isinf(_Atan) == 1)
+    _Atan = atan2f(Tac.m[2] * cosf(out[0]) + Tac.m[6] * sinf(out[0]), Tac.m[0] * cosf(out[0]) + Tac.m[4] * sinf(out[0]));
+    if (std::isinf(_Atan))
         return false;
     _theta = _Atan;
-    _k = sinf(*(out + 3)) * CALF_LENGTH;
-    _l = -THIGH_LENGTH - cosf(*(out + 3)) * CALF_LENGTH;
-    _m = cosf(*(out)) * vec.X + sinf(*(out)) * vec.Y;
-    _n = cosf(*(out + 1)) * vec.Z + sinf(*(out)) * sinf(*(out + 1)) * vec.X - cosf(*(out)) * sinf(*(out + 1)) * vec.Y;
+    _k = sinf(out[3]) * CALF_LENGTH;
+    _l = -THIGH_LENGTH - cosf(out[3]) * CALF_LENGTH;
+    _m = cosf(out[0]) * vec.X + sinf(out[0]) * vec.Y;
+    _n = cosf(out[1]) * vec.Z + sinf(out[0]) * sinf(out[1]) * vec.X - cosf(out[0]) * sinf(out[1]) * vec.Y;
     _s = (_k * _n + _l * _m) / (_k * _k + _l * _l);
     _c = (_n - _k * _s) / _l;
     _Atan = atan2f(_s, _c);
-    if (std::isinf(_Atan) == 1)
+    if (std::isinf(_Atan))
         return false;
     out[2] = _Atan;
     out[4] = _theta - out[3] - out[2];

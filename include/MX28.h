@@ -17,47 +17,47 @@ namespace Robot {
         static const int MIN_VALUE;
         static const int CENTER_VALUE;
         static const int MAX_VALUE;
-        static const double MIN_ANGLE;
-        static const double MAX_ANGLE;
-        static const double RATIO_VALUE2ANGLE;
-        static const double RATIO_ANGLE2VALUE;
+        static const float MIN_ANGLE;
+        static const float MAX_ANGLE;
+        static const float RATIO_VALUE2ANGLE;
+        static const float RATIO_ANGLE2VALUE;
 
         static const int PARAM_BYTES;
 
-        static constexpr double RATIO_VALUE2SPEED = 0.053;
-        static constexpr double RATIO_SPEED2VALUE = 18.87;
+        static constexpr float RATIO_VALUE2SPEED = 0.053;
+        static constexpr float RATIO_SPEED2VALUE = 18.87;
 
-        static constexpr double RATIO_VALUE2TORQUE = 0.01;
-        static constexpr double RATIO_TORQUE2VALUE = 100;
+        static constexpr float RATIO_VALUE2TORQUE = 0.01;
+        static constexpr float RATIO_TORQUE2VALUE = 100;
 
         static int GetMirrorValue(int value) { return MAX_VALUE + 1 - value; }
 
-        static double GetMirrorAngle(double angle) { return -angle; }
+        static float GetMirrorAngle(float angle) { return -angle; }
 
-        static int Angle2Value(double angle) { return (int) (angle * RATIO_ANGLE2VALUE) + CENTER_VALUE; }
+        static int Angle2Value(float angle) { return (int) (angle * RATIO_ANGLE2VALUE) + CENTER_VALUE; }
 
-        static double Value2Angle(int value) { return (double) (value - CENTER_VALUE) * RATIO_VALUE2ANGLE; }
+        static float Value2Angle(int value) { return (float) (value - CENTER_VALUE) * RATIO_VALUE2ANGLE; }
 
-        static double Speed2Value(double speed) {
+        static float Speed2Value(float speed) {
             int temp = ((int) (fabs(speed) * RATIO_SPEED2VALUE)) & 0x3FF;
             if (speed < 0) temp |= 0x400;
             return temp;
         }
 
-        static double Value2Speed(int value) {
-            double temp = (value & 0x3FF) * RATIO_VALUE2SPEED;
+        static float Value2Speed(int value) {
+            float temp = (value & 0x3FF) * RATIO_VALUE2SPEED;
             if (value & 0x400) temp = -temp;
             return temp;
         }
 
-        static double Torque2Value(double speed) {
+        static float Torque2Value(float speed) {
             int temp = ((int) (fabs(speed) * RATIO_TORQUE2VALUE)) & 0x3FF;
             if (speed < 0) temp |= 0x400;
             return temp;
         }
 
-        static double Value2Torque(int value) {
-            double temp = (value & 0x3FF) * RATIO_VALUE2TORQUE;
+        static float Value2Torque(int value) {
+            float temp = (value & 0x3FF) * RATIO_VALUE2TORQUE;
             if (value & 0x400) temp = -temp;
             return temp;
         }

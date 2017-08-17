@@ -5,7 +5,6 @@
  *
  */
 
-#include <stdio.h>
 #include <iostream>
 #include "ImgProcess.h"
 #include "MX28.h"
@@ -57,8 +56,8 @@ BallFollower::~BallFollower() {
 
 
 void BallFollower::Process(Point2D ball_pos,
-                           double angle_top,
-                           double angle_bot) {
+                           float angle_top,
+                           float angle_bot) {
     bool aim = false;
 
     if (ball_pos.X == -1.0 || ball_pos.Y == -1.0) {
@@ -75,14 +74,14 @@ void BallFollower::Process(Point2D ball_pos,
     } else {
         m_NoBallCount = 0;
 
-        double pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
-        double pan_range = Head::GetInstance()->GetLeftLimitAngle();
-        double pan_percent = pan / pan_range;
+        float pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
+        float pan_range = Head::GetInstance()->GetLeftLimitAngle();
+        float pan_percent = pan / pan_range;
 
-        double tilt = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_TILT);
-        double tilt_min = Head::GetInstance()->GetBottomLimitAngle();
-        double tilt_range = Head::GetInstance()->GetTopLimitAngle() - tilt_min;
-        double tilt_percent = (tilt - tilt_min) / tilt_range;
+        float tilt = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_TILT);
+        float tilt_min = Head::GetInstance()->GetBottomLimitAngle();
+        float tilt_range = Head::GetInstance()->GetTopLimitAngle() - tilt_min;
+        float tilt_percent = (tilt - tilt_min) / tilt_range;
         if (tilt_percent < 0)
             tilt_percent = -tilt_percent;
         if (pan > m_KickRightAngle && pan < m_KickLeftAngle) {
@@ -202,7 +201,7 @@ void BallFollower::LoadINISettings(minIni* ini, const std::string& section) {
     if ((value = ini->geti(section, "no_ball_max_count", INVALID_VALUE)) != INVALID_VALUE) m_NoBallMaxCount = value;
     if ((value = ini->geti(section, "kick_ball_max_count", INVALID_VALUE)) != INVALID_VALUE) m_KickBallMaxCount = value;
 
-    double dvalue = -2.0;
+    float dvalue = -2.0;
     if ((dvalue = ini->getd(section, "kick_top_angle", INVALID_VALUE)) != INVALID_VALUE) m_KickTopAngle = dvalue;
     if ((dvalue = ini->getd(section, "kick_right_angle", INVALID_VALUE)) != INVALID_VALUE) m_KickRightAngle = dvalue;
     if ((dvalue = ini->getd(section, "kick_left_angle", INVALID_VALUE)) != INVALID_VALUE) m_KickLeftAngle = dvalue;

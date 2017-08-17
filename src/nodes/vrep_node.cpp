@@ -8,9 +8,10 @@
 int main(int argc, char** argv)
 {
     int portNb = 19997;
+    int clientId = simxStart((const simxChar*)"127.0.0.1", portNb, true, true, 2000, 5);
     const char* visionSensorName = "Vision_sensor";
     
-    Robot::VREPCamera camera(256, 256, visionSensorName, "127.0.0.1", portNb);
+    Robot::VREPCamera camera(256, 256, visionSensorName, clientId);
     int w = camera.getWidth();
     int h = camera.getHeight();
     
@@ -26,6 +27,8 @@ int main(int argc, char** argv)
             cv::waitKey(1);
         }
     }
+    
+    simxFinish(clientId);
     
     /*
     if (clientID != -1) {

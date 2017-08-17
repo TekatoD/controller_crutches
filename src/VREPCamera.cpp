@@ -9,7 +9,6 @@ extern "C" {
 using namespace Robot;
 
 VREPCamera::VREPCamera(int width, int height, const char* sensorName, const char* remoteUrl, int portNum)
-    : m_fbuffer(nullptr), m_imageBuffer(nullptr)
 {
     // Connect to V-REP remote api
     m_clientId = simxStart((const simxChar*)remoteUrl, portNum, true, true, 2000, 5);
@@ -19,8 +18,36 @@ VREPCamera::VREPCamera(int width, int height, const char* sensorName, const char
         throw;
     }
     
+    m_cold = false;
     std::cout << "Connected to V-Rep" << std::endl;
     
+    cameraStreamInit(width, height, sensorName);
+}
+
+VREPCamera::VREPCamera(int width, int height, const char* sensorName, int clientId)
+{ 
+    if (clientId == -1) {
+        throw;
+    }
+    m_cold = true;
+    m_clientId = clientId;
+    
+    cameraStreamInit(width, height, sensorName);
+}
+
+VREPCamera::~VREPCamera()
+{
+    //TODO: Use framebuffer instead
+    simxReleaseBuffer(m_imageBuffer);
+    if (!m_cold) {
+        simxFinish(m_clientId);
+    }
+    
+    delete m_fbuffer;
+}
+
+void VREPCamera::cameraStreamInit(int w, int h, const char* sensorName)
+{
     // Get vision sensor handle
     int status = simxGetObjectHandle(
         m_clientId, sensorName, &m_sensorHandle, simx_opmode_blocking
@@ -40,20 +67,9 @@ VREPCamera::VREPCamera(int width, int height, const char* sensorName, const char
     
     std::cout << "Set up streaming: " << visStream << std::endl;
     
-    m_res[0] = width;
-    m_res[1] = height;
-    m_fbuffer = new FrameBuffer(width, height);
-}
-
-VREPCamera::~VREPCamera()
-{
-    //TODO: Use framebuffer instead
-    simxReleaseBuffer(m_imageBuffer);
-    simxFinish(m_clientId);
-    
-    if (m_fbuffer != nullptr) {
-        delete m_fbuffer;
-    }
+    m_res[0] = w;
+    m_res[1] = h;
+    m_fbuffer = new FrameBuffer(m_res[0], m_res[1]);
 }
 
 void VREPCamera::CaptureFrame()

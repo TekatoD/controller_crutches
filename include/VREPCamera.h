@@ -17,6 +17,7 @@ namespace Robot {
     class VREPCamera : public BaseCamera {
     public:
         VREPCamera(int width, int height, const char* sensorName, const char* remoteUrl, int portNum);
+        VREPCamera(int width, int height, const char* sensorName, int clientId);
         ~VREPCamera();
         
         void CaptureFrame();
@@ -34,6 +35,11 @@ namespace Robot {
         int getHeight() const { return m_res[1]; }
         
     private:
+        void cameraStreamInit(int w, int h, const char* sensorName);
+        
+        //Don't call simxFinish if not created here
+        bool m_cold;
+        
         FrameBuffer* m_fbuffer;
         simxUChar* m_imageBuffer;
         

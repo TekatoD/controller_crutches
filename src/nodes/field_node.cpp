@@ -1,16 +1,6 @@
-#define MAX_EXT_API_CONNECTIONS 255
-#define NON_MATLAB_PARSING
-
-extern "C" {
-    #include "extApi.h"
-    #include "extApi.c"
-    #include "extApiPlatform.h"
-    #include "extApiPlatform.c"
-}
-
-
 #include <iostream>
 #include <memory>
+#include <chrono>
 #include <opencv2/opencv.hpp>
 #include <Vision.h>
 #include <VisionUtils.h>
@@ -23,7 +13,7 @@ int main(int argc, char** argv)
         std::cout << "Provide image as argument" << std::endl;
         return -1;
     }
-
+    
     cv::Mat frame;
     frame = cv::imread(argv[1], CV_LOAD_IMAGE_COLOR);
 
@@ -35,11 +25,17 @@ int main(int argc, char** argv)
     cv::namedWindow("Vision result", cv::WINDOW_AUTOSIZE);
 
     cv::imshow("Field", frame);
-
+    
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+    
+    start = std::chrono::system_clock::now();
     ant::vision_utils::rot90(frame, 0);
     vision.setFrame(frame);
-    cv::Mat field = vision.fieldDetect();
     std::vector<cv::Vec4i> lines = vision.lineDetect();
+    end = std::chrono::system_clock::now();
+    
+    std::chrono::duration<double> dur = end - start;
+    std::cout << "lineDetect duration: " << dur.count() << std::endl;
 
     for (auto& line : lines) {
         cv::Point p1(line[0], line[1]);
@@ -47,12 +43,12 @@ int main(int argc, char** argv)
 
         cv::line(frame, p1, p2, cv::Scalar(0, 0, 255), 5);
     }
-
+    
     /*
     cv::Rect ball = vision.ballDetect();
     std::vector<cv::Vec3d> anglems = vision.angleDetect();
-
     */
+    
     cv::imshow("Vision result", frame);
     cv::waitKey(0);
     return 0;

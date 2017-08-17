@@ -1,6 +1,7 @@
 //
 // Created by nikitas on 26.03.16.
 //
+#include<chrono>
 
 #include "Vision.h"
 #include <VisionUtils.h>
@@ -35,10 +36,31 @@ namespace ant {
     }
 
     std::vector<cv::Vec4i> Vision::lineDetect() {
+        std::chrono::time_point<std::chrono::system_clock> start, end1, end2;
+        
+        start = std::chrono::system_clock::now();
         fieldDetect();
+        end1 = std::chrono::system_clock::now();
+        std::chrono::duration<double> fieldDur = end1 - start;
+        
         if (m_lines.empty()) {
+            cv::namedWindow("preproc", cv::WINDOW_AUTOSIZE);
+            
+            start = std::chrono::system_clock::now();
             m_preprocImage = m_lineDetector.preproccess(m_image);
+            end1 = std::chrono::system_clock::now();
+            
+            std::chrono::duration<double> procDur = end1 - start;
+            
             m_lines = m_lineDetector.detect(m_preprocImage);
+            end2 = std::chrono::system_clock::now();
+            std::chrono::duration<double> lineDur = end2 - start;
+            
+            std::cout << "lineDetector.fieldDetect duration: " << fieldDur.count() << "s" << std::endl;
+            std::cout << "lineDetector.preprocess duration: " << procDur.count() << "s" << std::endl;
+            std::cout << "lineDetector.detect duration: " << lineDur.count() << "s" << std::endl;
+            
+            cv::imshow("preproc", m_preprocImage);
         }
         return m_lines;
     }

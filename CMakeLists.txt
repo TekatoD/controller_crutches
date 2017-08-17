@@ -141,6 +141,37 @@ target_link_libraries(vision_vrep
     ${VREP_LIBRARIES}
 )
 
+set(VISION_TEST_SRC
+    src/nodes/field_node.cpp
+    src/detectors/AngleDetector.cpp
+    src/detectors/BallDetector.cpp
+    src/detectors/BaseDetector.cpp
+    src/detectors/FieldDetector.cpp
+    src/detectors/LineDetector.cpp
+    src/Vision.cpp
+    src/VisionUtils.cpp
+    src/VREPCamera.cpp
+    src/vision/Image.cpp
+    src/vision/ImgProcess.cpp
+)
+
+add_executable(vision_test ${VISION_TEST_SRC})
+
+target_include_directories(vision_test PUBLIC
+        ${JPEG_INCLUDE_DIR}
+        ${Boost_INCLUDE_DIRS}
+        ${OpenCV_INCLUDE_DIRS}
+)
+
+target_link_libraries(vision_test
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${JPEG_LIBRARIES}
+    ${Boost_LIBRARIES}
+    ${OpenCV_LIBS}
+    ${VREP_LIBRARIES}
+)
+
+
 #[[
 add_executable(soccer ${SRC})
 

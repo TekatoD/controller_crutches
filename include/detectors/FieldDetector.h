@@ -5,6 +5,7 @@
 #ifndef DEMO_FIELDDETECTOR_H
 #define DEMO_FIELDDETECTOR_H
 
+#include <minIni.h>
 #include <detectors/BaseDetector.h>
 
 namespace ant {
@@ -21,6 +22,7 @@ namespace ant {
 
       cv::Mat detect(const cv::Mat &image);
 
+      void load(minIni* ini);
       void load(const boost::property_tree::ptree &config);
 
       boost::property_tree::ptree get_params();

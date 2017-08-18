@@ -4,6 +4,7 @@ project(darwin_soccer)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules")
 set(Boost_USE_STATIC_LIBS ON)
+set(CXX_FLAGS "-O3")
 
 find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
@@ -113,6 +114,7 @@ set(SRC
 
 set(VISION_SRC
     src/nodes/vrep_node.cpp
+    src/minIni/minIni.c
     src/detectors/AngleDetector.cpp
     src/detectors/BallDetector.cpp
     src/detectors/BaseDetector.cpp
@@ -143,6 +145,7 @@ target_link_libraries(vision_vrep
 
 set(VISION_TEST_SRC
     src/nodes/field_node.cpp
+    src/minIni/minIni.c
     src/detectors/AngleDetector.cpp
     src/detectors/BallDetector.cpp
     src/detectors/BaseDetector.cpp

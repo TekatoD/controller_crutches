@@ -3,6 +3,7 @@
 //
 #include<chrono>
 
+#include "minIni.h"
 #include "Vision.h"
 #include <VisionUtils.h>
 #include <boost/exception/all.hpp>
@@ -44,11 +45,10 @@ namespace ant {
         std::chrono::duration<double> fieldDur = end1 - start;
         
         if (m_lines.empty()) {
-            cv::namedWindow("preproc", cv::WINDOW_AUTOSIZE);
-            
             start = std::chrono::system_clock::now();
             m_preprocImage = m_lineDetector.preproccess(m_image);
             end1 = std::chrono::system_clock::now();
+            //cv::imshow("preprocess", m_preprocImage);
             
             std::chrono::duration<double> procDur = end1 - start;
             
@@ -59,8 +59,6 @@ namespace ant {
             std::cout << "lineDetector.fieldDetect duration: " << fieldDur.count() << "s" << std::endl;
             std::cout << "lineDetector.preprocess duration: " << procDur.count() << "s" << std::endl;
             std::cout << "lineDetector.detect duration: " << lineDur.count() << "s" << std::endl;
-            
-            cv::imshow("preproc", m_preprocImage);
         }
         return m_lines;
     }

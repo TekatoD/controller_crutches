@@ -86,7 +86,9 @@ void VREPCamera::CaptureFrame()
     }
     
     // TODO: Debug?, sleep for some time
-    extApi_sleepMs(10);
+    if (!m_cold) {
+        extApi_sleepMs(10);
+    }
 }
 
 FrameBuffer* VREPCamera::getFrameBuffer()

@@ -1,4 +1,6 @@
 #include "VREPCamera.h"
+#include "Vision.h"
+#include "VisionUtils.h"
 
 #include <iostream>
 #include <stdio.h>
@@ -9,12 +11,13 @@ int main(int argc, char** argv)
 {
     int portNb = 19997;
     int clientId = simxStart((const simxChar*)"127.0.0.1", portNb, true, true, 2000, 5);
-    const char* visionSensorName = "Vision_sensor";
+    const char* visionSensorName = "Camera";
     
-    Robot::VREPCamera camera(256, 256, visionSensorName, clientId);
+    Robot::VREPCamera camera(320, 240, visionSensorName, clientId);
     int w = camera.getWidth();
     int h = camera.getHeight();
     
+    ant::Vision vision("../res/vision.json");
     cv::namedWindow("camera_image", cv::WINDOW_AUTOSIZE);
     while (true) {
         camera.CaptureFrame();
@@ -22,10 +25,24 @@ int main(int argc, char** argv)
         unsigned char* imgBuff = camera.getBGRFrame()->m_ImageData;
         
         if (imgBuff) {
-            cv::Mat cv_image(cv::Size(w, h), CV_8UC3, imgBuff, cv::Mat::AUTO_STEP);
-            cv::imshow("camera_image", cv_image);
+            cv::Mat frame(cv::Size(w, h), CV_8UC3, imgBuff, cv::Mat::AUTO_STEP);
+            
+            ant::vision_utils::rot90(frame, 0);
+            vision.setFrame(frame);
+            std::vector<cv::Vec4i> lines = vision.lineDetect();
+
+            for (auto& line : lines) {
+                cv::Point p1(line[0], line[1]);
+                cv::Point p2(line[2], line[3]);
+
+                cv::line(frame, p1, p2, cv::Scalar(0, 0, 255), 5);
+            }
+            
+            cv::imshow("camera_image", frame);
             cv::waitKey(1);
         }
+        
+        extApi_sleepMs(10);
     }
     
     simxFinish(clientId);

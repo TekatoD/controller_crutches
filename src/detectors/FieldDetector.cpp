@@ -34,7 +34,6 @@ cv::Mat ant::FieldDetector::preproccess(const cv::Mat &image) {
                             ColorThresh2.max_3);
 //
   cv::inRange(hsvImg, minColor, maxColor, preprocImage);
-
   cv::morphologyEx(preprocImage, preprocImage, CV_MOP_DILATE, cv::Mat::ones(7, 7, CV_8UC1));
 
   cv::Mat field = preprocImage.clone();

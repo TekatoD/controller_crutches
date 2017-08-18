@@ -1,13 +1,17 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.8)
 project(darwin-soccer)
-
-set(CMAKE_CXX_STANDARD 98)
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+#-DCMAKE_TOOLCHAIN_FILE=/home/tekatod/develop/controller_crutches/toolchain.cmake
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED)
+find_package(VREP REQUIRED)
 
 include_directories(include/)
+
+include_directories(${VREP_INCLUDE})
+include_directories(${VREP_REMOTE})
 
 set(SRC
         include/motion/modules/Action.h
@@ -88,6 +92,8 @@ set(SRC
 add_executable(soccer ${SRC})
 target_link_libraries(soccer
         ${CMAKE_THREAD_LIBS_INIT}
-        ${JPEG_LIBRARIES})
+        ${JPEG_LIBRARIES}
+        pthread
+        ${VREP_LIBRARIES})
 target_include_directories(soccer PUBLIC
         ${JPEG_INCLUDE_DIR})

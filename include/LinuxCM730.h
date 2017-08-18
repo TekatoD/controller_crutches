@@ -14,7 +14,7 @@
 
 namespace Robot {
     class LinuxCM730
-            : public PlatformCM730 {
+            /*: public PlatformCM730*/ {
     private:
         int m_Socket_fd;
         double m_PacketStartTime;

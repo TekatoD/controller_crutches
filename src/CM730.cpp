@@ -1,46 +1,29 @@
-/*
- *   CM730.cpp
- *   This class is the secondary controler that controls the motors MX28
- *   Author: ROBOTIS
- *
- */
-#include <stdio.h>
-#include "FSR.h"
+#define MAX_EXT_API_CONNECTIONS 255
+#define NON_MATLAB_PARSING
+extern "C" {
+    #include "extApi.h"
+    #include "extApi.c"
+    #include "extApiPlatform.h"
+    #include "extApiPlatform.c"
+}
+
+#include <iostream>
+#include <chrono>
+#include <thread>
 #include "CM730.h"
-#include "motion/MotionStatus.h"
-#include "motion/Kinematics.h"
+#include "motion/JointData.h"
 
-using namespace Robot;
-
-
-#define ID                    (2)
-#define LENGTH                (3)
-#define INSTRUCTION            (4)
-#define ERRBIT                (4)
-#define PARAMETER            (5)
-#define DEFAULT_BAUDNUMBER    (1)
-
-#define INST_PING            (1)
-#define INST_READ            (2)
-#define INST_WRITE            (3)
-#define INST_REG_WRITE        (4)
-#define INST_ACTION            (5)
-#define INST_RESET            (6)
-#define INST_SYNC_WRITE        (131)   // 0x83
-#define INST_BULK_READ      (146)   // 0x92
-
-
-BulkReadData::BulkReadData()
+Robot::BulkReadData::BulkReadData()
         :
         start_address(0),
-        length(0),
+        length(MX28::MAXNUM_ADDRESS),
         error(-1) {
     for (int i = 0; i < MX28::MAXNUM_ADDRESS; i++)
         table[i] = 0;
 }
 
 
-int BulkReadData::ReadByte(int address) {
+int Robot::BulkReadData::ReadByte(int address) {
     if (address >= start_address && address < (start_address + length))
         return (int) table[address];
 
@@ -48,728 +31,216 @@ int BulkReadData::ReadByte(int address) {
 }
 
 
-int BulkReadData::ReadWord(int address) {
+int Robot::BulkReadData::ReadWord(int address) {
     if (address >= start_address && address < (start_address + length))
         return CM730::MakeWord(table[address], table[address + 1]);
 
     return 0;
 }
 
-
-CM730::CM730(PlatformCM730* platform) {
-    m_Platform = platform;
-    DEBUG_PRINT = false;
-    m_BulkReadTxPacket[LENGTH] = 0;
-    for (int i = 0; i < ID_BROADCAST; i++)
-        m_BulkReadData[i] = BulkReadData();
-}
-
-
-CM730::~CM730() {
-    Disconnect();
-}
-
-
-int CM730::TxRxPacket(unsigned char* txpacket, unsigned char* rxpacket, int priority) {
-    if (priority > 1)
-        m_Platform->LowPriorityWait();
-    if (priority > 0)
-        m_Platform->MidPriorityWait();
-    m_Platform->HighPriorityWait();
-
-    int res = TX_FAIL;
-    int length = txpacket[LENGTH] + 4;
-
-    txpacket[0] = 0xFF;
-    txpacket[1] = 0xFF;
-    txpacket[length - 1] = CalculateChecksum(txpacket);
-
-    if (DEBUG_PRINT == true) {
-        fprintf(stderr, "\nTX: ");
-        for (int n = 0; n < length; n++)
-            fprintf(stderr, "%.2X ", txpacket[n]);
-
-        fprintf(stderr, "INST: ");
-        switch (txpacket[INSTRUCTION]) {
-            case INST_PING:
-                fprintf(stderr, "PING\n");
-                break;
-
-            case INST_READ:
-                fprintf(stderr, "READ\n");
-                break;
-
-            case INST_WRITE:
-                fprintf(stderr, "WRITE\n");
-                break;
-
-            case INST_REG_WRITE:
-                fprintf(stderr, "REG_WRITE\n");
-                break;
-
-            case INST_ACTION:
-                fprintf(stderr, "ACTION\n");
-                break;
-
-            case INST_RESET:
-                fprintf(stderr, "RESET\n");
-                break;
-
-            case INST_SYNC_WRITE:
-                fprintf(stderr, "SYNC_WRITE\n");
-                break;
-
-            case INST_BULK_READ:
-                fprintf(stderr, "BULK_READ\n");
-                break;
-
-            default:
-                fprintf(stderr, "UNKNOWN\n");
-                break;
-        }
+Robot::CM730::CM730(std::string server_ip, int server_port, int client_id, std::string device_postfix) {
+    if(client_id =- -1) {
+        m_client_id = simxStart((simxChar *) server_ip.c_str(), server_port, true, true, 5000, 5);
     }
-
-    if (length < (MAXNUM_TXPARAM + 6)) {
-        m_Platform->ClearPort();
-        if (m_Platform->WritePort(txpacket, length) == length) {
-            if (txpacket[ID] != ID_BROADCAST) {
-                int to_length = 0;
-
-                if (txpacket[INSTRUCTION] == INST_READ)
-                    to_length = txpacket[PARAMETER + 1] + 6;
-                else
-                    to_length = 6;
-
-                m_Platform->SetPacketTimeout(length);
-
-                int get_length = 0;
-                if (DEBUG_PRINT == true)
-                    fprintf(stderr, "RX: ");
-
-                while (1) {
-                    length = m_Platform->ReadPort(&rxpacket[get_length], to_length - get_length);
-                    if (DEBUG_PRINT == true) {
-                        for (int n = 0; n < length; n++)
-                            fprintf(stderr, "%.2X ", rxpacket[get_length + n]);
-                    }
-                    get_length += length;
-
-                    if (get_length == to_length) {
-                        // Find packet header
-                        int i;
-                        for (i = 0; i < (get_length - 1); i++) {
-                            if (rxpacket[i] == 0xFF && rxpacket[i + 1] == 0xFF)
-                                break;
-                            else if (i == (get_length - 2) && rxpacket[get_length - 1] == 0xFF)
-                                break;
-                        }
-
-                        if (i == 0) {
-                            // Check checksum
-                            unsigned char checksum = CalculateChecksum(rxpacket);
-                            if (DEBUG_PRINT == true)
-                                fprintf(stderr, "CHK:%.2X\n", checksum);
-
-                            if (rxpacket[get_length - 1] == checksum)
-                                res = SUCCESS;
-                            else
-                                res = RX_CORRUPT;
-
-                            break;
-                        } else {
-                            for (int j = 0; j < (get_length - i); j++)
-                                rxpacket[j] = rxpacket[j + i];
-                            get_length -= i;
-                        }
-                    } else {
-                        if (m_Platform->IsPacketTimeout() == true) {
-                            if (get_length == 0)
-                                res = RX_TIMEOUT;
-                            else
-                                res = RX_CORRUPT;
-
-                            break;
-                        }
-                    }
-                }
-            } else if (txpacket[INSTRUCTION] == INST_BULK_READ) {
-                int to_length = 0;
-                int num = (txpacket[LENGTH] - 3) / 3;
-
-                for (int x = 0; x < num; x++) {
-                    int _id = txpacket[PARAMETER + (3 * x) + 2];
-                    int _len = txpacket[PARAMETER + (3 * x) + 1];
-                    int _addr = txpacket[PARAMETER + (3 * x) + 3];
-
-                    to_length += _len + 6;
-                    m_BulkReadData[_id].length = _len;
-                    m_BulkReadData[_id].start_address = _addr;
-                }
-
-                m_Platform->SetPacketTimeout(to_length * 1.5);
-
-                int get_length = 0;
-                if (DEBUG_PRINT == true)
-                    fprintf(stderr, "RX: ");
-
-                while (1) {
-                    length = m_Platform->ReadPort(&rxpacket[get_length], to_length - get_length);
-                    if (DEBUG_PRINT == true) {
-                        for (int n = 0; n < length; n++)
-                            fprintf(stderr, "%.2X ", rxpacket[get_length + n]);
-                    }
-                    get_length += length;
-
-                    if (get_length == to_length) {
-                        res = SUCCESS;
-                        break;
-                    } else {
-                        if (m_Platform->IsPacketTimeout() == true) {
-                            if (get_length == 0)
-                                res = RX_TIMEOUT;
-                            else
-                                res = RX_CORRUPT;
-
-                            break;
-                        }
-                    }
-                }
-
-                for (int x = 0; x < num; x++) {
-                    int _id = txpacket[PARAMETER + (3 * x) + 2];
-                    m_BulkReadData[_id].error = -1;
-                }
-
-                while (1) {
-                    int i;
-                    for (i = 0; i < get_length - 1; i++) {
-                        if (rxpacket[i] == 0xFF && rxpacket[i + 1] == 0xFF)
-                            break;
-                        else if (i == (get_length - 2) && rxpacket[get_length - 1] == 0xFF)
-                            break;
-                    }
-
-                    if (i == 0) {
-                        // Check checksum
-                        unsigned char checksum = CalculateChecksum(rxpacket);
-                        if (DEBUG_PRINT == true)
-                            fprintf(stderr, "CHK:%.2X\n", checksum);
-
-                        if (rxpacket[LENGTH + rxpacket[LENGTH]] == checksum) {
-                            for (int j = 0; j < (rxpacket[LENGTH] - 2); j++)
-                                m_BulkReadData[rxpacket[ID]].table[m_BulkReadData[rxpacket[ID]].start_address +
-                                                                   j] = rxpacket[PARAMETER + j];
-
-                            m_BulkReadData[rxpacket[ID]].error = (int) rxpacket[ERRBIT];
-
-                            int cur_packet_length = LENGTH + 1 + rxpacket[LENGTH];
-                            to_length = get_length - cur_packet_length;
-                            for (int j = 0; j <= to_length; j++)
-                                rxpacket[j] = rxpacket[j + cur_packet_length];
-
-                            get_length = to_length;
-                            num--;
-                        } else {
-                            res = RX_CORRUPT;
-
-                            for (int j = 0; j <= get_length - 2; j++)
-                                rxpacket[j] = rxpacket[j + 2];
-
-                            to_length = get_length -= 2;
-                        }
-
-                        if (num == 0)
-                            break;
-                        else if (get_length <= 6) {
-                            if (num != 0) res = RX_CORRUPT;
-                            break;
-                        }
-
-                    } else {
-                        for (int j = 0; j < (get_length - i); j++)
-                            rxpacket[j] = rxpacket[j + i];
-                        get_length -= i;
-                    }
-                }
-            } else
-                res = SUCCESS;
-        } else
-            res = TX_FAIL;
-    } else
-        res = TX_CORRUPT;
-
-    if (DEBUG_PRINT == true) {
-        fprintf(stderr, "Time:%.2fms  ", m_Platform->GetPacketTime());
-        fprintf(stderr, "RETURN: ");
-        switch (res) {
-            case SUCCESS:
-                fprintf(stderr, "SUCCESS\n");
-                break;
-
-            case TX_CORRUPT:
-                fprintf(stderr, "TX_CORRUPT\n");
-                break;
-
-            case TX_FAIL:
-                fprintf(stderr, "TX_FAIL\n");
-                break;
-
-            case RX_FAIL:
-                fprintf(stderr, "RX_FAIL\n");
-                break;
-
-            case RX_TIMEOUT:
-                fprintf(stderr, "RX_TIMEOUT\n");
-                break;
-
-            case RX_CORRUPT:
-                fprintf(stderr, "RX_CORRUPT\n");
-                break;
-
-            default:
-                fprintf(stderr, "UNKNOWN\n");
-                break;
-        }
-    }
-
-    m_Platform->HighPriorityRelease();
-    if (priority > 0)
-        m_Platform->MidPriorityRelease();
-    if (priority > 1)
-        m_Platform->LowPriorityRelease();
-
-    return res;
-}
-
-
-unsigned char CM730::CalculateChecksum(unsigned char* packet) {
-    unsigned char checksum = 0x00;
-    for (int i = 2; i < packet[LENGTH] + 3; i++)
-        checksum += packet[i];
-    return (~checksum);
-}
-
-
-void CM730::MakeBulkReadPacket() {
-    int number = 0;
-
-    m_BulkReadTxPacket[ID] = (unsigned char) ID_BROADCAST;
-    m_BulkReadTxPacket[INSTRUCTION] = INST_BULK_READ;
-    m_BulkReadTxPacket[PARAMETER] = (unsigned char) 0x0;
-
-    if (Ping(CM730::ID_CM, 0) == SUCCESS) {
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 1] = 30;
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 2] = CM730::ID_CM;
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 3] = CM730::P_DXL_POWER;
-        number++;
-    }
-
-//    for(int id = 1; id < JointData::NUMBER_OF_JOINTS; id++)
-//    {
-//        if(MotionStatus::m_CurrentJoints.GetEnable(id))
-//        {
-//            m_BulkReadTxPacket[PARAMETER+3*number+1] = 2;   // length
-//            m_BulkReadTxPacket[PARAMETER+3*number+2] = id;  // id
-//            m_BulkReadTxPacket[PARAMETER+3*number+3] = MX28::P_PRESENT_POSITION_L; // start address
-//            number++;
-//        }
-//    }
-
-    if (Ping(FSR::ID_L_FSR, 0) == SUCCESS) {
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 1] = 10;               // length
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 2] = FSR::ID_L_FSR;   // id
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 3] = FSR::P_FSR1_L;    // start address
-        number++;
-    }
-
-    if (Ping(FSR::ID_R_FSR, 0) == SUCCESS) {
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 1] = 10;               // length
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 2] = FSR::ID_R_FSR;   // id
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 3] = FSR::P_FSR1_L;    // start address
-        number++;
-    }
-
-    m_BulkReadTxPacket[LENGTH] = (number * 3) + 3;
-}
-
-
-int CM730::BulkRead() {
-    unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
-
-    if (m_BulkReadTxPacket[LENGTH] != 0)
-        return TxRxPacket(m_BulkReadTxPacket, rxpacket, 0);
     else {
-        MakeBulkReadPacket();
-        return TX_FAIL;
+        m_client_id = client_id;
     }
-}
-
-
-int CM730::SyncWrite(int start_addr, int each_length, int number, int* pParam) {
-    unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
-    unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
-    int n;
-
-    txpacket[ID] = (unsigned char) ID_BROADCAST;
-    txpacket[INSTRUCTION] = INST_SYNC_WRITE;
-    txpacket[PARAMETER] = (unsigned char) start_addr;
-    txpacket[PARAMETER + 1] = (unsigned char) (each_length - 1);
-    for (n = 0; n < (number * each_length); n++)
-        txpacket[PARAMETER + 2 + n] = (unsigned char) pParam[n];
-    txpacket[LENGTH] = n + 4;
-
-    return TxRxPacket(txpacket, rxpacket, 0);
-}
-
-
-bool CM730::Connect() {
-    if (m_Platform->OpenPort() == false) {
-        fprintf(stderr, "\n Fail to open port\n");
-        fprintf(stderr, " CM-730 is used by another program or do not have root privileges.\n\n");
-        return false;
+    std::cout << "Can't connect with sim" << std::endl;
+    m_device_postfix = device_postfix;
+    init_devices();
+    for (int i = 0; i < ID_BROADCAST; i++) {
+        m_BulkReadData[i] = BulkReadData();
     }
-
-    return (DXLPowerOn() && MX28InitAll());
+    this->BulkRead();
 }
 
-
-bool CM730::ChangeBaud(int baud) {
-    if (m_Platform->SetBaud(baud) == false) {
-        fprintf(stderr, "\n Fail to change baudrate\n");
-        return false;
-    }
-
-    return DXLPowerOn();
-}
-
-
-bool CM730::DXLPowerOn() {
-    if (WriteByte(CM730::ID_CM, CM730::P_DXL_POWER, 1, 0) == CM730::SUCCESS) {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, " Succeed to change Dynamixel power!\n");
-
-        WriteWord(CM730::ID_CM, CM730::P_LED_HEAD_L, MakeColor(255, 128, 0), 0);
-        m_Platform->Sleep(300); // about 300msec
+Robot::CM730::CM730(int client_id, std::string device_postfix) {
+    std::string server_ip("127.0.0.1");
+    int server_port = 19999;
+    if(client_id == -1) {
+        m_client_id = simxStart((simxChar *) server_ip.c_str(), server_port, true, true, 5000, 5);
     } else {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, " Fail to change Dynamixel power!\n");
-        return false;
+        m_client_id = client_id;
     }
-
-    return true;
-}
-
-
-bool CM730::MX28InitAll() {
-    // no limits for R_SHOULDER_PITCH
-    // no limits for L_SHOULDER_PITCH
-
-    if (WriteWord(JointData::ID_R_SHOULDER_ROLL, MX28::P_CW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CW_LIMIT_R_SHOULDER_ROLL), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_SHOULDER_ROLL!\n");
-    if (WriteWord(JointData::ID_R_SHOULDER_ROLL, MX28::P_CCW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CCW_LIMIT_R_SHOULDER_ROLL), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_SHOULDER_ROLL!\n");
-
-    if (WriteWord(JointData::ID_L_SHOULDER_ROLL, MX28::P_CW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CW_LIMIT_L_SHOULDER_ROLL), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_SHOULDER_ROLL!\n");
-    if (WriteWord(JointData::ID_L_SHOULDER_ROLL, MX28::P_CCW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CCW_LIMIT_L_SHOULDER_ROLL), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_SHOULDER_ROLL!\n");
-
-    if (WriteWord(JointData::ID_R_ELBOW, MX28::P_CW_ANGLE_LIMIT_L, MX28::Angle2Value(Kinematics::CW_LIMIT_R_ELBOW),
-                  0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_ELBOW!\n");
-    if (WriteWord(JointData::ID_R_ELBOW, MX28::P_CCW_ANGLE_LIMIT_L, MX28::Angle2Value(Kinematics::CCW_LIMIT_R_ELBOW),
-                  0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_ELBOW!\n");
-
-    if (WriteWord(JointData::ID_L_ELBOW, MX28::P_CW_ANGLE_LIMIT_L, MX28::Angle2Value(Kinematics::CW_LIMIT_L_ELBOW),
-                  0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_ELBOW!\n");
-    if (WriteWord(JointData::ID_L_ELBOW, MX28::P_CCW_ANGLE_LIMIT_L, MX28::Angle2Value(Kinematics::CCW_LIMIT_L_ELBOW),
-                  0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_ELBOW!\n");
-
-    if (WriteWord(JointData::ID_R_HIP_YAW, MX28::P_CW_ANGLE_LIMIT_L, MX28::Angle2Value(Kinematics::CW_LIMIT_R_HIP_YAW),
-                  0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_HIP_YAW!\n");
-    if (WriteWord(JointData::ID_R_HIP_YAW, MX28::P_CCW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CCW_LIMIT_R_HIP_YAW), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_HIP_YAW!\n");
-
-    if (WriteWord(JointData::ID_L_HIP_YAW, MX28::P_CW_ANGLE_LIMIT_L, MX28::Angle2Value(Kinematics::CW_LIMIT_L_HIP_YAW),
-                  0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_HIP_YAW!\n");
-    if (WriteWord(JointData::ID_L_HIP_YAW, MX28::P_CCW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CCW_LIMIT_L_HIP_YAW), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_HIP_YAW!\n");
-
-    if (WriteWord(JointData::ID_R_HIP_ROLL, MX28::P_CW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CW_LIMIT_R_HIP_ROLL), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_HIP_ROLL!\n");
-    if (WriteWord(JointData::ID_R_HIP_ROLL, MX28::P_CCW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CCW_LIMIT_R_HIP_ROLL), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_HIP_ROLL!\n");
-
-    if (WriteWord(JointData::ID_L_HIP_ROLL, MX28::P_CW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CW_LIMIT_L_HIP_ROLL), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_HIP_ROLL!\n");
-    if (WriteWord(JointData::ID_L_HIP_ROLL, MX28::P_CCW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CCW_LIMIT_L_HIP_ROLL), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_HIP_ROLL!\n");
-
-    if (WriteWord(JointData::ID_R_HIP_PITCH, MX28::P_CW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CW_LIMIT_R_HIP_PITCH), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_HIP_PITCH!\n");
-    if (WriteWord(JointData::ID_R_HIP_PITCH, MX28::P_CCW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CCW_LIMIT_R_HIP_PITCH), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_HIP_PITCH!\n");
-
-    if (WriteWord(JointData::ID_L_HIP_PITCH, MX28::P_CW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CW_LIMIT_L_HIP_PITCH), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_HIP_PITCH!\n");
-    if (WriteWord(JointData::ID_L_HIP_PITCH, MX28::P_CCW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CCW_LIMIT_L_HIP_PITCH), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_HIP_PITCH!\n");
-
-    if (WriteWord(JointData::ID_R_KNEE, MX28::P_CW_ANGLE_LIMIT_L, MX28::Angle2Value(Kinematics::CW_LIMIT_R_KNEE), 0) !=
-        CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_KNEE!\n");
-    if (WriteWord(JointData::ID_R_KNEE, MX28::P_CCW_ANGLE_LIMIT_L, MX28::Angle2Value(Kinematics::CCW_LIMIT_R_KNEE),
-                  0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_KNEE!\n");
-
-    if (WriteWord(JointData::ID_L_KNEE, MX28::P_CW_ANGLE_LIMIT_L, MX28::Angle2Value(Kinematics::CW_LIMIT_L_KNEE), 0) !=
-        CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_KNEE!\n");
-    if (WriteWord(JointData::ID_L_KNEE, MX28::P_CCW_ANGLE_LIMIT_L, MX28::Angle2Value(Kinematics::CCW_LIMIT_L_KNEE),
-                  0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_KNEE!\n");
-
-    if (WriteWord(JointData::ID_R_ANKLE_PITCH, MX28::P_CW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CW_LIMIT_R_ANKLE_PITCH), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_ANKLE_PITCH!\n");
-    if (WriteWord(JointData::ID_R_ANKLE_PITCH, MX28::P_CCW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CCW_LIMIT_R_ANKLE_PITCH), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_ANKLE_PITCH!\n");
-
-    if (WriteWord(JointData::ID_L_ANKLE_PITCH, MX28::P_CW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CW_LIMIT_L_ANKLE_PITCH), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_ANKLE_PITCH!\n");
-    if (WriteWord(JointData::ID_L_ANKLE_PITCH, MX28::P_CCW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CCW_LIMIT_L_ANKLE_PITCH), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_ANKLE_PITCH!\n");
-
-    if (WriteWord(JointData::ID_R_ANKLE_ROLL, MX28::P_CW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CW_LIMIT_R_ANKLE_ROLL), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_ANKLE_ROLL!\n");
-    if (WriteWord(JointData::ID_R_ANKLE_ROLL, MX28::P_CCW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CCW_LIMIT_R_ANKLE_ROLL), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_ANKLE_ROLL!\n");
-
-    if (WriteWord(JointData::ID_L_ANKLE_ROLL, MX28::P_CW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CW_LIMIT_L_ANKLE_ROLL), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_ANKLE_ROLL!\n");
-    if (WriteWord(JointData::ID_L_ANKLE_ROLL, MX28::P_CCW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CCW_LIMIT_L_ANKLE_ROLL), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_ANKLE_ROLL!\n");
-
-    if (WriteWord(JointData::ID_HEAD_PAN, MX28::P_CW_ANGLE_LIMIT_L, MX28::Angle2Value(Kinematics::CW_LIMIT_HEAD_PAN),
-                  0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of HEAD_PAN!\n");
-    if (WriteWord(JointData::ID_HEAD_PAN, MX28::P_CCW_ANGLE_LIMIT_L, MX28::Angle2Value(Kinematics::CCW_LIMIT_HEAD_PAN),
-                  0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of HEAD_PAN!\n");
-
-    if (WriteWord(JointData::ID_HEAD_TILT, MX28::P_CW_ANGLE_LIMIT_L, MX28::Angle2Value(Kinematics::CW_LIMIT_HEAD_TILT),
-                  0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of HEAD_TILT!\n");
-    if (WriteWord(JointData::ID_HEAD_TILT, MX28::P_CCW_ANGLE_LIMIT_L,
-                  MX28::Angle2Value(Kinematics::CCW_LIMIT_HEAD_TILT), 0) != CM730::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of HEAD_TILT!\n");
-
-    return true;
-}
-
-
-void CM730::Disconnect() {
-    // Make the Head LED to green
-    //WriteWord(CM730::ID_CM, CM730::P_LED_HEAD_L, MakeColor(0, 255, 0), 0);
-    unsigned char txpacket[] = {0xFF, 0xFF, 0xC8, 0x05, 0x03, 0x1A, 0xE0, 0x03, 0x32};
-    m_Platform->WritePort(txpacket, 9);
-
-    m_Platform->ClosePort();
-}
-
-
-int CM730::WriteByte(int address, int value, int* error) {
-    return WriteByte(ID_CM, address, value, error);
-}
-
-
-int CM730::WriteWord(int address, int value, int* error) {
-    return WriteWord(ID_CM, address, value, error);
-}
-
-
-int CM730::Ping(int id, int* error) {
-    unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
-    unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
-    int result;
-
-    txpacket[ID] = (unsigned char) id;
-    txpacket[INSTRUCTION] = INST_PING;
-    txpacket[LENGTH] = 2;
-
-    result = TxRxPacket(txpacket, rxpacket, 2);
-    if (result == SUCCESS && txpacket[ID] != ID_BROADCAST) {
-        if (error != 0)
-            *error = (int) rxpacket[ERRBIT];
+    if (m_client_id == -1) {
+        std::cout << "Can't connect with sim" << std::endl;
     }
-
-    return result;
-}
-
-
-int CM730::ReadByte(int id, int address, int* pValue, int* error) {
-    unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
-    unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
-    int result;
-
-    txpacket[ID] = (unsigned char) id;
-    txpacket[INSTRUCTION] = INST_READ;
-    txpacket[PARAMETER] = (unsigned char) address;
-    txpacket[PARAMETER + 1] = 1;
-    txpacket[LENGTH] = 4;
-
-    result = TxRxPacket(txpacket, rxpacket, 2);
-    if (result == SUCCESS) {
-        *pValue = (int) rxpacket[PARAMETER];
-        if (error != 0)
-            *error = (int) rxpacket[ERRBIT];
+    m_device_postfix = device_postfix;
+    init_devices();
+    for (int i = 0; i < ID_BROADCAST; i++) {
+        m_BulkReadData[i] = BulkReadData();
     }
-
-    return result;
+    this->BulkRead();
 }
 
+void Robot::CM730::init_devices() {
+    m_sim_devices.reserve(20);
 
-int CM730::ReadWord(int id, int address, int* pValue, int* error) {
-    unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
-    unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
-    int result;
+    //initialize sensors readings
+    simxFloat h;
+    simxGetFloatSignal(m_client_id, (std::string("accelerometerX") + m_device_postfix).c_str(), &h, simx_opmode_streaming);
+    simxGetFloatSignal(m_client_id, (std::string("accelerometerY") + m_device_postfix).c_str(), &h, simx_opmode_streaming);
+    simxGetFloatSignal(m_client_id, (std::string("accelerometerZ") + m_device_postfix).c_str(), &h, simx_opmode_streaming);
+    simxGetFloatSignal(m_client_id, (std::string("gyroX") + m_device_postfix).c_str(), &h, simx_opmode_streaming);
+    simxGetFloatSignal(m_client_id, (std::string("gyroY") + m_device_postfix).c_str(), &h, simx_opmode_streaming);
+    simxGetFloatSignal(m_client_id, (std::string("gyroZ") + m_device_postfix).c_str(), &h, simx_opmode_streaming);
 
-    txpacket[ID] = (unsigned char) id;
-    txpacket[INSTRUCTION] = INST_READ;
-    txpacket[PARAMETER] = (unsigned char) address;
-    txpacket[PARAMETER + 1] = 2;
-    txpacket[LENGTH] = 4;
+    //get joints handlers
+    m_sim_devices.emplace(std::make_pair(JointData::ID_L_SHOULDER_PITCH, this->connect_device("j_shoulder_l" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_R_SHOULDER_PITCH, this->connect_device("j_shoulder_r" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_R_SHOULDER_ROLL, this->connect_device("j_high_arm_r" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_L_SHOULDER_ROLL, this->connect_device("j_high_arm_l" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_L_ELBOW, this->connect_device("j_low_arm_l" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_R_ELBOW, this->connect_device("j_low_arm_r" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_L_HIP_YAW, this->connect_device("j_pelvis_l" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_R_HIP_YAW, this->connect_device("j_pelvis_r" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_L_HIP_ROLL, this->connect_device("j_thigh1_l" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_R_HIP_ROLL, this->connect_device("j_thigh1_r" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_L_HIP_PITCH, this->connect_device("j_thigh2_l" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_R_HIP_PITCH, this->connect_device("j_thigh2_r" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_L_KNEE, this->connect_device("j_tibia_l" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_R_KNEE, this->connect_device("j_tibia_r" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_L_ANKLE_PITCH, this->connect_device("j_ankle1_l" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_R_ANKLE_PITCH, this->connect_device("j_ankle1_r" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_L_ANKLE_ROLL, this->connect_device("j_ankle2_l" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_R_ANKLE_ROLL, this->connect_device("j_ankle2_r" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_HEAD_PAN, this->connect_device("j_pan" + m_device_postfix)));
+    m_sim_devices.emplace(std::make_pair(JointData::ID_HEAD_TILT, this->connect_device("j_tilt" + m_device_postfix)));
+}
 
-    result = TxRxPacket(txpacket, rxpacket, 2);
-    if (result == SUCCESS) {
-        *pValue = MakeWord((int) rxpacket[PARAMETER], (int) rxpacket[PARAMETER + 1]);
+int Robot::CM730::get_client_id() {
+    return m_client_id;
+}
 
-        if (error != 0)
-            *error = (int) rxpacket[ERRBIT];
+int Robot::CM730::connect_device(std::string device_name) {
+    int object_handler;
+    if(simxGetObjectHandle(m_client_id, device_name.c_str(),
+                           &object_handler, simx_opmode_oneshot_wait) == simx_return_ok) {
+        return std::move(object_handler);
     }
-
-    return result;
+    return -1;
 }
 
+int Robot::CM730::SyncWrite(int start_addr, int each_length, int number, int *pParam) {
+    for(size_t i = 0; i < number * each_length; i += each_length) {
+        simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2000, 1, simx_opmode_oneshot);
+        simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2001, 1, simx_opmode_oneshot);
+        //TODO: Check PID control (order: D I P)
+        simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2004, (pParam[i + 1]  * M_PI / MX28::MAX_VALUE) * 4 / 1000, simx_opmode_oneshot);
+        simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2003, (pParam[i + 2]  * M_PI / MX28::MAX_VALUE) * 1000 / 2048, simx_opmode_oneshot);
+        simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2002, (pParam[i + 3]  * M_PI / MX28::MAX_VALUE) / 8, simx_opmode_oneshot);
 
-int CM730::ReadTable(int id, int start_addr, int end_addr, unsigned char* table, int* error) {
-    unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
-    unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
-    int result;
-    int length = end_addr - start_addr + 1;
-
-    txpacket[ID] = (unsigned char) id;
-    txpacket[INSTRUCTION] = INST_READ;
-    txpacket[PARAMETER] = (unsigned char) start_addr;
-    txpacket[PARAMETER + 1] = (unsigned char) length;
-    txpacket[LENGTH] = 4;
-
-    result = TxRxPacket(txpacket, rxpacket, 1);
-    if (result == SUCCESS) {
-        for (int i = 0; i < length; i++)
-            table[start_addr + i] = rxpacket[PARAMETER + i];
-
-        if (error != 0)
-            *error = (int) rxpacket[ERRBIT];
+        simxSetJointTargetPosition(m_client_id, m_sim_devices[pParam[i]],
+                                      (Robot::MX28::Value2Angle(CM730::MakeWord(pParam[i + 5], pParam[i + 6])) * M_PI) / 180,
+                                   simx_opmode_oneshot);
     }
-
-    return result;
 }
 
-
-int CM730::WriteByte(int id, int address, int value, int* error) {
-    unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
-    unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
-    int result;
-
-    txpacket[ID] = (unsigned char) id;
-    txpacket[INSTRUCTION] = INST_WRITE;
-    txpacket[PARAMETER] = (unsigned char) address;
-    txpacket[PARAMETER + 1] = (unsigned char) value;
-    txpacket[LENGTH] = 4;
-
-    result = TxRxPacket(txpacket, rxpacket, 2);
-    if (result == SUCCESS && id != ID_BROADCAST) {
-        if (error != 0)
-            *error = (int) rxpacket[ERRBIT];
+int Robot::CM730::ReadWord(int id, int address, int* pValue, int* error) {
+        auto get_sensor_data = [this, &error](std::string signal) {
+            simxFloat data;
+            while((*error = simxGetFloatSignal(m_client_id, signal.c_str(), &data, simx_opmode_buffer)) != simx_return_ok) { }
+            return data;
+        };
+        auto norm_accel = [](double value) {
+            return (int)((value + 39.24) / (78.48) * 1023);
+        };
+        auto norm_gyro = [](double value) {
+            return (int)((value + 500) / (1000) * 1023);
+        };
+        switch(address) {
+            case P_GYRO_Z_L:
+                *pValue = norm_gyro(get_sensor_data("gyroZ" + m_device_postfix));
+                break;
+            case P_GYRO_Y_L:
+                *pValue = norm_gyro(get_sensor_data("gyroY" + m_device_postfix));
+                break;
+            case P_GYRO_X_L:
+                *pValue = norm_gyro(get_sensor_data("gyroX" + m_device_postfix));
+                break;
+            case P_ACCEL_Z_L:
+                *pValue = norm_accel(get_sensor_data("accelerometerZ" + m_device_postfix));
+                break;
+            case P_ACCEL_Y_L:
+                *pValue = norm_accel(get_sensor_data("accelerometerY" + m_device_postfix));
+                break;
+            case P_ACCEL_X_L:
+                *pValue = norm_accel(get_sensor_data("accelerometerX" + m_device_postfix));
+                break;
+            default:
+                simxFloat pos;
+                simxSetObjectIntParameter(m_client_id, m_sim_devices[id], 2000, 1, simx_opmode_oneshot);
+                simxSetObjectIntParameter(m_client_id, m_sim_devices[id], 2001, 1, simx_opmode_oneshot);
+                while((*error = simxGetJointPosition(m_client_id, m_sim_devices[id], &pos, simx_opmode_oneshot))
+                      != simx_return_ok) { };
+                pos = (180 * pos) / M_PI;
+//                std::cout << "Joint" << address << " " << pos << std::endl;
+                *pValue = MX28::Angle2Value(pos);
+                return SUCCESS;
     }
-
-    return result;
 }
 
+int Robot::CM730::BulkRead() {
+//    std::chrono::high_resolution_clock::time_point tp = std::chrono::high_resolution_clock::now();
+    for(size_t i = JointData::ID_R_SHOULDER_PITCH; i < JointData::NUMBER_OF_JOINTS; ++i) {
+        int value;
+        int error;
+        this->ReadWord(i, 0, &value, &error);
+        m_BulkReadData[i].table[MX28::P_PRESENT_POSITION_L] = GetLowByte(value);
+        m_BulkReadData[i].table[MX28::P_PRESENT_POSITION_H] = GetHighByte(value);
+        if(error == simx_return_ok) {
+            m_BulkReadData->error = 0;
+        }
 
-int CM730::WriteWord(int id, int address, int value, int* error) {
-    unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
-    unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
-    int result;
-
-    txpacket[ID] = (unsigned char) id;
-    txpacket[INSTRUCTION] = INST_WRITE;
-    txpacket[PARAMETER] = (unsigned char) address;
-    txpacket[PARAMETER + 1] = (unsigned char) GetLowByte(value);
-    txpacket[PARAMETER + 2] = (unsigned char) GetHighByte(value);
-    txpacket[LENGTH] = 5;
-
-    result = TxRxPacket(txpacket, rxpacket, 2);
-    if (result == SUCCESS && id != ID_BROADCAST) {
-        if (error != 0)
-            *error = (int) rxpacket[ERRBIT];
     }
-
-    return result;
-}
-
-
-int CM730::WriteTable(int id, int start_addr, int end_addr, unsigned char* table, int* error) {
-    unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
-    unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
-    int result;
-    int length = end_addr - start_addr + 1;
-
-    txpacket[ID] = (unsigned char) id;
-    txpacket[INSTRUCTION] = INST_WRITE;
-    txpacket[PARAMETER] = (unsigned char) start_addr;
-    for (int i = 0; i < length; i++)
-        txpacket[PARAMETER + i + 1] = table[start_addr + i];
-    txpacket[LENGTH] = 3 + length;
-
-    result = TxRxPacket(txpacket, rxpacket, 2);
-    if (result == SUCCESS && id != ID_BROADCAST) {
-        if (error != 0)
-            *error = (int) rxpacket[ERRBIT];
+//    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp);
+//    std::cout << "Joints: " << ms.count() << std::endl;
+//    tp = std::chrono::high_resolution_clock::now();
+    for(size_t i = P_GYRO_Z_L; i < P_VOLTAGE; i += 2) { //TODO:: Check the loop
+        int value;
+        int error;
+        this->ReadWord(0, i, &value, &error);
+        m_BulkReadData[ID_CM].table[i] = GetLowByte(value);
+        m_BulkReadData[ID_CM].table[i + 1] = GetHighByte(value);
+        if(error == simx_return_ok) {
+            m_BulkReadData->error = 0;
+        }
     }
-
-    return result;
+    m_BulkReadData[ID_CM].error = 0; //TODO:: crutchk
+//    ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp);
+//    std::cout << "Sensors: " << ms.count() << std::endl;
 }
 
+int Robot::CM730::WriteByte(int address, int value, int* error) {
+    return SUCCESS;
+}
 
-int CM730::MakeWord(int lowbyte, int highbyte) {
+int Robot::CM730::WriteWord(int id, int address, int value, int* error) {
+    if(address == MX28::P_PRESENT_POSITION_L) {
+        simxSetObjectIntParameter(m_client_id, m_sim_devices[id], 2000, 1, simx_opmode_oneshot);
+        simxSetObjectIntParameter(m_client_id, m_sim_devices[id], 2001, 1, simx_opmode_oneshot);
+        *error = simxSetJointTargetPosition(m_client_id, m_sim_devices[id],
+                                   (Robot::MX28::Value2Angle(value) * M_PI) / 180,
+                                   simx_opmode_oneshot);
+        return SUCCESS;
+    }
+    return SUCCESS;
+}
+
+int Robot::CM730::ReadByte(int id, int address, int *pValue, int* error) {
+    if(address == MX28::P_VERSION) {
+        *pValue = 28;
+    }
+    return SUCCESS;
+}
+
+bool Robot::CM730::Connect() {
+    return (m_client_id != -1);
+}
+
+void Robot::CM730::DXLPowerOn() {}
+
+int Robot::CM730::MakeWord(int lowbyte, int highbyte) {
     unsigned short word;
 
     word = highbyte;
@@ -780,51 +251,19 @@ int CM730::MakeWord(int lowbyte, int highbyte) {
 }
 
 
-int CM730::GetLowByte(int word) {
+int Robot::CM730::GetLowByte(int word) {
     unsigned short temp;
     temp = word & 0xff;
     return (int) temp;
 }
 
 
-int CM730::GetHighByte(int word) {
+int Robot::CM730::GetHighByte(int word) {
     unsigned short temp;
     temp = word & 0xff00;
     return (int) (temp >> 8);
 }
 
-
-int CM730::MakeColor(int red, int green, int blue) {
-    int r = red & 0xFF;
-    int g = green & 0xFF;
-    int b = blue & 0xFF;
-
-    return (int) (((b >> 3) << 10) | ((g >> 3) << 5) | (r >> 3));
+Robot::CM730::~CM730() {
+    simxStopSimulation(m_client_id, simx_opmode_oneshot_wait);
 }
-
-// ***   WEBOTS PART  *** //
-
-void CM730::MakeBulkReadPacketWb() {
-    int number = 0;
-
-    m_BulkReadTxPacket[ID] = (unsigned char) ID_BROADCAST;
-    m_BulkReadTxPacket[INSTRUCTION] = INST_BULK_READ;
-    m_BulkReadTxPacket[PARAMETER] = (unsigned char) 0x0;
-
-    if (Ping(CM730::ID_CM, 0) == SUCCESS) {
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 1] = 30;
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 2] = CM730::ID_CM;
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 3] = CM730::P_DXL_POWER;
-        number++;
-    }
-
-    for (int id = 1; id < JointData::NUMBER_OF_JOINTS; id++) {
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 1] = 6; // length (goal + speed + torque)
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 2] = id;    // id
-        m_BulkReadTxPacket[PARAMETER + 3 * number + 3] = MX28::P_PRESENT_POSITION_L; // start address
-        number++;
-    }
-
-    m_BulkReadTxPacket[LENGTH] = (number * 3) + 3;
-}
-

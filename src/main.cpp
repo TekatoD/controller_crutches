@@ -28,8 +28,9 @@
 
 using namespace Robot;
 
-LinuxCM730 linux_cm730(U2D_DEV_NAME0);
-CM730 cm730(&linux_cm730);
+//LinuxCM730 linux_cm730(U2D_DEV_NAME0);
+//CM730 cm730(&linux_cm730);
+CM730 cm730;
 
 
 void change_current_dir() {
@@ -59,9 +60,9 @@ int main(void) {
 
     minIni ini(INI_FILE_PATH);
 
-    LinuxCamera::GetInstance()->Initialize(0);
-    LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
-    LinuxCamera::GetInstance()->LoadINISettings(&ini);                   // load from ini
+//    LinuxCamera::GetInstance()->Initialize(0);
+//    LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
+//    LinuxCamera::GetInstance()->LoadINISettings(&ini);                   // load from ini
 
 //    auto ball_finder = std::make_unique<ColorFinder>();
 //    ball_finder->LoadINISettings(ini.get());
@@ -74,7 +75,7 @@ int main(void) {
 
     //////////////////// Framework Initialize ///////////////////////////
     if (!MotionManager::GetInstance()->Initialize(&cm730)) {
-        linux_cm730.SetPortName(U2D_DEV_NAME1);
+//        linux_cm730.SetPortName(U2D_DEV_NAME1);
         if (!MotionManager::GetInstance()->Initialize(&cm730)) {
             std::cerr << "Fail to initialize Motion Manager!" << std::endl;
             return 1;
@@ -114,11 +115,11 @@ int main(void) {
 
     ///////////////////// Init game controller //////////////////////////
 
-    GameController::GetInstance()->LoadINISettings(&ini);
-    if (!GameController::GetInstance()->Connect()) {
-        std::cerr << "ERROR: Can't connect to game controller!" << std::endl;
-        return 1;
-    }
+//    GameController::GetInstance()->LoadINISettings(&ini);
+//    if (!GameController::GetInstance()->Connect()) {
+//        std::cerr << "ERROR: Can't connect to game controller!" << std::endl;
+//        return 1;
+//    }
 
     /////////////////////////////////////////////////////////////////////
 
@@ -132,44 +133,52 @@ int main(void) {
     /////////////////////////////////////////////////////////////////////
 
 
-
-    Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+    std::cout << "hui" << std::endl;
+//    SoccerBehavior soccer(cm730);
     MotionManager::GetInstance()->SetEnable(true);
-
-    cm730.WriteByte(CM730::P_LED_PANNEL, 0x01 | 0x02 | 0x04, NULL);
-
-    SoccerBehavior soccer(cm730);
-    GoalieBehavior goalie;
-
-    soccer.LoadINISettings(&ini);
-    goalie.LoadINISettings(&ini);
-
-    Action::GetInstance()->Start(15);
-    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
-
-    while (!finish) {
-        // Update game controller
-        GameController::GetInstance()->Update();
-
-        // Update state machine
-        StateMachine::GetInstance()->Check(cm730);
-
-        if (StateMachine::GetInstance()->IsStarted() == 0) {
-            continue;
-        }
-
-        switch (StateMachine::GetInstance()->GetRole()) {
-            case ROLE_IDLE:break;
-            case ROLE_SOCCER:
-                soccer.Process();
-                break;
-            case ROLE_PENALTY:break;
-            case ROLE_GOALKEEPER:
-                goalie.Process();
-                break;
-            case ROLES_COUNT:break;
-        }
+    Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+    Walking::GetInstance()->X_MOVE_AMPLITUDE = 10.0;
+    Walking::GetInstance()->Start();
+    while (true) {
+//        std::cout << "hui" << std::endl;
     }
+//    Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+//    MotionManager::GetInstance()->SetEnable(true);
+//
+//    cm730.WriteByte(CM730::P_LED_PANNEL, 0x01 | 0x02 | 0x04, NULL);
+//
+//    SoccerBehavior soccer(cm730);
+//    GoalieBehavior goalie;
+//
+//    soccer.LoadINISettings(&ini);
+//    goalie.LoadINISettings(&ini);
+//
+//    Action::GetInstance()->Start(15);
+//    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
+//
+//    while (!finish) {
+//        // Update game controller
+//        GameController::GetInstance()->Update();
+//
+//        // Update state machine
+//        StateMachine::GetInstance()->Check(cm730);
+//
+//        if (StateMachine::GetInstance()->IsStarted() == 0) {
+//            continue;
+//        }
+//
+//        switch (StateMachine::GetInstance()->GetRole()) {
+//            case ROLE_IDLE:break;
+//            case ROLE_SOCCER:
+//                soccer.Process();
+//                break;
+//            case ROLE_PENALTY:break;
+//            case ROLE_GOALKEEPER:
+//                goalie.Process();
+//                break;
+//            case ROLES_COUNT:break;
+//        }
+//    }
 
 
     return 0;

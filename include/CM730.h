@@ -1,17 +1,12 @@
-/*
- *   CM730.h
-*   This class is the secondary controler that controls the motors MX28
- *   Author: ROBOTIS
- *
+/**
+ *  @autor tekatod
+ *  @date 8/7/17
  */
+#pragma once
 
-#ifndef _CM_730_H_
-#define _CM_730_H_
-
+#include <string>
+#include <unordered_map>
 #include "MX28.h"
-
-#define MAXNUM_TXPARAM      (256)
-#define MAXNUM_RXPARAM      (1024)
 
 namespace Robot {
     class BulkReadData {
@@ -28,58 +23,7 @@ namespace Robot {
         int ReadByte(int address);
 
         int ReadWord(int address);
-    };
 
-/*
-PlatformCM730
-
-This abstract class corresponds to a platform CM730 that is the secondary controler that controls the motors MX28
-For instance, LinuxCM730 is a concretisation of this class.
-*/
-    class PlatformCM730 {
-    public:
-        /////////// Need to implement below methods (Platform porting) //////////////
-        // Port control
-        virtual bool OpenPort() = 0;
-
-        virtual bool SetBaud(int baud) = 0;
-
-        virtual void ClosePort() = 0;
-
-        virtual void ClearPort() = 0;
-
-        virtual int WritePort(unsigned char* packet, int numPacket) = 0;
-
-        virtual int ReadPort(unsigned char* packet, int numPacket) = 0;
-
-        // Using semaphore
-        virtual void LowPriorityWait() = 0;
-
-        virtual void MidPriorityWait() = 0;
-
-        virtual void HighPriorityWait() = 0;
-
-        virtual void LowPriorityRelease() = 0;
-
-        virtual void MidPriorityRelease() = 0;
-
-        virtual void HighPriorityRelease() = 0;
-
-        // Using timeout
-        virtual void SetPacketTimeout(int lenPacket) = 0;
-
-        virtual bool IsPacketTimeout() = 0;
-
-        virtual double GetPacketTime() = 0;
-
-        virtual void SetUpdateTimeout(int msec) = 0;
-
-        virtual bool IsUpdateTimeout() = 0;
-
-        virtual double GetUpdateTime() = 0;
-
-        virtual void Sleep(double msec) = 0;
-        //////////////////////////////////////////////////////////////////////////////
     };
 
     class CM730 {
@@ -92,18 +36,6 @@ For instance, LinuxCM730 is a concretisation of this class.
             RX_TIMEOUT,
             RX_CORRUPT
         };
-
-        enum {
-            INPUT_VOLTAGE = 1,
-            ANGLE_LIMIT = 2,
-            OVERHEATING = 4,
-            RANGE = 8,
-            CHECKSUM = 16,
-            OVERLOAD = 32,
-            INSTRUCTION = 64
-        };
-
-        /*EEPROM and RAM p. 4 in MX28 Technical Specifications.pdf ????*/
         enum {
             P_MODEL_NUMBER_L = 0,
             P_MODEL_NUMBER_H = 1,
@@ -170,62 +102,35 @@ For instance, LinuxCM730 is a concretisation of this class.
             ID_BROADCAST = 254
         };
 
-    private:
-        PlatformCM730* m_Platform;
-        static const int RefreshTime = 6; //msec
-        unsigned char m_ControlTable[MAXNUM_ADDRESS];
-
-        unsigned char m_BulkReadTxPacket[MAXNUM_TXPARAM + 10];
-
-        int TxRxPacket(unsigned char* txpacket, unsigned char* rxpacket, int priority);
-
-        unsigned char CalculateChecksum(unsigned char* packet);
-
-    public:
-        bool DEBUG_PRINT;
         BulkReadData m_BulkReadData[ID_BROADCAST];
 
-        CM730(PlatformCM730* platform);
+        CM730(int client_id = -1, std::string device_postfix = "");
 
-        ~CM730();
+        CM730(std::string server_ip, int server_port, int client_id = -1, std::string device_postfix = "");
 
-/*this method is to be used first to connect to the robot. Returns true when success and false when fail*/
-        bool Connect();
-
-        bool ChangeBaud(int baud);
-
-        void Disconnect();
-
-        bool DXLPowerOn();
-
-        bool MX28InitAll();
-
-        // For board
+        //This is dummy for now it can do nothing
         int WriteByte(int address, int value, int* error);
 
-        int WriteWord(int address, int value, int* error);
+        //This is dummy for now it can do nothing
+        int WriteWord(int id, int address, int value, int* error);
 
-        // For actuators
-        int Ping(int id, int* error);
-
+        //This is dummy for now it can do nothing
         int ReadByte(int id, int address, int* pValue, int* error);
+
+        //This is dummy for now it can do nothing
+        bool Connect();
+
+        //This is dummy for now it can do nothing
+        void DXLPowerOn();
+
+        //Note: This works only with joints
+        int SyncWrite(int start_addr, int each_length, int number, int *pParam);
 
         int ReadWord(int id, int address, int* pValue, int* error);
 
-        int ReadTable(int id, int start_addr, int end_addr, unsigned char* table, int* error);
-
-        int WriteByte(int id, int address, int value, int* error);
-
-        int WriteWord(int id, int address, int value, int* error);
-
-        int WriteTable(int id, int start_addr, int end_addr, unsigned char* table, int* error);
-
-        // For motion control
-        int SyncWrite(int start_addr, int each_length, int number, int* pParam);
-
-        void MakeBulkReadPacket();
-
         int BulkRead();
+
+        int get_client_id();
 
         // Utility
         static int MakeWord(int lowbyte, int highbyte);
@@ -234,12 +139,16 @@ For instance, LinuxCM730 is a concretisation of this class.
 
         static int GetHighByte(int word);
 
-        static int MakeColor(int red, int green, int blue);
+        ~CM730();
 
-        // ***   WEBOTS PART  *** //
+    private:
 
-        void MakeBulkReadPacketWb();
+        void init_devices();
+
+        int connect_device(std::string device_name);
+
+        int m_client_id;
+        std::string m_device_postfix;
+        std::unordered_map<int, int> m_sim_devices;
     };
 }
-
-#endif

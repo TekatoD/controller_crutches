@@ -23,7 +23,7 @@ MotionManager::MotionManager()
           m_IsRunning(false),
           m_IsThreadRunning(false),
           m_IsLogging(false),
-          DEBUG_PRINT(false) {
+          DEBUG_PRINT(true) {
     for (int i = 0; i < JointData::NUMBER_OF_JOINTS; i++)
         m_Offset[i] = 0;
 }
@@ -81,7 +81,6 @@ bool MotionManager::Reinitialize() {
     for (int id = JointData::ID_R_SHOULDER_PITCH; id < JointData::NUMBER_OF_JOINTS; id++) {
         if (DEBUG_PRINT == true)
             fprintf(stderr, "ID:%d initializing...", id);
-
         if (m_CM730->ReadWord(id, MX28::P_PRESENT_POSITION_L, &value, &error) == CM730::SUCCESS) {
             MotionStatus::m_CurrentJoints.SetValue(id, value);
             MotionStatus::m_CurrentJoints.SetEnable(id, true);

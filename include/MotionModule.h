@@ -25,6 +25,7 @@ namespace Robot {
         JointData m_Joint;
 
         static const int TIME_UNIT = 8; //msec
+//        static const int TIME_UNIT = 50; //msec
 
         virtual void Initialize() = 0;
 

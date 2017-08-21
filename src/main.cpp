@@ -14,7 +14,6 @@
 #include <GameController.h>
 #include <GoTo.h>
 #include <SoccerBehavior.h>
-#include <GoalieBehavior.h>
 
 #include "LinuxDARwIn.h"
 
@@ -50,7 +49,7 @@ void sighandler(int sig) {
 }
 
 
-int main(void) {
+int main(int argc, char** argv) {
     signal(SIGABRT, &sighandler);
     signal(SIGTERM, &sighandler);
     signal(SIGQUIT, &sighandler);
@@ -58,7 +57,8 @@ int main(void) {
 
     change_current_dir();
 
-    minIni ini(INI_FILE_PATH);
+
+    minIni ini(argc == 1 ? INI_FILE_PATH : argv[1]);
 
 //    LinuxCamera::GetInstance()->Initialize(0);
 //    LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
@@ -107,7 +107,7 @@ int main(void) {
                   << std::endl;
         return 1;
     } else if (27 <= firm_ver) {
-        Action::GetInstance()->LoadFile((char*) MOTION_FILE_PATH);
+        Action::GetInstance()->LoadFile(argc <= 2 ? (char*) MOTION_FILE_PATH : argv[2]);
     } else {
         return 1;
     }
@@ -135,13 +135,13 @@ int main(void) {
 
     std::cout << "hui" << std::endl;
 //    SoccerBehavior soccer(cm730);
-    MotionManager::GetInstance()->SetEnable(true);
-    Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-    Walking::GetInstance()->X_MOVE_AMPLITUDE = 10.0;
-    Walking::GetInstance()->Start();
-    while (true) {
+//    MotionManager::GetInstance()->SetEnable(true);
+//    Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+//    Walking::GetInstance()->X_MOVE_AMPLITUDE = 10.0;
+//    Walking::GetInstance()->Start();
+//    while (true) {
 //        std::cout << "hui" << std::endl;
-    }
+//    }
 //    Action::GetInstance()->m_Joint.SetEnableBody(true, true);
 //    MotionManager::GetInstance()->SetEnable(true);
 //
@@ -155,14 +155,23 @@ int main(void) {
 //
 //    Action::GetInstance()->Start(15);
 //    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
+
+    sleep(1);
+    StateMachine::GetInstance()->Enable();
 //
-//    while (!finish) {
-//        // Update game controller
+    while (!finish) {
+        // Update game controller
 //        GameController::GetInstance()->Update();
-//
-//        // Update state machine
-//        StateMachine::GetInstance()->Check(cm730);
-//
+
+        // Update state machine
+        StateMachine::GetInstance()->Check(cm730);
+
+        if (!Action::GetInstance()->IsRunning()) {
+            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+            Walking::GetInstance()->X_MOVE_AMPLITUDE = 10.0;
+            Walking::GetInstance()->Start();
+        }
+
 //        if (StateMachine::GetInstance()->IsStarted() == 0) {
 //            continue;
 //        }
@@ -178,7 +187,7 @@ int main(void) {
 //                break;
 //            case ROLES_COUNT:break;
 //        }
-//    }
+    }
 
 
     return 0;

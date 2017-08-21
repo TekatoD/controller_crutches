@@ -5,8 +5,6 @@
 #ifndef NAOMECH_VISION_H
 #define NAOMECH_VISION_H
 
-#include <boost/shared_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <minIni.h>
 #include <BaseModule.h>
 #include <detectors/BallDetector.h>

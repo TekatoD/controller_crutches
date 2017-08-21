@@ -249,46 +249,6 @@ namespace ant {
       m_conf.GaborThresh.max_3 = ini->geti("GaborThresh", "max_3");
   }
   
-  void BallDetector::load(const boost::property_tree::ptree &config) {
-    const boost::property_tree::ptree ball_config = config.get_child(detectorName());
-    m_conf.median_blur_size = ball_config.get<int>("median_blur_size");
-    m_conf.white_ball = ball_config.get<bool>("white_ball");
-    m_conf.ColorThresh.min_1 = ball_config.get<uchar>("ColorThresh.min_1");
-    m_conf.ColorThresh.min_2 = ball_config.get<uchar>("ColorThresh.min_2");
-    m_conf.ColorThresh.min_3 = ball_config.get<uchar>("ColorThresh.min_3");
-    m_conf.ColorThresh.max_1 = ball_config.get<uchar>("ColorThresh.max_1");
-    m_conf.ColorThresh.max_2 = ball_config.get<uchar>("ColorThresh.max_2");
-    m_conf.ColorThresh.max_3 = ball_config.get<uchar>("ColorThresh.max_3");
-    m_conf.GaborThresh.min_1 = ball_config.get<uchar>("GaborThresh.min_1");
-    m_conf.GaborThresh.min_2 = ball_config.get<uchar>("GaborThresh.min_2");
-    m_conf.GaborThresh.min_3 = ball_config.get<uchar>("GaborThresh.min_3");
-    m_conf.GaborThresh.max_1 = ball_config.get<uchar>("GaborThresh.max_1");
-    m_conf.GaborThresh.max_2 = ball_config.get<uchar>("GaborThresh.max_2");
-    m_conf.GaborThresh.max_3 = ball_config.get<uchar>("GaborThresh.max_3");
-  }
-
-
-  boost::property_tree::ptree BallDetector::get_params() {
-    boost::property_tree::ptree ball_config, ptree;
-
-    ball_config.put("median_blur_size", m_conf.median_blur_size);
-    ball_config.put("ColorThresh.min_1", m_conf.ColorThresh.min_1);
-    ball_config.put("ColorThresh.min_2", m_conf.ColorThresh.min_2);
-    ball_config.put("ColorThresh.min_3", m_conf.ColorThresh.min_3);
-    ball_config.put("ColorThresh.max_1", m_conf.ColorThresh.max_1);
-    ball_config.put("ColorThresh.max_2", m_conf.ColorThresh.max_2);
-    ball_config.put("ColorThresh.max_3", m_conf.ColorThresh.max_3);
-    ball_config.put("GaborThresh.min_1", m_conf.GaborThresh.min_1);
-    ball_config.put("GaborThresh.min_2", m_conf.GaborThresh.min_2);
-    ball_config.put("GaborThresh.min_3", m_conf.GaborThresh.min_3);
-    ball_config.put("GaborThresh.max_1", m_conf.GaborThresh.max_1);
-    ball_config.put("GaborThresh.max_2", m_conf.GaborThresh.max_2);
-    ball_config.put("GaborThresh.max_3", m_conf.GaborThresh.max_3);
-
-    ptree.put_child(detectorName(), ball_config);
-    return ptree;
-  }
-
   bool BallDetector::is_white() {
     return m_conf.white_ball;
   }

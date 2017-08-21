@@ -23,9 +23,6 @@ namespace ant {
       cv::Mat detect(const cv::Mat &image);
 
       void load(minIni* ini);
-      void load(const boost::property_tree::ptree &config);
-
-      boost::property_tree::ptree get_params();
   };
 }
 

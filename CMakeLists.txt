@@ -3,10 +3,8 @@ project(darwin_soccer)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules")
-set(Boost_USE_STATIC_LIBS ON)
 set(CXX_FLAGS "-O3")
 
-find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED)
 find_package(OpenCV 3 REQUIRED)
@@ -131,14 +129,12 @@ add_executable(vision_vrep ${VISION_SRC})
 
 target_include_directories(vision_vrep PUBLIC
         ${JPEG_INCLUDE_DIR}
-        ${Boost_INCLUDE_DIRS}
         ${OpenCV_INCLUDE_DIRS}
 )
 
 target_link_libraries(vision_vrep
     ${CMAKE_THREAD_LIBS_INIT}
     ${JPEG_LIBRARIES}
-    ${Boost_LIBRARIES}
     ${OpenCV_LIBS}
     ${VREP_LIBRARIES}
 )
@@ -162,14 +158,12 @@ add_executable(vision_test ${VISION_TEST_SRC})
 
 target_include_directories(vision_test PUBLIC
         ${JPEG_INCLUDE_DIR}
-        ${Boost_INCLUDE_DIRS}
         ${OpenCV_INCLUDE_DIRS}
 )
 
 target_link_libraries(vision_test
     ${CMAKE_THREAD_LIBS_INIT}
     ${JPEG_LIBRARIES}
-    ${Boost_LIBRARIES}
     ${OpenCV_LIBS}
     ${VREP_LIBRARIES}
 )
@@ -182,11 +176,9 @@ target_link_libraries(soccer
         ${CMAKE_SOURCE_DIR}/lib/darwin.a
         ${CMAKE_THREAD_LIBS_INIT}
         ${JPEG_LIBRARIES}
-        ${Boost_LIBRARIES}
         ${OpenCV_LIBS}
 )
 target_include_directories(soccer PUBLIC
         ${JPEG_INCLUDE_DIR}
-        ${Boost_INCLUDE_DIRS}
         ${OpenCV_INCLUDE_DIRS})
 ]]

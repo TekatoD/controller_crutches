@@ -53,9 +53,6 @@ namespace ant {
         };
 
         void load(minIni* ini);
-        void load(const boost::property_tree::ptree &line_config);
-
-        boost::property_tree::ptree get_params();
     private:
         configuration m_conf;
 

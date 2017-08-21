@@ -100,38 +100,3 @@ void ant::FieldDetector::load(minIni* ini)
     ColorThresh2.max_2 = ini->geti("ColorThresh2", "max_2", defMinThresh);
     ColorThresh2.max_3 = ini->geti("ColorThresh2", "max_3", defMinThresh);
 }
-
-void ant::FieldDetector::load(const boost::property_tree::ptree &config) {
-  const boost::property_tree::ptree line_config = config.get_child(detectorName());
-  ColorThresh.min_1 = line_config.get<uchar>("ColorThresh1.min_1");
-  ColorThresh.min_2 = line_config.get<uchar>("ColorThresh1.min_2");
-  ColorThresh.min_3 = line_config.get<uchar>("ColorThresh1.min_3");
-  ColorThresh.max_1 = line_config.get<uchar>("ColorThresh1.max_1");
-  ColorThresh.max_2 = line_config.get<uchar>("ColorThresh1.max_2");
-  ColorThresh.max_3 = line_config.get<uchar>("ColorThresh1.max_3");
-  ColorThresh2.min_1 = line_config.get<uchar>("ColorThresh2.min_1");
-  ColorThresh2.min_2 = line_config.get<uchar>("ColorThresh2.min_2");
-  ColorThresh2.min_3 = line_config.get<uchar>("ColorThresh2.min_3");
-  ColorThresh2.max_1 = line_config.get<uchar>("ColorThresh2.max_1");
-  ColorThresh2.max_2 = line_config.get<uchar>("ColorThresh2.max_2");
-  ColorThresh2.max_3 = line_config.get<uchar>("ColorThresh2.max_3");
-}
-
-boost::property_tree::ptree ant::FieldDetector::get_params() {
-  boost::property_tree::ptree line_config, ptree;
-  line_config.put("ColorThresh1.min_2", ColorThresh.min_2);
-  line_config.put("ColorThresh1.min_1", ColorThresh.min_1);
-  line_config.put("ColorThresh1.min_3", ColorThresh.min_3);
-  line_config.put("ColorThresh1.max_1", ColorThresh.max_1);
-  line_config.put("ColorThresh1.max_2", ColorThresh.max_2);
-  line_config.put("ColorThresh1.max_3", ColorThresh.max_3);
-
-  line_config.put("ColorThresh2.min_1", ColorThresh2.min_1);
-  line_config.put("ColorThresh2.min_2", ColorThresh2.min_2);
-  line_config.put("ColorThresh2.min_3", ColorThresh2.min_3);
-  line_config.put("ColorThresh2.max_1", ColorThresh2.max_1);
-  line_config.put("ColorThresh2.max_2", ColorThresh2.max_2);
-  line_config.put("ColorThresh2.max_3", ColorThresh2.max_3);
-  ptree.put_child(detectorName(), line_config);
-  return ptree;
-}

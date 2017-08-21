@@ -6,7 +6,6 @@
 #include "minIni.h"
 #include "Vision.h"
 #include <VisionUtils.h>
-#include <boost/exception/all.hpp>
 #include <VisionUtils.h>
 //#include <lines_generated.h>
 //#include <vec3_generated.h>
@@ -133,3 +132,4 @@ namespace ant {
         m_angleDetector.load(&angleDetectorIni);
     }
 }
+

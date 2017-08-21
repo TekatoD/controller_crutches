@@ -9,9 +9,6 @@
 
 #include "opencv2/opencv.hpp"
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-
 //#include "utils/Logger.h"
 //#include "utils/Stopwatch.h"
 

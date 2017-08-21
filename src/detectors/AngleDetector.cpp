@@ -41,16 +41,11 @@ namespace ant {
     return angles;
   }
 
-  void AngleDetector::load(const boost::property_tree::ptree &config) {
-
+  void AngleDetector::load(minIni* ini)
+  {
+      std::cout << "Loading AngleDetector ini" << std::endl;
   }
-
-
-  boost::property_tree::ptree AngleDetector::get_params() {
-    return boost::property_tree::ptree();
-  }
-
-
+  
   std::pair<double, double> AngleDetector::getLineParams(const cv::Vec4i &line) {
     double x0 = line(0);
     double y0 = line(1);

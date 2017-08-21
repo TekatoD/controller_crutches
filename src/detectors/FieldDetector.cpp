@@ -76,6 +76,7 @@ cv::Mat ant::FieldDetector::detect(const cv::Mat &preprocImage) {
 
 void ant::FieldDetector::load(minIni* ini)
 {
+    std::cout << "Loading FieldDetector ini" << std::endl;
     int defKernelSize = 32;
     int defMinThresh = 0, defMaxThresh = 255;
     int val = -1;

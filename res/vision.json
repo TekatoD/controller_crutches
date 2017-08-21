@@ -6,7 +6,7 @@
         "min_line_length": 0,
         "rho": 0.5,
         "theta": 0.0027,
-        "threshold": 28
+        "threshold": 28 
       },
       "LineEqualPredicate": {
         "angle_eps": 0.048,

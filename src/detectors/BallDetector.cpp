@@ -228,6 +228,27 @@ namespace ant {
     return preprocImage - ball;
   }
 
+  void BallDetector::load(minIni* ini)
+  {
+      std::cout << "Loading BallDetector ini" << std::endl;
+      
+      m_conf.median_blur_size = ini->geti("BallDetector", "median_blur_size");
+      m_conf.white_ball = ini->geti("BallDetector", "white_ball");
+      m_conf.ColorThresh.min_1 = ini->geti("ColorThresh", "min_1");
+      m_conf.ColorThresh.min_2 = ini->geti("ColorThresh", "min_2");
+      m_conf.ColorThresh.min_3 = ini->geti("ColorThresh", "min_3");
+      m_conf.ColorThresh.max_1 = ini->geti("ColorThresh", "max_1");
+      m_conf.ColorThresh.max_2 = ini->geti("ColorThresh", "max_2");
+      m_conf.ColorThresh.max_3 = ini->geti("ColorThresh", "max_3");
+      
+      m_conf.GaborThresh.min_1 = ini->geti("GaborThresh", "min_1");
+      m_conf.GaborThresh.min_2 = ini->geti("GaborThresh", "min_2");
+      m_conf.GaborThresh.min_3 = ini->geti("GaborThresh", "min_3");
+      m_conf.GaborThresh.max_1 = ini->geti("GaborThresh", "max_1");
+      m_conf.GaborThresh.max_2 = ini->geti("GaborThresh", "max_2");
+      m_conf.GaborThresh.max_3 = ini->geti("GaborThresh", "max_3");
+  }
+  
   void BallDetector::load(const boost::property_tree::ptree &config) {
     const boost::property_tree::ptree ball_config = config.get_child(detectorName());
     m_conf.median_blur_size = ball_config.get<int>("median_blur_size");

@@ -7,6 +7,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <minIni.h>
 #include <BaseModule.h>
 #include <detectors/BallDetector.h>
 #include <detectors/LineDetector.h>

@@ -271,6 +271,43 @@ namespace ant {
     return parallel && pointInLineC;
   }
 
+  void LineDetector::load(minIni* ini)
+  {
+      std::cout << "Loading LineDetector ini" << std::endl;
+      m_conf.HoughLines.max_line_gap = ini->getf("HoughLines", "max_line_gap");
+      m_conf.HoughLines.min_line_length = ini->getf("HoughLines", "min_line_length");
+      m_conf.HoughLines.rho = ini->getf("HoughLines", "rho");
+      m_conf.HoughLines.theta = ini->getf("HoughLines", "theta");
+      m_conf.HoughLines.threshold = ini->geti("HoughLines", "threshold");
+      
+      m_conf.LineEqualPredicate.angle_eps = ini->getf("LineEqualpredicate", "angle_eps");
+      m_conf.LineEqualPredicate.error_px = ini->geti("LineEqualPredicate", "error_px");
+      
+      m_conf.Preproc.kernel_size = ini->geti("Preproc", "kernel_size");
+      m_conf.Preproc.min_thresh = ini->geti("Preproc", "min_thresh");
+      m_conf.Preproc.ColorThresh.min_1 = ini->geti("ColorThresh", "min_1");
+      m_conf.Preproc.ColorThresh.min_2 = ini->geti("ColorThresh", "min_2");
+      m_conf.Preproc.ColorThresh.min_3 = ini->geti("ColorThresh", "min_3");
+      m_conf.Preproc.ColorThresh.max_1 = ini->geti("ColorThresh", "max_1");
+      m_conf.Preproc.ColorThresh.max_2 = ini->geti("ColorThresh", "max_2");
+      m_conf.Preproc.ColorThresh.max_3 = ini->geti("ColorThresh", "max_3");
+      
+      m_conf.Preproc_new.kernel_size = ini->geti("Preproc_new", "kernel_size");
+      m_conf.Preproc_new.min_thresh = ini->geti("Preproc_new", "min_thresh");
+      m_conf.Preproc_new.ColorThresh.min_1 = ini->geti("ColorThresh1", "min_1");
+      m_conf.Preproc_new.ColorThresh.min_2 = ini->geti("ColorThresh1", "min_2");
+      m_conf.Preproc_new.ColorThresh.min_3 = ini->geti("ColorThresh1", "min_3");
+      m_conf.Preproc_new.ColorThresh.max_1 = ini->geti("ColorThresh1", "max_1");
+      m_conf.Preproc_new.ColorThresh.max_2 = ini->geti("ColorThresh1", "max_2");
+      m_conf.Preproc_new.ColorThresh.max_3 = ini->geti("ColorThresh1", "max_3");
+      m_conf.Preproc_new.ColorThresh2.min_1 = ini->geti("ColorThresh2", "min_1");
+      m_conf.Preproc_new.ColorThresh2.min_2 = ini->geti("ColorThresh2", "min_2");
+      m_conf.Preproc_new.ColorThresh2.min_3 = ini->geti("ColorThresh2", "min_3");
+      m_conf.Preproc_new.ColorThresh2.max_1 = ini->geti("ColorThresh2", "max_1");
+      m_conf.Preproc_new.ColorThresh2.max_2 = ini->geti("ColorThresh2", "max_2");
+      m_conf.Preproc_new.ColorThresh2.max_3 = ini->geti("ColorThresh2", "max_3");
+  }
+  
   void LineDetector::load(const boost::property_tree::ptree &config) {
     const boost::property_tree::ptree line_config = config.get_child(detectorName());
 
@@ -279,8 +316,10 @@ namespace ant {
     m_conf.HoughLines.rho = line_config.get<double>("HoughLines.rho");
     m_conf.HoughLines.theta = line_config.get<double>("HoughLines.theta");
     m_conf.HoughLines.threshold = line_config.get<int>("HoughLines.threshold");
+    
     m_conf.LineEqualPredicate.angle_eps = line_config.get<float>("LineEqualPredicate.angle_eps");
     m_conf.LineEqualPredicate.error_px = line_config.get<int>("LineEqualPredicate.error_px");
+    
     m_conf.Preproc.kernel_size = line_config.get<int>("Preproc.kernel_size");
     m_conf.Preproc.min_thresh = line_config.get<int>("Preproc.min_thresh");
     m_conf.Preproc.ColorThresh.min_1 = line_config.get<uchar>("Preproc.ColorThresh.min_1");

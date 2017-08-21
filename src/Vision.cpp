@@ -109,21 +109,27 @@ namespace ant {
     }
 
     void Vision::update_properties() {
-        boost::property_tree::ptree properties;
-        try {
-            boost::property_tree::json_parser::read_json(m_prop_file, properties);
-            const boost::property_tree::ptree vision_config = properties.get_child("Vision");
-            m_enabled = properties.get<bool>("enabled", true);
-            m_lineDetector.load(vision_config);
-            m_ballDetector.load(vision_config);
-            m_angleDetector.load(vision_config);
-            m_fieldDetector.load(vision_config);
-        } catch (boost::exception &exception){
-            std::cerr << boost::diagnostic_information(exception) << std::endl;
-            std::cerr << "Seemed to be no config for vision or it is incorrect. "
-                      << "It is required to correct that. So, we disabled vision module :("
-                      << std::endl;
-            m_enabled = false;
+        auto visionConfig = m_prop_file + "Vision.ini";
+        minIni visionIni(visionConfig);
+        m_enabled = visionIni.geti("Vision", "enabled");
+        
+        if (m_enabled) {
+            std::cout << "Vision module is enabled" << std::endl;
         }
+        
+        // TODO: Fix this mess
+        auto fieldDetectorConfig = m_prop_file + "FieldDetector.ini";
+        auto lineDetectorConfig = m_prop_file + "LineDetector.ini";
+        auto ballDetectorConfig = m_prop_file + "BallDetector.ini";
+        auto angleDetectorConfig = m_prop_file + "AngleDetector.ini";
+        minIni fieldDetectorIni(fieldDetectorConfig);
+        minIni lineDetectorIni(lineDetectorConfig);
+        minIni ballDetectorIni(ballDetectorConfig);
+        minIni angleDetectorIni(angleDetectorConfig);
+        
+        m_fieldDetector.load(&fieldDetectorIni);
+        m_lineDetector.load(&lineDetectorIni);
+        m_ballDetector.load(&ballDetectorIni);
+        m_angleDetector.load(&angleDetectorIni);
     }
 }

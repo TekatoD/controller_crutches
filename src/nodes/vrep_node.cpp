@@ -17,8 +17,9 @@ int main(int argc, char** argv)
     int w = camera.getWidth();
     int h = camera.getHeight();
     
-    ant::Vision vision("../res/vision.json");
+    ant::Vision vision("../res/vision_cfg/");
     cv::namedWindow("camera_image", cv::WINDOW_AUTOSIZE);
+    cv::namedWindow("line_image", cv::WINDOW_AUTOSIZE);
     while (true) {
         camera.CaptureFrame();
         
@@ -26,6 +27,8 @@ int main(int argc, char** argv)
         
         if (imgBuff) {
             cv::Mat frame(cv::Size(w, h), CV_8UC3, imgBuff, cv::Mat::AUTO_STEP);
+            
+            cv::imshow("camera_image", frame);
             
             ant::vision_utils::rot90(frame, 0);
             vision.setFrame(frame);
@@ -38,7 +41,7 @@ int main(int argc, char** argv)
                 cv::line(frame, p1, p2, cv::Scalar(0, 0, 255), 5);
             }
             
-            cv::imshow("camera_image", frame);
+            cv::imshow("line_image", frame);
             cv::waitKey(1);
         }
         

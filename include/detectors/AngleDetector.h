@@ -6,6 +6,7 @@
 #define DEMO_ANGLEDETECOR_H
 
 #include "BaseDetector.h"
+#include "minIni.h"
 
 namespace ant {
 
@@ -15,10 +16,7 @@ namespace ant {
 
         std::vector<cv::Vec3d> detect(cv::Mat &img, const std::vector<cv::Vec4i> &lines);
 
-        void load(const boost::property_tree::ptree &config);
-
-        boost::property_tree::ptree get_params();
-
+        void load(minIni* ini);
     private:
         std::pair<double, double> getLineParams(const cv::Vec4i &line);
 

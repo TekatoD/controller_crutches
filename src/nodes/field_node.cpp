@@ -7,7 +7,7 @@
 
 int main(int argc, char** argv)
 {
-    ant::Vision vision("../res/vision.json");
+    ant::Vision vision("../res/vision_cfg/");
 
     if (argc != 2) {
         std::cout << "Provide image as argument" << std::endl;

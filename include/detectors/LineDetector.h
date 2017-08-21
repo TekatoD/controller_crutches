@@ -5,6 +5,7 @@
 #ifndef NAOMECH_LINEDETECTOR_H
 #define NAOMECH_LINEDETECTOR_H
 
+#include "minIni.h"
 #include "BaseDetector.h"
 
 namespace ant {
@@ -51,6 +52,7 @@ namespace ant {
             } LineEqualPredicate;
         };
 
+        void load(minIni* ini);
         void load(const boost::property_tree::ptree &line_config);
 
         boost::property_tree::ptree get_params();

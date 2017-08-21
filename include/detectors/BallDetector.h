@@ -5,6 +5,7 @@
 #ifndef NAOMECH_BALLDETECTOR_H
 #define NAOMECH_BALLDETECTOR_H
 
+#include "minIni.h"
 #include "BaseDetector.h"
 
 namespace ant {
@@ -38,6 +39,7 @@ namespace ant {
       int median_blur_size;
     };
 
+    void load(minIni* ini);
     void load(const boost::property_tree::ptree &ball_config);
 
     boost::property_tree::ptree get_params();

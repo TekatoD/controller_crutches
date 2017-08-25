@@ -5,7 +5,7 @@ project(darwin-soccer)
 option(CROSSCOMPILE "Compile for real Darwin-OP (V-REP build by default)" OFF)
 
 #### Compile properties ####
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(Boost_USE_STATIC_LIBS ON)
 
@@ -124,6 +124,22 @@ target_link_libraries(controller
         Eigen3::Eigen)
 
 target_include_directories(controller PUBLIC
+        ${BOOST_INCLUDE_DIR}
+        ${JPEG_INCLUDE_DIR}
+        ${OpenCV_INCLUDE_DIR})
+        
+add_executable(localization
+    src/localization/localization_test.cpp
+    src/localization/data_reader.cpp)
+
+target_link_libraries(localization
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${JPEG_LIBRARIES}
+        ${BOOST_LIBRARIES}
+        ${OpenCV_LIBRARIES}
+        Eigen3::Eigen)
+
+target_include_directories(localization PUBLIC
         ${BOOST_INCLUDE_DIR}
         ${JPEG_INCLUDE_DIR}
         ${OpenCV_INCLUDE_DIR})

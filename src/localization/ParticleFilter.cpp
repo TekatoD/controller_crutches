@@ -5,14 +5,16 @@
 using namespace Localization;
 using namespace Robot;
 
-ParticleFilter::ParticleFilter(const Robot::Pose2D& pose, int num_particles)
+ParticleFilter::ParticleFilter(const Robot::Pose2D& pose, world_data world, int num_particles)
 {
     init_particles(pose, num_particles);
+    prepare_world(world);
 }
 
-ParticleFilter::ParticleFilter(int num_particles)
+ParticleFilter::ParticleFilter(world_data world, int num_particles)
 {
     init_particles(Robot::Pose2D(0, 0, 0), num_particles);
+    prepare_world(world);
 }
 
 void ParticleFilter::predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise)
@@ -37,6 +39,14 @@ void ParticleFilter::init_particles(const Pose2D& pose, int num_particles)
     for (int i = 0; i < m_particles.size(); i++) {
         m_particles[i].pose = pose;
         m_particles[i].weight = defaultWeight;
+    }
+}
+
+void ParticleFilter::prepare_world(const world_data& world)
+{
+    for (const auto& landmark : world) {
+        Eigen::Vector2f lpos = {landmark(1), landmark(2)};
+        m_world[landmark(0)] = lpos;
     }
 }
 

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 #include <eigen3/Eigen/Dense>
 
 #include "Pose2D.h"
@@ -25,8 +26,8 @@ public:
         float weight;
     };
 
-    ParticleFilter(const Pose2D& pose, int num_particles = DEFAULT_PARTICLE_NUMBER);
-    ParticleFilter(int num_particles = DEFAULT_PARTICLE_NUMBER);
+    ParticleFilter(const Pose2D& pose, world_data world, int num_particles = DEFAULT_PARTICLE_NUMBER);
+    ParticleFilter(world_data world, int num_particles = DEFAULT_PARTICLE_NUMBER);
     
     ParticleFilter(const ParticleFilter& pf) = delete;
     ParticleFilter(ParticleFilter&& pf) = delete;
@@ -37,6 +38,7 @@ public:
     void correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise);
     
     std::vector<Particle> getParticles() const { return m_particles; }
+    std::map<int, Eigen::Vector2f> getWorld() const { return m_world; }
      
     /* Util functions, place in separate class */
     float sample_normal_distribution(float variance);
@@ -44,8 +46,10 @@ public:
     /* */
 private:
     std::vector<Particle> m_particles;
+    std::map<int, Eigen::Vector2f> m_world;
     
     void init_particles(const Pose2D& pose, int num_particles);
+    void prepare_world(const world_data& world);
     
     void resample() { low_variance_resampling(); }
     void low_variance_resampling();

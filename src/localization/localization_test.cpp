@@ -3,7 +3,9 @@
 #include <string>
 #include <eigen3/Eigen/Dense>
 
-#include <localization/data_reader.h>
+#include <Pose2D.h>
+#include <localization/DataReader.h>
+#include <localization/ParticleFilter.h>
 
 using namespace Eigen;
 
@@ -38,9 +40,12 @@ int main(int argc, char** argv)
             std::cout << meas << std::endl;
             std::cout << "===============" << std::endl;
         }
+        
+        Robot::Pose2D pose(2, 3, 3.14/2);
+        Localization::ParticleFilter pf(pose);
+        
     } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;
-        return -1;
     }
     
     return 0;

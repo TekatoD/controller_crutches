@@ -130,7 +130,11 @@ target_include_directories(controller PUBLIC
         
 add_executable(localization
     src/localization/localization_test.cpp
-    src/localization/data_reader.cpp)
+    src/Pose2D.cpp
+    src/localization/DataReader.cpp
+    src/localization/ParticleFilter.cpp
+)
+    
 
 target_link_libraries(localization
         ${CMAKE_THREAD_LIBS_INIT}

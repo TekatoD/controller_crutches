@@ -40,7 +40,7 @@ namespace Robot {
         Pose2D& operator-=(const Pose2D& rhs);
 
         friend std::ostream& operator << (std::ostream& os, const Pose2D& data);
-
+        
     private:
         float m_x;
         float m_y;

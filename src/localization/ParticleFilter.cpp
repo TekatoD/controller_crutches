@@ -17,10 +17,14 @@ ParticleFilter::ParticleFilter(int num_particles)
 
 void ParticleFilter::predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise)
 {
-    
+    for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++) {
+        Particle p = (*itr);
+        p.pose = odometry_sample(p.pose, command, noise);
+        (*itr) = p;
+    }
 }
 
-void ParticleFilter::correct(const measurement_data& measurements, const Eigen::Vector3f& noise)
+void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise)
 {
     
 }

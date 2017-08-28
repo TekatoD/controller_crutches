@@ -42,15 +42,22 @@ int main(int argc, char** argv)
         }
         
         Robot::Pose2D pose(0, 0, 0);
-        Localization::ParticleFilter pf(pose);
+        Localization::ParticleFilter pf(pose, 10);
+        
+        int max_timestep = controlData.size();
         
         Eigen::Vector3f noise = {0.1, 0.001, 0.1};
-        Eigen::Vector3f command = controlData[0];
+        for (int t = 0; t < max_timestep; t++) {
+            auto command = controlData[t];
+            auto measurementBundle = measurementData[t];
+            
+            pf.predict(command, noise);
+            break;
+        }
         
-        std::cout << command << std::endl;
-        for (int i = 0; i < 25; i++) {
-            Robot::Pose2D sampled_pose = pf.odometry_sample(pose, command, noise);
-            std::cout << sampled_pose << std::endl;
+        auto particles = pf.getParticles();
+        for (const auto& particle : particles) {
+            std::cout << particle.pose << std::endl;
         }
         
     } catch (const std::runtime_error& e) {

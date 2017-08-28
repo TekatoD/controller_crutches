@@ -34,7 +34,9 @@ public:
     ParticleFilter& operator=(ParticleFilter&& pf) = delete;
     
     void predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise);
-    void correct(const measurement_data& measurements, const Eigen::Vector3f& noise);
+    void correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise);
+    
+    std::vector<Particle> getParticles() const { return m_particles; }
      
     /* Util functions, place in separate class */
     float sample_normal_distribution(float variance);

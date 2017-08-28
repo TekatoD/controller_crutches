@@ -67,13 +67,11 @@ Pose2D ParticleFilter::odometry_sample(Pose2D pose, Eigen::Vector3f command, Eig
     
     Pose2D newPose;
     newPose.setTheta(theta_old + rot1_h);
-    newPose.normalizeTheta();
     float normalized = newPose.Theta();
     
     newPose.setX(trans_h * std::cos(normalized));
     newPose.setY(trans_h * std::sin(normalized));
     newPose.setTheta(rot1_h + rot2_h);
-    newPose.normalizeTheta();
     
     return pose + newPose;
 }

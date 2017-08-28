@@ -41,8 +41,17 @@ int main(int argc, char** argv)
             std::cout << "===============" << std::endl;
         }
         
-        Robot::Pose2D pose(2, 3, 3.14/2);
+        Robot::Pose2D pose(0, 0, 0);
         Localization::ParticleFilter pf(pose);
+        
+        Eigen::Vector3f noise = {0.1, 0.001, 0.1};
+        Eigen::Vector3f command = controlData[0];
+        
+        std::cout << command << std::endl;
+        for (int i = 0; i < 25; i++) {
+            Robot::Pose2D sampled_pose = pf.odometry_sample(pose, command, noise);
+            std::cout << sampled_pose << std::endl;
+        }
         
     } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;

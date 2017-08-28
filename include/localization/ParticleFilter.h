@@ -28,14 +28,24 @@ public:
     ParticleFilter(const Pose2D& pose, int num_particles = DEFAULT_PARTICLE_NUMBER);
     ParticleFilter(int num_particles = DEFAULT_PARTICLE_NUMBER);
     
+    ParticleFilter(const ParticleFilter& pf) = delete;
+    ParticleFilter(ParticleFilter&& pf) = delete;
+    ParticleFilter& operator=(const ParticleFilter& pf) = delete;
+    ParticleFilter& operator=(ParticleFilter&& pf) = delete;
+    
     void predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise);
     void correct(const measurement_data& measurements, const Eigen::Vector3f& noise);
+     
+    /* Util functions, place in separate class */
+    float sample_normal_distribution(float variance);
+    Pose2D odometry_sample(Pose2D pose, Eigen::Vector3f command, Eigen::Vector3f noise);
+    /* */
 private:
     std::vector<Particle> m_particles;
     
     void init_particles(const Pose2D& pose, int num_particles);
-    void resample() { low_variance_resampling(); }
     
+    void resample() { low_variance_resampling(); }
     void low_variance_resampling();
 };
 

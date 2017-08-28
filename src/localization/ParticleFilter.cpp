@@ -1,3 +1,4 @@
+#include <cmath>
 #include <chrono>
 #include <random>
 #include "localization/ParticleFilter.h"
@@ -20,15 +21,82 @@ ParticleFilter::ParticleFilter(world_data world, int num_particles)
 void ParticleFilter::predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise)
 {
     for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++) {
-        Particle p = (*itr);
+        Particle& p = (*itr);
         p.pose = odometry_sample(p.pose, command, noise);
-        (*itr) = p;
     }
 }
 
 void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise)
 {
+    float normalizer = 0;
+    for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++) {
+        Particle& p = (*itr);
+        
+        float rx, ry, rtheta;
+        rx = p.pose.X(); ry = p.pose.Y(); rtheta = p.pose.Theta();
+        
+        float vrange, vbearing;
+        vrange = noise(0); vbearing = noise(1);
+        
+        // TODO: Create matrix from vector
+        Eigen::MatrixXf Qt = Eigen::MatrixXf::Identity(measurements.size()*2, measurements.size()*2);
+        Qt = Qt * 0.1;
+        
+        Eigen::MatrixXf Zdiff(measurements.size()*2, 1);
+        int z_counter = 0;
+        for (const auto& reading : measurements) {
+            float lid, srange, sbearing;
+            lid = reading(0); srange = reading(1); sbearing = reading(2);
+            
+            Eigen::Vector2f z_measured = {srange, sbearing};
+            
+            float lx, ly, dx, dy;
+            Eigen::Vector2f lm = m_world[lid];
+            lx = lm(0); ly = lm(1);
+            
+            dx = lx - rx;
+            dy = ly - ry;
+            Eigen::Vector2f delta = { dx, dy };
+            float q = delta.transpose() * delta;
+            
+            Pose2D normalizer(0, 0, std::atan2(dy, dx) - rtheta);
+            Eigen::Vector2f z_expected = {
+                std::sqrt(q),
+                normalizer.Theta()
+            };
+            
+            Eigen::Vector2f diff = z_expected - z_measured;
+            normalizer.setTheta(diff(1));
+            diff(1) = normalizer.Theta();
+            
+            Zdiff.block(z_counter, 0, 2, 1) = diff;
+            z_counter += 2;
+        }
+        
+        float det = (2 * M_PI * Qt).determinant();
+        float denom = 1 / std::sqrt(det);
+        
+        float temp = (Zdiff.transpose() * Qt.inverse() * Zdiff)(0);
+        float new_weight = denom * std::exp((-1.0f / 2.0f) * temp);
+        
+        normalizer = normalizer + new_weight;
+        p.weight = new_weight;
+    }
     
+    for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++) {
+        Particle& p = (*itr);
+        p.weight = p.weight / normalizer;
+    }
+}
+
+void ParticleFilter::resample()
+{
+    low_variance_resampling();
+}
+
+void ParticleFilter::low_variance_resampling()
+{
+    //TODO: Resampling
 }
 
 void ParticleFilter::init_particles(const Pose2D& pose, int num_particles)
@@ -48,10 +116,6 @@ void ParticleFilter::prepare_world(const world_data& world)
         Eigen::Vector2f lpos = {landmark(1), landmark(2)};
         m_world[landmark(0)] = lpos;
     }
-}
-
-void ParticleFilter::low_variance_resampling()
-{
 }
 
 float ParticleFilter::sample_normal_distribution(float variance)

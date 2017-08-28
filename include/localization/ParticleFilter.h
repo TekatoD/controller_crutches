@@ -36,6 +36,7 @@ public:
     
     void predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise);
     void correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise);
+    void resample();
     
     std::vector<Particle> getParticles() const { return m_particles; }
     std::map<int, Eigen::Vector2f> getWorld() const { return m_world; }
@@ -51,7 +52,6 @@ private:
     void init_particles(const Pose2D& pose, int num_particles);
     void prepare_world(const world_data& world);
     
-    void resample() { low_variance_resampling(); }
     void low_variance_resampling();
 };
 

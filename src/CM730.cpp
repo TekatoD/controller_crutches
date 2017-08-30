@@ -162,10 +162,10 @@ int Robot::CM730::ReadWord(int id, int address, int* pValue, int* error) {
                 *pValue = norm_accel(get_sensor_data("accelerometerZ" + m_device_postfix));
                 break;
             case P_ACCEL_Y_L:
-                *pValue = norm_accel(get_sensor_data("accelerometerY" + m_device_postfix));
+                *pValue = norm_accel(-get_sensor_data("accelerometerX" + m_device_postfix));
                 break;
             case P_ACCEL_X_L:
-                *pValue = norm_accel(get_sensor_data("accelerometerX" + m_device_postfix));
+                *pValue = norm_accel(get_sensor_data("accelerometerY" + m_device_postfix));
                 break;
             default:
                 simxFloat pos;

@@ -38,6 +38,8 @@ public:
     void correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise);
     void resample();
     
+    // TODO: Per-particle predict and correct functions
+    
     std::vector<Particle> getParticles() const { return m_particles; }
     std::map<int, Eigen::Vector2f> getWorld() const { return m_world; }
      

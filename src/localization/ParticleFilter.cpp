@@ -20,22 +20,18 @@ ParticleFilter::ParticleFilter(world_data world, int num_particles)
 
 void ParticleFilter::predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise)
 {
-    for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++) {
-        Particle& p = (*itr);
-        p.pose = odometry_sample(p.pose, command, noise);
+    for (auto& particle : m_particles) {
+        particle.pose = odometry_sample(particle.pose, command, noise);
     }
 }
 
 void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise)
 {
     float normalizer = 0;
-    for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++) {
-        Particle& p = (*itr);
+    for (auto& particle : m_particles) {
+        float rx, ry, rtheta, vrange, vbearing;
+        rx = particle.pose.X(); ry = particle.pose.Y(); rtheta = particle.pose.Theta();
         
-        float rx, ry, rtheta;
-        rx = p.pose.X(); ry = p.pose.Y(); rtheta = p.pose.Theta();
-        
-        float vrange, vbearing;
         vrange = noise(0); vbearing = noise(1);
         
         // TODO: Create matrix from vector
@@ -44,13 +40,11 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         
         Eigen::MatrixXf Zdiff(measurements.size()*2, 1);
         int z_counter = 0;
+        float lid, srange, sbearing, lx, ly, dx, dy;
         for (const auto& reading : measurements) {
-            float lid, srange, sbearing;
             lid = reading(0); srange = reading(1); sbearing = reading(2);
-            
             Eigen::Vector2f z_measured = {srange, sbearing};
             
-            float lx, ly, dx, dy;
             Eigen::Vector2f lm = m_world[lid];
             lx = lm(0); ly = lm(1);
             
@@ -80,12 +74,11 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         float new_weight = denom * std::exp((-1.0f / 2.0f) * temp);
         
         normalizer = normalizer + new_weight;
-        p.weight = new_weight;
+        particle.weight = new_weight;
     }
     
-    for (auto itr = m_particles.begin(); itr != m_particles.end(); itr++) {
-        Particle& p = (*itr);
-        p.weight = p.weight / normalizer;
+    for (auto& particle : m_particles) {
+        particle.weight = particle.weight / normalizer;
     }
 }
 
@@ -96,7 +89,30 @@ void ParticleFilter::resample()
 
 void ParticleFilter::low_variance_resampling()
 {
-    //TODO: Resampling
+    std::vector<Particle> new_particles;
+    
+    float Jinv = 1.0f / m_particles.size();
+    
+    std::default_random_engine generator;
+    std::uniform_real_distribution<float> dist(0.0, Jinv);
+    float r = dist(generator);
+    
+    float c = m_particles[0].weight;
+    int i = 0;
+    for (int j = 0; j < m_particles.size(); j++) {
+       float U = r + (j-1) * Jinv; 
+       while (U > c) {
+           i++;
+           c += m_particles[i].weight;
+       }
+       new_particles.push_back(m_particles[i]);
+    }
+    
+    if (new_particles.size() != m_particles.size()) {
+        throw std::length_error("Length error in low_variance_resampling");
+    }
+    
+    m_particles.swap(new_particles);
 }
 
 void ParticleFilter::init_particles(const Pose2D& pose, int num_particles)
@@ -104,9 +120,9 @@ void ParticleFilter::init_particles(const Pose2D& pose, int num_particles)
     float defaultWeight = 1.0f / num_particles;
     
     m_particles.resize(num_particles);
-    for (int i = 0; i < m_particles.size(); i++) {
-        m_particles[i].pose = pose;
-        m_particles[i].weight = defaultWeight;
+    for (auto& particle : m_particles) {
+        particle.pose = pose;
+        particle.weight = defaultWeight;
     }
 }
 

@@ -24,14 +24,13 @@ int main(int argc, char** argv)
         auto worldData = reader.getWorldData();
         
         Robot::Pose2D pose(0, 0, 0);
-        Localization::ParticleFilter pf(pose, worldData, 10);
+        Localization::ParticleFilter pf(pose, worldData, 100);
         
         int max_timestep = controlData.size();
         Eigen::Vector3f noise = {0.01, 0.05, 0.01};
-        max_timestep = 50;
         for (int t = 0; t < max_timestep; t++) {
-            auto command = controlData[t];
-            auto measurementBundle = measurementData[t];
+            auto& command = controlData[t];
+            auto& measurementBundle = measurementData[t];
             
             pf.predict(command, noise);
             pf.correct(measurementBundle, noise);

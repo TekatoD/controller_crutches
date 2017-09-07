@@ -122,6 +122,7 @@ int Robot::CM730::connect_device(std::string device_name) {
 }
 
 int Robot::CM730::SyncWrite(int start_addr, int each_length, int number, int *pParam) {
+    simxPauseCommunication(m_client_id, 1);
     for(size_t i = 0; i < number * each_length; i += each_length) {
         simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2000, 1, simx_opmode_oneshot);
         simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2001, 1, simx_opmode_oneshot);
@@ -131,9 +132,10 @@ int Robot::CM730::SyncWrite(int start_addr, int each_length, int number, int *pP
         simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2002, (pParam[i + 3]  * M_PI / MX28::MAX_VALUE) / 8, simx_opmode_oneshot);
 
         simxSetJointTargetPosition(m_client_id, m_sim_devices[pParam[i]],
-                                      (Robot::MX28::Value2Angle(CM730::MakeWord(pParam[i + 5], pParam[i + 6])) * M_PI) / 180,
+                                   ((Robot::MX28::Value2Angle(CM730::MakeWord(pParam[i + 5], pParam[i + 6])) * M_PI) / 180) * 1,
                                    simx_opmode_oneshot);
     }
+    simxPauseCommunication(m_client_id, 0);
 }
 
 int Robot::CM730::ReadWord(int id, int address, int* pValue, int* error) {

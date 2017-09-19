@@ -157,8 +157,8 @@ int main(int argc, char** argv) {
 
     sleep(1);
     StateMachine::GetInstance()->Enable();
-//    Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-//    Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+    Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
+    Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
 //
 ////    Action::GetInstance()->Start(12);
 //    Action::GetInstance()->Start(13);
@@ -169,7 +169,7 @@ int main(int argc, char** argv) {
 //        GameController::GetInstance()->Update();
 
         // Update state machine
-//        StateMachine::GetInstance()->Check(cm730);
+        StateMachine::GetInstance()->Check(cm730);
 //
         if (!Action::GetInstance()->IsRunning()) {
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);

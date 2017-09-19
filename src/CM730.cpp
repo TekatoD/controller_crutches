@@ -154,7 +154,7 @@ int Robot::CM730::connect_device(std::string device_name) {
 
 int Robot::CM730::SyncWrite(int start_addr, int each_length, int number, int *pParam) {
     simxPauseCommunication(m_client_id, 1);
-    this->DumpJoints("/home/tekatod/develop/Walking.txt", start_addr, each_length, number, pParam);
+//    this->DumpJoints("/home/tekatod/develop/Walking.txt", start_addr, each_length, number, pParam);
     for(size_t i = 0; i < number * each_length; i += each_length) {
         simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2000, 1, simx_opmode_oneshot);
         simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2001, 1, simx_opmode_oneshot);
@@ -198,11 +198,9 @@ void Robot::CM730::DumpJoints(std::string file_name, int start_addr, int each_le
 int Robot::CM730::ReadWord(int id, int address, int* pValue, int* error) {
         auto get_sensor_data = [this, &error](std::string signal) {
             simxFloat data;
-            while((*error = simxGetFloatSignal(m_client_id, signal.c_str(), &data, simx_opmode_buffer)) != simx_return_ok) {
-                if (*error != simx_return_ok) {
-                    data = 0;
-                }
-                break;
+            *error = simxGetFloatSignal(m_client_id, signal.c_str(), &data, simx_opmode_buffer);
+            if (*error != simx_return_ok) {
+                data = 0;
             }
             return data;
         };
@@ -217,7 +215,7 @@ int Robot::CM730::ReadWord(int id, int address, int* pValue, int* error) {
                 *pValue = norm_gyro(get_sensor_data("gyroZ" + m_device_postfix));
                 break;
             case P_GYRO_Y_L:
-                *pValue = norm_gyro(get_sensor_data("gyroY" + m_device_postfix));
+                *pValue = norm_gyro(-get_sensor_data("gyroY" + m_device_postfix));
                 break;
             case P_GYRO_X_L:
                 *pValue = norm_gyro(get_sensor_data("gyroX" + m_device_postfix));
@@ -236,15 +234,12 @@ int Robot::CM730::ReadWord(int id, int address, int* pValue, int* error) {
 
                 simxSetObjectIntParameter(m_client_id, m_sim_devices[id], 2000, 1, simx_opmode_oneshot);
                 simxSetObjectIntParameter(m_client_id, m_sim_devices[id], 2001, 1, simx_opmode_oneshot);
-                while((*error = simxGetJointPosition(m_client_id, m_sim_devices[id], &pos, simx_opmode_oneshot))
-                      != simx_return_ok) {
-                    if (*error != simx_return_ok) {
-                        pos = 0;
-                    }
-                    break;
-                };
+                *error = simxGetJointPosition(m_client_id, m_sim_devices[id], &pos, simx_opmode_oneshot);
+                if (*error != simx_return_ok) {
+                    pos = 0;
+                }
                 pos = (180 * pos) / M_PI;
-                std::cout << "Joint " << id << " " << pos << std::endl;
+//                std::cout << "Joint " << id << " " << pos << std::endl;
                 *pValue = MX28::Angle2Value(pos);
                 return SUCCESS;
     }

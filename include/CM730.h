@@ -126,6 +126,8 @@ namespace Robot {
         //Note: This works only with joints
         int SyncWrite(int start_addr, int each_length, int number, int *pParam);
 
+        void DumpJoints(std::string file_name, int start_addr, int each_length, int number, int *pParam);
+
         int ReadWord(int id, int address, int* pValue, int* error);
 
         int BulkRead();

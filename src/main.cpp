@@ -133,7 +133,6 @@ int main(int argc, char** argv) {
     /////////////////////////////////////////////////////////////////////
 
 
-    std::cout << "hui" << std::endl;
 //    SoccerBehavior soccer(cm730);
 //    MotionManager::GetInstance()->SetEnable(true);
 //    Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
@@ -158,17 +157,24 @@ int main(int argc, char** argv) {
 
     sleep(1);
     StateMachine::GetInstance()->Enable();
+//    Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
+//    Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+//
+////    Action::GetInstance()->Start(12);
+//    Action::GetInstance()->Start(13);
+
 //
     while (!finish) {
         // Update game controller
 //        GameController::GetInstance()->Update();
 
         // Update state machine
-        StateMachine::GetInstance()->Check(cm730);
-
+//        StateMachine::GetInstance()->Check(cm730);
+//
         if (!Action::GetInstance()->IsRunning()) {
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-            Walking::GetInstance()->X_MOVE_AMPLITUDE = 10.0;
+            Walking::GetInstance()->X_MOVE_AMPLITUDE = 20.0;
+            Walking::GetInstance()->A_MOVE_AMPLITUDE = 20.0;
             Walking::GetInstance()->Start();
         }
 

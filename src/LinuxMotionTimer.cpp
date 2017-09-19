@@ -28,8 +28,8 @@ void* LinuxMotionTimer::TimerProc(void* param) {
 
     while (!timer->m_FinishTimer) {
         //TODO: Something with the time
-        next_time.tv_sec += (next_time.tv_nsec + 8 * 1000000) / 1000000000;
-        next_time.tv_nsec = (next_time.tv_nsec + 8 * 1000000) % 1000000000;
+        next_time.tv_sec += (next_time.tv_nsec + 0 * 1000000) / 1000000000;
+        next_time.tv_nsec = (next_time.tv_nsec + 0 * 1000000) % 1000000000;
 
         if (timer->m_Manager != NULL)
             timer->m_Manager->Process();

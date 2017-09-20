@@ -28,8 +28,8 @@
 using namespace Robot;
 
 //LinuxCM730 linux_cm730(U2D_DEV_NAME0);
-//CM730 cm730(&linux_cm730);
-CM730 cm730;
+//CM730vrep cm730(&linux_cm730);
+CM730* cm730 = new CM730vrep();
 
 
 void change_current_dir() {
@@ -74,9 +74,9 @@ int main(int argc, char** argv) {
 //    goTo.LoadINISettings(ini.get());
 
     //////////////////// Framework Initialize ///////////////////////////
-    if (!MotionManager::GetInstance()->Initialize(&cm730)) {
+    if (!MotionManager::GetInstance()->Initialize(cm730)) {
 //        linux_cm730.SetPortName(U2D_DEV_NAME1);
-        if (!MotionManager::GetInstance()->Initialize(&cm730)) {
+        if (!MotionManager::GetInstance()->Initialize(cm730)) {
             std::cerr << "Fail to initialize Motion Manager!" << std::endl;
             return 1;
         }
@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
     StateMachine::GetInstance()->LoadINISettings(&ini);
 
     int firm_ver = 0;
-    if (cm730.ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0) != CM730::SUCCESS) {
+    if (cm730->ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0) != CM730vrep::SUCCESS) {
         std::cerr << "Can't read firmware version from Dynamixel ID " << JointData::ID_HEAD_PAN << "!!\n" << std::endl;
         return 1;
     }
@@ -144,7 +144,7 @@ int main(int argc, char** argv) {
 //    Action::GetInstance()->m_Joint.SetEnableBody(true, true);
 //    MotionManager::GetInstance()->SetEnable(true);
 //
-//    cm730.WriteByte(CM730::P_LED_PANNEL, 0x01 | 0x02 | 0x04, NULL);
+//    cm730.WriteByte(CM730vrep::P_LED_PANNEL, 0x01 | 0x02 | 0x04, NULL);
 //
 //    SoccerBehavior soccer(cm730);
 //    GoalieBehavior goalie;

@@ -50,7 +50,7 @@ bool MotionManager::Initialize(CM730* cm730) {
         if (DEBUG_PRINT == true)
             fprintf(stderr, "ID:%d initializing...", id);
 
-        if (m_CM730->ReadWord(id, MX28::P_PRESENT_POSITION_L, &value, &error) == CM730::SUCCESS) {
+        if (m_CM730->ReadWord(id, MX28::P_PRESENT_POSITION_L, &value, &error) == CM730vrep::SUCCESS) {
             MotionStatus::m_CurrentJoints.SetValue(id, value);
             MotionStatus::m_CurrentJoints.SetEnable(id, true);
 
@@ -81,7 +81,7 @@ bool MotionManager::Reinitialize() {
     for (int id = JointData::ID_R_SHOULDER_PITCH; id < JointData::NUMBER_OF_JOINTS; id++) {
         if (DEBUG_PRINT == true)
             fprintf(stderr, "ID:%d initializing...", id);
-        if (m_CM730->ReadWord(id, MX28::P_PRESENT_POSITION_L, &value, &error) == CM730::SUCCESS) {
+        if (m_CM730->ReadWord(id, MX28::P_PRESENT_POSITION_L, &value, &error) == CM730vrep::SUCCESS) {
             MotionStatus::m_CurrentJoints.SetValue(id, value);
             MotionStatus::m_CurrentJoints.SetEnable(id, true);
 
@@ -302,7 +302,7 @@ void MotionManager::Process() {
     }
 
     if (m_CM730->m_BulkReadData[CM730::ID_CM].error == 0)
-        MotionStatus::BUTTON = m_CM730->m_BulkReadData[CM730::ID_CM].ReadByte(CM730::P_BUTTON);
+        MotionStatus::BUTTON = m_CM730->m_BulkReadData[CM730::ID_CM].ReadByte(CM730vrep::P_BUTTON);
 
     m_IsRunning = false;
 }

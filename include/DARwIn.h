@@ -9,7 +9,9 @@
 #ifndef _DARWIN_H_
 #define _DARWIN_H_
 
+#include "CM730vrep.h"
 #include "CM730.h"
+#include "CM730robot.h"
 #include "MX28.h"
 #include "FSR.h"
 #include "MotionModule.h"

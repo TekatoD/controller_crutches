@@ -18,7 +18,7 @@ set(SRC
         include/BallFollower.h
         include/BallTracker.h
         include/Camera.h
-        include/CM730.h
+        include/CM730vrep.h
         include/ColorFinder.h
         include/DARwIn.h
         include/FSR.h
@@ -61,7 +61,7 @@ set(SRC
         src/vision/ColorFinder.cpp
         src/vision/Image.cpp
         src/vision/ImgProcess.cpp
-        src/CM730.cpp
+        src/CM730vrep.cpp
         src/LinuxCamera.cpp
         src/LinuxCM730.cpp
         src/LinuxMotionTimer.cpp
@@ -87,7 +87,15 @@ set(SRC
         include/SoccerBehavior.h
         src/SoccerBehavior.cpp
         include/GoalieBehavior.h
-        src/GoalieBehavior.cpp src/Field.cpp include/Field.h src/BallSearcher.cpp include/BallSearcher.h)
+        src/GoalieBehavior.cpp
+        src/Field.cpp
+        include/Field.h
+        src/BallSearcher.cpp
+        include/BallSearcher.h
+        include/CM730robot.h
+        src/CM730robot.cpp
+        include/CM730.h
+        src/CM730.cpp)
 
 add_executable(soccer ${SRC})
 target_link_libraries(soccer

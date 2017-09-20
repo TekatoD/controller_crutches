@@ -1,12 +1,13 @@
 /**
  *  @autor tekatod
- *  @date 8/7/17
+ *  @date 9/20/17
  */
 #pragma once
 
-#include <string>
-#include <unordered_map>
 #include "MX28.h"
+
+#define MAXNUM_TXPARAM      (256)
+#define MAXNUM_RXPARAM      (1024)
 
 namespace Robot {
     class BulkReadData {
@@ -23,7 +24,58 @@ namespace Robot {
         int ReadByte(int address);
 
         int ReadWord(int address);
+    };
 
+/*
+PlatformCM730
+
+This abstract class corresponds to a platform CM730 that is the secondary controler that controls the motors MX28
+For instance, LinuxCM730 is a concretisation of this class.
+*/
+    class PlatformCM730 {
+    public:
+        /////////// Need to implement below methods (Platform porting) //////////////
+        // Port control
+        virtual bool OpenPort() = 0;
+
+        virtual bool SetBaud(int baud) = 0;
+
+        virtual void ClosePort() = 0;
+
+        virtual void ClearPort() = 0;
+
+        virtual int WritePort(unsigned char* packet, int numPacket) = 0;
+
+        virtual int ReadPort(unsigned char* packet, int numPacket) = 0;
+
+        // Using semaphore
+        virtual void LowPriorityWait() = 0;
+
+        virtual void MidPriorityWait() = 0;
+
+        virtual void HighPriorityWait() = 0;
+
+        virtual void LowPriorityRelease() = 0;
+
+        virtual void MidPriorityRelease() = 0;
+
+        virtual void HighPriorityRelease() = 0;
+
+        // Using timeout
+        virtual void SetPacketTimeout(int lenPacket) = 0;
+
+        virtual bool IsPacketTimeout() = 0;
+
+        virtual float GetPacketTime() = 0;
+
+        virtual void SetUpdateTimeout(int msec) = 0;
+
+        virtual bool IsUpdateTimeout() = 0;
+
+        virtual float GetUpdateTime() = 0;
+
+        virtual void Sleep(float msec) = 0;
+        //////////////////////////////////////////////////////////////////////////////
     };
 
     class CM730 {
@@ -36,6 +88,18 @@ namespace Robot {
             RX_TIMEOUT,
             RX_CORRUPT
         };
+
+        enum {
+            INPUT_VOLTAGE = 1,
+            ANGLE_LIMIT = 2,
+            OVERHEATING = 4,
+            RANGE = 8,
+            CHECKSUM = 16,
+            OVERLOAD = 32,
+            INSTRUCTION = 64
+        };
+
+        /*EEPROM and RAM p. 4 in MX28 Technical Specifications.pdf ????*/
         enum {
             P_MODEL_NUMBER_L = 0,
             P_MODEL_NUMBER_H = 1,
@@ -102,37 +166,49 @@ namespace Robot {
             ID_BROADCAST = 254
         };
 
+    public:
+
         BulkReadData m_BulkReadData[ID_BROADCAST];
 
-        CM730(int client_id = -1, std::string device_postfix = "");
+//        virtual ~CM730() = 0;
 
-        CM730(std::string server_ip, int server_port, int client_id = -1, std::string device_postfix = "");
+/*this method is to be used first to connect to the robot. Returns true when success and false when fail*/
+        virtual bool Connect() = 0;
 
-        //This is dummy for now it can do nothing
-        int WriteByte(int address, int value, int* error);
+        virtual bool ChangeBaud(int baud) = 0;
 
-        //This is dummy for now it can do nothing
-        int WriteWord(int id, int address, int value, int* error);
+        virtual void Disconnect() = 0;
 
-        //This is dummy for now it can do nothing
-        int ReadByte(int id, int address, int* pValue, int* error);
+        virtual bool DXLPowerOn() = 0;
 
-        //This is dummy for now it can do nothing
-        bool Connect();
+        virtual bool MX28InitAll() = 0;
 
-        //This is dummy for now it can do nothing
-        void DXLPowerOn();
+        // For board
+        virtual int WriteByte(int address, int value, int* error) = 0;
 
-        //Note: This works only with joints
-        int SyncWrite(int start_addr, int each_length, int number, int *pParam);
+        virtual int WriteWord(int address, int value, int* error) = 0;
 
-        void DumpJoints(std::string file_name, int start_addr, int each_length, int number, int *pParam);
+        // For actuators
+        virtual int Ping(int id, int* error) = 0;
 
-        int ReadWord(int id, int address, int* pValue, int* error);
+        virtual int ReadByte(int id, int address, int* pValue, int* error) = 0;
 
-        int BulkRead();
+        virtual int ReadWord(int id, int address, int* pValue, int* error) = 0;
 
-        int get_client_id();
+        virtual int ReadTable(int id, int start_addr, int end_addr, unsigned char* table, int* error) = 0;
+
+        virtual int WriteByte(int id, int address, int value, int* error) = 0;
+
+        virtual int WriteWord(int id, int address, int value, int* error) = 0;
+
+        virtual int WriteTable(int id, int start_addr, int end_addr, unsigned char* table, int* error) = 0;
+
+        // For motion control
+        virtual int SyncWrite(int start_addr, int each_length, int number, int* pParam) = 0;
+
+        virtual void MakeBulkReadPacket() = 0;
+
+        virtual int BulkRead() = 0;
 
         // Utility
         static int MakeWord(int lowbyte, int highbyte);
@@ -141,16 +217,6 @@ namespace Robot {
 
         static int GetHighByte(int word);
 
-        ~CM730();
-
-    private:
-
-        void init_devices();
-
-        int connect_device(std::string device_name);
-
-        int m_client_id;
-        std::string m_device_postfix;
-        std::unordered_map<int, int> m_sim_devices;
+        static int MakeColor(int red, int green, int blue);
     };
 }

@@ -34,7 +34,7 @@
 namespace Robot {
     class SoccerBehavior {
     public:
-        SoccerBehavior(CM730& cm730);
+        SoccerBehavior(CM730* cm730);
 
         void Process();
 
@@ -47,7 +47,7 @@ namespace Robot {
         void SaveINISettings(minIni* ini, const std::string& section);
 
     protected:
-        CM730& m_CM730;
+        CM730* m_CM730; //TODO:: WHY?
         ColorFinder m_BallFinder;
         BallTracker m_BallTracker;
         BallFollower m_BallFollower;

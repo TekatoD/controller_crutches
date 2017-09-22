@@ -13,7 +13,7 @@
 #include <fstream>
 
 #include "minIni.h"
-#include "MotionModule.h"
+#include "motion/MotionModule.h"
 #include "OdometryCollector.h"
 
 #define WALKING_SECTION "Walking Config"
@@ -146,11 +146,6 @@ namespace Robot {
         float Z_MOVE_AMPLITUDE;
         float A_MOVE_AMPLITUDE;
         bool A_MOVE_AIM_ON;
-
-        bool GO_TO_MODE_ON;
-        float GO_TO_X;
-        float GO_TO_Y;
-        float GO_TO_A;
 
         // Balance control
         bool BALANCE_ENABLE;

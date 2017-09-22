@@ -48,7 +48,7 @@ set(SRC
         include/math/Matrix.h
         include/minIni.h
         include/motion/MotionManager.h
-        include/MotionModule.h
+        include/motion/MotionModule.h
         include/motion/MotionStatus.h
         include/MX28.h
         include/math/Point.h
@@ -111,7 +111,7 @@ set(SRC
         include/ServiceInterface.h
         include/Singleton.h
         src/PropertyReader.cpp
-        include/PropertyReader.h)
+        include/PropertyReader.h src/motion/modules/Kicking.cpp include/motion/modules/Kicking.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

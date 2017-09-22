@@ -42,7 +42,7 @@ BallFollower::BallFollower() {
     m_FBStep = 0;
     m_RLStep = 0;
     m_RLTurn = 0;
-    m_TiltOffset = MX28::RATIO_VALUE2ANGLE;
+    m_TiltOffset = MX28::RATIO_VALUE2DEGREES;
     m_KickBall = NO_KICKING;
 
     m_AimTiltOffset = 15;

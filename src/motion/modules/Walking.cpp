@@ -178,7 +178,7 @@ void Walking::update_param_time() {
     m_Phase_Time2 = (m_SSP_Time_Start_R + m_SSP_Time_End_L) / 2;
     m_Phase_Time3 = (m_SSP_Time_End_R + m_SSP_Time_Start_R) / 2;
 
-    m_Pelvis_Offset = PELVIS_OFFSET * MX28::RATIO_ANGLE2VALUE;
+    m_Pelvis_Offset = PELVIS_OFFSET * MX28::RATIO_DEGREES2VALUE;
     m_Pelvis_Swing = m_Pelvis_Offset * 0.35;
     m_Arm_Swing_Gain = ARM_SWING_GAIN;
 }
@@ -226,7 +226,7 @@ void Walking::update_param_balance() {
     m_R_Offset = radians(R_OFFSET);
     m_P_Offset = radians(P_OFFSET);
     m_A_Offset = radians(A_OFFSET);
-    m_Hip_Pitch_Offset = HIP_PITCH_OFFSET * MX28::RATIO_ANGLE2VALUE;
+    m_Hip_Pitch_Offset = HIP_PITCH_OFFSET * MX28::RATIO_DEGREES2VALUE;
 }
 
 
@@ -282,10 +282,10 @@ void Walking::Process() {
     float pelvis_offset_r, pelvis_offset_l;
     float angle[14], ep[12];
     float offset;
-    float TIME_UNIT = MotionModule::TIME_UNIT;
+    const float TIME_UNIT = MotionModule::TIME_UNIT;
     //                     R_HIP_YAW, R_HIP_ROLL, R_HIP_PITCH, R_KNEE, R_ANKLE_PITCH, R_ANKLE_ROLL, L_HIP_YAW, L_HIP_ROLL, L_HIP_PITCH, L_KNEE, L_ANKLE_PITCH, L_ANKLE_ROLL, R_ARM_SWING, L_ARM_SWING
-    int dir[14] = {-1, -1, 1, 1, -1, 1, -1, -1, -1, -1, 1, 1, 1, -1};
-    float initAngle[14] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -48.345, 41.313};
+    const int dir[14] = {-1, -1, 1, 1, -1, 1, -1, -1, -1, -1, 1, 1, 1, -1};
+    const float initAngle[14] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -48.345, 41.313};
     int outValue[14];
 
     // Update walk parameters
@@ -577,28 +577,28 @@ void Walking::Process() {
 
     // Compute motor value
     for (int i = 0; i < 14; i++) {
-        offset = (float) dir[i] * angle[i] * MX28::RATIO_ANGLE2VALUE;
+        offset = (float) dir[i] * angle[i] * MX28::RATIO_DEGREES2VALUE;
         if (i == 1) // R_HIP_ROLL
-            offset += (float) dir[i] * (pelvis_offset_r /** cos(ep[5])*/ - HIP_PITCH_OFFSET * sin(ep[5]) * MX28::RATIO_ANGLE2VALUE);
+            offset += (float) dir[i] * (pelvis_offset_r /** cos(ep[5])*/ - HIP_PITCH_OFFSET * sin(ep[5]) * MX28::RATIO_DEGREES2VALUE);
         else if (i == 7) // L_HIP_ROLL
-            offset += (float) dir[i] * (pelvis_offset_l /** cos(ep[11])*/ - HIP_PITCH_OFFSET * sin(ep[11]) * MX28::RATIO_ANGLE2VALUE);
+            offset += (float) dir[i] * (pelvis_offset_l /** cos(ep[11])*/ - HIP_PITCH_OFFSET * sin(ep[11]) * MX28::RATIO_DEGREES2VALUE);
         else if (i == 2) // R_HIP_PITCH
-            offset += (float) dir[i] * (/*-pelvis_offset_r * sin(ep[5])*/ - HIP_PITCH_OFFSET * cos(ep[5]) ) * MX28::RATIO_ANGLE2VALUE;
+            offset += (float) dir[i] * (/*-pelvis_offset_r * sin(ep[5])*/ - HIP_PITCH_OFFSET * cos(ep[5]) ) * MX28::RATIO_DEGREES2VALUE;
         else if (i == 8) // L_HIP_PITCH
-            offset += (float) dir[i] * (/*-pelvis_offset_l * sin(ep[11])*/ - HIP_PITCH_OFFSET * cos(ep[11])) * MX28::RATIO_ANGLE2VALUE;
+            offset += (float) dir[i] * (/*-pelvis_offset_l * sin(ep[11])*/ - HIP_PITCH_OFFSET * cos(ep[11])) * MX28::RATIO_DEGREES2VALUE;
 
         outValue[i] = MX28::Angle2Value(initAngle[i]) + (int) offset;
     }
 
 //    // Compute motor value
 //    for (int i = 0; i < 14; i++) {
-//        offset = (float) dir[i] * angle[i] * MX28::RATIO_ANGLE2VALUE;
+//        offset = (float) dir[i] * angle[i] * MX28::RATIO_DEGREES2VALUE;
 //        if (i == 1) // R_HIP_ROLL
 //            offset += (float) dir[i] * pelvis_offset_r;
 //        else if (i == 7) // L_HIP_ROLL
 //            offset += (float) dir[i] * pelvis_offset_l;
 //        else if (i == 2 || i == 8) // R_HIP_PITCH or L_HIP_PITCH
-//            offset -= (float) dir[i] * HIP_PITCH_OFFSET * MX28::RATIO_ANGLE2VALUE;
+//            offset -= (float) dir[i] * HIP_PITCH_OFFSET * MX28::RATIO_DEGREES2VALUE;
 //
 //        outValue[i] = MX28::Angle2Value(initAngle[i]) + (int) offset;
 //    }
@@ -672,7 +672,6 @@ void Walking::SetMoveAmplitude(float x, float y, float a, bool aim_mode) {
     Y_MOVE_AMPLITUDE = y;
     A_MOVE_AMPLITUDE = a;
     A_MOVE_AIM_ON = aim_mode;
-    GO_TO_MODE_ON = false;
 }
 
 int Walking::GetCurrentPhase() { return m_Phase; }

@@ -12,7 +12,7 @@
 #include <memory>
 
 #include "minIni.h"
-#include "MotionModule.h"
+#include "motion/MotionModule.h"
 #include "math/Point.h"
 
 #define HEAD_SECTION    "Head Pan/Tilt"

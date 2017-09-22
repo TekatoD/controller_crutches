@@ -131,7 +131,7 @@ void GoalieBehavior::Process() {
                 float tilt_min = Head::GetInstance()->GetBottomLimitAngle();
 
                 if (pan > m_KickRightAngle && pan < m_KickLeftAngle) {
-                    if (tilt <= (tilt_min + MX28::RATIO_VALUE2ANGLE)) {
+                    if (tilt <= (tilt_min + MX28::RATIO_VALUE2DEGREES)) {
                         if (m_BallTracker.GetBallPosition().Y < m_KickTopAngle) {
                             m_GoalRLTurn = 0;
 

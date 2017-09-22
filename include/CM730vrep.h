@@ -14,11 +14,7 @@ namespace Robot {
     class CM730vrep : public CM730 {
     public:
 
-//        BulkReadData m_BulkReadData[ID_BROADCAST];
-
-        CM730vrep(int client_id = -1, std::string device_postfix = "");
-
-        CM730vrep(std::string server_ip, int server_port, int client_id = -1, std::string device_postfix = "");
+        CM730vrep(int client_id, std::string device_postfix = "");
 
         //This is dummy for now it can do nothing
         int WriteByte(int address, int value, int* error);

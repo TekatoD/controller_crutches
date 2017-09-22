@@ -14,6 +14,7 @@
 #include <GameController.h>
 #include <GoTo.h>
 #include <SoccerBehavior.h>
+#include <VrepConnector.h>
 
 #include "LinuxDARwIn.h"
 
@@ -29,7 +30,8 @@ using namespace Robot;
 
 //LinuxCM730 linux_cm730(U2D_DEV_NAME0);
 //CM730vrep cm730(&linux_cm730);
-CM730* cm730 = new CM730vrep();
+VrepConnector vrepConnector;
+CM730* cm730 = new CM730vrep(vrepConnector.GetClientID());
 
 
 void change_current_dir() {
@@ -194,7 +196,7 @@ int main(int argc, char** argv) {
 //            case ROLES_COUNT:break;
 //        }
     }
-
+    vrepConnector.Disconnect();
 
     return 0;
 }

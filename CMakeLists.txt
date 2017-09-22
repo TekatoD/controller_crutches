@@ -95,7 +95,9 @@ set(SRC
         include/CM730robot.h
         src/CM730robot.cpp
         include/CM730.h
-        src/CM730.cpp)
+        src/CM730.cpp
+        include/VrepConnector.h
+        src/VrepConnector.cpp)
 
 add_executable(soccer ${SRC})
 target_link_libraries(soccer

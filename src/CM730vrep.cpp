@@ -1,52 +1,20 @@
-#define MAX_EXT_API_CONNECTIONS 255
-#define NON_MATLAB_PARSING
-extern "C" {
-    #include "extApi.h"
-    #include "extApi.c"
-    #include "extApiPlatform.h"
-    #include "extApiPlatform.c"
-}
-
 #include <iostream>
 #include <chrono>
 #include <thread>
 #include <fstream>
 #include "CM730vrep.h"
 
-Robot::CM730vrep::CM730vrep(std::string server_ip, int server_port, int client_id, std::string device_postfix) {
-    if(client_id =- -1) {
-        m_client_id = simxStart((simxChar *) server_ip.c_str(), server_port, true, true, 5000, 5);
-    }
-    else {
-        m_client_id = client_id;
-    }
-    if (m_client_id == -1) {
-        std::cout << "Can't connect with sim" << std::endl;
-    }
-    simxStartSimulation(m_client_id, simx_opmode_oneshot);
-    simxSynchronous(m_client_id, 1);
-    m_device_postfix = device_postfix;
-    init_devices();
-    for (int i = 0; i < ID_BROADCAST; i++) {
-        m_BulkReadData[i] = BulkReadData();
-    }
-
-    this->BulkRead();
+#define MAX_EXT_API_CONNECTIONS 255
+#define NON_MATLAB_PARSING
+extern "C" {
+#include "extApi.h"
+#include "extApiPlatform.h"
 }
 
+
+
 Robot::CM730vrep::CM730vrep(int client_id, std::string device_postfix) {
-    std::string server_ip("127.0.0.1");
-    int server_port = 19997;
-    if(client_id == -1) {
-        m_client_id = simxStart((simxChar *) server_ip.c_str(), server_port, true, true, 5000, 5);
-    } else {
-        m_client_id = client_id;
-    }
-    if (m_client_id == -1) {
-        std::cout << "Can't connect with sim" << std::endl;
-    }
-    simxSynchronous(m_client_id, 1);
-    simxStartSimulation(m_client_id, simx_opmode_oneshot);
+    m_client_id = client_id;
     m_device_postfix = device_postfix;
     init_devices();
     for (int i = 0; i < ID_BROADCAST; i++) {
@@ -236,18 +204,13 @@ bool Robot::CM730vrep::DXLPowerOn() {
     return true;
 }
 
-Robot::CM730vrep::~CM730vrep() {
-    this->Disconnect();
-}
+Robot::CM730vrep::~CM730vrep() { }
 
 bool Robot::CM730vrep::ChangeBaud(int baud) {
     return true;
 }
 
-void Robot::CM730vrep::Disconnect() {
-    simxStopSimulation(m_client_id, simx_opmode_oneshot_wait);
-    simxFinish(m_client_id);
-}
+void Robot::CM730vrep::Disconnect() { }
 
 bool Robot::CM730vrep::MX28InitAll() {
     return true;

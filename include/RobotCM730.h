@@ -5,7 +5,7 @@
 #pragma once
 
 /*
- *   CM730robot.h
+ *   RobotCM730.h
 *   This class is the secondary controler that controls the motors MX28
  *   Author: ROBOTIS
  *
@@ -18,7 +18,7 @@
 
 namespace Robot {
     
-    class CM730robot : public CM730 {
+    class RobotCM730 : public CM730 {
 
     private:
         PlatformCM730* m_Platform;
@@ -35,9 +35,9 @@ namespace Robot {
         bool DEBUG_PRINT;
 //        BulkReadData m_BulkReadData[ID_BROADCAST];
 
-        CM730robot(PlatformCM730* platform);
+        RobotCM730(PlatformCM730* platform);
 
-        ~CM730robot();
+        ~RobotCM730();
 
 /*this method is to be used first to connect to the robot. Returns true when success and false when fail*/
         bool Connect();

@@ -11,10 +11,10 @@
 
 namespace Robot {
 
-    class CM730vrep : public CM730 {
+    class VrepCM730 : public CM730 {
     public:
 
-        CM730vrep(int client_id, std::string device_postfix = "");
+        VrepCM730(int client_id, std::string device_postfix = "");
 
         //This is dummy for now it can do nothing
         int WriteByte(int address, int value, int* error);
@@ -74,7 +74,7 @@ namespace Robot {
 
         static int GetHighByte(int word);
 
-        ~CM730vrep();
+        ~VrepCM730();
 
     private:
 
@@ -82,6 +82,7 @@ namespace Robot {
 
         int connect_device(std::string device_name);
 
+        bool m_connected;
         int m_client_id;
         std::string m_device_postfix;
         int m_joints[JointData::NUMBER_OF_JOINTS - 1];

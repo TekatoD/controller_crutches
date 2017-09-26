@@ -13,12 +13,18 @@ public:
 
     VrepConnector(std::string server_ip, int server_port);
 
+    void Connect();
+
     int GetClientID();
 
     void Disconnect();
 
+    ~VrepConnector() = default;
+
 private:
 
     int m_client_id;
+    std::string m_server_ip;
+    int m_port;
 
 };

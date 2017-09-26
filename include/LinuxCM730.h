@@ -14,7 +14,7 @@
 
 namespace Robot {
     class LinuxCM730
-            /*: public PlatformCM730*/ {
+            : public PlatformCM730 {
     private:
         int m_Socket_fd;
         double m_PacketStartTime;
@@ -70,13 +70,13 @@ namespace Robot {
 
         bool IsPacketTimeout();
 
-        double GetPacketTime();
+        float GetPacketTime();
 
         void SetUpdateTimeout(int msec);
 
         bool IsUpdateTimeout();
 
-        double GetUpdateTime();
+        float GetUpdateTime();
 
         virtual void Sleep(double msec);
         ////////////////////////////////////////////////////////

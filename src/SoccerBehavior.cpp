@@ -28,8 +28,7 @@
 
 using namespace Robot;
 
-SoccerBehavior::SoccerBehavior(CM730* cm730)
-        : m_CM730(cm730) {
+SoccerBehavior::SoccerBehavior() {
     m_PreviousState = STATE_INITIAL;
 }
 

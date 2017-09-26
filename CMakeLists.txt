@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.0)
 project(darwin-soccer)
 #-DCMAKE_TOOLCHAIN_FILE=/home/tekatod/develop/controller_crutches/toolchain.cmake
 set(CMAKE_CXX_STANDARD 17)
@@ -10,15 +10,12 @@ find_package(VREP REQUIRED)
 
 include_directories(include/)
 
-include_directories(${VREP_INCLUDE})
-include_directories(${VREP_REMOTE})
-
 set(SRC
         include/motion/modules/Action.h
         include/BallFollower.h
         include/BallTracker.h
         include/Camera.h
-        include/CM730vrep.h
+        include/VrepCM730.h
         include/ColorFinder.h
         include/DARwIn.h
         include/FSR.h
@@ -61,7 +58,7 @@ set(SRC
         src/vision/ColorFinder.cpp
         src/vision/Image.cpp
         src/vision/ImgProcess.cpp
-        src/CM730vrep.cpp
+        src/VrepCM730.cpp
         src/LinuxCamera.cpp
         src/LinuxCM730.cpp
         src/LinuxMotionTimer.cpp
@@ -92,8 +89,8 @@ set(SRC
         include/Field.h
         src/BallSearcher.cpp
         include/BallSearcher.h
-        include/CM730robot.h
-        src/CM730robot.cpp
+        include/RobotCM730.h
+        src/RobotCM730.cpp
         include/CM730.h
         src/CM730.cpp
         include/VrepConnector.h
@@ -103,7 +100,9 @@ add_executable(soccer ${SRC})
 target_link_libraries(soccer
         ${CMAKE_THREAD_LIBS_INIT}
         ${JPEG_LIBRARIES}
-        pthread
         ${VREP_LIBRARIES})
+
 target_include_directories(soccer PUBLIC
-        ${JPEG_INCLUDE_DIR})
+        ${JPEG_INCLUDE_DIR}
+        ${VREP_REMOTE}
+        ${VREP_INCLUDE})

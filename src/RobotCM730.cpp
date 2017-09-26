@@ -10,7 +10,7 @@
  */
 #include <stdio.h>
 #include "FSR.h"
-#include "CM730robot.h"
+#include "RobotCM730.h"
 #include "motion/MotionStatus.h"
 #include "motion/Kinematics.h"
 
@@ -35,7 +35,7 @@ using namespace Robot;
 
 
 
-CM730robot::CM730robot(PlatformCM730* platform) {
+RobotCM730::RobotCM730(PlatformCM730* platform) {
     m_Platform = platform;
     DEBUG_PRINT = false;
     m_BulkReadTxPacket[LENGTH] = 0;
@@ -44,12 +44,12 @@ CM730robot::CM730robot(PlatformCM730* platform) {
 }
 
 
-CM730robot::~CM730robot() {
+RobotCM730::~RobotCM730() {
     Disconnect();
 }
 
 
-int CM730robot::TxRxPacket(unsigned char* txpacket, unsigned char* rxpacket, int priority) {
+int RobotCM730::TxRxPacket(unsigned char* txpacket, unsigned char* rxpacket, int priority) {
     if (priority > 1)
         m_Platform->LowPriorityWait();
     if (priority > 0)
@@ -321,7 +321,7 @@ int CM730robot::TxRxPacket(unsigned char* txpacket, unsigned char* rxpacket, int
 }
 
 
-unsigned char CM730robot::CalculateChecksum(unsigned char* packet) {
+unsigned char RobotCM730::CalculateChecksum(unsigned char* packet) {
     unsigned char checksum = 0x00;
     for (int i = 2; i < packet[LENGTH] + 3; i++)
         checksum += packet[i];
@@ -329,7 +329,7 @@ unsigned char CM730robot::CalculateChecksum(unsigned char* packet) {
 }
 
 
-void CM730robot::MakeBulkReadPacket() {
+void RobotCM730::MakeBulkReadPacket() {
     int number = 0;
 
     m_BulkReadTxPacket[ID] = (unsigned char) ID_BROADCAST;
@@ -372,7 +372,7 @@ void CM730robot::MakeBulkReadPacket() {
 }
 
 
-int CM730robot::BulkRead() {
+int RobotCM730::BulkRead() {
     unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
 
     if (m_BulkReadTxPacket[LENGTH] != 0)
@@ -384,7 +384,7 @@ int CM730robot::BulkRead() {
 }
 
 
-int CM730robot::SyncWrite(int start_addr, int each_length, int number, int* pParam) {
+int RobotCM730::SyncWrite(int start_addr, int each_length, int number, int* pParam) {
     unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
     unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
     int n;
@@ -401,7 +401,7 @@ int CM730robot::SyncWrite(int start_addr, int each_length, int number, int* pPar
 }
 
 
-bool CM730robot::Connect() {
+bool RobotCM730::Connect() {
     if (m_Platform->OpenPort() == false) {
         fprintf(stderr, "\n Fail to open port\n");
         fprintf(stderr, " CM-730 is used by another program or do not have root privileges.\n\n");
@@ -412,7 +412,7 @@ bool CM730robot::Connect() {
 }
 
 
-bool CM730robot::ChangeBaud(int baud) {
+bool RobotCM730::ChangeBaud(int baud) {
     if (m_Platform->SetBaud(baud) == false) {
         fprintf(stderr, "\n Fail to change baudrate\n");
         return false;
@@ -422,7 +422,7 @@ bool CM730robot::ChangeBaud(int baud) {
 }
 
 
-bool CM730robot::DXLPowerOn() {
+bool RobotCM730::DXLPowerOn() {
     if (WriteByte(CM730::ID_CM, CM730::P_DXL_POWER, 1, 0) == CM730::SUCCESS) {
         if (DEBUG_PRINT == true)
             fprintf(stderr, " Succeed to change Dynamixel power!\n");
@@ -439,7 +439,7 @@ bool CM730robot::DXLPowerOn() {
 }
 
 
-bool CM730robot::MX28InitAll() {
+bool RobotCM730::MX28InitAll() {
     // no limits for R_SHOULDER_PITCH
     // no limits for L_SHOULDER_PITCH
 
@@ -573,7 +573,7 @@ bool CM730robot::MX28InitAll() {
 }
 
 
-void CM730robot::Disconnect() {
+void RobotCM730::Disconnect() {
     // Make the Head LED to green
     //WriteWord(CM730::ID_CM, CM730::P_LED_HEAD_L, MakeColor(0, 255, 0), 0);
     unsigned char txpacket[] = {0xFF, 0xFF, 0xC8, 0x05, 0x03, 0x1A, 0xE0, 0x03, 0x32};
@@ -583,17 +583,17 @@ void CM730robot::Disconnect() {
 }
 
 
-int CM730robot::WriteByte(int address, int value, int* error) {
+int RobotCM730::WriteByte(int address, int value, int* error) {
     return WriteByte(ID_CM, address, value, error);
 }
 
 
-int CM730robot::WriteWord(int address, int value, int* error) {
+int RobotCM730::WriteWord(int address, int value, int* error) {
     return WriteWord(ID_CM, address, value, error);
 }
 
 
-int CM730robot::Ping(int id, int* error) {
+int RobotCM730::Ping(int id, int* error) {
     unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
     unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
     int result;
@@ -612,7 +612,7 @@ int CM730robot::Ping(int id, int* error) {
 }
 
 
-int CM730robot::ReadByte(int id, int address, int* pValue, int* error) {
+int RobotCM730::ReadByte(int id, int address, int* pValue, int* error) {
     unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
     unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
     int result;
@@ -634,7 +634,7 @@ int CM730robot::ReadByte(int id, int address, int* pValue, int* error) {
 }
 
 
-int CM730robot::ReadWord(int id, int address, int* pValue, int* error) {
+int RobotCM730::ReadWord(int id, int address, int* pValue, int* error) {
     unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
     unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
     int result;
@@ -657,7 +657,7 @@ int CM730robot::ReadWord(int id, int address, int* pValue, int* error) {
 }
 
 
-int CM730robot::ReadTable(int id, int start_addr, int end_addr, unsigned char* table, int* error) {
+int RobotCM730::ReadTable(int id, int start_addr, int end_addr, unsigned char* table, int* error) {
     unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
     unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
     int result;
@@ -682,7 +682,7 @@ int CM730robot::ReadTable(int id, int start_addr, int end_addr, unsigned char* t
 }
 
 
-int CM730robot::WriteByte(int id, int address, int value, int* error) {
+int RobotCM730::WriteByte(int id, int address, int value, int* error) {
     unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
     unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
     int result;
@@ -703,7 +703,7 @@ int CM730robot::WriteByte(int id, int address, int value, int* error) {
 }
 
 
-int CM730robot::WriteWord(int id, int address, int value, int* error) {
+int RobotCM730::WriteWord(int id, int address, int value, int* error) {
     unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
     unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
     int result;
@@ -725,7 +725,7 @@ int CM730robot::WriteWord(int id, int address, int value, int* error) {
 }
 
 
-int CM730robot::WriteTable(int id, int start_addr, int end_addr, unsigned char* table, int* error) {
+int RobotCM730::WriteTable(int id, int start_addr, int end_addr, unsigned char* table, int* error) {
     unsigned char txpacket[MAXNUM_TXPARAM + 10] = {0,};
     unsigned char rxpacket[MAXNUM_RXPARAM + 10] = {0,};
     int result;

@@ -217,7 +217,7 @@ bool LinuxCM730::IsPacketTimeout() {
 }
 
 
-double LinuxCM730::GetPacketTime() {
+float LinuxCM730::GetPacketTime() {
     double time;
 
     time = GetCurrentTime() - m_PacketStartTime;
@@ -242,7 +242,7 @@ bool LinuxCM730::IsUpdateTimeout() {
 }
 
 
-double LinuxCM730::GetUpdateTime() {
+float LinuxCM730::GetUpdateTime() {
     double time;
 
     time = GetCurrentTime() - m_UpdateStartTime;

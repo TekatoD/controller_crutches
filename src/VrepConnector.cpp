@@ -17,22 +17,14 @@ extern "C" {
 }
 
 
-VrepConnector::VrepConnector() {
-    std::string server_ip("127.0.0.1");
-    int server_port = 19997;
-    m_client_id = simxStart((simxChar *) server_ip.c_str(), server_port, true, true, 5000, 5);
+VrepConnector::VrepConnector() : m_server_ip("127.0.0.1"), m_port(19997) { }
 
-    if (m_client_id == -1) {
-        std::cout << "Can't connect with sim" << std::endl;
-    }
-    simxSynchronous(m_client_id, 1);
-    simxStartSimulation(m_client_id, simx_opmode_oneshot);
-}
+VrepConnector::VrepConnector(std::string server_ip, int server_port) : m_server_ip(server_ip), m_port(server_port) { }
 
-VrepConnector::VrepConnector(std::string server_ip, int server_port) {
-    m_client_id = simxStart((simxChar *) server_ip.c_str(), server_port, true, true, 5000, 5);
+void VrepConnector::Connect() {
+    m_client_id = simxStart((simxChar *) m_server_ip.c_str(), m_port, true, true, 5000, 5);
     if (m_client_id == -1) {
-        std::cout << "Can't connect with sim" << std::endl;
+        throw std::runtime_error("Can't connect with sim");
     }
     simxSynchronous(m_client_id, 1);
     simxStartSimulation(m_client_id, simx_opmode_oneshot);

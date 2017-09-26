@@ -15,6 +15,7 @@
 #include <GoTo.h>
 #include <SoccerBehavior.h>
 #include <VrepConnector.h>
+#include <VrepCM730.h>
 
 #include "LinuxDARwIn.h"
 
@@ -29,9 +30,8 @@
 using namespace Robot;
 
 //LinuxCM730 linux_cm730(U2D_DEV_NAME0);
-//CM730vrep cm730(&linux_cm730);
 VrepConnector vrepConnector;
-CM730* cm730 = new CM730vrep(vrepConnector.GetClientID());
+CM730* cm730 = new VrepCM730(vrepConnector.GetClientID());
 
 
 void change_current_dir() {
@@ -58,6 +58,14 @@ int main(int argc, char** argv) {
     signal(SIGINT, &sighandler);
 
     change_current_dir();
+
+    try {
+        vrepConnector.Connect();
+        cm730->Connect();
+    }
+    catch(std::runtime_error& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+    }
 
 
     minIni ini(argc == 1 ? INI_FILE_PATH : argv[1]);
@@ -98,7 +106,7 @@ int main(int argc, char** argv) {
     StateMachine::GetInstance()->LoadINISettings(&ini);
 
     int firm_ver = 0;
-    if (cm730->ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0) != CM730vrep::SUCCESS) {
+    if (cm730->ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0) != CM730::SUCCESS) {
         std::cerr << "Can't read firmware version from Dynamixel ID " << JointData::ID_HEAD_PAN << "!!\n" << std::endl;
         return 1;
     }
@@ -146,7 +154,7 @@ int main(int argc, char** argv) {
 //    Action::GetInstance()->m_Joint.SetEnableBody(true, true);
 //    MotionManager::GetInstance()->SetEnable(true);
 //
-//    cm730.WriteByte(CM730vrep::P_LED_PANNEL, 0x01 | 0x02 | 0x04, NULL);
+//    cm730.WriteByte(CM730::P_LED_PANNEL, 0x01 | 0x02 | 0x04, NULL);
 //
 //    SoccerBehavior soccer(cm730);
 //    GoalieBehavior goalie;

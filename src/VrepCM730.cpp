@@ -2,7 +2,7 @@
 #include <chrono>
 #include <thread>
 #include <fstream>
-#include "CM730vrep.h"
+#include "VrepCM730.h"
 
 #define MAX_EXT_API_CONNECTIONS 255
 #define NON_MATLAB_PARSING
@@ -13,18 +13,16 @@ extern "C" {
 
 
 
-Robot::CM730vrep::CM730vrep(int client_id, std::string device_postfix) {
-    m_client_id = client_id;
-    m_device_postfix = device_postfix;
-    init_devices();
+Robot::VrepCM730::VrepCM730(int client_id, std::string device_postfix) : m_client_id(client_id),
+                                                                         m_device_postfix(device_postfix),
+                                                                         m_connected(false) {
     for (int i = 0; i < ID_BROADCAST; i++) {
         m_BulkReadData[i] = BulkReadData();
-        m_BulkReadData[i].length = MX28::MAXNUM_ADDRESS; //TODO: Dunno if it woth to do something more clever with length
+        m_BulkReadData[i].length = MX28::MAXNUM_ADDRESS; //TODO: Dunno if it worth to do something more clever with length
     }
-    this->BulkRead();
 }
 
-void Robot::CM730vrep::init_devices() {
+void Robot::VrepCM730::init_devices() {
 
     //initialize sensors readings
     simxFloat h;
@@ -56,23 +54,23 @@ void Robot::CM730vrep::init_devices() {
     m_joints[JointData::ID_L_ANKLE_ROLL - 1] = this->connect_device("j_ankle_roll_l" + m_device_postfix);
     m_joints[JointData::ID_HEAD_PAN - 1] = this->connect_device("j_head_yaw" + m_device_postfix);
     m_joints[JointData::ID_HEAD_TILT - 1] = this->connect_device("j_head_pitch" + m_device_postfix);
-    std::cout << "Devices initialized" << std::endl;
+    std::cout << "\033[32mDevices initialized\033[0m" << std::endl;
 }
 
-int Robot::CM730vrep::get_client_id() {
+int Robot::VrepCM730::get_client_id() {
     return m_client_id;
 }
 
-int Robot::CM730vrep::connect_device(std::string device_name) {
+int Robot::VrepCM730::connect_device(std::string device_name) {
     int object_handler;
     if(simxGetObjectHandle(m_client_id, device_name.c_str(),
                            &object_handler, simx_opmode_oneshot_wait) == simx_return_ok) {
         return object_handler;
     }
-    return -1;
+    throw std::runtime_error("Can't connect with " + device_name + " device");
 }
 
-int Robot::CM730vrep::SyncWrite(int start_addr, int each_length, int number, int *pParam) {
+int Robot::VrepCM730::SyncWrite(int start_addr, int each_length, int number, int *pParam) {
     simxPauseCommunication(m_client_id, 1);
 //    this->DumpJoints("/home/tekatod/develop/Walking.txt", start_addr, each_length, number, pParam);
     for(size_t i = 0; i < number * each_length; i += each_length) {
@@ -91,7 +89,8 @@ int Robot::CM730vrep::SyncWrite(int start_addr, int each_length, int number, int
     simxSynchronousTrigger(m_client_id);
 }
 
-void Robot::CM730vrep::DumpJoints(std::string file_name, int start_addr, int each_length, int number, int *pParam) {
+//This method can be used in the SyncWrite method above for saving the sequence of servos values into the file.
+void Robot::VrepCM730::DumpJoints(std::string file_name, int start_addr, int each_length, int number, int *pParam) {
     std::ofstream f(file_name, std::ios_base::app);
     for(size_t i = 0; i < number * each_length; i += each_length) {
         f << pParam[i] << " " << (Robot::MX28::Value2Angle(CM730::MakeWord(pParam[i + 5], pParam[i + 6])) * M_PI) / 180 << std::endl;
@@ -100,7 +99,7 @@ void Robot::CM730vrep::DumpJoints(std::string file_name, int start_addr, int eac
     f.close();
 }
 
-int Robot::CM730vrep::ReadWord(int id, int address, int* pValue, int* error) {
+int Robot::VrepCM730::ReadWord(int id, int address, int* pValue, int* error) {
         auto get_sensor_data = [this, &error](std::string signal) {
             simxFloat data;
             *error = simxGetFloatSignal(m_client_id, signal.c_str(), &data, simx_opmode_buffer);
@@ -150,7 +149,7 @@ int Robot::CM730vrep::ReadWord(int id, int address, int* pValue, int* error) {
     }
 }
 
-int Robot::CM730vrep::BulkRead() {
+int Robot::VrepCM730::BulkRead() {
     for(size_t i = JointData::ID_R_SHOULDER_PITCH; i < JointData::NUMBER_OF_JOINTS; ++i) {
         int value;
         int error;
@@ -173,11 +172,11 @@ int Robot::CM730vrep::BulkRead() {
     m_BulkReadData[ID_CM].error = 0; //TODO:: crutch
 }
 
-int Robot::CM730vrep::WriteByte(int address, int value, int* error) {
+int Robot::VrepCM730::WriteByte(int address, int value, int* error) {
     return SUCCESS;
 }
 
-int Robot::CM730vrep::WriteWord(int id, int address, int value, int* error) {
+int Robot::VrepCM730::WriteWord(int id, int address, int value, int* error) {
     if(address == MX28::P_PRESENT_POSITION_L) {
         simxSetObjectIntParameter(m_client_id, m_joints[id - 1], 2000, 1, simx_opmode_oneshot);
         simxSetObjectIntParameter(m_client_id, m_joints[id - 1], 2001, 1, simx_opmode_oneshot);
@@ -189,53 +188,58 @@ int Robot::CM730vrep::WriteWord(int id, int address, int value, int* error) {
     return SUCCESS;
 }
 
-int Robot::CM730vrep::ReadByte(int id, int address, int *pValue, int* error) {
+int Robot::VrepCM730::ReadByte(int id, int address, int *pValue, int* error) {
     if(address == MX28::P_VERSION) {
         *pValue = 28;
     }
     return SUCCESS;
 }
 
-bool Robot::CM730vrep::Connect() {
-    return (m_client_id != -1);
+bool Robot::VrepCM730::Connect() {
+    if(!m_connected) {
+        this->init_devices();
+        this->BulkRead();
+        m_connected = true;
+    }
+    return m_connected;
 }
 
-bool Robot::CM730vrep::DXLPowerOn() {
+bool Robot::VrepCM730::DXLPowerOn() {
     return true;
 }
 
-Robot::CM730vrep::~CM730vrep() { }
+Robot::VrepCM730::~VrepCM730() { }
 
-bool Robot::CM730vrep::ChangeBaud(int baud) {
+bool Robot::VrepCM730::ChangeBaud(int baud) {
     return true;
 }
 
-void Robot::CM730vrep::Disconnect() { }
+void Robot::VrepCM730::Disconnect() { }
 
-bool Robot::CM730vrep::MX28InitAll() {
+bool Robot::VrepCM730::MX28InitAll() {
     return true;
 }
 
-int Robot::CM730vrep::WriteWord(int address, int value, int *error) {
+int Robot::VrepCM730::WriteWord(int address, int value, int *error) {
     return 0;
 }
 
-int Robot::CM730vrep::Ping(int id, int *error) {
+int Robot::VrepCM730::Ping(int id, int *error) {
     int p;
     *error = simxGetPingTime(m_client_id, &p);
     return p;
 }
 
-int Robot::CM730vrep::ReadTable(int id, int start_addr, int end_addr, unsigned char *table, int *error) {
+int Robot::VrepCM730::ReadTable(int id, int start_addr, int end_addr, unsigned char *table, int *error) {
     return 0;
 }
 
-int Robot::CM730vrep::WriteByte(int id, int address, int value, int *error) {
+int Robot::VrepCM730::WriteByte(int id, int address, int value, int *error) {
     return 0;
 }
 
-int Robot::CM730vrep::WriteTable(int id, int start_addr, int end_addr, unsigned char *table, int *error) {
+int Robot::VrepCM730::WriteTable(int id, int start_addr, int end_addr, unsigned char *table, int *error) {
     return 0;
 }
 
-void Robot::CM730vrep::MakeBulkReadPacket() { }
+void Robot::VrepCM730::MakeBulkReadPacket() { }

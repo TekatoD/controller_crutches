@@ -13,7 +13,7 @@ extern "C" {
 
 
 
-Robot::VrepCM730::VrepCM730(int client_id, std::string device_postfix) : m_client_id(client_id),
+Robot::VrepCM730::VrepCM730(std::string device_postfix) : m_client_id(-1),
                                                                          m_device_postfix(device_postfix),
                                                                          m_connected(false) {
     for (int i = 0; i < ID_BROADCAST; i++) {
@@ -57,7 +57,11 @@ void Robot::VrepCM730::init_devices() {
     std::cout << "\033[32mDevices initialized\033[0m" << std::endl;
 }
 
-int Robot::VrepCM730::get_client_id() {
+void Robot::VrepCM730::SetClientId(int client_id) {
+    m_client_id = client_id;
+}
+
+int Robot::VrepCM730::GetClientId() {
     return m_client_id;
 }
 
@@ -196,7 +200,7 @@ int Robot::VrepCM730::ReadByte(int id, int address, int *pValue, int* error) {
 }
 
 bool Robot::VrepCM730::Connect() {
-    if(!m_connected) {
+    if(!m_connected && m_client_id != -1) {
         this->init_devices();
         this->BulkRead();
         m_connected = true;

@@ -14,7 +14,7 @@ namespace Robot {
     class VrepCM730 : public CM730 {
     public:
 
-        VrepCM730(int client_id, std::string device_postfix = "");
+        VrepCM730(std::string device_postfix = "");
 
         //This is dummy for now it can do nothing
         int WriteByte(int address, int value, int* error);
@@ -65,7 +65,9 @@ namespace Robot {
         //This is dummy for now it can do nothing
         void MakeBulkReadPacket();
 
-        int get_client_id();
+        int GetClientId();
+
+        void SetClientId(int client_id);
 
         // Utility
         static int MakeWord(int lowbyte, int highbyte);

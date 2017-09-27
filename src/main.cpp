@@ -31,7 +31,7 @@ using namespace Robot;
 
 //LinuxCM730 linux_cm730(U2D_DEV_NAME0);
 VrepConnector vrepConnector;
-CM730* cm730 = new VrepCM730(vrepConnector.GetClientID());
+CM730* cm730 = new VrepCM730();
 
 
 void change_current_dir() {
@@ -60,7 +60,9 @@ int main(int argc, char** argv) {
     change_current_dir();
 
     try {
+        VrepCM730* vrepCM730 = static_cast<VrepCM730*>(cm730);
         vrepConnector.Connect();
+        vrepCM730->SetClientId(vrepConnector.GetClientID());
         cm730->Connect();
     }
     catch(std::runtime_error& e) {

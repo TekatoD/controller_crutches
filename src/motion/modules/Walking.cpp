@@ -286,6 +286,7 @@ void Walking::Process() {
     //                     R_HIP_YAW, R_HIP_ROLL, R_HIP_PITCH, R_KNEE, R_ANKLE_PITCH, R_ANKLE_ROLL, L_HIP_YAW, L_HIP_ROLL, L_HIP_PITCH, L_KNEE, L_ANKLE_PITCH, L_ANKLE_ROLL, R_ARM_SWING, L_ARM_SWING
     int dir[14] = {-1, -1, 1, 1, -1, 1, -1, -1, -1, -1, 1, 1, 1, -1};
     float initAngle[14] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -48.345, 41.313};
+
     int outValue[14];
 
     // Update walk parameters
@@ -538,7 +539,7 @@ void Walking::Process() {
     }
 
     Pose2D odo_offset = GetOdoOffset();
-    std::cout << "Odo: " << odo_offset.X() << ' ' << odo_offset.Y() << ' ' << odo_offset.Theta() << std::endl;
+//    std::cout << "Odo: " << odo_offset.X() << ' ' << odo_offset.Y() << ' ' << odo_offset.Theta() << std::endl;
     m_odometry_collector.odoTranslate(odo_offset);
 
     // Compute body swing

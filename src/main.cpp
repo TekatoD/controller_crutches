@@ -14,6 +14,8 @@
 #include <GameController.h>
 #include <GoTo.h>
 #include <SoccerBehavior.h>
+#include <VrepConnector.h>
+#include <VrepCM730.h>
 #include <GoalieBehavior.h>
 #include <LinuxCM730.h>
 #include <LinuxCamera.h>
@@ -34,8 +36,9 @@
 
 using namespace Robot;
 
-LinuxCM730 linux_cm730(U2D_DEV_NAME0);
-CM730 cm730(&linux_cm730);
+//LinuxCM730 linux_cm730(U2D_DEV_NAME0);
+VrepConnector vrepConnector;
+CM730* cm730 = new VrepCM730();
 
 
 void change_current_dir() {
@@ -55,7 +58,7 @@ void sighandler(int sig) {
 }
 
 
-int main(void) {
+int main(int argc, char** argv) {
     signal(SIGABRT, &sighandler);
     signal(SIGTERM, &sighandler);
     signal(SIGQUIT, &sighandler);
@@ -63,11 +66,22 @@ int main(void) {
 
     change_current_dir();
 
-    minIni ini(INI_FILE_PATH);
+    try {
+        VrepCM730* vrepCM730 = static_cast<VrepCM730*>(cm730);
+        vrepConnector.Connect();
+        vrepCM730->SetClientId(vrepConnector.GetClientID());
+        cm730->Connect();
+    }
+    catch(std::runtime_error& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+    }
 
-    LinuxCamera::GetInstance()->Initialize(0);
-    LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
-    LinuxCamera::GetInstance()->LoadINISettings(&ini);                   // load from ini
+
+    minIni ini(argc == 1 ? INI_FILE_PATH : argv[1]);
+
+//    LinuxCamera::GetInstance()->Initialize(0);
+//    LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
+//    LinuxCamera::GetInstance()->LoadINISettings(&ini);                   // load from ini
 
 //    auto ball_finder = std::make_unique<ColorFinder>();
 //    ball_finder->LoadINISettings(ini.get());
@@ -79,9 +93,9 @@ int main(void) {
 //    goTo.LoadINISettings(ini.get());
 
     //////////////////// Framework Initialize ///////////////////////////
-    if (!MotionManager::GetInstance()->Initialize(&cm730)) {
-        linux_cm730.SetPortName(U2D_DEV_NAME1);
-        if (!MotionManager::GetInstance()->Initialize(&cm730)) {
+    if (!MotionManager::GetInstance()->Initialize(cm730)) {
+//        linux_cm730.SetPortName(U2D_DEV_NAME1);
+        if (!MotionManager::GetInstance()->Initialize(cm730)) {
             std::cerr << "Fail to initialize Motion Manager!" << std::endl;
             return 1;
         }
@@ -101,7 +115,7 @@ int main(void) {
     StateMachine::GetInstance()->LoadINISettings(&ini);
 
     int firm_ver = 0;
-    if (cm730.ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0) != CM730::SUCCESS) {
+    if (cm730->ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0) != CM730::SUCCESS) {
         std::cerr << "Can't read firmware version from Dynamixel ID " << JointData::ID_HEAD_PAN << "!!\n" << std::endl;
         return 1;
     }
@@ -112,7 +126,7 @@ int main(void) {
                   << std::endl;
         return 1;
     } else if (27 <= firm_ver) {
-        Action::GetInstance()->LoadFile((char*) MOTION_FILE_PATH);
+        Action::GetInstance()->LoadFile(argc <= 2 ? (char*) MOTION_FILE_PATH : argv[2]);
     } else {
         return 1;
     }
@@ -120,11 +134,11 @@ int main(void) {
 
     ///////////////////// Init game controller //////////////////////////
 
-    GameController::GetInstance()->LoadINISettings(&ini);
-    if (!GameController::GetInstance()->Connect()) {
-        std::cerr << "ERROR: Can't connect to game controller!" << std::endl;
-        return 1;
-    }
+//    GameController::GetInstance()->LoadINISettings(&ini);
+//    if (!GameController::GetInstance()->Connect()) {
+//        std::cerr << "ERROR: Can't connect to game controller!" << std::endl;
+//        return 1;
+//    }
 
     /////////////////////////////////////////////////////////////////////
 
@@ -138,45 +152,68 @@ int main(void) {
     /////////////////////////////////////////////////////////////////////
 
 
+//    SoccerBehavior soccer(cm730);
+//    MotionManager::GetInstance()->SetEnable(true);
+//    Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+//    Walking::GetInstance()->X_MOVE_AMPLITUDE = 10.0;
+//    Walking::GetInstance()->Start();
+//    while (true) {
+//        std::cout << "hui" << std::endl;
+//    }
+//    Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+//    MotionManager::GetInstance()->SetEnable(true);
+//
+//    cm730.WriteByte(CM730::P_LED_PANNEL, 0x01 | 0x02 | 0x04, NULL);
+//
+//    SoccerBehavior soccer(cm730);
+//    GoalieBehavior goalie;
+//
+//    soccer.LoadINISettings(&ini);
+//    goalie.LoadINISettings(&ini);
+//
+//    Action::GetInstance()->Start(15);
+//    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 
-    Action::GetInstance()->m_Joint.SetEnableBody(true, true);
-    MotionManager::GetInstance()->SetEnable(true);
+    sleep(1);
+    StateMachine::GetInstance()->Enable();
+    Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
+    Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+//
+////    Action::GetInstance()->Start(12);
+//    Action::GetInstance()->Start(13);
 
-    cm730.WriteByte(CM730::P_LED_PANNEL, 0x01 | 0x02 | 0x04, NULL);
-
-    SoccerBehavior soccer(cm730);
-    GoalieBehavior goalie;
-
-    soccer.LoadINISettings(&ini);
-    goalie.LoadINISettings(&ini);
-
-    Action::GetInstance()->Start(15);
-    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
-
+//
     while (!finish) {
         // Update game controller
-        GameController::GetInstance()->Update();
+//        GameController::GetInstance()->Update();
 
         // Update state machine
         StateMachine::GetInstance()->Check(cm730);
-
-        if (StateMachine::GetInstance()->IsStarted() == 0) {
-            continue;
+//
+        if (!Action::GetInstance()->IsRunning()) {
+            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+            Walking::GetInstance()->X_MOVE_AMPLITUDE = 20.0;
+            Walking::GetInstance()->A_MOVE_AMPLITUDE = 20.0;
+            Walking::GetInstance()->Start();
         }
 
-        switch (StateMachine::GetInstance()->GetRole()) {
-            case ROLE_IDLE:break;
-            case ROLE_SOCCER:
-                soccer.Process();
-                break;
-            case ROLE_PENALTY:break;
-            case ROLE_GOALKEEPER:
-                goalie.Process();
-                break;
-            case ROLES_COUNT:break;
-        }
+//        if (StateMachine::GetInstance()->IsStarted() == 0) {
+//            continue;
+//        }
+//
+//        switch (StateMachine::GetInstance()->GetRole()) {
+//            case ROLE_IDLE:break;
+//            case ROLE_SOCCER:
+//                soccer.Process();
+//                break;
+//            case ROLE_PENALTY:break;
+//            case ROLE_GOALKEEPER:
+//                goalie.Process();
+//                break;
+//            case ROLES_COUNT:break;
+//        }
     }
-
+    vrepConnector.Disconnect();
 
     return 0;
 }

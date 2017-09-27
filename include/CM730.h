@@ -1,12 +1,8 @@
-/*
- *   CM730.h
-*   This class is the secondary controler that controls the motors MX28
- *   Author: ROBOTIS
- *
+/**
+ *  @autor tekatod
+ *  @date 9/20/17
  */
-
-#ifndef _CM_730_H_
-#define _CM_730_H_
+#pragma once
 
 #include "MX28.h"
 
@@ -170,62 +166,49 @@ For instance, LinuxCM730 is a concretisation of this class.
             ID_BROADCAST = 254
         };
 
-    private:
-        PlatformCM730* m_Platform;
-        static const int RefreshTime = 6; //msec
-        unsigned char m_ControlTable[MAXNUM_ADDRESS];
-
-        unsigned char m_BulkReadTxPacket[MAXNUM_TXPARAM + 10];
-
-        int TxRxPacket(unsigned char* txpacket, unsigned char* rxpacket, int priority);
-
-        unsigned char CalculateChecksum(unsigned char* packet);
-
     public:
-        bool DEBUG_PRINT;
+
         BulkReadData m_BulkReadData[ID_BROADCAST];
 
-        CM730(PlatformCM730* platform);
-
-        ~CM730();
+//        virtual ~CM730() = 0;
 
 /*this method is to be used first to connect to the robot. Returns true when success and false when fail*/
-        bool Connect();
+        virtual bool Connect() = 0;
 
-        bool ChangeBaud(int baud);
+        virtual bool ChangeBaud(int baud) = 0;
 
-        void Disconnect();
+        virtual void Disconnect() = 0;
 
-        bool DXLPowerOn();
+        virtual bool DXLPowerOn() = 0;
 
-        bool MX28InitAll();
+        virtual bool MX28InitAll() = 0;
 
         // For board
-        int WriteByte(int address, int value, int* error);
+        virtual int WriteByte(int address, int value, int* error) = 0;
 
-        int WriteWord(int address, int value, int* error);
+        virtual int WriteWord(int address, int value, int* error) = 0;
 
         // For actuators
-        int Ping(int id, int* error);
+        virtual int Ping(int id, int* error) = 0;
 
-        int ReadByte(int id, int address, int* pValue, int* error);
+        virtual int ReadByte(int id, int address, int* pValue, int* error) = 0;
 
-        int ReadWord(int id, int address, int* pValue, int* error);
+        virtual int ReadWord(int id, int address, int* pValue, int* error) = 0;
 
-        int ReadTable(int id, int start_addr, int end_addr, unsigned char* table, int* error);
+        virtual int ReadTable(int id, int start_addr, int end_addr, unsigned char* table, int* error) = 0;
 
-        int WriteByte(int id, int address, int value, int* error);
+        virtual int WriteByte(int id, int address, int value, int* error) = 0;
 
-        int WriteWord(int id, int address, int value, int* error);
+        virtual int WriteWord(int id, int address, int value, int* error) = 0;
 
-        int WriteTable(int id, int start_addr, int end_addr, unsigned char* table, int* error);
+        virtual int WriteTable(int id, int start_addr, int end_addr, unsigned char* table, int* error) = 0;
 
         // For motion control
-        int SyncWrite(int start_addr, int each_length, int number, int* pParam);
+        virtual int SyncWrite(int start_addr, int each_length, int number, int* pParam) = 0;
 
-        void MakeBulkReadPacket();
+        virtual void MakeBulkReadPacket() = 0;
 
-        int BulkRead();
+        virtual int BulkRead() = 0;
 
         // Utility
         static int MakeWord(int lowbyte, int highbyte);
@@ -235,11 +218,5 @@ For instance, LinuxCM730 is a concretisation of this class.
         static int GetHighByte(int word);
 
         static int MakeColor(int red, int green, int blue);
-
-        // ***   WEBOTS PART  *** //
-
-        void MakeBulkReadPacketWb();
     };
 }
-
-#endif

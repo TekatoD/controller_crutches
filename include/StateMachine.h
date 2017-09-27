@@ -59,7 +59,7 @@ namespace Robot {
 
         void SetRole(Role role);
 
-        void Check(CM730& cm730);
+        void Check(CM730* cm730);
 
         void LoadINISettings(minIni* ini);
 
@@ -73,7 +73,7 @@ namespace Robot {
 
         void Enable();
 
-        void UpdateLeds(CM730 &cm730) const;
+        void UpdateLeds(CM730* cm730) const;
     };
 }
 

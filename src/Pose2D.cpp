@@ -7,31 +7,31 @@
 
 Robot::Pose2D::Pose2D() : m_x(0), m_y(0), m_theta(0) { }
 
-Robot::Pose2D::Pose2D(double x, double y, double theta) : m_x(x), m_y(y), m_theta(theta) {
+Robot::Pose2D::Pose2D(float x, float y, float theta) : m_x(x), m_y(y), m_theta(theta) {
     this->normalizeTheta();
 }
 
-double Robot::Pose2D::X() const {
+float Robot::Pose2D::X() const {
     return m_x;
 }
 
-double Robot::Pose2D::Y() const {
+float Robot::Pose2D::Y() const {
     return m_y;
 }
 
-double Robot::Pose2D::Theta() const {
+float Robot::Pose2D::Theta() const {
     return m_theta;
 }
 
-void Robot::Pose2D::setX(double x) {
+void Robot::Pose2D::setX(float x) {
     m_x = x;
 }
 
-void Robot::Pose2D::setY(double y) {
+void Robot::Pose2D::setY(float y) {
     m_y = y;
 }
 
-void Robot::Pose2D::setTheta(double theta) {
+void Robot::Pose2D::setTheta(float theta) {
     m_theta = theta;
     this->normalizeTheta();
 }
@@ -77,10 +77,10 @@ Robot::Pose2D& Robot::Pose2D::operator-=(const Robot::Pose2D &rhs) {
 
 
 void Robot::Pose2D::rotateAround(const Robot::Pose2D& pose) {
-    double c = cos(pose.Theta());
-    double s = sin(pose.Theta());
-    double d_x = m_x - pose.X();
-    double d_y = m_y - pose.Y();
+    float c = cos(pose.Theta());
+    float s = sin(pose.Theta());
+    float d_x = m_x - pose.X();
+    float d_y = m_y - pose.Y();
     m_x = c * (d_x) - s * (d_y) + pose.X();
     m_y = s * (d_x) + c * (d_y) + pose.Y();
 }

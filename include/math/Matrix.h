@@ -40,7 +40,7 @@ namespace Robot {
     protected:
 
     public:
-        double m[MAXNUM_ELEMENT]; // Element
+        float m[MAXNUM_ELEMENT]; // Element
 
         Matrix3D();
 
@@ -54,7 +54,7 @@ namespace Robot {
 
         void Scale(Vector3D scale);
 
-        void Rotate(double angle, Vector3D axis);
+        void Rotate(float angle, Vector3D axis);
 
         void Translate(Vector3D offset);
 

@@ -3,6 +3,10 @@
  *  @date 5/11/17
  */
 
+#include <Camera.h>
+#include <motion/modules/Head.h>
+#include <cmath>
+#include <motion/modules/Walking.h>
 #include "BallSearcher.h"
 
 using namespace Robot;
@@ -46,17 +50,17 @@ void BallSearcher::Process() {
     m_PanPhase += m_PanPhaseStep * m_PanDirection;
     m_TiltPhase += m_TiltPhaseStep * m_TurnDirection;
 
-    const double tilt_max = Head::GetInstance()->GetTopLimitAngle();
-    const double tilt_min = Head::GetInstance()->GetBottomLimitAngle();
-    const double tilt_diff = tilt_max - tilt_min;
-    const double pan_max = Head::GetInstance()->GetLeftLimitAngle();
-    const double pan_min = Head::GetInstance()->GetRightLimitAngle();
-    const double pan_diff = pan_max - pan_min;
+    const float tilt_max = Head::GetInstance()->GetTopLimitAngle();
+    const float tilt_min = Head::GetInstance()->GetBottomLimitAngle();
+    const float tilt_diff = tilt_max - tilt_min;
+    const float pan_max = Head::GetInstance()->GetLeftLimitAngle();
+    const float pan_min = Head::GetInstance()->GetRightLimitAngle();
+    const float pan_diff = pan_max - pan_min;
 
 
 
-    double pan = sin(m_PanPhase / m_PhaseSize * M_2_PI) * pan_diff - pan_min;
-    double tilt = sin(m_TiltPhase / m_PhaseSize * M_2_PI) * tilt_diff - tilt_min;
+    float pan = sinf(m_PanPhase / m_PhaseSize * M_2_PI) * pan_diff - pan_min;
+    float tilt = sinf(m_TiltPhase / m_PhaseSize * M_2_PI) * tilt_diff - tilt_min;
     Head::GetInstance()->MoveByAngle(pan, tilt);
 
     if (m_WalkingEnabled) {
@@ -81,7 +85,7 @@ void BallSearcher::LoadINISettings(minIni* ini) {
 }
 
 void BallSearcher::LoadINISettings(minIni* ini, const std::string& section) {
-    double value;
+    float value;
     if ((value = ini->getd(section, "tilt_phase_step", INVALID_VALUE)) != INVALID_VALUE) m_TiltPhaseStep = value;
     if ((value = ini->getd(section, "pan_phase_step", INVALID_VALUE)) != INVALID_VALUE) m_PanPhaseStep = value;
     if ((value = ini->getd(section, "phase_size", INVALID_VALUE)) != INVALID_VALUE) m_PhaseSize = value;

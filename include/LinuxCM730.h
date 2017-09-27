@@ -17,18 +17,18 @@ namespace Robot {
             : public PlatformCM730 {
     private:
         int m_Socket_fd;
-        double m_PacketStartTime;
-        double m_PacketWaitTime;
-        double m_UpdateStartTime;
-        double m_UpdateWaitTime;
-        double m_ByteTransferTime;
+        float m_PacketStartTime;
+        float m_PacketWaitTime;
+        float m_UpdateStartTime;
+        float m_UpdateWaitTime;
+        float m_ByteTransferTime;
         char m_PortName[20];
 
         sem_t m_LowSemID;
         sem_t m_MidSemID;
         sem_t m_HighSemID;
 
-        double GetCurrentTime();
+        float GetCurrentTime();
 
     public:
         bool DEBUG_PRINT;
@@ -78,7 +78,7 @@ namespace Robot {
 
         float GetUpdateTime();
 
-        virtual void Sleep(double msec);
+        virtual void Sleep(float msec);
         ////////////////////////////////////////////////////////
     };
 }

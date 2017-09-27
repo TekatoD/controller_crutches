@@ -38,8 +38,8 @@ void BallTracker::Process(Point2D pos) {
         Point2D center = Point2D(Camera::WIDTH / 2, Camera::HEIGHT / 2);
         Point2D offset = pos - center;
         offset *= -1; // Inverse X-axis, Y-axis
-        offset.X *= (Camera::VIEW_H_ANGLE / (double) Camera::WIDTH); // pixel per angle
-        offset.Y *= (Camera::VIEW_V_ANGLE / (double) Camera::HEIGHT); // pixel per angle
+        offset.X *= (Camera::VIEW_H_ANGLE / (float) Camera::WIDTH); // pixel per angle
+        offset.Y *= (Camera::VIEW_V_ANGLE / (float) Camera::HEIGHT); // pixel per angle
         BallPosition = offset;
         Head::GetInstance()->MoveTracking(BallPosition);
     }

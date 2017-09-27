@@ -170,7 +170,7 @@ void StateMachine::LoadINISettings(minIni *ini, const std::string& section) {
         }
     }
 
-    double dvalue = -2;
+    float dvalue = -2;
     if ((dvalue = ini->getd(section, "spawn_x", INVALID_VALUE)) != INVALID_VALUE) m_spawn_pos.setX(dvalue);
     if ((dvalue = ini->getd(section, "spawn_y", INVALID_VALUE)) != INVALID_VALUE) m_spawn_pos.setY(dvalue);
     if ((dvalue = ini->getd(section, "spawn_theta", INVALID_VALUE)) != INVALID_VALUE)

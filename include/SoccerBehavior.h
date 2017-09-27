@@ -55,7 +55,7 @@ namespace Robot {
         Field m_Field;
         int m_PreviousState;
 
-        void normalize(double& m_theta) const;
+        void normalize(float& m_theta) const;
     };
 }
 

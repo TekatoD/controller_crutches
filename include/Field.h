@@ -13,17 +13,17 @@
 
 class Field {
 public:
-    double GetWidth() const;
+    float GetWidth() const;
 
-    void SetWidth(double field_width);
+    void SetWidth(float field_width);
 
-    double GetLength() const;
+    float GetLength() const;
 
-    void SetLength(double field_height);
+    void SetLength(float field_height);
 
-    double GetGateWidth() const;
+    float GetGateWidth() const;
 
-    void SetGateWidth(double gate_width);
+    void SetGateWidth(float gate_width);
 
     void LoadINISettings(minIni* ini);
 
@@ -36,9 +36,9 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Field& field);
 
 private:
-    double m_FieldWidth;
-    double m_FieldLength;
-    double m_GateWidth;
+    float m_FieldWidth;
+    float m_FieldLength;
+    float m_GateWidth;
 };
 
 

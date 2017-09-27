@@ -397,12 +397,12 @@ int LinuxCamera::ReadFrame() {
 void LinuxCamera::CaptureFrame() {
     if (DEBUG_PRINT == true) {
         struct timeval tv;
-        static double beforeTime = 0;
-        double currentTime;
-        double durationTime;
+        static float beforeTime = 0;
+        float currentTime;
+        float durationTime;
 
         gettimeofday(&tv, NULL);
-        currentTime = (double) tv.tv_sec * 1000.0 + (double) tv.tv_usec / 1000.0;
+        currentTime = (float) tv.tv_sec * 1000.0 + (float) tv.tv_usec / 1000.0;
         durationTime = currentTime - beforeTime;
         fprintf(stderr, "\rCamera: %.1fmsec(%.1ffps)                    ", durationTime, 1000.0 / durationTime);
         beforeTime = currentTime;

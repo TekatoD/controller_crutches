@@ -22,22 +22,22 @@ namespace Robot {
     class Head
             : public MotionModule {
     private:
-        double m_LeftLimit;
-        double m_RightLimit;
-        double m_TopLimit;
-        double m_BottomLimit;
-        double m_Pan_Home;
-        double m_Tilt_Home;
-        double m_Pan_err;
-        double m_Pan_err_diff;
-        double m_Pan_p_gain;
-        double m_Pan_d_gain;
-        double m_Tilt_err;
-        double m_Tilt_err_diff;
-        double m_Tilt_p_gain;
-        double m_Tilt_d_gain;
-        double m_PanAngle;
-        double m_TiltAngle;
+        float m_LeftLimit;
+        float m_RightLimit;
+        float m_TopLimit;
+        float m_BottomLimit;
+        float m_Pan_Home;
+        float m_Tilt_Home;
+        float m_Pan_err;
+        float m_Pan_err_diff;
+        float m_Pan_p_gain;
+        float m_Pan_d_gain;
+        float m_Tilt_err;
+        float m_Tilt_err_diff;
+        float m_Tilt_p_gain;
+        float m_Tilt_d_gain;
+        float m_PanAngle;
+        float m_TiltAngle;
 
         Head();
 
@@ -55,23 +55,23 @@ namespace Robot {
 
         void Process();
 
-        double GetTopLimitAngle() { return m_TopLimit; }
+        float GetTopLimitAngle() { return m_TopLimit; }
 
-        double GetBottomLimitAngle() { return m_BottomLimit; }
+        float GetBottomLimitAngle() { return m_BottomLimit; }
 
-        double GetRightLimitAngle() { return m_RightLimit; }
+        float GetRightLimitAngle() { return m_RightLimit; }
 
-        double GetLeftLimitAngle() { return m_LeftLimit; }
+        float GetLeftLimitAngle() { return m_LeftLimit; }
 
-        double GetPanAngle() { return m_PanAngle; }
+        float GetPanAngle() { return m_PanAngle; }
 
-        double GetTiltAngle() { return m_TiltAngle; }
+        float GetTiltAngle() { return m_TiltAngle; }
 
         void MoveToHome();
 
-        void MoveByAngle(double pan, double tilt);
+        void MoveByAngle(float pan, float tilt);
 
-        void MoveByAngleOffset(double pan, double tilt);
+        void MoveByAngleOffset(float pan, float tilt);
 
         void InitTracking();
 

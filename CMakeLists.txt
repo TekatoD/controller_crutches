@@ -1,15 +1,35 @@
 cmake_minimum_required(VERSION 3.0)
 project(darwin-soccer)
-#-DCMAKE_TOOLCHAIN_FILE=/home/tekatod/develop/controller_crutches/toolchain.cmake
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
-find_package(Threads REQUIRED)
-find_package(JPEG REQUIRED)
-find_package(VREP REQUIRED)
+#### Project options ####
+option(CROSSCOMPILE "Compile for real Darwin-OP (V-REP build by default)" OFF)
+
+#### Compile properties ####
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(Boost_USE_STATIC_LIBS ON)
+
+if (CROSSCOMPILE)
+    add_definitions(-DCROSSCOMPILE) # This definition is used during the initialization in the main
+    set(CROSSCOMPILE_FLAGS "-m32 -march=atom -mtune=atom -mfpmath=sse -flto -ffast-math")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++")
+endif (CROSSCOMPILE)
 
 include_directories(include/)
 
+#### External libraries and packages ####
+find_package(Threads REQUIRED)
+find_package(JPEG REQUIRED) # This lib is used by the linux camera
+find_package(VREP REQUIRED)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+# Path to Boost and OpenCV needs to be set manually when crosscompiling
+find_package(Boost REQUIRED)
+find_package(OpenCV REQUIRED)
+
+#### Sources ####
+# All sources of the project. Insert one file per line.
+# Don't forget include header files
 set(SRC
         include/motion/modules/Action.h
         include/BallFollower.h
@@ -17,7 +37,6 @@ set(SRC
         include/Camera.h
         include/VrepCM730.h
         include/ColorFinder.h
-        include/DARwIn.h
         include/FSR.h
         include/motion/modules/Head.h
         include/Image.h
@@ -26,7 +45,6 @@ set(SRC
         include/motion/Kinematics.h
         include/LinuxCamera.h
         include/LinuxCM730.h
-        include/LinuxDARwIn.h
         include/LinuxMotionTimer.h
         include/math/Matrix.h
         include/minIni.h
@@ -65,16 +83,12 @@ set(SRC
         src/main.cpp
         src/MX28.cpp
         src/StateMachine.cpp
-
         include/gamecontroller/RoboCupGameControlData.h
         include/gamecontroller/SPLCoachMessage.h
         include/gamecontroller/SPLStandardMessage.h
         src/GameController.cpp include/GameController.h
-
         include/UdpComm.h
         src/UdpComm.cpp
-#        src/Speech.cpp
-#        include/Speech.h
         src/Pose2D.cpp
         include/Pose2D.h
         src/OdometryCollector.cpp
@@ -95,14 +109,32 @@ set(SRC
         src/CM730.cpp
         include/VrepConnector.h
         src/VrepConnector.cpp)
+        include/math/AngleTools.h
+        include/math/Eigen.h
+        src/math/AngleTools.cpp
+        src/ServiceLocator.cpp
+        include/ServiceLocator.h
+        src/ServiceInterface.cpp
+        include/ServiceInterface.h
+        include/Singleton.h
+        src/PropertyReader.cpp
+        include/PropertyReader.h)
 
-add_executable(soccer ${SRC})
-target_link_libraries(soccer
+#### Build targets #####
+add_executable(controller ${SRC})
+
+target_link_libraries(controller
         ${CMAKE_THREAD_LIBS_INIT}
         ${JPEG_LIBRARIES}
+        ${BOOST_LIBRARIES}
+        ${OpenCV_LIBRARIES}
+        Eigen3::Eigen
         ${VREP_LIBRARIES})
 
-target_include_directories(soccer PUBLIC
+target_include_directories(controller PUBLIC
         ${JPEG_INCLUDE_DIR}
         ${VREP_REMOTE}
-        ${VREP_INCLUDE})
+        ${VREP_INCLUDE}
+        ${BOOST_INCLUDE_DIR}
+        ${JPEG_INCLUDE_DIR}
+        ${OpenCV_INCLUDE_DIR})

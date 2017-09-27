@@ -37,18 +37,18 @@ namespace Robot {
         int m_KickBallCount;
         int m_PreviousState;
 
-        double m_KickTopAngle;
-        double m_KickRightAngle;
+        float m_KickTopAngle;
+        float m_KickRightAngle;
 
-        double m_KickLeftAngle;
-        double m_FollowMaxRL;
-        double m_FitMaxRLTurn;
+        float m_KickLeftAngle;
+        float m_FollowMaxRL;
+        float m_FitMaxRLTurn;
 
-        double m_UnitRLTurn;
-        double m_GoalRLTurn;
-        double m_RLTurn;
-        double m_EdgeDistThreshhold;
-        double m_FollowThreshhold;
+        float m_UnitRLTurn;
+        float m_GoalRLTurn;
+        float m_RLTurn;
+        float m_EdgeDistThreshhold;
+        float m_FollowThreshhold;
 
         BallSearcher m_BallSearcher;
         BallTracker m_BallTracker;
@@ -56,7 +56,7 @@ namespace Robot {
         Field m_Field;
         GoTo m_GoTo;
 
-        double m_XCrutch;
-        double m_ACrutch;
+        float m_XCrutch;
+        float m_ACrutch;
     };
 }

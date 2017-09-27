@@ -7,7 +7,8 @@
 
 
 #include <vector>
-#include "DARwIn.h"
+#include <math/Point.h>
+#include "minIni.h"
 
 
 #define FINDER_SECTION "Ball Searcher"
@@ -41,15 +42,15 @@ namespace Robot {
         bool m_Active;
         Point2D m_LastPosition;
 
-        double m_TiltPhase;
-        double m_PanPhase;
-        double m_TiltPhaseStep;
-        double m_PanPhaseStep;
-        double m_PhaseSize;
+        float m_TiltPhase;
+        float m_PanPhase;
+        float m_TiltPhaseStep;
+        float m_PanPhaseStep;
+        float m_PhaseSize;
 
-        double m_TurnSpeed;
-        double m_TurnStep;
-        double m_MaxTurn;
+        float m_TurnSpeed;
+        float m_TurnStep;
+        float m_MaxTurn;
 
         int m_TurnDirection;
         int m_PanDirection;

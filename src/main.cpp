@@ -24,6 +24,8 @@
 #include <LinuxMotionTimer.h>
 #include <motion/modules/Action.h>
 #include <motion/modules/Head.h>
+#include <motion/Kinematics.h>
+#include <thread>
 
 
 #include "StateMachine.h"
@@ -183,6 +185,8 @@ int main(int argc, char** argv) {
 //    Action::GetInstance()->Start(13);
 
 //
+
+
     while (!finish) {
         // Update game controller
 //        GameController::GetInstance()->Update();
@@ -190,12 +194,27 @@ int main(int argc, char** argv) {
         // Update state machine
         StateMachine::GetInstance()->Check(cm730);
 //
-        if (!Action::GetInstance()->IsRunning()) {
-            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-            Walking::GetInstance()->X_MOVE_AMPLITUDE = 20.0;
-            Walking::GetInstance()->A_MOVE_AMPLITUDE = 20.0;
-            Walking::GetInstance()->Start();
-        }
+//        if (!Action::GetInstance()->IsRunning()) {
+//            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+//            Walking::GetInstance()->X_MOVE_AMPLITUDE = 20.0;
+//            Walking::GetInstance()->A_MOVE_AMPLITUDE = 20.0;
+//            Walking::GetInstance()->Start();
+//        }
+
+        Matrix4x4f out;
+        int pan;
+        int tilt;
+        int error;
+        Head::GetInstance()->MoveByAngle(0, 0);
+//    cm730->WriteWord(JointData::ID_HEAD_PAN, MX28::P_PRESENT_POSITION_L, MX28::Angle2Value(60), &error);
+        cm730->ReadWord(JointData::ID_HEAD_PAN, MX28::P_PRESENT_POSITION_L, &pan, &error);
+        cm730->ReadWord(JointData::ID_HEAD_TILT, MX28::P_PRESENT_POSITION_L, &tilt, &error);
+        Kinematics::ComputeHeadForwardKinematics(out, (MX28::Value2Angle(pan) * M_PI) / 180, (MX28::Value2Angle(tilt) * M_PI) / 180);
+        std::cout << "pan " << MX28::Value2Angle(pan) << std::endl;
+        std::cout << "tilt " << MX28::Value2Angle(tilt) << std::endl;
+        std::cout << "---------matrix---------" << std::endl;
+        std::cout << out << std::endl;
+
 
 //        if (StateMachine::GetInstance()->IsStarted() == 0) {
 //            continue;

@@ -187,6 +187,7 @@ int Robot::VrepCM730::WriteWord(int id, int address, int value, int* error) {
         *error = simxSetJointTargetPosition(m_client_id, m_joints[id - 1],
                                    (Robot::MX28::Value2Angle(value) * M_PI) / 180,
                                    simx_opmode_oneshot);
+        simxSynchronousTrigger(m_client_id);
         return SUCCESS;
     }
     return SUCCESS;

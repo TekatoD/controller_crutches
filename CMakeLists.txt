@@ -108,7 +108,7 @@ set(SRC
         include/CM730.h
         src/CM730.cpp
         include/VrepConnector.h
-        src/VrepConnector.cpp)
+        src/VrepConnector.cpp
         include/math/AngleTools.h
         include/math/Eigen.h
         src/math/AngleTools.cpp

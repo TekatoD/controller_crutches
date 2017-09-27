@@ -145,14 +145,14 @@ void Kinematics::ComputeLegForwardKinematics(Matrix4x4f& out, float pelvis, floa
 
 void Kinematics::ComputeHeadForwardKinematics(Matrix4x4f& out, float pan, float tilt) {
     // todo check order of angles
-    const float s1 = sinf(pan);
-    const float c1 = cosf(pan);
-    const float s2 = sinf(tilt);
-    const float c2 = cosf(tilt);
+    const float s1 = sinf(tilt);
+    const float c1 = cosf(tilt);
+    const float s2 = sinf(pan);
+    const float c2 = cosf(pan);
 
     const float r11 = c1 * c2;
     const float r12 = -c1 * s2;
-    const float r13 = -s1;
+    const float r13 = s1;
 
     const float r21 = -s2;
     const float r22 = -c2;

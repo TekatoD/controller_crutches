@@ -154,7 +154,7 @@ void Kinematics::ComputeHeadForwardKinematics(Matrix4x4f& out, float pan, float 
     const float r12 = -c1 * s2;
     const float r13 = s1;
 
-    const float r21 = -s2;
+    const float r21 = s2;
     const float r22 = -c2;
     const float r23 = 0.0f;
 

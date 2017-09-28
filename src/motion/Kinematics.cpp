@@ -120,22 +120,22 @@ void Kinematics::ComputeLegForwardKinematics(Matrix4x4f& out, float pelvis, floa
     const float c1c2c3 = c1 * c2 * c3;
     const float s3c1c2 = c1 * c2 * s3;
 
-    const float r11 = (c1c2c3 - s1s3) * (c4c5 - s4s5) * c6 + (-s3c1c2 - s1c3) * (s4c5 + c4s5) * c6 - c1s2 * s6;
-    const float r12 = (c1c2c3 - s1s3) * (-c4c5 + s4s5) * s6 + (-s3c1c2 - s1c3) * (-s4c5 - c4s5) * s6 - c1s2 * c6;
+    const float r11 = (c1c2c3 - s1s3) * ((c4c5 - s4s5) * c6) + (-s3c1c2 - s1c3) * ((s4c5 + c4s5) * c6) - c1s2 * s6;
+    const float r12 = (c1c2c3 - s1s3) * ((-c4c5 + s4s5) * s6) + (-s3c1c2 - s1c3) *((-s4c5 - c4s5) * s6) - c1s2 * c6;
     const float r13 = (c1c2c3 - s1s3) * (c4s5 + s4c5) + (-s3c1c2 - s1c3) * (s4s5 - c4c5);
-    const float r31 = (s2c3 * c6) * (c4c5 - s4s5) - s2s3 * (s4c5 + c4s5) * c6 + c2 * s6;
-    const float r32 = (s2c3 * s6) * (-c4c5 + s4s5) - s2s3 * (-s4c5 - c4s5) * s6 + c2 * c6;
-    const float r33 = s2c3 * (c4s5 + s4c5) - s2s3 * (s4s5 - c4c5);
-    const float r21 = r12 * r33 - r13 * r32;
-    const float r22 = r13 * r31 - r11 * r33;
-    const float r23 = r11 * r32 - r12 * r31;
+    const float r31 = s2c3 * (c6 * (c4c5 - s4s5)) - s2s3 * ((s4c5 + c4s5) * c6) + c2 * s6;
+    const float r33 = s2c3 * (s6 * (-c4c5 + s4s5)) - s2s3 * (-s4c5 - c4s5) * s6 + c2 * c6;
+    const float r32 = s2c3 * (c4s5 + s4c5) - s2s3 * (s4s5 - c4c5);
+    const float r21 = -(r12 * r33 - r13 * r32);
+    const float r22 = -(r13 * r31 - r11 * r33);
+    const float r23 = -(r11 * r32 - r12 * r31);
 
     const float px = s2c3 * (c4 * CALF_LENGTH + THIGH_LENGTH) -
                      s2s3 * (s4 * CALF_LENGTH) + r13 * ANKLE_LENGTH;
-    const float py = (c1c2c3 - s1s3) * (c4 * CALF_LENGTH + THIGH_LENGTH) +
-                     (-s3c1c2 - s1c3) * (s4 * CALF_LENGTH) + r11 * ANKLE_LENGTH;
-    const float pz = (s1 * c2 * c3 + c1 * s3) * (c4 * CALF_LENGTH + THIGH_LENGTH) +
+    const float py = (s1 * c2 * c3 + c1 * s3) * (c4 * CALF_LENGTH + THIGH_LENGTH) +
                      (-s3 * s1 * c2 + c1 * c3) * (s4 * CALF_LENGTH) + r12 * ANKLE_LENGTH;
+    const float pz = (c1c2c3 - s1s3) * (c4 * CALF_LENGTH + THIGH_LENGTH) +
+                     (-s3c1c2 - s1c3) * (s4 * CALF_LENGTH) + r11 * ANKLE_LENGTH;
 
     out << r11, r12, r13, px,
            r21, r22, r23, py,
@@ -151,15 +151,15 @@ void Kinematics::ComputeHeadForwardKinematics(Matrix4x4f& out, float pan, float 
     const float c2 = cosf(pan);
 
     const float r11 = c1 * c2;
-    const float r12 = -c1 * s2;
+    const float r12 = -c1 * s2; //TODO: Check the minus
     const float r13 = s1;
 
     const float r21 = s2;
-    const float r22 = -c2;
+    const float r22 = c2;
     const float r23 = 0.0f;
 
     const float r31 = s1 * c2;
-    const float r32 = -s1 * s2;
+    const float r32 = -s1 * s2; //TODO: Check the minus
     const float r33 = c1;
 
     const float px = r11 * CAMERA_OFFSET_X + r13 * CAMERA_OFFSET_Z;

@@ -177,7 +177,7 @@ int main(int argc, char** argv) {
 //    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 
     sleep(1);
-    StateMachine::GetInstance()->Enable();
+//    StateMachine::GetInstance()->Enable();
     Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
     Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
 //
@@ -192,14 +192,14 @@ int main(int argc, char** argv) {
 //        GameController::GetInstance()->Update();
 
         // Update state machine
-        StateMachine::GetInstance()->Check(cm730);
-//
+//        StateMachine::GetInstance()->Check(cm730);
 //        if (!Action::GetInstance()->IsRunning()) {
 //            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
 //            Walking::GetInstance()->X_MOVE_AMPLITUDE = 20.0;
 //            Walking::GetInstance()->A_MOVE_AMPLITUDE = 20.0;
 //            Walking::GetInstance()->Start();
 //        }
+
 
         Matrix4x4f out;
         int pan = cm730->m_BulkReadData[JointData::ID_HEAD_PAN].ReadWord(MX28::P_PRESENT_POSITION_L);
@@ -211,6 +211,33 @@ int main(int argc, char** argv) {
         std::cout << "tilt " << MX28::Value2Angle(tilt) << std::endl;
         std::cout << "---------matrix---------" << std::endl;
         std::cout << out << std::endl;
+
+//        Pose2D od = Walking::GetInstance()->GetOdo();
+//        if (od.X() != 0 || od.Y() != 0 || od.Theta() != 0) {
+//            Matrix4x4f out_leg;
+//            int pelvis = cm730->m_BulkReadData[JointData::ID_L_HIP_YAW].ReadWord(MX28::P_PRESENT_POSITION_L);
+//            int tigh_roll = cm730->m_BulkReadData[JointData::ID_L_HIP_ROLL].ReadWord(MX28::P_PRESENT_POSITION_L);
+//            int tigh_pitch = cm730->m_BulkReadData[JointData::ID_L_HIP_PITCH].ReadWord(MX28::P_PRESENT_POSITION_L);
+//            int knee_pitch = cm730->m_BulkReadData[JointData::ID_L_KNEE].ReadWord(MX28::P_PRESENT_POSITION_L);
+//            int ankle_pitch = cm730->m_BulkReadData[JointData::ID_L_ANKLE_PITCH].ReadWord(MX28::P_PRESENT_POSITION_L);
+//            int ankle_roll = cm730->m_BulkReadData[JointData::ID_L_ANKLE_ROLL].ReadWord(MX28::P_PRESENT_POSITION_L);
+//            Kinematics::ComputeLegForwardKinematics(out_leg, (MX28::Value2Angle(pelvis) * M_PI) / 180,
+//                                                    (MX28::Value2Angle(tigh_roll) * M_PI) / 180,
+//                                                    (MX28::Value2Angle(tigh_pitch) * M_PI) / 180,
+//                                                    (MX28::Value2Angle(knee_pitch) * M_PI) / 180,
+//                                                    (MX28::Value2Angle(ankle_pitch) * M_PI) / 180,
+//                                                    (MX28::Value2Angle(ankle_roll) * M_PI) / 180);
+//
+//            std::cout << "pelvis " << MX28::Value2Angle(pelvis) << std::endl;
+//            std::cout << "tigh_roll " << MX28::Value2Angle(tigh_roll) << std::endl;
+//            std::cout << "tigh_pitch " << MX28::Value2Angle(tigh_pitch) << std::endl;
+//            std::cout << "knee_pitch " << MX28::Value2Angle(knee_pitch) << std::endl;
+//            std::cout << "ankle_pitch " << MX28::Value2Angle(ankle_pitch) << std::endl;
+//            std::cout << "ankle_roll " << MX28::Value2Angle(ankle_roll) << std::endl;
+//            std::cout << "---------matrix---------" << std::endl;
+//            std::cout << out_leg << std::endl;
+//        }
+//        Walking::GetInstance()->ResetOdo(Pose2D(0, 0, 0));
 
 
 //        if (StateMachine::GetInstance()->IsStarted() == 0) {

@@ -8,11 +8,19 @@
 #ifndef _BALL_FOLLOWER_H_
 #define _BALL_FOLLOWER_H_
 
-#include "Point.h"
+#include "math/Point.h"
 #include "BallTracker.h"
+
+#define FOLLOWER_SECTION ("Ball Follower")
 
 
 namespace Robot {
+    enum Kicking {
+        NO_KICKING,
+        LEFT_LEG_KICK,
+        RIGHT_LEG_KICK
+    };
+
     class BallFollower {
     private:
         int m_NoBallMaxCount;
@@ -20,38 +28,58 @@ namespace Robot {
         int m_KickBallMaxCount;
         int m_KickBallCount;
 
-        double m_MaxFBStep;
-        double m_MaxRLStep;
-        double m_MaxDirAngle;
+        float m_MaxFBStep;
+        float m_MaxRLStep;
+        float m_MaxDirAngle;
 
-        double m_KickTopAngle;
-        double m_KickRightAngle;
-        double m_KickLeftAngle;
+        float m_KickTopAngle;
+        float m_KickRightAngle;
+        float m_KickLeftAngle;
 
-        double m_FollowMaxFBStep;
-        double m_FollowMinFBStep;
-        double m_FollowMaxRLTurn;
-        double m_FitFBStep;
-        double m_FitMaxRLTurn;
-        double m_UnitFBStep;
-        double m_UnitRLTurn;
+        float m_FollowMaxFBStep;
+        float m_FollowMinFBStep;
+        float m_FollowMaxRLTurn;
+        float m_FitFBStep;
+        float m_FitMaxRLTurn;
+        float m_UnitFBStep;
+        float m_UnitRLStep;
+        float m_UnitRLTurn;
 
-        double m_GoalFBStep;
-        double m_GoalRLTurn;
-        double m_FBStep;
-        double m_RLTurn;
+        float m_GoalFBStep;
+        float m_GoalRLStep;
+        float m_GoalRLTurn;
+        float m_FBStep;
+        float m_RLStep;
+        float m_RLTurn;
 
-    protected:
+        float m_TiltOffset;
+
+        float m_AimTiltOffset;
+        float m_AimRLStep;
+        float m_AimRLTurn;
+
+        Kicking m_KickBall;
 
     public:
-        bool DEBUG_PRINT;
-        int KickBall;        // 0: No ball 1:Left -1:Right
 
         BallFollower();
 
         ~BallFollower();
 
-        void Process(Point2D ball_pos);
+        void Process(Point2D ball_pos, float angle_top, float angle_bot);
+
+        void LoadINISettings(minIni* ini);
+
+        void LoadINISettings(minIni* ini, const std::string& section);
+
+        void SaveINISettings(minIni* ini);
+
+        void SaveINISettings(minIni* ini, const std::string& section);
+
+        bool IsNoBall() const;
+
+        Kicking GetKickingLeg() const;
+
     };
 }
 

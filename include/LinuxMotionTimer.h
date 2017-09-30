@@ -9,7 +9,7 @@
 #define _LINUX_MOTION_MANAGER_H_
 
 #include <pthread.h>
-#include "MotionManager.h"
+#include "motion/MotionManager.h"
 #include <time.h>
 
 namespace Robot {

@@ -7,13 +7,12 @@
 
 #include <string.h>
 #include <memory>
-#include "MotionStatus.h"
-#include "Action.h"
+#include "motion/MotionStatus.h"
+#include "motion/modules/Action.h"
 
 using namespace Robot;
 
 
-std::unique_ptr<Action> Action::m_UniqueInstance = new Action();
 
 
 Action::Action() {

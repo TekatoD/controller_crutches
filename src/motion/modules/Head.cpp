@@ -6,14 +6,13 @@
  */
 
 #include "MX28.h"
-#include "Kinematics.h"
-#include "MotionStatus.h"
-#include "Head.h"
+#include "motion/Kinematics.h"
+#include "motion/MotionStatus.h"
+#include "motion/modules/Head.h"
 
 using namespace Robot;
 
 /*initialization of the head*/
-std::unique_ptr<Head> Head::m_UniqueInstance = new Head();
 
 
 Head::Head() {
@@ -68,7 +67,7 @@ void Head::LoadINISettings(minIni* ini) {
 
 
 void Head::LoadINISettings(minIni* ini, const std::string& section) {
-    double value = INVALID_VALUE;
+    float value = INVALID_VALUE;
 
     if ((value = ini->getd(section, "pan_p_gain", INVALID_VALUE)) != INVALID_VALUE) m_Pan_p_gain = value;
     if ((value = ini->getd(section, "pan_d_gain", INVALID_VALUE)) != INVALID_VALUE) m_Pan_d_gain = value;
@@ -107,7 +106,7 @@ void Head::MoveToHome() {
 }
 
 
-void Head::MoveByAngle(double pan, double tilt) {
+void Head::MoveByAngle(float pan, float tilt) {
     m_PanAngle = pan;
     m_TiltAngle = tilt;
 
@@ -115,7 +114,7 @@ void Head::MoveByAngle(double pan, double tilt) {
 }
 
 
-void Head::MoveByAngleOffset(double pan, double tilt) {
+void Head::MoveByAngleOffset(float pan, float tilt) {
     MoveByAngle(m_PanAngle + pan, m_TiltAngle + tilt);
 }
 
@@ -140,7 +139,7 @@ void Head::MoveTracking(Point2D err) {
 
 
 void Head::MoveTracking() {
-    double pOffset, dOffset;
+    float pOffset, dOffset;
 
     pOffset = m_Pan_err * m_Pan_p_gain;
     pOffset *= pOffset;

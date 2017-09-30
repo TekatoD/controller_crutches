@@ -233,22 +233,22 @@ void LinuxCamera::LoadINISettings(minIni* ini) {
     int value = -2;
     CameraSettings newset = GetCameraSettings();
 
-    if ((value = ini->geti("Camera", "Brightness", -2)) != -2) newset.brightness = value;
-    if ((value = ini->geti("Camera", "Contrast", -2)) != -2) newset.contrast = value;
-    if ((value = ini->geti("Camera", "Saturation", -2)) != -2) newset.saturation = value;
-    if ((value = ini->geti("Camera", "Gain", -2)) != -2) newset.gain = value;
-    if ((value = ini->geti("Camera", "Exposure", -2)) != -2) newset.exposure = value;
+    if ((value = ini->geti("Camera", "brightness", -2)) != -2) newset.brightness = value;
+    if ((value = ini->geti("Camera", "contrast", -2)) != -2) newset.contrast = value;
+    if ((value = ini->geti("Camera", "saturation", -2)) != -2) newset.saturation = value;
+    if ((value = ini->geti("Camera", "gain", -2)) != -2) newset.gain = value;
+    if ((value = ini->geti("Camera", "exposure", -2)) != -2) newset.exposure = value;
 
     SetCameraSettings(newset);
 }
 
 
 void LinuxCamera::SaveINISettings(minIni* ini) {
-    ini->put("Camera", "Brightness", settings.brightness);
-    ini->put("Camera", "Contrast", settings.contrast);
-    ini->put("Camera", "Saturation", settings.saturation);
-    ini->put("Camera", "Gain", settings.gain);
-    ini->put("Camera", "Exposure", settings.exposure);
+    ini->put("Camera", "brightness", settings.brightness);
+    ini->put("Camera", "contrast", settings.contrast);
+    ini->put("Camera", "saturation", settings.saturation);
+    ini->put("Camera", "gain", settings.gain);
+    ini->put("Camera", "exposure", settings.exposure);
 }
 
 
@@ -397,12 +397,12 @@ int LinuxCamera::ReadFrame() {
 void LinuxCamera::CaptureFrame() {
     if (DEBUG_PRINT == true) {
         struct timeval tv;
-        static double beforeTime = 0;
-        double currentTime;
-        double durationTime;
+        static float beforeTime = 0;
+        float currentTime;
+        float durationTime;
 
         gettimeofday(&tv, NULL);
-        currentTime = (double) tv.tv_sec * 1000.0 + (double) tv.tv_usec / 1000.0;
+        currentTime = (float) tv.tv_sec * 1000.0 + (float) tv.tv_usec / 1000.0;
         durationTime = currentTime - beforeTime;
         fprintf(stderr, "\rCamera: %.1fmsec(%.1ffps)                    ", durationTime, 1000.0 / durationTime);
         beforeTime = currentTime;
@@ -439,149 +439,4 @@ void LinuxCamera::CaptureFrame() {
 
         /* EAGAIN - continue select loop. */
     }
-}
-
-// WEBOTS PART //
-
-int LinuxCamera::ReadFrameWb() {
-    struct v4l2_buffer buf;
-
-    CLEAR (buf);
-
-    buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    buf.memory = V4L2_MEMORY_MMAP;
-
-    if (-1 == ioctl(camera_fd, VIDIOC_DQBUF, &buf)) {
-        switch (errno) {
-            case EAGAIN:
-                return 0;
-
-            case EIO:
-                /* Could ignore EIO, see spec. */
-
-                /* fall through */
-
-            default:
-                exit(EXIT_FAILURE);
-        }
-    }
-
-    assert (buf.index < n_buffers);
-
-    // Extract the image from the buffer, flip it (H and V) and convert it in BGRA format (everything in only one loop)
-    unsigned char* yuyv = (unsigned char*) buffers[buf.index].start + fbuffer->m_YUVFrame->m_ImageSize / 2 - 1;
-    unsigned char* bgra = fbuffer->m_BGRAFrame->m_ImageData;
-    int z = 0;
-
-    while (yuyv > (((unsigned char*) buffers[buf.index].start))) {
-        int r, g, b;
-        int y, u, v;
-
-        if (z)
-            y = yuyv[-3] << 8;
-        else
-            y = yuyv[-1] << 8;
-        u = yuyv[-2] - 128;
-        v = yuyv[0] - 128;
-
-        r = (y + (359 * v)) >> 8;
-        g = (y - (88 * u) - (183 * v)) >> 8;
-        b = (y + (454 * u)) >> 8;
-
-        *(bgra++) = (b > 255) ? 255 : ((b < 0) ? 0 : b);
-        *(bgra++) = (g > 255) ? 255 : ((g < 0) ? 0 : g);
-        *(bgra++) = (r > 255) ? 255 : ((r < 0) ? 0 : r);
-        *(bgra++) = 255; // a
-
-        if (z++) {
-            z = 0;
-            yuyv -= 4;
-        }
-    }
-
-
-    if (-1 == ioctl(camera_fd, VIDIOC_QBUF, &buf))
-        ErrorExit("VIDIOC_QBUF");
-
-    return 1;
-}
-
-
-void LinuxCamera::CaptureFrameWb() {
-    if (DEBUG_PRINT == true) {
-        struct timeval tv;
-        static double beforeTime = 0;
-        double currentTime;
-        double durationTime;
-
-        gettimeofday(&tv, NULL);
-        currentTime = (double) tv.tv_sec * 1000.0 + (double) tv.tv_usec / 1000.0;
-        durationTime = currentTime - beforeTime;
-        fprintf(stderr, "\rCamera: %.1fmsec(%.1ffps)                    ", durationTime, 1000.0 / durationTime);
-        beforeTime = currentTime;
-    }
-
-
-    for (;;) {
-
-        fd_set fds;
-        struct timeval tv;
-        int r;
-
-        FD_ZERO (&fds);
-        FD_SET (camera_fd, &fds);
-
-        /* Timeout. */
-        tv.tv_sec = 2;
-        tv.tv_usec = 0;
-
-        r = select(camera_fd + 1, &fds, NULL, NULL, &tv);
-
-        if (-1 == r) {
-            if (EINTR == errno)
-                continue;
-
-            exit(EXIT_FAILURE);
-        }
-
-        if (0 == r) {
-            fprintf(stderr, "select timeout\n");
-            exit(EXIT_FAILURE);
-        }
-
-        if (ReadFrameWb())
-            break;
-
-        /* EAGAIN - continue select loop. */
-    }
-}
-
-FrameBuffer* LinuxCamera::getFrameBuffer()
-{
-    return fbuffer;
-}
-
-Image* LinuxCamera::getYUVFrame()
-{
-    return fbuffer->m_YUVFrame;
-}
-
-Image* LinuxCamera::getRGBFrame()
-{
-    return fbuffer->m_RGBFrame;
-}
-
-Image* LinuxCamera::getHSVFrame()
-{
-    return fbuffer->m_HSVFrame;
-}
-
-Image* LinuxCamera::getBGRFrame()
-{
-    return fbuffer->m_BGRFrame;
-}
-
-Image* LinuxCamera::getBGRAFrame()
-{
-    return fbuffer->m_BGRAFrame;
 }

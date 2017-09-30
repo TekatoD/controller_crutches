@@ -6,7 +6,8 @@
  */
 
 #include <math.h>
-#include "Matrix.h"
+#include <math/AngleTools.h>
+#include "math/Matrix.h"
 
 using namespace Robot;
 
@@ -60,7 +61,7 @@ returns true iff the matrix is invertible
 */
 bool Matrix3D::Inverse() {
     Matrix3D src, dst, tmp;
-    double det;
+    float det;
 
     /* transpose matrix */
     for (int i = 0; i < 4; i++) {
@@ -166,10 +167,10 @@ void Matrix3D::Scale(Vector3D scale) {
 
 
 /*construct the matrix corresponding to a rotation of angle around the axis*/
-void Matrix3D::Rotate(double angle, Vector3D axis) {
-    double rad = angle * 3.141592 / 180.0;
-    double C = cos(rad);
-    double S = sin(rad);
+void Matrix3D::Rotate(float angle, Vector3D axis) {
+    float rad = radians(angle);
+    float C = cos(rad);
+    float S = sin(rad);
     Matrix3D mat;
 
     mat.m[m00] = C + axis.X * axis.X * (1 - C);
@@ -221,12 +222,12 @@ Vector3D Matrix3D::Transform(Vector3D vector) {
 
 /*?*/
 void Matrix3D::SetTransform(Point3D point, Vector3D angle) {
-    double Cx = cos(angle.X * 3.141592 / 180.0);
-    double Cy = cos(angle.Y * 3.141592 / 180.0);
-    double Cz = cos(angle.Z * 3.141592 / 180.0);
-    double Sx = sin(angle.X * 3.141592 / 180.0);
-    double Sy = sin(angle.Y * 3.141592 / 180.0);
-    double Sz = sin(angle.Z * 3.141592 / 180.0);
+    float Cx = cosf(radians(angle.X));
+    float Cy = cosf(radians(angle.Y));
+    float Cz = cosf(radians(angle.Z));
+    float Sx = sinf(radians(angle.X));
+    float Sy = sinf(radians(angle.Y));
+    float Sz = sinf(radians(angle.Z));
 
     Identity();
     m[0] = Cz * Cy;

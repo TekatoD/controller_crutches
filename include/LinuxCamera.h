@@ -13,7 +13,6 @@
 #include <sys/time.h>
 
 #include "Image.h"
-#include "BaseCamera.h"
 #include "minIni.h"
 
 namespace Robot {
@@ -38,7 +37,7 @@ namespace Robot {
                 exposure(1000) {}
     };
 
-    class LinuxCamera : public BaseCamera {
+    class LinuxCamera {
     private:
         static LinuxCamera* uniqueInstance;
 
@@ -57,8 +56,6 @@ namespace Robot {
         void ErrorExit(const char* s);
 
         int ReadFrame();
-
-        int ReadFrameWb();  // for Webots only
 
     protected:
 
@@ -91,14 +88,6 @@ namespace Robot {
         unsigned char GetAutoWhiteBalance() { return (unsigned char) (v4l2GetControl(V4L2_CID_AUTO_WHITE_BALANCE)); }
 
         void CaptureFrame();
-
-        void CaptureFrameWb(); // for Webots only
-        
-        FrameBuffer* getFrameBuffer();
-        Image* getYUVFrame();
-        Image* getRGBFrame();
-        Image* getHSVFFrame();
-        Image* getBGRAFrame();
     };
 }
 

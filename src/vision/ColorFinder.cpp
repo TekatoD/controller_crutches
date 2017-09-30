@@ -6,6 +6,7 @@
  */
 
 #include <stdlib.h>
+#include <iostream>
 
 #include "ColorFinder.h"
 #include "ImgProcess.h"
@@ -14,47 +15,44 @@ using namespace Robot;
 
 
 ColorFinder::ColorFinder()
-        :
-        m_center_point(Point2D()),
-        m_hue(356),
-        m_hue_tolerance(15),
-        m_min_saturation(50),
-        m_max_saturation(100),
-        m_min_value(10),
-        m_max_value(100),
-        m_min_percent(0.07),
-        m_max_percent(30.0),
-        color_section(""),
-        m_result(0) {}
+        : m_center_point(Point2D()),
+          m_hue(356),
+          m_hue_tolerance(15),
+          m_min_saturation(50),
+          m_max_saturation(100),
+          m_min_value(10),
+          m_max_value(100),
+          m_min_percent(0.07),
+          m_max_percent(30.0),
+          color_section(""),
+          m_result(0) {}
 
 
-ColorFinder::ColorFinder(int hue, int hue_tol, int min_sat, int min_val, double min_per, double max_per)
-        :
-        m_hue(hue),
-        m_hue_tolerance(hue_tol),
-        m_min_saturation(min_sat),
-        m_max_saturation(100),
-        m_min_value(min_val),
-        m_max_value(100),
-        m_min_percent(min_per),
-        m_max_percent(max_per),
-        color_section(""),
-        m_result(0) {}
+ColorFinder::ColorFinder(int hue, int hue_tol, int min_sat, int min_val, float min_per, float max_per)
+        : m_hue(hue),
+          m_hue_tolerance(hue_tol),
+          m_min_saturation(min_sat),
+          m_max_saturation(100),
+          m_min_value(min_val),
+          m_max_value(100),
+          m_min_percent(min_per),
+          m_max_percent(max_per),
+          color_section(""),
+          m_result(0) {}
 
 
-ColorFinder::ColorFinder(int hue, int hue_tol, int min_sat, int max_sat, int min_val, int max_val, double min_per,
-                         double max_per)
-        :
-        m_hue(hue),
-        m_hue_tolerance(hue_tol),
-        m_min_saturation(min_sat),
-        m_max_saturation(max_sat),
-        m_min_value(min_val),
-        m_max_value(max_val),
-        m_min_percent(min_per),
-        m_max_percent(max_per),
-        color_section(""),
-        m_result(0) {}
+ColorFinder::ColorFinder(int hue, int hue_tol, int min_sat, int max_sat, int min_val, int max_val, float min_per,
+                         float max_per)
+        : m_hue(hue),
+          m_hue_tolerance(hue_tol),
+          m_min_saturation(min_sat),
+          m_max_saturation(max_sat),
+          m_min_value(min_val),
+          m_max_value(max_val),
+          m_min_percent(min_per),
+          m_max_percent(max_per),
+          color_section(""),
+          m_result(0) {}
 
 
 ColorFinder::~ColorFinder() {
@@ -123,7 +121,7 @@ void ColorFinder::LoadINISettings(minIni* ini, const std::string& section) {
     if ((value = ini->geti(section, "min_value", INVALID_VALUE)) != INVALID_VALUE) m_min_value = value;
     if ((value = ini->geti(section, "max_value", INVALID_VALUE)) != INVALID_VALUE) m_max_value = value;
 
-    double dvalue = -2.0;
+    float dvalue = -2.0;
     if ((dvalue = ini->getd(section, "min_percent", INVALID_VALUE)) != INVALID_VALUE) m_min_percent = dvalue;
     if ((dvalue = ini->getd(section, "max_percent", INVALID_VALUE)) != INVALID_VALUE) m_max_percent = dvalue;
 
@@ -178,8 +176,8 @@ Point2D& ColorFinder::GetPosition(Image* hsv_img) {
         m_center_point.X = -1.0;
         m_center_point.Y = -1.0;
     } else {
-        m_center_point.X = (int) ((double) sum_x / (double) count);
-        m_center_point.Y = (int) ((double) sum_y / (double) count);
+        m_center_point.X = (int) ((float) sum_x / (float) count);
+        m_center_point.Y = (int) ((float) sum_y / (float) count);
     }
 
     return m_center_point;

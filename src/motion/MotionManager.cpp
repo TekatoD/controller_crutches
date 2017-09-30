@@ -9,7 +9,7 @@
 #include <math.h>
 #include "FSR.h"
 #include "MX28.h"
-#include "MotionManager.h"
+#include "motion/MotionManager.h"
 
 using namespace Robot;
 
@@ -17,14 +17,13 @@ MotionManager* MotionManager::m_UniqueInstance = new MotionManager();
 
 
 MotionManager::MotionManager()
-        :
-        m_CM730(0),
-        m_ProcessEnable(false),
-        m_Enabled(false),
-        m_IsRunning(false),
-        m_IsThreadRunning(false),
-        m_IsLogging(false),
-        DEBUG_PRINT(false) {
+        : m_CM730(0),
+          m_ProcessEnable(false),
+          m_Enabled(false),
+          m_IsRunning(false),
+          m_IsThreadRunning(false),
+          m_IsLogging(false),
+          DEBUG_PRINT(false) {
     for (int i = 0; i < JointData::NUMBER_OF_JOINTS; i++)
         m_Offset[i] = 0;
 }
@@ -82,7 +81,6 @@ bool MotionManager::Reinitialize() {
     for (int id = JointData::ID_R_SHOULDER_PITCH; id < JointData::NUMBER_OF_JOINTS; id++) {
         if (DEBUG_PRINT == true)
             fprintf(stderr, "ID:%d initializing...", id);
-
         if (m_CM730->ReadWord(id, MX28::P_PRESENT_POSITION_L, &value, &error) == CM730::SUCCESS) {
             MotionStatus::m_CurrentJoints.SetValue(id, value);
             MotionStatus::m_CurrentJoints.SetEnable(id, true);
@@ -184,10 +182,10 @@ void MotionManager::Process() {
                 buf_idx++;
             }
         } else {
-            double fb_sum = 0.0, rl_sum = 0.0;
-            double fb_sd = 0.0, rl_sd = 0.0;
-            double fb_diff, rl_diff;
-            double fb_mean = 0.0, rl_mean = 0.0;
+            float fb_sum = 0.0, rl_sum = 0.0;
+            float fb_sd = 0.0, rl_sd = 0.0;
+            float fb_diff, rl_diff;
+            float fb_mean = 0.0, rl_mean = 0.0;
 
             buf_idx = 0;
 

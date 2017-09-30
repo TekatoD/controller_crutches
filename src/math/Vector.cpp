@@ -6,7 +6,7 @@
  */
 
 #include <math.h>
-#include "Vector.h"
+#include "math/Vector.h"
 
 using namespace Robot;
 
@@ -18,7 +18,7 @@ Vector3D::Vector3D() {
 }
 
 
-Vector3D::Vector3D(double x, double y, double z) {
+Vector3D::Vector3D(float x, float y, float z) {
     X = x;
     Y = y;
     Z = z;
@@ -43,13 +43,13 @@ Vector3D::~Vector3D() {
 }
 
 
-double Vector3D::Length() {
+float Vector3D::Length() {
     return sqrt(X * X + Y * Y + Z * Z);
 }
 
 
 void Vector3D::Normalize() {
-    double length = Length();
+    float length = Length();
 
     X = X / length;
     Y = Y / length;
@@ -57,7 +57,7 @@ void Vector3D::Normalize() {
 }
 
 
-double Vector3D::Dot(const Vector3D& vector) {
+float Vector3D::Dot(const Vector3D& vector) {
     return (X * vector.X + Y * vector.Y + Z * vector.Z);
 }
 
@@ -71,13 +71,13 @@ Vector3D Vector3D::Cross(const Vector3D& vector) {
 }
 
 
-double Vector3D::AngleBetween(Vector3D& vector) {
+float Vector3D::AngleBetween(Vector3D& vector) {
     return acos((X * vector.X + Y * vector.Y + Z * vector.Z) / (Length() * vector.Length())) * (180.0 / 3.141592);
 }
 
 
-double Vector3D::AngleBetween(Vector3D& vector, Vector3D& axis) {
-    double angle = AngleBetween(vector);
+float Vector3D::AngleBetween(Vector3D& vector, Vector3D& axis) {
+    float angle = AngleBetween(vector);
     Vector3D cross = Cross(vector);
     if (cross.Dot(axis) < 0.0)
         angle *= -1.0;
@@ -110,7 +110,7 @@ Vector3D& Vector3D::operator-=(const Vector3D& vector) {
 }
 
 
-Vector3D& Vector3D::operator+=(const double value) {
+Vector3D& Vector3D::operator+=(const float value) {
     X += value;
     Y += value;
     Z += value;
@@ -118,7 +118,7 @@ Vector3D& Vector3D::operator+=(const double value) {
 }
 
 
-Vector3D& Vector3D::operator-=(const double value) {
+Vector3D& Vector3D::operator-=(const float value) {
     X -= value;
     Y -= value;
     Z -= value;
@@ -126,7 +126,7 @@ Vector3D& Vector3D::operator-=(const double value) {
 }
 
 
-Vector3D& Vector3D::operator*=(const double value) {
+Vector3D& Vector3D::operator*=(const float value) {
     X *= value;
     Y *= value;
     Z *= value;
@@ -134,7 +134,7 @@ Vector3D& Vector3D::operator*=(const double value) {
 }
 
 
-Vector3D& Vector3D::operator/=(const double value) {
+Vector3D& Vector3D::operator/=(const float value) {
     X /= value;
     Y /= value;
     Z /= value;
@@ -152,21 +152,21 @@ Vector3D Vector3D::operator-(const Vector3D& vector) {
 }
 
 
-Vector3D Vector3D::operator+(const double value) {
+Vector3D Vector3D::operator+(const float value) {
     return Vector3D(X + value, Y + value, Z + value);
 }
 
 
-Vector3D Vector3D::operator-(const double value) {
+Vector3D Vector3D::operator-(const float value) {
     return Vector3D(X - value, Y - value, Z - value);
 }
 
 
-Vector3D Vector3D::operator*(const double value) {
+Vector3D Vector3D::operator*(const float value) {
     return Vector3D(X * value, Y * value, Z * value);
 }
 
 
-Vector3D Vector3D::operator/(const double value) {
+Vector3D Vector3D::operator/(const float value) {
     return Vector3D(X / value, Y / value, Z / value);
 }

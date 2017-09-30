@@ -2,47 +2,37 @@
 #include <iostream>
 #include <stdexcept>
 
+#define MAX_EXT_API_CONNECTIONS 255
+#define NON_MATLAB_PARSING
 extern "C" {
-    #include "extApi.c"
-    #include "extApiPlatform.c"
+    #include "extApi.h"
+    #include "extApiPlatform.h"
 }
 
 using namespace Robot;
 
-VREPCamera::VREPCamera(int width, int height, const char* sensorName, const char* remoteUrl, int portNum)
-{
-    // Connect to V-REP remote api
-    m_clientId = simxStart((const simxChar*)remoteUrl, portNum, true, true, 2000, 5);
-    
-    if (m_clientId == -1) {
-        throw std::runtime_error("VREPCamera failed to connect to V-Rep");
-    }
-    
-    m_cold = false;
-    std::cout << "Connected to V-Rep" << std::endl;
-    
-    cameraStreamInit(width, height, sensorName);
-}
-
-VREPCamera::VREPCamera(int width, int height, const char* sensorName, int clientId)
+VREPCamera::VREPCamera(int width, int height, const char* sensorName) :
+    m_width(width), m_height(height), m_sensorName((char*)sensorName)
 { 
-    if (clientId == -1) {
-        throw std::runtime_error("VREPCamera invalid clientId");
-    }
-    m_cold = true;
-    m_clientId = clientId;
-    
-    cameraStreamInit(width, height, sensorName);
+    m_clientId = -1;
 }
 
 VREPCamera::~VREPCamera()
 {
     simxReleaseBuffer(m_imageBuffer);
-    if (!m_cold) {
-        simxFinish(m_clientId);
-    }
     
     delete m_fbuffer;
+}
+
+void VREPCamera::connect(int clientId)
+{
+
+    if (clientId == -1) {
+        throw std::runtime_error("VREPCamera invalid clientId");
+    }
+    m_clientId = clientId;
+    
+    cameraStreamInit(m_width, m_height, m_sensorName);
 }
 
 void VREPCamera::cameraStreamInit(int w, int h, const char* sensorName)
@@ -81,11 +71,6 @@ void VREPCamera::CaptureFrame()
         m_fbuffer->m_RGBFrame->m_ImageData = (unsigned char*)m_imageBuffer;
         ImgProcess::VFlipRGB(m_fbuffer->m_RGBFrame);
         ImgProcess::RGBtoBGR(m_fbuffer);
-    }
-    
-    // TODO: Debug?, sleep for some time
-    if (!m_cold) {
-        extApi_sleepMs(10);
     }
 }
 

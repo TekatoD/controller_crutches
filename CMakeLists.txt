@@ -118,7 +118,23 @@ set(SRC
         include/ServiceInterface.h
         include/Singleton.h
         src/PropertyReader.cpp
-        include/PropertyReader.h)
+        include/PropertyReader.h
+        src/VREPCamera.cpp
+        include/VREPCamera.h
+        src/Vision.cpp
+        include/Vision.h
+        src/VisionUtils.cpp
+        include/VisionUtils.h
+        src/detectors/AngleDetector.cpp
+        include/detectors/AngleDetector.h
+        src/detectors/BallDetector.cpp
+        include/detectors/BallDetector.h
+        src/detectors/BaseDetector.cpp
+        include/detectors/BaseDetector.h
+        src/detectors/FieldDetector.cpp
+        include/detectors/FieldDetector.h
+        src/detectors/LineDetector.cpp
+        include/detectors/LineDetector.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

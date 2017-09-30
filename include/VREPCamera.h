@@ -1,14 +1,6 @@
 #ifndef _VREP_CAMERA_H_
 #define _VREP_CAMERA_H_
 
-#define MAX_EXT_API_CONNECTIONS 255
-#define NON_MATLAB_PARSING
-
-extern "C" {
-    #include "extApi.h"
-    #include "extApiPlatform.h"
-}
-
 #include "Image.h"
 #include "ImgProcess.h"
 #include "BaseCamera.h"
@@ -16,8 +8,7 @@ extern "C" {
 namespace Robot {
     class VREPCamera : public BaseCamera {
     public:
-        VREPCamera(int width, int height, const char* sensorName, const char* remoteUrl, int portNum);
-        VREPCamera(int width, int height, const char* sensorName, int clientId);
+        VREPCamera(int width, int height, const char* sensorName);
         ~VREPCamera();
         
         void CaptureFrame();
@@ -31,7 +22,7 @@ namespace Robot {
         
         // TODO: Debug
         unsigned char* getImageBuffer() { return (unsigned char*)m_imageBuffer; }
-        
+        void connect(int clientId = -1);
         int getWidth() const { return m_res[0]; }
         int getHeight() const { return m_res[1]; }
         
@@ -42,11 +33,16 @@ namespace Robot {
         bool m_cold;
         
         FrameBuffer* m_fbuffer;
-        simxUChar* m_imageBuffer;
+        unsigned char* m_imageBuffer;
+        int m_width, m_height;
         
+        char* m_remoteUrl;
+        char* m_sensorName;
+        int m_port;
         int m_clientId;
-        simxInt m_res[2];
-        simxInt m_sensorHandle;
+        
+        int m_res[2];
+        int m_sensorHandle;
     };
 }
 

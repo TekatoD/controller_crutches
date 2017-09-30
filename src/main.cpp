@@ -10,12 +10,14 @@
 #include <libgen.h>
 #include <signal.h>
 #include <memory>
+#include <opencv2/opencv.hpp>
 
 #include <GameController.h>
 #include <GoTo.h>
 #include <SoccerBehavior.h>
 #include <VrepConnector.h>
 #include <VrepCM730.h>
+#include <VREPCamera.h>
 #include <GoalieBehavior.h>
 #include <LinuxCM730.h>
 #include <LinuxCamera.h>
@@ -24,7 +26,8 @@
 #include <LinuxMotionTimer.h>
 #include <motion/modules/Action.h>
 #include <motion/modules/Head.h>
-
+#include <Vision.h>
+#include <VisionUtils.h>
 
 #include "StateMachine.h"
 
@@ -65,12 +68,17 @@ int main(int argc, char** argv) {
     signal(SIGINT, &sighandler);
 
     change_current_dir();
-
+    
+    int width = 320, height = 240;
+    VREPCamera camera(width, height, "camera");
+    
     try {
         VrepCM730* vrepCM730 = static_cast<VrepCM730*>(cm730);
         vrepConnector.Connect();
         vrepCM730->SetClientId(vrepConnector.GetClientID());
         cm730->Connect();
+        
+        camera.connect(vrepConnector.GetClientID());
     }
     catch(std::runtime_error& e) {
         std::cout << "Error: " << e.what() << std::endl;
@@ -93,6 +101,7 @@ int main(int argc, char** argv) {
 //    goTo.LoadINISettings(ini.get());
 
     //////////////////// Framework Initialize ///////////////////////////
+    /*
     if (!MotionManager::GetInstance()->Initialize(cm730)) {
 //        linux_cm730.SetPortName(U2D_DEV_NAME1);
         if (!MotionManager::GetInstance()->Initialize(cm730)) {
@@ -109,6 +118,7 @@ int main(int argc, char** argv) {
 
     LinuxMotionTimer motion_timer(MotionManager::GetInstance());
     motion_timer.Start();
+    
     /////////////////////////////////////////////////////////////////////
 
     MotionManager::GetInstance()->LoadINISettings(&ini);
@@ -130,7 +140,7 @@ int main(int argc, char** argv) {
     } else {
         return 1;
     }
-
+    */
 
     ///////////////////// Init game controller //////////////////////////
 
@@ -173,21 +183,48 @@ int main(int argc, char** argv) {
 //
 //    Action::GetInstance()->Start(15);
 //    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
-
+/*
     sleep(1);
     StateMachine::GetInstance()->Enable();
     Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
     Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+*/
 //
 ////    Action::GetInstance()->Start(12);
 //    Action::GetInstance()->Start(13);
 
-//
+    ant::Vision vision("res/vision_cfg");
+    cv::namedWindow("camera_image", cv::WINDOW_AUTOSIZE);
     while (!finish) {
+        camera.CaptureFrame();
+        
+        unsigned char* imgBuff = camera.getBGRFrame()->m_ImageData;
+        
+        if (imgBuff) {
+            cv::Mat frame(cv::Size(width, height), CV_8UC3, imgBuff, cv::Mat::AUTO_STEP);
+            //cv::imshow("camera_image", frame);
+            
+            ant::vision_utils::rot90(frame, 0);
+            vision.setFrame(frame);
+            /*
+            std::vector<cv::Vec4i> lines = vision.lineDetect();
+            
+            for (auto& line : lines) {
+                cv::Point p1(line[0], line[1]);
+                cv::Point p2(line[2], line[3]);
+                
+                cv::line(frame, p1, p2, cv::Scalar(0, 0, 255), 5);
+            }
+            */
+            
+            cv::imshow("camera_image", frame);
+        }
+        
         // Update game controller
 //        GameController::GetInstance()->Update();
 
         // Update state machine
+        /*
         StateMachine::GetInstance()->Check(cm730);
 //
         if (!Action::GetInstance()->IsRunning()) {
@@ -196,6 +233,7 @@ int main(int argc, char** argv) {
             Walking::GetInstance()->A_MOVE_AMPLITUDE = 20.0;
             Walking::GetInstance()->Start();
         }
+        */
 
 //        if (StateMachine::GetInstance()->IsStarted() == 0) {
 //            continue;
@@ -212,6 +250,7 @@ int main(int argc, char** argv) {
 //                break;
 //            case ROLES_COUNT:break;
 //        }
+        cv::waitKey(1);
     }
     vrepConnector.Disconnect();
 

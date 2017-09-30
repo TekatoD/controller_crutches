@@ -5,6 +5,7 @@
 
 #include <VrepConnector.h>
 #include <iostream>
+#include <stdexcept>
 
 
 #define MAX_EXT_API_CONNECTIONS 255

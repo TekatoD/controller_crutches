@@ -1,5 +1,6 @@
 #include "VREPCamera.h"
 #include <iostream>
+#include <stdexcept>
 
 extern "C" {
     #include "extApi.c"
@@ -14,8 +15,7 @@ VREPCamera::VREPCamera(int width, int height, const char* sensorName, const char
     m_clientId = simxStart((const simxChar*)remoteUrl, portNum, true, true, 2000, 5);
     
     if (m_clientId == -1) {
-        // TODO: throw something meaningful
-        throw;
+        throw std::runtime_error("VREPCamera failed to connect to V-Rep");
     }
     
     m_cold = false;
@@ -27,7 +27,7 @@ VREPCamera::VREPCamera(int width, int height, const char* sensorName, const char
 VREPCamera::VREPCamera(int width, int height, const char* sensorName, int clientId)
 { 
     if (clientId == -1) {
-        throw;
+        throw std::runtime_error("VREPCamera invalid clientId");
     }
     m_cold = true;
     m_clientId = clientId;
@@ -37,7 +37,6 @@ VREPCamera::VREPCamera(int width, int height, const char* sensorName, int client
 
 VREPCamera::~VREPCamera()
 {
-    //TODO: Use framebuffer instead
     simxReleaseBuffer(m_imageBuffer);
     if (!m_cold) {
         simxFinish(m_clientId);
@@ -54,8 +53,7 @@ void VREPCamera::cameraStreamInit(int w, int h, const char* sensorName)
     );
     
     if (status != simx_return_ok) {
-        // TODO: throw something
-        throw;
+        throw std::runtime_error("VREPCamera can't get sensor handle. Check sensorName");
     }
     
     std::cout << "Got sensor handle" << std::endl;

@@ -21,6 +21,7 @@ include_directories(include/)
 #### External libraries and packages ####
 find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED) # This lib is used by the linux camera
+find_package(VREP REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 # Path to Boost and OpenCV needs to be set manually when crosscompiling
 find_package(Boost REQUIRED)
@@ -34,7 +35,7 @@ set(SRC
         include/BallFollower.h
         include/BallTracker.h
         include/Camera.h
-        include/CM730.h
+        include/VrepCM730.h
         include/ColorFinder.h
         include/FSR.h
         include/motion/modules/Head.h
@@ -75,7 +76,7 @@ set(SRC
         src/vision/ColorFinder.cpp
         src/vision/Image.cpp
         src/vision/ImgProcess.cpp
-        src/CM730.cpp
+        src/VrepCM730.cpp
         src/LinuxCamera.cpp
         src/LinuxCM730.cpp
         src/LinuxMotionTimer.cpp
@@ -101,6 +102,12 @@ set(SRC
         include/Field.h
         src/BallSearcher.cpp
         include/BallSearcher.h
+        include/RobotCM730.h
+        src/RobotCM730.cpp
+        include/CM730.h
+        src/CM730.cpp
+        include/VrepConnector.h
+        src/VrepConnector.cpp
         include/math/AngleTools.h
         include/math/Eigen.h
         src/math/AngleTools.cpp
@@ -120,9 +127,13 @@ target_link_libraries(controller
         ${JPEG_LIBRARIES}
         ${BOOST_LIBRARIES}
         ${OpenCV_LIBRARIES}
-        Eigen3::Eigen)
+        Eigen3::Eigen
+        ${VREP_LIBRARIES})
 
 target_include_directories(controller PUBLIC
+        ${JPEG_INCLUDE_DIR}
+        ${VREP_REMOTE}
+        ${VREP_INCLUDE}
         ${BOOST_INCLUDE_DIR}
         ${JPEG_INCLUDE_DIR}
         ${OpenCV_INCLUDE_DIR})

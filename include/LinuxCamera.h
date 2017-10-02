@@ -57,8 +57,6 @@ namespace Robot {
 
         int ReadFrame();
 
-        int ReadFrameWb();  // for Webots only
-
     protected:
 
     public:
@@ -90,8 +88,6 @@ namespace Robot {
         unsigned char GetAutoWhiteBalance() { return (unsigned char) (v4l2GetControl(V4L2_CID_AUTO_WHITE_BALANCE)); }
 
         void CaptureFrame();
-
-        void CaptureFrameWb(); // for Webots only
     };
 }
 

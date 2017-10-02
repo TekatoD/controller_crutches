@@ -25,7 +25,7 @@ StateMachine::StateMachine() {
 }
 
 
-void StateMachine::Check(CM730& cm730) {
+void StateMachine::Check(CM730* cm730) {
     if (MotionStatus::FALLEN != STANDUP && m_is_started == 1) {
         Walking::GetInstance()->Stop();
         while (Walking::GetInstance()->IsRunning()) usleep(8000);
@@ -95,20 +95,20 @@ void StateMachine::Check(CM730& cm730) {
     }
 }
 
-void StateMachine::UpdateLeds(CM730& cm730) const {
+void StateMachine::UpdateLeds(CM730* cm730) const {
     switch (m_role) {
         case (ROLE_SOCCER):
-            cm730.WriteByte(CM730::P_LED_PANNEL, 0x01, NULL);
+            cm730->WriteByte(CM730::P_LED_PANNEL, 0x01, NULL);
             break;
         case (ROLE_PENALTY):
-            cm730.WriteByte(CM730::P_LED_PANNEL, 0x02, NULL);
+            cm730->WriteByte(CM730::P_LED_PANNEL, 0x02, NULL);
             break;
         case (ROLE_GOALKEEPER):
-            cm730.WriteByte(CM730::P_LED_PANNEL, 0x04, NULL);
+            cm730->WriteByte(CM730::P_LED_PANNEL, 0x04, NULL);
             break;
         case (ROLE_IDLE):
         default:
-            cm730.WriteByte(CM730::P_LED_PANNEL, 0x01 | 0x02 | 0x04, NULL);
+            cm730->WriteByte(CM730::P_LED_PANNEL, 0x01 | 0x02 | 0x04, NULL);
             break;
     }
 }

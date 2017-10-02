@@ -538,7 +538,7 @@ void Walking::Process() {
     }
 
     Pose2D odo_offset = GetOdoOffset();
-    std::cout << "Odo: " << odo_offset.X() << ' ' << odo_offset.Y() << ' ' << odo_offset.Theta() << std::endl;
+//    std::cout << "Odo: " << odo_offset.X() << ' ' << odo_offset.Y() << ' ' << odo_offset.Theta() << std::endl;
     m_odometry_collector.odoTranslate(odo_offset);
 
     // Compute body swing

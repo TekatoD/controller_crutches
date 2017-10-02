@@ -14,6 +14,8 @@
 #include <GameController.h>
 #include <GoTo.h>
 #include <SoccerBehavior.h>
+#include <VrepConnector.h>
+#include <VrepCM730.h>
 #include <GoalieBehavior.h>
 #include <LinuxCM730.h>
 #include <LinuxCamera.h>
@@ -61,19 +63,29 @@ int main(int argc, char** argv) {
 
     change_current_dir();
 
-    minIni ini(INI_FILE_PATH);
+    //LinuxCM730 linux_cm730(U2D_DEV_NAME0);
+    VrepConnector vrepConnector;
+    VrepCM730 cm730;
 
-    LinuxCM730 linux_cm730(U2D_DEV_NAME0);
-    CM730 cm730(&linux_cm730);
+    try {
+        vrepConnector.Connect();
+        cm730.SetClientId(vrepConnector.GetClientID());
+        cm730.Connect();
+    }
+    catch(std::runtime_error& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+    }
+
+    minIni ini(argc == 1 ? INI_FILE_PATH : argv[1]);
 
     LinuxCamera::GetInstance()->Initialize(0);
     LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
     LinuxCamera::GetInstance()->LoadINISettings(&ini);                   // load from ini
 
     //////////////////// Framework Initialize ///////////////////////////
-    if (!MotionManager::GetInstance()->Initialize(&cm730)) {
-        linux_cm730.SetPortName(U2D_DEV_NAME1);
-        if (!MotionManager::GetInstance()->Initialize(&cm730)) {
+    if (!MotionManager::GetInstance()->Initialize(cm730)) {
+//        linux_cm730.SetPortName(U2D_DEV_NAME1);
+        if (!MotionManager::GetInstance()->Initialize(cm730)) {
             std::cerr << "Fail to initialize Motion Manager!" << std::endl;
             return 1;
         }
@@ -105,7 +117,7 @@ int main(int argc, char** argv) {
                   << std::endl;
         return 1;
     } else if (27 <= firm_ver) {
-        Action::GetInstance()->LoadFile((char*) MOTION_FILE_PATH);
+        Action::GetInstance()->LoadFile(argc <= 2 ? (char*) MOTION_FILE_PATH : argv[2]);
     } else {
         return 1;
     }
@@ -113,11 +125,11 @@ int main(int argc, char** argv) {
 
     ///////////////////// Init game controller //////////////////////////
 
-    GameController::GetInstance()->LoadINISettings(&ini);
-    if (!GameController::GetInstance()->Connect()) {
-        std::cerr << "ERROR: Can't connect to game controller!" << std::endl;
-        return 1;
-    }
+//    GameController::GetInstance()->LoadINISettings(&ini);
+//    if (!GameController::GetInstance()->Connect()) {
+//        std::cerr << "ERROR: Can't connect to game controller!" << std::endl;
+//        return 1;
+//    }
 
     /////////////////////////////////////////////////////////////////////
 

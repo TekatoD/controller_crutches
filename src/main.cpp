@@ -83,9 +83,9 @@ int main(int argc, char** argv) {
     LinuxCamera::GetInstance()->LoadINISettings(&ini);                   // load from ini
 
     //////////////////// Framework Initialize ///////////////////////////
-    if (!MotionManager::GetInstance()->Initialize(cm730)) {
+    if (!MotionManager::GetInstance()->Initialize(&cm730)) {
 //        linux_cm730.SetPortName(U2D_DEV_NAME1);
-        if (!MotionManager::GetInstance()->Initialize(cm730)) {
+        if (!MotionManager::GetInstance()->Initialize(&cm730)) {
             std::cerr << "Fail to initialize Motion Manager!" << std::endl;
             return 1;
         }
@@ -138,13 +138,13 @@ int main(int argc, char** argv) {
 
     cm730.WriteByte(CM730::P_LED_PANNEL, 0x01 | 0x02 | 0x04, nullptr);
 
-    SoccerBehavior soccer(cm730);
+    SoccerBehavior soccer;
     GoalieBehavior goalie;
 
     soccer.LoadINISettings(&ini);
     goalie.LoadINISettings(&ini);
 
-    Action::GetInstance()->Start(15);
+    Action::GetInstance()->Start(9);
     while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 
     while (!finish) {
@@ -152,7 +152,7 @@ int main(int argc, char** argv) {
         GameController::GetInstance()->Update();
 
         // Update state machine
-        StateMachine::GetInstance()->Check(cm730);
+        StateMachine::GetInstance()->Check(&cm730);
 
         if (!Action::GetInstance()->IsRunning()) {
             Kicking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);

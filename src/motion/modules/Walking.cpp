@@ -518,24 +518,25 @@ void Walking::Process() {
         m_right_end = false;
         m_right_start = false;
         m_left_end = false;
+
     } else {
         if(X_MOVE_AMPLITUDE > 0) {
-            m_left_odo_x = -m_odo_x_factor * ep[6];
+            m_left_odo_x = -1 * ep[6];
         }
         else {
-            m_left_odo_x = m_odo_x_factor * ep[6];
+            m_left_odo_x = 1 * ep[6];
         }
-        m_left_odo_y = -m_odo_y_factor * ep[7];
-        m_left_odo_theta = -m_odo_a_factor * ep[11];
+        m_left_odo_y = -1* ep[7];
+        m_left_odo_theta = -1* ep[11];
 
         if(X_MOVE_AMPLITUDE > 0) {
-            m_right_odo_x = -m_odo_x_factor * ep[0];
+            m_right_odo_x = -1* ep[0];
         }
         else {
-            m_right_odo_x = m_odo_x_factor * ep[0];
+            m_right_odo_x = 1* ep[0];
         }
-        m_right_odo_y = -m_odo_y_factor * ep[1];
-        m_right_odo_theta = -m_odo_a_factor * ep[5];
+        m_right_odo_y = -1* ep[1];
+        m_right_odo_theta = -1* ep[5];
     }
 
     Pose2D odo_offset = GetOdoOffset();
@@ -575,6 +576,14 @@ void Walking::Process() {
     } else {
         return; // Do not use angle;
     }
+    std::ofstream f("positions.txt", std::ios_base::app);
+    std::ofstream f1("motots.txt", std::ios_base::app);
+    std::cout << "Positions: " << ep[6] << " " << ep[7] << " " << ep[8] - Kinematics::LEG_LENGTH << " " << ep[9] << " " << ep[10] << " " << ep[11] << std::endl;
+    f << ep[6] << " " << ep[7]  << " " << ep[8] - Kinematics::LEG_LENGTH << " " << ep[9] << " " << ep[10] << " " << ep[11] << std::endl;
+    f << "END" << std::endl;
+
+    f1 << angle[6] << " " << angle[7]  << " " << angle[8] - Kinematics::LEG_LENGTH << " " << angle[9] << " " << angle[10] << " " << angle[11] << std::endl;
+    f1 << "END" << std::endl;
 
     // Compute motor value
     for (int i = 0; i < 14; i++) {
@@ -590,6 +599,25 @@ void Walking::Process() {
 
         outValue[i] = MX28::Angle2Value(initAngle[i]) + (int) offset;
     }
+
+    Matrix4x4f out;
+//
+//    Kinematics::ComputeLegForwardKinematics(out, (MX28::Value2Angle(outValue[0]) * M_PI) / 180,
+//                                            (MX28::Value2Angle(outValue[1]) * M_PI) / 180,
+//                                            (MX28::Value2Angle(outValue[2]) * M_PI) / 180,
+//                                            (MX28::Value2Angle(outValue[3]) * M_PI) / 180,
+//                                            (MX28::Value2Angle(outValue[4]) * M_PI) / 180,
+//                                            (MX28::Value2Angle(outValue[5]) * M_PI) / 180);
+
+    Kinematics::ComputeLegForwardKinematics(out, (angle[6] * M_PI) / 180,
+                                            (angle[7] * M_PI) / 180,
+                                            (angle[8] * M_PI) / 180,
+                                            (angle[9] * M_PI) / 180,
+                                            (angle[10] * M_PI) / 180,
+                                            (angle[11] * M_PI) / 180);
+
+
+    std::cout << "Matrix: " << out << std::endl;
 
 //    // Compute motor value
 //    for (int i = 0; i < 14; i++) {

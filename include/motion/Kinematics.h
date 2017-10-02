@@ -36,6 +36,7 @@ namespace Robot {
         static constexpr float ANKLE_LENGTH = 33.5f; //mm
         static constexpr float LEG_LENGTH = 219.5f; //mm (THIGH_LENGTH + CALF_LENGTH + ANKLE_LENGTH)
 
+
         static constexpr float CW_LIMIT_R_SHOULDER_ROLL = -75.0f; // degree
         static constexpr float CCW_LIMIT_R_SHOULDER_ROLL = 135.0f; // degree
         static constexpr float CW_LIMIT_L_SHOULDER_ROLL = -135.0f; // degree

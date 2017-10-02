@@ -80,7 +80,6 @@ set(SRC
         src/LinuxCM730.cpp
         src/LinuxMotionTimer.cpp
         src/main.cpp
-        src/MX28.cpp
         src/StateMachine.cpp
         include/gamecontroller/RoboCupGameControlData.h
         include/gamecontroller/SPLCoachMessage.h

@@ -15,7 +15,7 @@
 
 
 namespace Robot {
-    enum Kicking {
+    enum KickingAction {
         NO_KICKING,
         LEFT_LEG_KICK,
         RIGHT_LEG_KICK
@@ -58,7 +58,7 @@ namespace Robot {
         float m_AimRLStep;
         float m_AimRLTurn;
 
-        Kicking m_KickBall;
+        KickingAction m_KickBall;
 
     public:
 
@@ -78,7 +78,7 @@ namespace Robot {
 
         bool IsNoBall() const;
 
-        Kicking GetKickingLeg() const;
+        KickingAction GetKickingLeg() const;
 
     };
 }

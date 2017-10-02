@@ -5,10 +5,10 @@
  *      Author: robotis
  */
 
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 #include <libgen.h>
-#include <signal.h>
+#include <csignal>
 #include <memory>
 
 #include <GameController.h>
@@ -22,6 +22,7 @@
 #include <LinuxMotionTimer.h>
 #include <motion/modules/Action.h>
 #include <motion/modules/Head.h>
+#include <motion/modules/Kicking.h>
 
 
 #include "StateMachine.h"
@@ -33,9 +34,6 @@
 #define U2D_DEV_NAME1       "/dev/ttyUSB1"
 
 using namespace Robot;
-
-LinuxCM730 linux_cm730(U2D_DEV_NAME0);
-CM730 cm730(&linux_cm730);
 
 
 void change_current_dir() {
@@ -50,12 +48,12 @@ void change_current_dir() {
 bool finish = false;
 
 
-void sighandler(int sig) {
+void sighandler(int /*sig*/) {
     finish = true;
 }
 
 
-int main(void) {
+int main(int argc, char** argv) {
     signal(SIGABRT, &sighandler);
     signal(SIGTERM, &sighandler);
     signal(SIGQUIT, &sighandler);
@@ -65,18 +63,12 @@ int main(void) {
 
     minIni ini(INI_FILE_PATH);
 
+    LinuxCM730 linux_cm730(U2D_DEV_NAME0);
+    CM730 cm730(&linux_cm730);
+
     LinuxCamera::GetInstance()->Initialize(0);
     LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
     LinuxCamera::GetInstance()->LoadINISettings(&ini);                   // load from ini
-
-//    auto ball_finder = std::make_unique<ColorFinder>();
-//    ball_finder->LoadINISettings(ini.get());
-
-//    BallTracker tracker = BallTracker();
-//    BallFollower follower = BallFollower();
-//    GoTo goTo = GoTo();
-
-//    goTo.LoadINISettings(ini.get());
 
     //////////////////// Framework Initialize ///////////////////////////
     if (!MotionManager::GetInstance()->Initialize(&cm730)) {
@@ -92,6 +84,7 @@ int main(void) {
     MotionManager::GetInstance()->AddModule((MotionModule*) Action::GetInstance());
     MotionManager::GetInstance()->AddModule((MotionModule*) Head::GetInstance());
     MotionManager::GetInstance()->AddModule((MotionModule*) Walking::GetInstance());
+    MotionManager::GetInstance()->AddModule((MotionModule*) Kicking::GetInstance());
 
     LinuxMotionTimer motion_timer(MotionManager::GetInstance());
     motion_timer.Start();
@@ -101,7 +94,7 @@ int main(void) {
     StateMachine::GetInstance()->LoadINISettings(&ini);
 
     int firm_ver = 0;
-    if (cm730.ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0) != CM730::SUCCESS) {
+    if (cm730.ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, nullptr) != CM730::SUCCESS) {
         std::cerr << "Can't read firmware version from Dynamixel ID " << JointData::ID_HEAD_PAN << "!!\n" << std::endl;
         return 1;
     }
@@ -128,21 +121,10 @@ int main(void) {
 
     /////////////////////////////////////////////////////////////////////
 
-
-
-    ///////////////////////// Init speech ///////////////////////////////
-//    if (!Speech::GetInstance()->Start()) {
-//        std::cerr << "ERROR: Can't start speech module!" << std::endl;
-//        return 1;
-//    }
-    /////////////////////////////////////////////////////////////////////
-
-
-
     Action::GetInstance()->m_Joint.SetEnableBody(true, true);
     MotionManager::GetInstance()->SetEnable(true);
 
-    cm730.WriteByte(CM730::P_LED_PANNEL, 0x01 | 0x02 | 0x04, NULL);
+    cm730.WriteByte(CM730::P_LED_PANNEL, 0x01 | 0x02 | 0x04, nullptr);
 
     SoccerBehavior soccer(cm730);
     GoalieBehavior goalie;
@@ -160,21 +142,26 @@ int main(void) {
         // Update state machine
         StateMachine::GetInstance()->Check(cm730);
 
-        if (StateMachine::GetInstance()->IsStarted() == 0) {
-            continue;
+        if (!Action::GetInstance()->IsRunning()) {
+            Kicking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+            Kicking::GetInstance()->Kick(Kicking::RIGHT_LEG, 0.0, 0.0, 20.0, 0.0, 50.0, 0.0);
         }
 
-        switch (StateMachine::GetInstance()->GetRole()) {
-            case ROLE_IDLE:break;
-            case ROLE_SOCCER:
-                soccer.Process();
-                break;
-            case ROLE_PENALTY:break;
-            case ROLE_GOALKEEPER:
-                goalie.Process();
-                break;
-            case ROLES_COUNT:break;
-        }
+//        if (StateMachine::GetInstance()->IsStarted() == 0) {
+//            continue;
+//        }
+//
+//        switch (StateMachine::GetInstance()->GetRole()) {
+//            case ROLE_IDLE:break;
+//            case ROLE_SOCCER:
+//                soccer.Process();
+//                break;
+//            case ROLE_PENALTY:break;
+//            case ROLE_GOALKEEPER:
+//                goalie.Process();
+//                break;
+//            case ROLES_COUNT:break;
+//        }
     }
 
 

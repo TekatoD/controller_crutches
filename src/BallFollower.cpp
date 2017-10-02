@@ -249,6 +249,6 @@ bool BallFollower::IsNoBall() const {
     return m_NoBallCount >= m_NoBallCount;
 }
 
-Kicking BallFollower::GetKickingLeg() const {
+KickingAction BallFollower::GetKickingLeg() const {
     return m_KickBall;
 }

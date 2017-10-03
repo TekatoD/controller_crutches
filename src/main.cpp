@@ -192,20 +192,20 @@ int main(int argc, char** argv) {
 //        GameController::GetInstance()->Update();
 
 //         Update state machine
-        StateMachine::GetInstance()->Check(cm730);
-        if (!Action::GetInstance()->IsRunning()) {
-            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-            Walking::GetInstance()->X_MOVE_AMPLITUDE = 20.0;
-//            Walking::GetInstance()->A_MOVE_AMPLITUDE = 20.0;
-            Walking::GetInstance()->Start();
-        }
+//        StateMachine::GetInstance()->Check(cm730);
+//        if (!Action::GetInstance()->IsRunning()) {
+//            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+//            Walking::GetInstance()->X_MOVE_AMPLITUDE = 20.0;
+////            Walking::GetInstance()->A_MOVE_AMPLITUDE = 20.0;
+//            Walking::GetInstance()->Start();
+//        }
 
 
 //        Matrix4x4f out;
 //        int pan = cm730->m_BulkReadData[JointData::ID_HEAD_PAN].ReadWord(MX28::P_PRESENT_POSITION_L);
 //        int tilt = cm730->m_BulkReadData[JointData::ID_HEAD_TILT].ReadWord(MX28::P_PRESENT_POSITION_L);
-//        Head::GetInstance()->MoveByAngle(0, -15);
-////    cm730->WriteWord(JointData::ID_HEAD_PAN, MX28::P_PRESENT_POSITION_L, MX28::Angle2Value(60), &error);
+//        Head::GetInstance()->MoveByAngle(10, 0);
+//    cm730->WriteWord(JointData::ID_HEAD_PAN, MX28::P_PRESENT_POSITION_L, MX28::Angle2Value(60), &error);
 //        Kinematics::ComputeHeadForwardKinematics(out, (MX28::Value2Angle(pan) * M_PI) / 180, (MX28::Value2Angle(tilt) * M_PI) / 180);
 //        std::cout << "pan " << MX28::Value2Angle(pan) << std::endl;
 //        std::cout << "tilt " << MX28::Value2Angle(tilt) << std::endl;

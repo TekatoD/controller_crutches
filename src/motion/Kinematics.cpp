@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <math/AngleTools.h>
+#include <iostream>
 #include "motion/Kinematics.h"
 
 using namespace Robot;
@@ -135,7 +136,7 @@ void Kinematics::ComputeLegForwardKinematics(Matrix4x4f& out, float pelvis, floa
     const float px = s2c3 * (c4 * CALF_LENGTH + THIGH_LENGTH) -
                      s2s3 * (s4 * CALF_LENGTH);
     const float py = (s1 * c2 * c3 + c1 * s3) * (c4 * CALF_LENGTH + THIGH_LENGTH) +
-                     (-s3 * s1 * c2 + c1 * c3) * (s4 * CALF_LENGTH);
+                     (-s3 * s1 * c2 + c1 * c3) * (s4 * CALF_LENGTH); //TODO:: X2?
     const float pz = (c1c2c3 - s1s3) * (c4 * CALF_LENGTH + THIGH_LENGTH) +
                      (-s3c1c2 - s1c3) * (s4 * CALF_LENGTH);
 
@@ -145,26 +146,17 @@ void Kinematics::ComputeLegForwardKinematics(Matrix4x4f& out, float pelvis, floa
             r31, r32, r33, pz,
             0.0, 0.0, 0.0, 1.0;
 
-    Matrix4x4f T0C2;
-    T0C2 << 0, -1, 0, 0,
+    //Rotates axises to the robot notation and apply ankle_length
+    Matrix4x4f transform;
+    transform << 0, -1, 0, 0,
             1, 0, 0, 0,
-            0, 0, -1, 0,
+            0, 0, -1, -ANKLE_LENGTH,
             0, 0, 0, 1;
-
-    Matrix4x4f T6F;
-    T6F << 1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, ANKLE_LENGTH,
-            0, 0, 0, 1;
-
-
-    out = out * T6F;
-    out = T0C2 * out;
-
+    out = transform * out;
 }
 
 void Kinematics::ComputeHeadForwardKinematics(Matrix4x4f& out, float pan, float tilt) {
-    // todo check order of angles
+//    // todo check order of angles
     const float s1 = sinf(tilt);
     const float c1 = cosf(tilt);
     const float s2 = sinf(pan);

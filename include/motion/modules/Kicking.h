@@ -59,9 +59,9 @@ namespace Robot {
         float m_kick_z_offset{0.0f};
         float m_kick_yaw_offset{0.0f};
 
-        float m_shifting_body_duration{600.0f};
-        float m_kicking_duration{300.0f};
-        float m_restoring_duration{600.0f};
+        float m_shifting_body_duration{100.0f};
+        float m_kicking_duration{30.0f};
+        float m_restoring_duration{80.0f};
 
         float m_cur_shifting_body_duration{0.0f};
         float m_cur_kicking_duration{0.0f};
@@ -69,26 +69,22 @@ namespace Robot {
 
         float m_body_init_x_offset{-10.0f};
         float m_body_init_y_offset{0.0f};
-        float m_body_init_z_offset{20.0f};
-        float m_body_init_pitch_offset{0.0f};
+        float m_body_init_z_offset{-5.0f};
+        float m_body_init_pitch_offset{radians(-15.0f)};
 
         float m_cur_body_init_x_offset{0.0f};
-        float m_cur_body_init_y_offset{0.0f};
+        float m_cur_body_init_y_offset{-15.0f};
         float m_cur_body_init_z_offset{0.0f};
         float m_cur_body_init_pitch_offset{0.0f};
 
-        float m_body_x_offset{-10.0f};
-        float m_body_y_offset{0.0f};
-        float m_body_z_offset{20.0f};
-        float m_body_pitch_offset{0.0f};
-        float m_body_roll_offset{0.0f};
-
+        float m_body_x_offset{-20.0f};
+        float m_body_y_offset{-15.0f};
+        float m_body_z_offset{-5.0f};
 
         float m_cur_body_x_offset{0.0f};
         float m_cur_body_y_offset{0.0f};
         float m_cur_body_z_offset{0.0f};
         float m_cur_body_pitch_offset{0.0f};
-        float m_cur_body_roll_offset{0.0f};
 
         float m_arm_swing_gain{0.0f};
         float m_balance_roll_gain{0.0f};

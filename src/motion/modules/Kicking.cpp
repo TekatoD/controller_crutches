@@ -4,6 +4,7 @@
  */
 
 #include <motion/modules/Kicking.h>
+#include <iostream>
 
 
 void Robot::Kicking::Kick(int leg, float leg_x_offset, float leg_y_offset, float leg_z_offset, float leg_yaw_offset,
@@ -55,12 +56,9 @@ void Robot::Kicking::Process() {
     float leg_b_support = 0;
     float leg_c_support = 0;
     // Body transformation
-    float b_x = 0;
-    float b_y = 0;
-    float b_z = 0;
-    float b_a = 0;
-    float b_b = 0;
-    float b_c = 0;
+    float body_x = 0;
+    float body_y = 0;
+    float body_z = 0;
 
     if (m_time == 0) {
         UpdateActiveParams();
@@ -78,51 +76,42 @@ void Robot::Kicking::Process() {
             local_time = m_time;
             leg_x_active = wsin(local_time, period, 0.0, m_kick_x_offset, 0.0);
             leg_y_active = wsin(local_time, period, 0.0, m_kick_y_offset, 0.0);
-            leg_z_active = wsin(local_time, period, 0.0, -m_kick_z_offset, 0.0);
+            leg_z_active = wsin(local_time, period, 0.0, m_kick_z_offset, 0.0);
             leg_a_active = 0;
             leg_b_active = 0;
             leg_c_active = wsin(local_time, period, 0.0, m_kick_yaw_offset, 0.0);
 
-            b_x = wsin(local_time, period, 0.0, m_cur_body_x_offset, m_cur_body_init_x_offset);
-            b_y = wsin(local_time, period, 0.0, m_cur_body_y_offset, m_cur_body_init_y_offset);
-            b_z = wsin(local_time, period, 0.0, -m_cur_body_z_offset, -m_cur_body_init_z_offset);
-            b_a = wsin(local_time, period, 0.0, m_cur_body_roll_offset, 0.0);
-            b_b = wsin(local_time, period, 0.0, m_cur_body_pitch_offset, m_cur_body_init_pitch_offset);
-            b_c = 0.0;
+            body_x = wsin(local_time, period, 0.0, m_cur_body_x_offset - m_cur_body_init_x_offset, m_cur_body_init_x_offset);
+            body_y = wsin(local_time, period, 0.0, m_cur_body_y_offset - m_cur_body_init_y_offset, m_cur_body_init_y_offset);
+            body_z = wsin(local_time, period, 0.0, m_cur_body_z_offset - m_cur_body_init_z_offset, m_cur_body_init_z_offset);
             break;
         case (PHASE_KICKING):
             period = m_cur_kicking_duration * 2.0f;
             local_time = m_time - m_cur_shifting_body_duration;
-            leg_x_active = wsin(local_time, period, 0.0, m_kick_x_offset - m_kick_target_x_offset, m_kick_x_offset);
-            leg_y_active = wsin(local_time, period, 0.0, m_kick_y_offset - m_kick_target_y_offset, m_kick_y_offset);
-            leg_z_active = -m_kick_z_offset;
+            leg_x_active = wsin(local_time, period, 0.0, m_kick_target_x_offset - m_kick_x_offset, m_kick_x_offset);
+            leg_y_active = wsin(local_time, period, 0.0, m_kick_target_y_offset - m_kick_y_offset, m_kick_y_offset);
+            leg_z_active = m_kick_z_offset;
             leg_a_active = 0;
             leg_b_active = 0;
             leg_c_active = m_kick_yaw_offset;
 
-            b_x = m_cur_body_x_offset;
-            b_y = m_cur_body_y_offset;
-            b_z = -m_cur_body_z_offset;
-            b_a = m_cur_body_roll_offset;
-            b_b = m_cur_body_roll_offset;
-            b_c = 0.0;
+            body_x = m_cur_body_x_offset;
+            body_y = m_cur_body_y_offset;
+            body_z = m_cur_body_z_offset;
             break;
         case (PHASE_RESTORING):
             period = m_cur_restoring_duration * 4.0f;
             local_time = m_time - m_cur_kicking_duration - m_shifting_body_duration;
-            leg_x_active = wsin(local_time, period, m_restoring_duration, m_kick_x_offset, 0.0);
-            leg_y_active = wsin(local_time, period, m_restoring_duration, m_kick_y_offset, 0.0);
-            leg_z_active = wsin(local_time, period, -m_restoring_duration, -m_kick_z_offset, 0.0);
+            leg_x_active = wsin(local_time, period, -half_pi, m_kick_x_offset, 0.0);
+            leg_y_active = wsin(local_time, period, -half_pi, m_kick_y_offset, 0.0);
+            leg_z_active = wsin(local_time, period, -half_pi, m_kick_z_offset, 0.0);
             leg_a_active = 0;
             leg_b_active = 0;
-            leg_c_active = wsin(local_time, period, m_restoring_duration, m_kick_yaw_offset, 0.0);
+            leg_c_active = wsin(local_time, period, -half_pi, m_kick_yaw_offset, 0.0);
 
-            b_x = wsin(local_time, period, m_restoring_duration, m_cur_body_x_offset, 0.0);
-            b_y = wsin(local_time, period, m_restoring_duration, m_cur_body_y_offset, 0.0);
-            b_z = wsin(local_time, period, -m_restoring_duration, -m_cur_body_z_offset, 0.0);
-            b_a = wsin(local_time, period, m_restoring_duration, m_cur_body_roll_offset, 0.0);
-            b_b = wsin(local_time, period, m_restoring_duration, m_cur_body_roll_offset, m_cur_body_init_pitch_offset);
-            b_c = 0.0;
+            body_x = wsin(local_time, period, -half_pi, m_cur_body_x_offset - m_cur_body_init_x_offset, m_cur_body_init_x_offset);
+            body_y = wsin(local_time, period, -half_pi, m_cur_body_y_offset - m_cur_body_init_y_offset, m_cur_body_init_y_offset);
+            body_z = wsin(local_time, period, -half_pi, m_cur_body_z_offset - m_cur_body_init_z_offset, m_cur_body_init_z_offset);
             break;
         case (PHASE_DONE):
         default:
@@ -131,21 +120,15 @@ void Robot::Kicking::Process() {
             return;
     }
 
-//    b_z -= Kinematics::LEG_LENGTH;
+    m_time += TIME_UNIT;
 
-    leg_x_active -= b_x;
-    leg_y_active -= b_y;
-    leg_z_active -= b_z;
-    //leg_a_active -= b_a;
-    //leg_b_active -= b_b;
-    //leg_c_active -= b_c;
+    leg_x_active -= body_x;
+    leg_y_active -= body_y;
+    leg_z_active -= body_z;
 
-    leg_x_support -= b_x;
-    leg_y_support -= b_y;
-    leg_z_support -= b_z;
-    //leg_a_support -= b_a;
-    //leg_b_support -= b_b;
-    //leg_c_support -= b_c;
+    leg_x_support -= body_x;
+    leg_y_support -= body_y;
+    leg_z_support -= body_z;
 
     float* support_leg = l_joints;
     float* active_leg = r_joints;
@@ -174,9 +157,21 @@ void Robot::Kicking::Process() {
             leg_c_support
     );
 
+//    if (ik_status || m_phase == PHASE_KICKING) {
+        std::cout << m_phase << ' ' << m_time
+                  << ' ' << leg_x_active << ' ' << leg_y_active << ' ' << leg_z_active
+                  << ' ' << leg_x_support << ' ' << leg_y_support << ' ' << leg_z_support << std::endl;
+//    }
+
     if (!ik_status) {
         return;
     }
+
+    // Add body pitch offset
+    r_joints[1] += m_cur_body_init_pitch_offset * sinf(r_joints[0]);
+    r_joints[2] += m_cur_body_init_pitch_offset * cosf(r_joints[0]);
+    l_joints[1] += m_cur_body_init_pitch_offset * sinf(l_joints[0]);
+    l_joints[2] += m_cur_body_init_pitch_offset * cosf(l_joints[0]);
 
     for (int i = 0; i < 6; ++i) {
         out_value[i] = (int) (r_joints[i] * MX28::RATIO_RADIANS2VALUE * dir[i]) +
@@ -199,11 +194,9 @@ void Robot::Kicking::Process() {
     m_Joint.SetValue(JointData::ID_L_KNEE, out_value[9]);
     m_Joint.SetValue(JointData::ID_L_ANKLE_PITCH, out_value[10]);
     m_Joint.SetValue(JointData::ID_L_ANKLE_ROLL, out_value[11]);
-    m_Joint.SetValue(JointData::ID_R_SHOULDER_PITCH, out_value[12]); // TODO Shoulders
-    m_Joint.SetValue(JointData::ID_L_SHOULDER_PITCH, out_value[13]); // TODO !!!!!!!!!
-    m_Joint.SetAngle(JointData::ID_HEAD_PAN, 0.0f); // TODO Head
-
-    m_time += TIME_UNIT;
+//    m_Joint.SetValue(JointData::ID_R_SHOULDER_PITCH, out_value[12]); // TODO Shoulders
+//    m_Joint.SetValue(JointData::ID_L_SHOULDER_PITCH, out_value[13]); // TODO !!!!!!!!!
+//    m_Joint.SetAngle(JointData::ID_HEAD_PAN, 0.0f); // TODO Head
 }
 
 void Robot::Kicking::Break() {
@@ -217,20 +210,20 @@ void Robot::Kicking::UpdateTimeParameters() {
     } else {
         float sum = 0;
 
-        sum += m_shifting_body_duration;
-        if (m_time < sum) {
+        sum += m_cur_shifting_body_duration;
+        if (m_time <= sum) {
             m_phase = PHASE_SHIFTING_BODY;
             return;
         }
 
-        sum += m_kicking_duration;
-        if (m_time < sum) {
+        sum += m_cur_kicking_duration;
+        if (m_time <= sum) {
             m_phase = PHASE_KICKING;
             return;
         }
 
-        sum += m_restoring_duration;
-        if (m_time < sum) {
+        sum += m_cur_restoring_duration;
+        if (m_time <= sum) {
             m_phase = PHASE_RESTORING;
             return;
         }
@@ -252,8 +245,6 @@ void Robot::Kicking::UpdateActiveParams() {
     m_cur_body_x_offset = m_body_x_offset;
     m_cur_body_y_offset = m_body_y_offset;
     m_cur_body_z_offset = m_body_z_offset;
-    m_cur_body_pitch_offset = m_body_pitch_offset;
-    m_cur_body_roll_offset = m_body_roll_offset;
 
     m_cur_arm_swing_gain = m_arm_swing_gain;
     m_cur_balance_roll_gain = m_balance_roll_gain;

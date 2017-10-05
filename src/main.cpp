@@ -144,8 +144,8 @@ int main(int argc, char** argv) {
     soccer.LoadINISettings(&ini);
     goalie.LoadINISettings(&ini);
 
-    Action::GetInstance()->Start(9);
-    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
+//    Action::GetInstance()->Start(9);
+//    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 
     while (!finish) {
         // Update game controller
@@ -156,7 +156,7 @@ int main(int argc, char** argv) {
 
         if (!Action::GetInstance()->IsRunning()) {
             Kicking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-            Kicking::GetInstance()->Kick(Kicking::RIGHT_LEG, 0.0, 0.0, 20.0, 0.0, 50.0, 0.0);
+            Kicking::GetInstance()->Kick(Kicking::RIGHT_LEG, -10.0, -25.0f, 10.0, -radians(45), 50.0, 15.0);
         }
 
 //        if (StateMachine::GetInstance()->IsStarted() == 0) {

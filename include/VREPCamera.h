@@ -29,9 +29,6 @@ namespace Robot {
     private:
         void cameraStreamInit(int w, int h, const char* sensorName);
         
-        //Don't call simxFinish if not created here
-        bool m_cold;
-        
         FrameBuffer* m_fbuffer;
         unsigned char* m_imageBuffer;
         int m_width, m_height;

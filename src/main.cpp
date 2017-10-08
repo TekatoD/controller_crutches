@@ -101,7 +101,6 @@ int main(int argc, char** argv) {
 //    goTo.LoadINISettings(ini.get());
 
     //////////////////// Framework Initialize ///////////////////////////
-    /*
     if (!MotionManager::GetInstance()->Initialize(cm730)) {
 //        linux_cm730.SetPortName(U2D_DEV_NAME1);
         if (!MotionManager::GetInstance()->Initialize(cm730)) {
@@ -140,7 +139,6 @@ int main(int argc, char** argv) {
     } else {
         return 1;
     }
-    */
 
     ///////////////////// Init game controller //////////////////////////
 
@@ -183,18 +181,34 @@ int main(int argc, char** argv) {
 //
 //    Action::GetInstance()->Start(15);
 //    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
-/*
     sleep(1);
     StateMachine::GetInstance()->Enable();
     Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
     Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-*/
 //
 ////    Action::GetInstance()->Start(12);
 //    Action::GetInstance()->Start(13);
 
     ant::Vision vision("res/vision_cfg");
-    cv::namedWindow("camera_image", cv::WINDOW_AUTOSIZE);
+    //cv::namedWindow("camera_image", cv::WINDOW_AUTOSIZE);
+    
+    cv::Mat R = cv::Mat::eye(3, 3, CV_32F);
+    cv::Mat t = (cv::Mat_<float>(3, 1) << 1.0f, 1.0f, 0.0);
+    
+    ant::vision_utils::CameraParameters params(R, t, 2.0);
+    
+    cv::Mat Kint33 = params.GetIntCalibrationMatrix33();
+    cv::Mat Ext34 = params.GetExtCalibrationMatrix34();
+    
+    cv::Mat Kint34 = params.GetIntCalibrationMatrix34();
+    cv::Mat Ext44 = params.GetExtCalibrationMatrix44();
+    
+    std::cout << Kint33 << std::endl;
+    std::cout << Ext34 << std::endl;
+    
+    std::cout << Kint34 << std::endl;
+    std::cout << Ext44 << std::endl;
+    
     while (!finish) {
         camera.CaptureFrame();
         
@@ -224,7 +238,6 @@ int main(int argc, char** argv) {
 //        GameController::GetInstance()->Update();
 
         // Update state machine
-        /*
         StateMachine::GetInstance()->Check(cm730);
 //
         if (!Action::GetInstance()->IsRunning()) {
@@ -233,7 +246,6 @@ int main(int argc, char** argv) {
             Walking::GetInstance()->A_MOVE_AMPLITUDE = 20.0;
             Walking::GetInstance()->Start();
         }
-        */
 
 //        if (StateMachine::GetInstance()->IsStarted() == 0) {
 //            continue;

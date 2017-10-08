@@ -62,6 +62,8 @@ void VREPCamera::cameraStreamInit(int w, int h, const char* sensorName)
 
 void VREPCamera::CaptureFrame()
 {
+    
+    // m_imageBuffer data is automatically released on every call
     int visStream = simxGetVisionSensorImage(
         m_clientId, m_sensorHandle, m_res, &m_imageBuffer, 0, simx_opmode_buffer
     );
@@ -72,6 +74,8 @@ void VREPCamera::CaptureFrame()
         ImgProcess::VFlipRGB(m_fbuffer->m_RGBFrame);
         ImgProcess::RGBtoBGR(m_fbuffer);
     }
+    
+    simxSynchronousTrigger(m_clientId);
 }
 
 FrameBuffer* VREPCamera::getFrameBuffer()

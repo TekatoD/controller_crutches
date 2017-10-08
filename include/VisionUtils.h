@@ -10,6 +10,99 @@
 
 namespace ant {
     namespace vision_utils {
+        
+        struct CameraParameters {
+            /*
+             * Intrinsic calibration parameters (camera to image coordinates transform)
+             */
+            float f, a, s, cx, cy;
+            
+            /*
+             * Extrinsic calibration parameters (world to camera coordinates transform) 
+             * Rot is 3x3 rotation matrix
+             * Trans is 3x1 translation vector
+             */
+            cv::Mat Rot, Trans; 
+            
+            /*
+             * f = focal length (Vrep default is 2.0 (units?))
+             * a = aspect ratio
+             * s = skew
+             * cx = offset x
+             * cx = offset y
+             */
+            CameraParameters(float f, float a = 1.0f, float s = 0.0f, float cx = 0.0f, float cy = 0.0f)
+            {
+                SetIntrinsicParameters(f, a, s, cx, cy);
+            }
+            
+            CameraParameters(cv::Mat& R, cv::Mat& t, float f, float a = 1.0f, float s = 0.0f, float cx = 0.0f, float cy = 0.0f)
+            {
+                SetExtrinsicParameters(R, t);
+                SetIntrinsicParameters(f, a, s, cx, cy);
+            }
+            
+            void SetIntrinsicParameters(float f, float a = 1.0f, float s = 0.0f, float cx = 0.0f, float cy = 0.0f)
+            {
+                this->f = f;
+                this->a = a;
+                this->s = s;
+                this->cx = cx;
+                this->cy = cy;
+            }
+            
+            void SetExtrinsicParameters(cv::Mat& Rot, cv::Mat& Trans)
+            {
+                if (Rot.rows != 3 || Rot.rows != 3) {
+                    throw std::runtime_error{"Rotation matrix must be 3x3"};
+                }
+                
+                if (Trans.rows != 3 || Trans.cols != 1) {
+                    throw std::runtime_error{"Translation vector must be 3x1"};
+                }
+                
+                this->Rot = Rot.clone();
+                this->Trans = Trans.clone();
+            }
+            
+            /*
+             * Returns 3x3 intrinsic calibration matrix 
+             */
+            cv::Mat GetIntCalibrationMatrix33() const
+            {
+                return (cv::Mat_<float>(3, 3) << f, s, cx, 0, a*f, cy, 0, 0, 1);
+            } 
+            
+            /*
+             * Returns 3x4 intrinsic calibration matrix 
+             */
+            cv::Mat GetIntCalibrationMatrix34() const
+            {
+                return (cv::Mat_<float>(3, 4) << f, s, cx, 0, 0, a*f, cy, 0, 0, 0, 1, 0);
+            }
+            
+            /*
+             * Returns 3x4 extrinsic calibration matrix
+             */
+            cv::Mat GetExtCalibrationMatrix34() const
+            {
+                cv::Mat T;
+                cv::hconcat(Rot, Trans, T);
+                return T;
+            }
+            
+            /*
+             * Returns 4x4 extrinsic calibration matrix
+             */
+            cv::Mat GetExtCalibrationMatrix44() const
+            {
+                cv::Mat T, pad;
+                pad = (cv::Mat_<float>(1, 4) << 0, 0, 0, 1);
+                cv::hconcat(Rot, Trans, T);
+                cv::vconcat(T, pad, T);
+                return T;
+            }
+        };
 
         template<class _Tp, int m, int n>
         inline

@@ -215,8 +215,10 @@ namespace ant {
             return (cv::Mat_<float>(3, 3) << 0, -z, y, z, 0, -x, y, x, 0);
         }
         
+
         /*
-         *  https://math.stackexchange.com/questions/400268/equation-for-a-line-through-a-plane-in-homogeneous-coordinates
+         * P1, P2 - points on the line
+         * Returns line in Plucker coordinates (6 points)
          */
         inline cv::Mat PluckerLine(cv::Mat P1, cv::Mat P2)
         {
@@ -235,6 +237,34 @@ namespace ant {
             PLine(cv::Range(p1.rows, PLine.rows), cv::Range::all()) = XproductMatrix33(p1) * p2;
             
             return PLine;
+        }
+        
+        /*
+         * W - plane in H.C.
+         * L - line in Plucker coordinates 
+         *  https://math.stackexchange.com/questions/400268/equation-for-a-line-through-a-plane-in-homogeneous-coordinates
+         */
+        inline cv::Mat PlaneRayIntersection(cv::Mat W, cv::Mat L)
+        {
+            // Plane parameters
+            // Normal
+            cv::Mat w = W(cv::Range(0, W.rows-1), cv::Range::all());
+            // Distance
+            float eps = W.at<float>(W.rows-1, 0);
+            
+            // Line parameters 
+            cv::Mat l, m;
+            l = L(cv::Range(0, L.rows/2), cv::Range::all());
+            m = L(cv::Range(L.rows/2, L.rows), cv::Range::all());
+            
+            // meet operator
+            cv::Mat meet, last;
+            cv::hconcat((-eps) * cv::Mat::eye(3, 3, CV_32F), XproductMatrix33(w), meet);
+            cv::hconcat(w.t(), cv::Mat::zeros(1, 3, CV_32F), last);
+            cv::vconcat(meet, last, meet);
+            
+            // Intersection point of plane and ray
+            return meet * L;
         }
         
         template<class _Tp, int m, int n>

@@ -225,6 +225,7 @@ int main(int argc, char** argv) {
     // Testing
     CameraPoint.at<float>(2, 0) = HeightFromGround;
     
+    // TODO: Correct translation, rotation
     std::cout << ":thinking:" << std::endl;
     std::cout << CameraRay << std::endl;
     std::cout << CameraPoint << std::endl;
@@ -233,11 +234,18 @@ int main(int argc, char** argv) {
     
     std::cout << WorldPoint << std::endl;
     
-    // Testing Ray-Plane intersection 
+    // Plucker line
     cv::Mat P1 = (cv::Mat_<float>(4, 1) << 1, 2, 3, 1);
     cv::Mat P2 = (cv::Mat_<float>(4, 1) << 4, 5, 42, 1);
     cv::Mat L = ant::vision_utils::PluckerLine(P1, P2);
     std::cout << L << std::endl;
+    
+    // Testing Ray-Plane intersection 
+    cv::Mat Line = (cv::Mat_<float>(6, 1) << 1.0f, 0.0f, 1.0f, 2.0f, 0.0f, -2.0f);
+    cv::Mat Plane = (cv::Mat_<float>(4, 1) << 1.0f, 0.0f, 0.0f, -3.0f);
+    
+    cv::Mat Intersection = ant::vision_utils::PlaneRayIntersection(Plane, Line);
+    std::cout << "Intersection" << std::endl << Intersection << std::endl;
     
     while (!finish) {
         camera.CaptureFrame();

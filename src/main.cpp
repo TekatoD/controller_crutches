@@ -206,7 +206,7 @@ int main(int argc, char** argv) {
     cv::Mat Ry = (cv::Mat_<float>(3, 3) << cos(HeadTilt), 0.0f, sin(HeadTilt), 0.0f, 1.0f, 0.0f, -sin(HeadTilt), 0.0f, cos(HeadTilt));
     cv::Mat Rz = (cv::Mat_<float>(3, 3) << cos(HeadPan), -sin(HeadPan), 0.0f, sin(HeadPan), cos(HeadPan), 0.0f, 0.0f, 0.0f, 1.0f);
     
-    cv::Mat R = Rz * Ry * Rx;
+    cv::Mat R = Rz * (Ry * Rx);
     cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, HeightFromGround);
     
     ant::vision_utils::CameraParameters params(R, t, 2.0);

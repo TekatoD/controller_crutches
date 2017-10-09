@@ -193,7 +193,28 @@ namespace ant {
         private:
             CameraParameters m_cameraParams;
         };
+        
+        /*
+         * Cross product matrix
+         * instead of using cross product operator a x b
+         * use matrix multiplication a_cross * b
+         */
+        inline cv::Mat XproductMatrix33(float x, float y, float z)
+        {
+            return (cv::Mat_<float>(3, 3) << 0, -z, y, z, 0, -x, y, x, 0);
+        }
 
+        inline cv::Mat XproductMatrix33(cv::Mat vec)
+        {
+            float x, y, z;
+            
+            x = vec.at<float>(0, 0);
+            y = vec.at<float>(1, 0);
+            z = vec.at<float>(2, 0);
+            
+            return (cv::Mat_<float>(3, 3) << 0, -z, y, z, 0, -x, y, x, 0);
+        }
+        
         template<class _Tp, int m, int n>
         inline
         float norm(const cv::Matx<_Tp, m, n> &M) {
@@ -205,7 +226,6 @@ namespace ant {
             }
             return std::sqrt(sum);
         }
-
 
         template<class _Tp>
         inline

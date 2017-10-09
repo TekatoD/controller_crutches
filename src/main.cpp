@@ -28,6 +28,7 @@
 #include <motion/modules/Head.h>
 #include <Vision.h>
 #include <VisionUtils.h>
+#include <motion/Kinematics.h>
 
 #include "StateMachine.h"
 
@@ -192,22 +193,45 @@ int main(int argc, char** argv) {
     ant::Vision vision("res/vision_cfg");
     //cv::namedWindow("camera_image", cv::WINDOW_AUTOSIZE);
     
-    cv::Mat R = cv::Mat::eye(3, 3, CV_32F);
-    cv::Mat t = (cv::Mat_<float>(3, 1) << 1.0f, 1.0f, 0.0);
+    auto DarwinHead = Head::GetInstance();
+    // Leg + total torso length
+    float HeightFromGround = Robot::Kinematics::LEG_LENGTH + 122.2f + 50.5f + Robot::Kinematics::CAMERA_OFFSET_Z;
+    
+    // Z
+    float HeadPan = DarwinHead->GetPanAngle();
+    // Y
+    float HeadTilt = DarwinHead->GetTiltAngle();
+    
+    cv::Mat Rx = cv::Mat::eye(3, 3, CV_32F);
+    cv::Mat Ry = (cv::Mat_<float>(3, 3) << cos(HeadTilt), 0.0f, sin(HeadTilt), 0.0f, 1.0f, 0.0f, -sin(HeadTilt), 0.0f, cos(HeadTilt));
+    cv::Mat Rz = (cv::Mat_<float>(3, 3) << cos(HeadPan), -sin(HeadPan), 0.0f, sin(HeadPan), cos(HeadPan), 0.0f, 0.0f, 0.0f, 1.0f);
+    
+    cv::Mat R = Rz * Ry * Rx;
+    cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, HeightFromGround);
     
     ant::vision_utils::CameraParameters params(R, t, 2.0);
+    ant::vision_utils::CameraProjection cameraToGround(params);
     
-    cv::Mat Kint33 = params.GetIntCalibrationMatrix33();
-    cv::Mat Ext34 = params.GetExtCalibrationMatrix34();
+    // Testing something
+    // Ray in H.C, 
+    cv::Mat CameraRay = cameraToGround.ImageToCamera(160, 120);
+    cv::Mat HCRow = (cv::Mat_<float>(1, 1) << 1.0f);
+    cv::Mat CameraPoint;
+    cv::vconcat(CameraRay, HCRow, CameraPoint);
     
-    cv::Mat Kint34 = params.GetIntCalibrationMatrix34();
-    cv::Mat Ext44 = params.GetExtCalibrationMatrix44();
+    float scaler = CameraPoint.at<float>(2, 0);
+    CameraPoint.at<float>(0, 0) /= scaler;
+    CameraPoint.at<float>(1, 0) /= scaler;
+    // Testing
+    CameraPoint.at<float>(2, 0) = HeightFromGround;
     
-    std::cout << Kint33 << std::endl;
-    std::cout << Ext34 << std::endl;
+    std::cout << ":thinking:" << std::endl;
+    std::cout << CameraRay << std::endl;
+    std::cout << CameraPoint << std::endl;
     
-    std::cout << Kint34 << std::endl;
-    std::cout << Ext44 << std::endl;
+    cv::Mat WorldPoint = cameraToGround.CameraToWorld(CameraPoint);
+    
+    std::cout << WorldPoint << std::endl;
     
     while (!finish) {
         camera.CaptureFrame();

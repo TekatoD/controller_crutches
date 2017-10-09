@@ -20,7 +20,6 @@ namespace Robot {
         Image* getBGRFrame();
         Image* getBGRAFrame();
         
-        // TODO: Debug
         unsigned char* getImageBuffer() { return (unsigned char*)m_imageBuffer; }
         void connect(int clientId = -1);
         int getWidth() const { return m_res[0]; }

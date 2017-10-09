@@ -26,8 +26,10 @@ Image::Image(int width, int height, int pixelsize)
 
 
 Image::~Image() {
-    delete[] m_ImageData;
-    m_ImageData = 0;
+    if (m_ImageData) {
+        delete[] m_ImageData;
+        m_ImageData = 0;
+    }
 }
 
 

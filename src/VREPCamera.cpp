@@ -21,6 +21,10 @@ VREPCamera::~VREPCamera()
 {
     simxReleaseBuffer(m_imageBuffer);
     
+    // points to already released imageBuffer ^
+    m_fbuffer->m_RGBFrame->m_ImageData = 0;
+    m_fbuffer->m_BGRFrame->m_ImageData = 0;
+    
     delete m_fbuffer;
 }
 

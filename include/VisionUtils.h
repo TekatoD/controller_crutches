@@ -103,6 +103,96 @@ namespace ant {
                 return T;
             }
         };
+        
+        class CameraProjection {
+        public:
+            CameraProjection(CameraParameters cameraParams) : m_cameraParams(cameraParams) {}
+            
+            void SetCameraParameters(CameraParameters cameraParams)
+            {
+                m_cameraParams = cameraParams;
+            }
+            
+            /*
+             * World coords to camera coords
+             * Result is 3x1 vector in homogeneous coordinates 
+             */
+            cv::Mat WorldToImage(float x, float y, float z)
+            {
+                return CameraToImage(WorldToCamera(x, y, z));
+            }
+            
+            cv::Mat WorldToImage(cv::Mat WorldPoint)
+            {
+                return CameraToImage(WorldToCamera(WorldPoint));
+            }
+            
+            
+            /*
+             * Transform point in world coordinates to camera coordinates
+             * Result is 4x1 vector in homogeneous coordinates
+             */
+            cv::Mat WorldToCamera(float x, float y, float z)
+            {
+                cv::Mat WorldPoint = (cv::Mat_<float>(4, 1) << x, y, z, 1);
+                return m_cameraParams.GetExtCalibrationMatrix44() * WorldPoint;
+            }
+            
+            cv::Mat WorldToCamera(cv::Mat WorldPoint)
+            {
+                return m_cameraParams.GetExtCalibrationMatrix44() * WorldPoint;
+            }
+            
+            
+            /*
+             * Project a point in camera coordinates to camera projective plane (image coordinates)
+             * Result is 3x1 vector in homogeneous coordinates
+             */
+            
+            cv::Mat CameraToImage(float x, float y, float z)
+             {
+                cv::Mat CameraPoint = (cv::Mat_<float>(4, 1) << x, y, z, 1);
+                return m_cameraParams.GetIntCalibrationMatrix34() * CameraPoint;
+            }
+            
+            cv::Mat CameraToImage(cv::Mat CameraPoint)
+            {
+                return m_cameraParams.GetIntCalibrationMatrix34() * CameraPoint;
+            }
+            
+            /*
+             * Point on image to camera coordinates. Result is a ray in H.C.
+             * Result is 3x1 vector in homogeneous coordinates (sx, sy, s)
+             * (Ray from camera COP through the x, y point on the camera projective plane)
+             */
+            cv::Mat ImageToCamera(float x, float y)
+            {
+                cv::Mat ImagePoint = (cv::Mat_<float>(3, 1) << x, y, 1);
+                return m_cameraParams.GetIntCalibrationMatrix33().inv() * ImagePoint;
+            }
+            
+            cv::Mat ImageToCamera(cv::Mat ImagePoint)
+            {
+                return m_cameraParams.GetIntCalibrationMatrix33().inv() * ImagePoint;
+            }
+            
+            /*
+             * Transform a point in camera coordinates to world coordinates
+             * Result is 4x1 vector of world coordinates in homogeneous coordinates (x, y, z, w)
+             */
+            cv::Mat CameraToWorld(float x, float y, float z)
+            {
+                cv::Mat CameraPoint = (cv::Mat_<float>(4, 1) << x, y, z, 1);
+                return m_cameraParams.GetExtCalibrationMatrix44().inv() * CameraPoint;
+            }
+            
+            cv::Mat CameraToWorld(cv::Mat CameraPoint)
+            {
+                return m_cameraParams.GetExtCalibrationMatrix44().inv() * CameraPoint;
+            }
+        private:
+            CameraParameters m_cameraParams;
+        };
 
         template<class _Tp, int m, int n>
         inline

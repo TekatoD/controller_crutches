@@ -233,6 +233,12 @@ int main(int argc, char** argv) {
     
     std::cout << WorldPoint << std::endl;
     
+    // Testing Ray-Plane intersection 
+    cv::Mat P1 = (cv::Mat_<float>(4, 1) << 1, 2, 3, 1);
+    cv::Mat P2 = (cv::Mat_<float>(4, 1) << 4, 5, 42, 1);
+    cv::Mat L = ant::vision_utils::PluckerLine(P1, P2);
+    std::cout << L << std::endl;
+    
     while (!finish) {
         camera.CaptureFrame();
         

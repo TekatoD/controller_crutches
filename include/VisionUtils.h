@@ -215,6 +215,28 @@ namespace ant {
             return (cv::Mat_<float>(3, 3) << 0, -z, y, z, 0, -x, y, x, 0);
         }
         
+        /*
+         *  https://math.stackexchange.com/questions/400268/equation-for-a-line-through-a-plane-in-homogeneous-coordinates
+         */
+        inline cv::Mat PluckerLine(cv::Mat P1, cv::Mat P2)
+        {
+            int rows = P1.rows;
+            cv::Mat p1, p2;
+            float d1, d2;
+            
+            p1 = P1(cv::Range(0, rows-1), cv::Range::all());
+            d1 = P1.at<float>(rows-1, 0);
+            p2 = P2(cv::Range(0, rows-1), cv::Range::all());
+            d2 = P2.at<float>(rows-1, 0);
+            
+            cv::Mat PLine = cv::Mat_<float>(p1.rows * 2, 1);
+            
+            PLine(cv::Range(0, p1.rows), cv::Range::all()) = d1 * p2 - d2 * p1;
+            PLine(cv::Range(p1.rows, PLine.rows), cv::Range::all()) = XproductMatrix33(p1) * p2;
+            
+            return PLine;
+        }
+        
         template<class _Tp, int m, int n>
         inline
         float norm(const cv::Matx<_Tp, m, n> &M) {

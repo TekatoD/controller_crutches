@@ -5,11 +5,14 @@
 #include "OdometryCollector.h"
 #include <math.h>
 
-Robot::OdometryCollector::OdometryCollector() : m_initial(0, 0, 0), m_pose(0, 0, 0) { }
+Robot::OdometryCollector::OdometryCollector()
+        : m_initial(0, 0, 0), m_pose(0, 0, 0) { }
 
-Robot::OdometryCollector::OdometryCollector(Pose2D initial) : m_initial(initial), m_pose(initial) { }
+Robot::OdometryCollector::OdometryCollector(Pose2D initial)
+        : m_initial(initial), m_pose(initial) { }
 
-Robot::OdometryCollector::OdometryCollector(float x, float y, float theta) : m_initial(x, y, theta), m_pose(x, y, theta) { }
+Robot::OdometryCollector::OdometryCollector(float x, float y, float theta)
+        : m_initial(x, y, theta), m_pose(x, y, theta) { }
 
 void Robot::OdometryCollector::odoTranslate(Pose2D offset) {
     float dst = hypot(offset.X(), offset.Y());

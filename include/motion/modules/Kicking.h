@@ -31,11 +31,9 @@ namespace Robot {
     public:
         static Kicking* GetInstance();
 
-        void Kick(int leg, float leg_x_offset, float leg_y_offset,
-                  float leg_z_offset, float leg_yaw_offset,
-                  float leg_target_x_offset, float leg_target_y_offset);
+        void Kick();
 
-        bool IsDone() const noexcept;
+        bool IsRunning() const noexcept;
 
         void Initialize() override;
 
@@ -43,14 +41,100 @@ namespace Robot {
 
         void Break();
 
+        int GetKickingLeg() const noexcept;
+
+        void SetKickingLeg(int kicking_leg) noexcept;
+
+        float GetKickTargetXOffset() const noexcept;
+
+        void SetKickTargetXOffset(float kick_target_x_offset) noexcept;
+
+        float GetKickTargetYOffset() const noexcept;
+
+        void SetKickTargetYOffset(float kick_target_y_offset) noexcept;
+
+        float GetKickXOffset() const noexcept;
+
+        void SetKickXOffset(float kick_x_offset) noexcept;
+
+        float GetKickYOffset() const noexcept;
+
+        void SetKickYOffset(float kick_y_offset) noexcept;
+
+        float GetLickZOffset() const noexcept;
+
+        void SetKickZOffset(float kick_z_offset) noexcept;
+
+        float GetKickYawOffset() const noexcept;
+
+        void SetKickYawOffset(float kick_yaw_offset) noexcept;
+
+        float GetShiftingBodyDuration() const noexcept;
+
+        void SetShiftingBodyDuration(float shifting_body_duration) noexcept;
+
+        float GetKickingDuration() const noexcept;
+
+        void SetKickingDuration(float kicking_duration) noexcept;
+
+        float GetRestoringDuration() const noexcept;
+
+        void SetRestoringDuration(float restoring_duration) noexcept;
+
+        float GetBodyInitXOffset() const noexcept;
+
+        void SetBodyInitXOffset(float body_init_x_offset) noexcept;
+
+        float GetBodyInitYOffset() const noexcept;
+
+        void SetBodyInitYOffset(float body_init_y_offset) noexcept;
+
+        float GetBodyInitZOffset() const noexcept;
+
+        void SetBodyInitZOffset(float body_init_z_offset) noexcept;
+
+        float GetBodyInitPitchOffset() const noexcept;
+
+        void SetBodyInitPitchOffset(float body_init_pitch_offset) noexcept;
+
+        float GetBodyXOffset() const noexcept;
+
+        void SetBodyXOffset(float body_x_offset) noexcept;
+
+        float GetBodyYOffset() const noexcept;
+
+        void SetBodyYOffset(float body_y_offset) noexcept;
+
+        float GetBodyZOffset() const noexcept;
+
+        void SetBodyZOffset(float body_z_offset) noexcept;
+
+        float GetArmSwingGain() const noexcept;
+
+        void SetArmSwingGain(float arm_swing_gain) noexcept;
+
+        float GetBalanceRollGain() const noexcept;
+
+        void SetBalanceRollGain(float balance_roll_gain) noexcept;
+
+        float GetBalancePitchGain() const noexcept;
+
+        void SetBalancePitchGain(float balance_pitch_gain) noexcept;
+
+        bool GetBalanceEnabled() const noexcept;
+
+        void SetBalanceEnabled(bool balance_enabled) noexcept;
+
     private:
         Kicking() = default;
 
         void UpdateTimeParameters();
 
-        void UpdateActiveParams();
+        void UpdateActiveParams() noexcept;
 
     private:
+        bool m_debug{true};
+
         int m_kicking_leg{RIGHT_LEG};
         float m_kick_target_x_offset{0.0f};
         float m_kick_target_y_offset{0.0f};
@@ -58,6 +142,14 @@ namespace Robot {
         float m_kick_y_offset{0.0f};
         float m_kick_z_offset{0.0f};
         float m_kick_yaw_offset{0.0f};
+
+        int m_cur_kicking_leg{RIGHT_LEG};
+        float m_cur_kick_target_x_offset{0.0f};
+        float m_cur_kick_target_y_offset{0.0f};
+        float m_cur_kick_x_offset{0.0f};
+        float m_cur_kick_y_offset{0.0f};
+        float m_cur_kick_z_offset{0.0f};
+        float m_cur_kick_yaw_offset{0.0f};
 
         float m_shifting_body_duration{100.0f};
         float m_kicking_duration{30.0f};

@@ -26,6 +26,19 @@
 #include <motion/modules/Head.h>
 #include <motion/modules/Kicking.h>
 
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/log/core.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/log/sinks/sync_frontend.hpp>
+#include <boost/log/sinks/text_ostream_backend.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+#include <boost/log/sources/record_ostream.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/support/date_time.hpp>
+#include <log/ColouredSink.h>
+#include <log/Logger.h>
+
 
 #include "StateMachine.h"
 
@@ -36,6 +49,12 @@
 #define U2D_DEV_NAME1       "/dev/ttyUSB1"
 
 using namespace Robot;
+
+namespace logging = boost::log;
+namespace src = boost::log::sources;
+namespace expr = boost::log::expressions;
+namespace sinks = boost::log::sinks;
+namespace keywords = boost::log::keywords;
 
 
 void change_current_dir() {
@@ -61,6 +80,25 @@ int main(int argc, char** argv) {
     signal(SIGQUIT, &sighandler);
     signal(SIGINT, &sighandler);
 
+    //////////////////// Logging Initialize ///////////////////////////
+    using coloured_sink = sinks::synchronous_sink<ColouredSink>;
+    auto sink = boost::make_shared<coloured_sink>();
+    sink->set_formatter(expr::stream
+                                << expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%H:%M:%S.%f")
+                                << " [" << logging::trivial::severity
+                                << "] " << expr::smessage);
+    logging::core::get()->set_filter(
+#ifdef DEBUG
+            logging::trivial::severity >= logging::trivial::trace
+#else
+            logging::trivial::severity >= logging::trivial::info
+#endif
+    );
+    logging::core::get()->add_sink(std::move(sink));
+
+    LOG_INFO << "=== Initialization started ===";
+
+
     change_current_dir();
 
     //LinuxCM730 linux_cm730(U2D_DEV_NAME0);
@@ -71,10 +109,11 @@ int main(int argc, char** argv) {
         vrepConnector.Connect();
         cm730.SetClientId(vrepConnector.GetClientID());
         cm730.Connect();
+    } catch(std::runtime_error& e) {
+        LOG_FATAL << "Error: " << e.what();
+        return 1;
     }
-    catch(std::runtime_error& e) {
-        std::cout << "Error: " << e.what() << std::endl;
-    }
+    LOG_INFO << "Hardware is ready";
 
     minIni ini(argc == 1 ? INI_FILE_PATH : argv[1]);
 
@@ -86,10 +125,11 @@ int main(int argc, char** argv) {
     if (!MotionManager::GetInstance()->Initialize(&cm730)) {
 //        linux_cm730.SetPortName(U2D_DEV_NAME1);
         if (!MotionManager::GetInstance()->Initialize(&cm730)) {
-            std::cerr << "Fail to initialize Motion Manager!" << std::endl;
+            LOG_FATAL << "Fail to initialize Motion Manager!";
             return 1;
         }
     }
+    LOG_INFO << "Motion manager is ready";
 
     Walking::GetInstance()->LoadINISettings(&ini);
 
@@ -107,21 +147,19 @@ int main(int argc, char** argv) {
 
     int firm_ver = 0;
     if (cm730.ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, nullptr) != CM730::SUCCESS) {
-        std::cerr << "Can't read firmware version from Dynamixel ID " << JointData::ID_HEAD_PAN << "!!\n" << std::endl;
+        LOG_FATAL << "Can't read firmware version from Dynamixel ID " << JointData::ID_HEAD_PAN;
         return 1;
     }
 
     if (0 < firm_ver && firm_ver < 27) {
-        std::cerr << "MX-28's firmware is not support 4096 resolution!! \n"
-                  << "Upgrade MX-28's firmware to version 27(0x1B) or higher.\n"
-                  << std::endl;
+        LOG_FATAL << "MX-28's firmware is not support 4096 resolution! "
+                  << "Upgrade MX-28's firmware to version 27(0x1B) or higher.";
         return 1;
     } else if (27 <= firm_ver) {
         Action::GetInstance()->LoadFile(argc <= 2 ? (char*) MOTION_FILE_PATH : argv[2]);
     } else {
         return 1;
     }
-
 
     ///////////////////// Init game controller //////////////////////////
 
@@ -130,6 +168,7 @@ int main(int argc, char** argv) {
 //        std::cerr << "ERROR: Can't connect to game controller!" << std::endl;
 //        return 1;
 //    }
+//    LOG_INFO << "Game controller client is ready";
 
     /////////////////////////////////////////////////////////////////////
 
@@ -147,6 +186,7 @@ int main(int argc, char** argv) {
 //    Action::GetInstance()->Start(9);
 //    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 
+    LOG_INFO << "=== Initialization finished ===";
     while (!finish) {
         // Update game controller
         GameController::GetInstance()->Update();
@@ -154,9 +194,11 @@ int main(int argc, char** argv) {
         // Update state machine
         StateMachine::GetInstance()->Check(&cm730);
 
-        if (!Action::GetInstance()->IsRunning()) {
+        if (!Action::GetInstance()->IsRunning() && !Kicking::GetInstance()->IsRunning()) {
             Kicking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-            Kicking::GetInstance()->Kick(Kicking::RIGHT_LEG, -10.0, -25.0f, 10.0, -radians(45), 50.0, 15.0);
+            Kicking::GetInstance()->SetKickingLeg(Kicking::RIGHT_LEG);
+            Kicking::GetInstance()->SetKickTargetXOffset(10.0);
+            Kicking::GetInstance()->Kick();
         }
 
 //        if (StateMachine::GetInstance()->IsStarted() == 0) {

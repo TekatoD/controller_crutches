@@ -5,9 +5,17 @@ project(darwin-soccer)
 option(CROSSCOMPILE "Compile for real Darwin-OP (V-REP build by default)" OFF)
 
 #### Compile properties ####
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-set(Boost_USE_STATIC_LIBS ON)
+add_definitions(-DBOOST_ALL_DYN_LINK)
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release FORCE)
+endif()
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    add_definitions(-DDEBUG)
+endif()
 
 if (CROSSCOMPILE)
     add_definitions(-DCROSSCOMPILE) # This definition is used during the initialization in the main
@@ -24,8 +32,8 @@ find_package(JPEG REQUIRED) # This lib is used by the linux camera
 find_package(VREP REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 # Path to Boost and OpenCV needs to be set manually when crosscompiling
-find_package(Boost REQUIRED)
-find_package(OpenCV REQUIRED)
+find_package(Boost 1.54 COMPONENTS system log date_time filesystem thread REQUIRED)
+find_package(OpenCV 3.3 REQUIRED)
 
 #### Sources ####
 # All sources of the project. Insert one file per line.
@@ -117,7 +125,14 @@ set(SRC
         include/ServiceInterface.h
         include/Singleton.h
         src/PropertyReader.cpp
-        include/PropertyReader.h src/motion/modules/Kicking.cpp include/motion/modules/Kicking.h)
+        include/PropertyReader.h
+        src/motion/modules/Kicking.cpp
+        include/motion/modules/Kicking.h
+        include/log/Console.h
+        src/log/ColouredSink.cpp
+        include/log/ColouredSink.h
+        src/log/Logger.cpp
+        include/log/Logger.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})
@@ -125,8 +140,8 @@ add_executable(controller ${SRC})
 target_link_libraries(controller
         ${CMAKE_THREAD_LIBS_INIT}
         ${JPEG_LIBRARIES}
-        ${BOOST_LIBRARIES}
-        ${OpenCV_LIBRARIES}
+        ${Boost_LIBRARIES}
+#        ${OpenCV_LIBRARIES}
         Eigen3::Eigen
         ${VREP_LIBRARIES})
 
@@ -134,6 +149,6 @@ target_include_directories(controller PUBLIC
         ${JPEG_INCLUDE_DIR}
         ${VREP_REMOTE}
         ${VREP_INCLUDE}
-        ${BOOST_INCLUDE_DIR}
+        ${Boost_INCLUDE_DIR}
         ${JPEG_INCLUDE_DIR}
         ${OpenCV_INCLUDE_DIR})

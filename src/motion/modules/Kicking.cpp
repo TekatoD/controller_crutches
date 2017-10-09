@@ -9,22 +9,23 @@
 
 
 void Robot::Kicking::Kick() {
-    if (m_kicking_done) {
+    if (m_done) {
         m_time = 0;
-        m_kicking_done = false;
+        m_done = false;
     }
 }
 
 bool Robot::Kicking::IsRunning() const noexcept {
-    return !m_kicking_done;
+    return !m_done;
 }
 
 void Robot::Kicking::Initialize() {
-    Break();
+    m_time = 0;
+    m_done = true;
 }
 
 void Robot::Kicking::Process() {
-    if (m_kicking_done) return;
+    if (m_done) return;
 
     constexpr float TIME_UNIT = MotionModule::TIME_UNIT;
     //                     R_HIP_YAW, R_HIP_ROLL, R_HIP_PITCH, R_KNEE, R_ANKLE_PITCH, R_ANKLE_ROLL, L_HIP_YAW, L_HIP_ROLL, L_HIP_PITCH, L_KNEE, L_ANKLE_PITCH, L_ANKLE_ROLL, R_ARM_SWING, L_ARM_SWING
@@ -113,7 +114,7 @@ void Robot::Kicking::Process() {
             if (m_debug) {
                 LOG_DEBUG << "KICKING: Kick was finished";
             }
-            m_kicking_done = true;
+            m_done = true;
             m_time = 0.0;
             return;
     }
@@ -199,11 +200,11 @@ void Robot::Kicking::Break() {
     if (m_debug) {
         LOG_DEBUG << "KICKING: Kick was interrupted";
     }
-    m_kicking_done = true;
+    m_done = true;
 }
 
 void Robot::Kicking::UpdateTimeParameters() {
-    if (m_kicking_done) {
+    if (m_done) {
         m_phase = PHASE_DONE;
         m_time = 0;
     } else {
@@ -259,7 +260,7 @@ void Robot::Kicking::UpdateActiveParams() noexcept {
     m_cur_balance_enabled = m_balance_enabled;
 
     if (m_debug) {
-        LOG_DEBUG << "KICKING: kick is started";
+        LOG_DEBUG << "KICKING: kick was started";
     }
 }
 
@@ -274,7 +275,7 @@ int Robot::Kicking::GetKickingLeg() const noexcept {
 
 void Robot::Kicking::SetKickingLeg(int kicking_leg) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: kicking leg was switched to " << (m_kicking_leg == RIGHT_LEG ? "right leg" : "left leg");
+        LOG_DEBUG << "KICKING: kicking_leg = " << (m_kicking_leg == RIGHT_LEG ? "RIGHT_LEG" : "LEFT_LEG");
     }
     m_kicking_leg = kicking_leg;
 }
@@ -285,7 +286,7 @@ float Robot::Kicking::GetKickTargetXOffset() const noexcept {
 
 void Robot::Kicking::SetKickTargetXOffset(float kick_target_x_offset) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: kicking target x offset was switched to: " << kick_target_x_offset;
+        LOG_DEBUG << "KICKING: kicking_target_x_offset = " << kick_target_x_offset;
     }
     m_kick_target_x_offset = kick_target_x_offset;
 }
@@ -296,7 +297,7 @@ float Robot::Kicking::GetKickTargetYOffset() const noexcept {
 
 void Robot::Kicking::SetKickTargetYOffset(float kick_target_y_offset) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: kicking target y offset was switched to: " << kick_target_y_offset;
+        LOG_DEBUG << "KICKING: kicking_target_y_offset = " << kick_target_y_offset;
     }
     m_kick_target_y_offset = kick_target_y_offset;
 }
@@ -307,7 +308,7 @@ float Robot::Kicking::GetKickXOffset() const noexcept {
 
 void Robot::Kicking::SetKickXOffset(float kick_x_offset) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: kicking x offset was switched to: " << kick_x_offset;
+        LOG_DEBUG << "KICKING: kicking_x_offset = " << kick_x_offset;
     }
     m_kick_x_offset = kick_x_offset;
 }
@@ -318,7 +319,7 @@ float Robot::Kicking::GetKickYOffset() const noexcept {
 
 void Robot::Kicking::SetKickYOffset(float kick_y_offset) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: kicking y offset was switched to: " << kick_y_offset;
+        LOG_DEBUG << "KICKING: kicking_y_offset = " << kick_y_offset;
     }
     m_kick_y_offset = kick_y_offset;
 }
@@ -329,7 +330,7 @@ float Robot::Kicking::GetLickZOffset() const noexcept {
 
 void Robot::Kicking::SetKickZOffset(float kick_z_offset) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: kicking z offset was switched to: " << kick_z_offset;
+        LOG_DEBUG << "KICKING: kicking_z_offset = " << kick_z_offset;
     }
     m_kick_z_offset = kick_z_offset;
 }
@@ -340,7 +341,7 @@ float Robot::Kicking::GetKickYawOffset() const noexcept {
 
 void Robot::Kicking::SetKickYawOffset(float kick_yaw_offset) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: kicking yaw offset was switched to: " << kick_yaw_offset;
+        LOG_DEBUG << "KICKING: kicking_yaw_offset = " << kick_yaw_offset;
     }
     m_kick_yaw_offset = kick_yaw_offset;
 }
@@ -351,7 +352,7 @@ float Robot::Kicking::GetShiftingBodyDuration() const noexcept {
 
 void Robot::Kicking::SetShiftingBodyDuration(float shifting_body_duration) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: shifting body duration was switched to: " << shifting_body_duration;
+        LOG_DEBUG << "KICKING: shifting_body_duration = " << shifting_body_duration;
     }
     m_shifting_body_duration = shifting_body_duration;
 }
@@ -362,7 +363,7 @@ float Robot::Kicking::GetKickingDuration() const noexcept {
 
 void Robot::Kicking::SetKickingDuration(float kicking_duration) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: kicking duration was switched to: " << kicking_duration;
+        LOG_DEBUG << "KICKING: kicking_duration = " << kicking_duration;
     }
     m_kicking_duration = kicking_duration;
 }
@@ -373,7 +374,7 @@ float Robot::Kicking::GetRestoringDuration() const noexcept {
 
 void Robot::Kicking::SetRestoringDuration(float restoring_duration) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: restoring duration was switched to: " << restoring_duration;
+        LOG_DEBUG << "KICKING: restoring_duration = " << restoring_duration;
     }
     m_restoring_duration = restoring_duration;
 }
@@ -384,7 +385,7 @@ float Robot::Kicking::GetBodyInitXOffset() const noexcept {
 
 void Robot::Kicking::SetBodyInitXOffset(float body_init_x_offset) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: body init x offset was switched to: " << body_init_x_offset;
+        LOG_DEBUG << "KICKING: body_init_x_offset = " << body_init_x_offset;
     }
     m_body_init_x_offset = body_init_x_offset;
 }
@@ -395,7 +396,7 @@ float Robot::Kicking::GetBodyInitYOffset() const noexcept {
 
 void Robot::Kicking::SetBodyInitYOffset(float body_init_y_offset) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: body init y offset was switched to: " << body_init_y_offset;
+        LOG_DEBUG << "KICKING: body_init_y_offset = " << body_init_y_offset;
     }
     m_body_init_y_offset = body_init_y_offset;
 }
@@ -406,7 +407,7 @@ float Robot::Kicking::GetBodyInitZOffset() const noexcept {
 
 void Robot::Kicking::SetBodyInitZOffset(float body_init_z_offset) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: body init z offset was switched to: " << body_init_z_offset;
+        LOG_DEBUG << "KICKING: body_init_z_offset = " << body_init_z_offset;
     }
     m_body_init_z_offset = body_init_z_offset;
 }
@@ -417,7 +418,7 @@ float Robot::Kicking::GetBodyInitPitchOffset() const noexcept {
 
 void Robot::Kicking::SetBodyInitPitchOffset(float body_init_pitch_offset) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: body init pitch offset was switched to: " << body_init_pitch_offset;
+        LOG_DEBUG << "KICKING: body_init_pitch_offset = " << body_init_pitch_offset;
     }
     m_body_init_pitch_offset = body_init_pitch_offset;
 }
@@ -428,7 +429,7 @@ float Robot::Kicking::GetBodyXOffset() const noexcept {
 
 void Robot::Kicking::SetBodyXOffset(float body_x_offset) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: body x offset was switched to: " << body_x_offset;
+        LOG_DEBUG << "KICKING: body_x_offset = " << body_x_offset;
     }
     m_body_x_offset = body_x_offset;
 }
@@ -439,7 +440,7 @@ float Robot::Kicking::GetBodyYOffset() const noexcept {
 
 void Robot::Kicking::SetBodyYOffset(float body_y_offset) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: body y offset was switched to: " << body_y_offset;
+        LOG_DEBUG << "KICKING: body_y_offset = " << body_y_offset;
     }
     m_body_y_offset = body_y_offset;
 }
@@ -450,7 +451,7 @@ float Robot::Kicking::GetBodyZOffset() const noexcept {
 
 void Robot::Kicking::SetBodyZOffset(float body_z_offset) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: body z offset was switched to: " << body_z_offset;
+        LOG_DEBUG << "KICKING: body_z_offset = " << body_z_offset;
     }
     m_body_z_offset = body_z_offset;
 }
@@ -461,7 +462,7 @@ float Robot::Kicking::GetArmSwingGain() const noexcept {
 
 void Robot::Kicking::SetArmSwingGain(float arm_swing_gain) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: arm swing gain was switched to: " << arm_swing_gain;
+        LOG_DEBUG << "KICKING: arm_swing_gain = " << arm_swing_gain;
     }
     m_arm_swing_gain = arm_swing_gain;
 }
@@ -472,7 +473,7 @@ float Robot::Kicking::GetBalanceRollGain() const noexcept {
 
 void Robot::Kicking::SetBalanceRollGain(float balance_roll_gain) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: balance roll gain was switched to: " << balance_roll_gain;
+        LOG_DEBUG << "KICKING: balance_roll_gain = " << balance_roll_gain;
     }
     m_balance_roll_gain = balance_roll_gain;
 }
@@ -483,7 +484,7 @@ float Robot::Kicking::GetBalancePitchGain() const noexcept {
 
 void Robot::Kicking::SetBalancePitchGain(float balance_pitch_gain) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: balance pitch gain was switched to: " << balance_pitch_gain;
+        LOG_DEBUG << "KICKING: balance_pitch_gain = " << balance_pitch_gain;
     }
     m_balance_pitch_gain = balance_pitch_gain;
 }

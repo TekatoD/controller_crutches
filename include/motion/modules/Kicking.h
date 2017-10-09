@@ -190,7 +190,7 @@ namespace Robot {
 
         float m_time{0.0f};
         int m_phase{PHASE_DONE};
-        bool m_kicking_done{true};
+        bool m_done{true};
     };
 }
 

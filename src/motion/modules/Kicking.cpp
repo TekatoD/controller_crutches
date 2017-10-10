@@ -128,19 +128,26 @@ void Robot::Kicking::Process() {
         body_y = -body_y;
         std::swap(support_leg, active_leg);
         std::swap(r_shoulder, l_shoulder);
-
     }
 
     m_time += TIME_UNIT;
 
     // Shift leg position by body offset
     leg_x_active -= body_x;
-    leg_y_active -= body_y;
-    leg_z_active -= body_z;
+    leg_y_active += body_y;
+    leg_z_active += body_z;
 
     leg_x_support -= body_x;
-    leg_y_support -= body_y;
-    leg_z_support -= body_z;
+    leg_y_support += body_y;
+    leg_z_support += body_z;
+
+    if (m_cur_kicking_leg == RIGHT_LEG) {
+        leg_y_active += -m_cur_legs_y_offset / 2.0;
+        leg_y_support += m_cur_legs_y_offset / 2.0;
+    } else {
+        leg_y_active -= -m_cur_legs_y_offset / 2.0;
+        leg_y_support -= m_cur_legs_y_offset / 2.0;
+    }
 
     bool ik_status = true;
     ik_status = ik_status && Kinematics::ComputeLegInverseKinematics(
@@ -168,10 +175,10 @@ void Robot::Kicking::Process() {
     }
 
     // Add body pitch offset
-    r_joints[1] += m_cur_body_init_pitch_offset * sinf(r_joints[0]);
-    r_joints[2] += m_cur_body_init_pitch_offset * cosf(r_joints[0]);
-    l_joints[1] += m_cur_body_init_pitch_offset * sinf(l_joints[0]);
-    l_joints[2] += m_cur_body_init_pitch_offset * cosf(l_joints[0]);
+    r_joints[1] -= m_cur_body_init_pitch_offset * sinf(r_joints[0]);
+    r_joints[2] -= m_cur_body_init_pitch_offset * cosf(r_joints[0]);
+    l_joints[1] -= m_cur_body_init_pitch_offset * sinf(l_joints[0]);
+    l_joints[2] -= m_cur_body_init_pitch_offset * cosf(l_joints[0]);
 
     for (int i = 0; i < 6; ++i) {
         out_value[i] = (int) (r_joints[i] * MX28::RATIO_RADIANS2VALUE * dir[i]) +
@@ -258,6 +265,7 @@ void Robot::Kicking::UpdateActiveParams() noexcept {
     m_cur_body_init_y_offset = m_body_init_y_offset;
     m_cur_body_init_z_offset = m_body_init_z_offset;
     m_cur_body_init_pitch_offset = m_body_init_pitch_offset;
+    m_cur_legs_y_offset = m_legs_y_offset;
 
     m_cur_body_x_offset = m_body_x_offset;
     m_cur_body_y_offset = m_body_y_offset;
@@ -507,5 +515,24 @@ void Robot::Kicking::SetBalanceEnabled(bool balance_enabled) noexcept {
         }
     }
     m_balance_enabled = balance_enabled;
+}
+
+float Robot::Kicking::GetLegsYOffset() const {
+    return m_legs_y_offset;
+}
+
+void Robot::Kicking::SetLegsYOffset(float legs_y_offset) {
+    if (m_debug) {
+        LOG_DEBUG << "KICKING: legs_y_offset = " << legs_y_offset;
+    }
+    m_legs_y_offset = legs_y_offset;
+}
+
+bool Robot::Kicking::GetDebug() const {
+    return m_debug;
+}
+
+void Robot::Kicking::SetDebug(bool debug) {
+    m_debug = debug;
 }
 

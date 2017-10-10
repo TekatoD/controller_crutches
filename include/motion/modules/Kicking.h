@@ -125,6 +125,14 @@ namespace Robot {
 
         void SetBalanceEnabled(bool balance_enabled) noexcept;
 
+        float GetLegsYOffset() const;
+
+        void SetLegsYOffset(float legs_y_offset);
+
+        bool GetDebug() const;
+
+        void SetDebug(bool debug);
+
     private:
         Kicking() = default;
 
@@ -140,8 +148,27 @@ namespace Robot {
         float m_kick_target_y_offset{0.0f};
         float m_kick_x_offset{0.0f};
         float m_kick_y_offset{0.0f};
-        float m_kick_z_offset{0.0f};
+        float m_kick_z_offset{5.0f};
         float m_kick_yaw_offset{0.0f};
+
+        float m_shifting_body_duration{45.0f};
+        float m_kicking_duration{20.0f};
+        float m_restoring_duration{45.0f};
+
+        float m_body_init_x_offset{-10.0f};
+        float m_body_init_y_offset{0.0f}; // Unused
+        float m_body_init_z_offset{5.0f};
+        float m_body_init_pitch_offset{radians(13.0f)};
+        float m_legs_y_offset{5};
+
+        float m_body_x_offset{-15.0f};
+        float m_body_y_offset{-15.0f};
+        float m_body_z_offset{7.0f};
+
+        float m_arm_swing_gain{0.0f};
+        float m_balance_roll_gain{0.0f};
+        float m_balance_pitch_gain{0.0f};
+        bool m_balance_enabled{true};
 
         int m_cur_kicking_leg{RIGHT_LEG};
         float m_cur_kick_target_x_offset{0.0f};
@@ -151,37 +178,20 @@ namespace Robot {
         float m_cur_kick_z_offset{0.0f};
         float m_cur_kick_yaw_offset{0.0f};
 
-        float m_shifting_body_duration{100.0f};
-        float m_kicking_duration{30.0f};
-        float m_restoring_duration{80.0f};
-
         float m_cur_shifting_body_duration{0.0f};
         float m_cur_kicking_duration{0.0f};
         float m_cur_restoring_duration{0.0f};
 
-        float m_body_init_x_offset{-10.0f};
-        float m_body_init_y_offset{0.0f};
-        float m_body_init_z_offset{-5.0f};
-        float m_body_init_pitch_offset{radians(-15.0f)};
-
         float m_cur_body_init_x_offset{0.0f};
-        float m_cur_body_init_y_offset{-15.0f};
+        float m_cur_body_init_y_offset{0.0f};
         float m_cur_body_init_z_offset{0.0f};
         float m_cur_body_init_pitch_offset{0.0f};
-
-        float m_body_x_offset{-20.0f};
-        float m_body_y_offset{-15.0f};
-        float m_body_z_offset{-5.0f};
+        float m_cur_legs_y_offset{0.0f};
 
         float m_cur_body_x_offset{0.0f};
         float m_cur_body_y_offset{0.0f};
         float m_cur_body_z_offset{0.0f};
         float m_cur_body_pitch_offset{0.0f};
-
-        float m_arm_swing_gain{0.0f};
-        float m_balance_roll_gain{0.0f};
-        float m_balance_pitch_gain{0.0f};
-        bool m_balance_enabled{true};
 
         float m_cur_arm_swing_gain{0.0f};
         float m_cur_balance_roll_gain{0.0f};

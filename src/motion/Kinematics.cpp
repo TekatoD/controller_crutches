@@ -37,6 +37,11 @@ bool Kinematics::ComputeLegInverseKinematics(float* out, float x, float y, float
     z = LEG_LENGTH - z;
     const float offset_sqr = z * z + x * x;
     const float offset_dist = sqrtf(offset_sqr);
+
+    if (offset_dist > CALF_LENGTH + THIGH_LENGTH) {
+        return false;
+    }
+
     // Hip yaw
     out[0] = yaw;
     // Hip roll

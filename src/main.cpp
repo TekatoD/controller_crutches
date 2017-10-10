@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
     );
     logging::core::get()->add_sink(std::move(sink));
 
-    LOG_INFO << "=== Initialization started ===";
+    LOG_INFO << "=== Initialization was started ===";
 
 
     change_current_dir();
@@ -186,7 +186,8 @@ int main(int argc, char** argv) {
 //    Action::GetInstance()->Start(9);
 //    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 
-    LOG_INFO << "=== Initialization finished ===";
+    LOG_INFO << "=== Initialization was finished ===";
+    LOG_INFO << "=== Controller was started ===";
     while (!finish) {
         // Update game controller
         GameController::GetInstance()->Update();
@@ -197,7 +198,11 @@ int main(int argc, char** argv) {
         if (!Action::GetInstance()->IsRunning() && !Kicking::GetInstance()->IsRunning()) {
             Kicking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
             Kicking::GetInstance()->SetKickingLeg(Kicking::RIGHT_LEG);
-            Kicking::GetInstance()->SetKickTargetXOffset(10.0);
+            Kicking::GetInstance()->SetKickTargetXOffset(0.0);
+            Kicking::GetInstance()->SetKickXOffset(0.0);
+            Kicking::GetInstance()->SetBodyInitPitchOffset(0.0);
+//            Kicking::GetInstance()->SetBodyZOffset(0.0);
+            Kicking::GetInstance()->SetKickZOffset(0.0);
             Kicking::GetInstance()->Kick();
         }
 
@@ -217,6 +222,7 @@ int main(int argc, char** argv) {
 //            case ROLES_COUNT:break;
 //        }
     }
+    LOG_INFO << "=== Controller was terminated ===";
 
 
     return 0;

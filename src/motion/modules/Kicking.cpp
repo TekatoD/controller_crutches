@@ -57,6 +57,9 @@ void Robot::Kicking::Process() {
     float l_shoulder = 0;
 
     if (m_time == 0) {
+        if (m_debug) {
+            LOG_DEBUG << "KICKING: kick was started";
+        }
         UpdateActiveParams();
     }
 
@@ -121,7 +124,7 @@ void Robot::Kicking::Process() {
 
     float* support_leg = l_joints;
     float* active_leg = r_joints;
-    if (m_cur_kicking_leg == LEFT_FEG) {
+    if (m_cur_kicking_leg == LEFT_LEG) {
         body_y = -body_y;
         std::swap(support_leg, active_leg);
         std::swap(r_shoulder, l_shoulder);
@@ -204,6 +207,9 @@ void Robot::Kicking::Break() {
 }
 
 void Robot::Kicking::UpdateTimeParameters() {
+    if (m_debug) {
+        LOG_TRACE << "KICKING: Updating time parameters";
+    }
     if (m_done) {
         m_phase = PHASE_DONE;
         m_time = 0;
@@ -233,6 +239,9 @@ void Robot::Kicking::UpdateTimeParameters() {
 }
 
 void Robot::Kicking::UpdateActiveParams() noexcept {
+    if (m_debug) {
+        LOG_TRACE << "KICKING: Updating parameters";
+    }
     m_cur_kicking_leg = m_kicking_leg;
     m_cur_kick_target_x_offset = m_kick_target_x_offset;
     m_cur_kick_target_y_offset = m_kick_target_y_offset;
@@ -258,10 +267,6 @@ void Robot::Kicking::UpdateActiveParams() noexcept {
     m_cur_balance_roll_gain = m_balance_roll_gain;
     m_cur_balance_pitch_gain = m_balance_pitch_gain;
     m_cur_balance_enabled = m_balance_enabled;
-
-    if (m_debug) {
-        LOG_DEBUG << "KICKING: kick was started";
-    }
 }
 
 Robot::Kicking* Robot::Kicking::GetInstance() {

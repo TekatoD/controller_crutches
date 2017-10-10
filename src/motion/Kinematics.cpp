@@ -7,91 +7,53 @@
 
 #include <cmath>
 #include <math/AngleTools.h>
+#include <iostream>
 #include "motion/Kinematics.h"
 
 using namespace Robot;
 
-bool Kinematics::ComputeLegInverseKinematics(float* out, float x, float y, float z, float a, float b, float c) {
-    Matrix3D Tad, Tda, Tcd, Tdc, Tac;
-    Vector3D vec;
-    float _Rac, _Acos, _Atan, _k, _l, _m, _n, _s, _c, _theta;
-    float LEG_LENGTH = Kinematics::LEG_LENGTH;
-    float THIGH_LENGTH = Kinematics::THIGH_LENGTH;
-    float CALF_LENGTH = Kinematics::CALF_LENGTH;
-    float ANKLE_LENGTH = Kinematics::ANKLE_LENGTH;
+bool Kinematics::ComputeLegInverseKinematics(float* out, float x, float y, float z, float roll, float pitch, float yaw) {
+    const float cyaw = cosf(yaw);
+    const float syaw = sinf(yaw);
+    const float cpitch = cosf(pitch);
+    const float spitch = sinf(pitch);
+    const float croll = cosf(roll);
+    const float sroll = sinf(roll);
 
-    Tad.SetTransform(Point3D(x, y, z - LEG_LENGTH), Vector3D(degrees(a), degrees(b), degrees(c)));
-
-    vec.X = x + Tad.m[2] * ANKLE_LENGTH;
-    vec.Y = y + Tad.m[6] * ANKLE_LENGTH;
-    vec.Z = (z - LEG_LENGTH) + Tad.m[10] * ANKLE_LENGTH;
-
-    // Get Knee
-    _Rac = vec.Length();
-    _Acos = acosf((_Rac * _Rac - THIGH_LENGTH * THIGH_LENGTH - CALF_LENGTH * CALF_LENGTH) /
-                    (2 * THIGH_LENGTH * CALF_LENGTH));
-    if (std::isnan(_Acos))
-        return false;
-    out[3] = _Acos;
-
-    // Get Ankle Roll
-    Tda = Tad;
-    if (!Tda.Inverse())
-        return false;
-    _k = sqrtf(Tda.m[7] * Tda.m[7] + Tda.m[11] * Tda.m[11]);
-    _l = sqrtf(Tda.m[7] * Tda.m[7] + (Tda.m[11] - ANKLE_LENGTH) * (Tda.m[11] - ANKLE_LENGTH));
-    _m = (_k * _k - _l * _l - ANKLE_LENGTH * ANKLE_LENGTH) / (2 * _l * ANKLE_LENGTH);
-    if (_m > 1.0)
-        _m = 1.0;
-    else if (_m < -1.0)
-        _m = -1.0f;
-    _Acos = acosf(_m);
-    if (std::isnan(_Acos))
-        return false;
-    if (Tda.m[7] < 0.0)
-        out[5] = -_Acos;
-    else
-        out[5] = _Acos;
-
-    // Get Hip Yaw
-    Tcd.SetTransform(Point3D(0, 0, -ANKLE_LENGTH), Vector3D(degrees(out[5]), 0, 0));
-    Tdc = Tcd;
-    if (!Tdc.Inverse())
-        return false;
-    Tac = Tad * Tdc;
-    _Atan = atan2f(-Tac.m[1], Tac.m[5]);
-    if (std::isinf(_Atan))
-        return false;
-    out[0] = _Atan;
-
-    // Get Hip Roll
-    _Atan = atan2f(Tac.m[9], -Tac.m[1] * sinf(out[0]) + Tac.m[5] * cosf(out[0]));
-    if (std::isinf(_Atan))
-        return false;
-    out[1] = _Atan;
-
-    // Get Hip Pitch and Ankle Pitch
-    _Atan = atan2f(Tac.m[2] * cosf(out[0]) + Tac.m[6] * sinf(out[0]), Tac.m[0] * cosf(out[0]) + Tac.m[4] * sinf(out[0]));
-    if (std::isinf(_Atan))
-        return false;
-    _theta = _Atan;
-    _k = sinf(out[3]) * CALF_LENGTH;
-    _l = -THIGH_LENGTH - cosf(out[3]) * CALF_LENGTH;
-    _m = cosf(out[0]) * vec.X + sinf(out[0]) * vec.Y;
-    _n = cosf(out[1]) * vec.Z + sinf(out[0]) * sinf(out[1]) * vec.X - cosf(out[0]) * sinf(out[1]) * vec.Y;
-    _s = (_k * _n + _l * _m) / (_k * _k + _l * _l);
-    _c = (_n - _k * _s) / _l;
-    _Atan = atan2f(_s, _c);
-    if (std::isinf(_Atan))
-        return false;
-    out[2] = _Atan;
-    out[4] = _theta - out[3] - out[2];
-
+    // Apply yaw
+    const float oldx = x;
+    const float oldy  = y;
+    x = cyaw * oldx + syaw * oldy;
+    y = cyaw * oldy - syaw * oldx;
+    // Apply pitch
+    z += cpitch * ANKLE_LENGTH;
+    x += -spitch * ANKLE_LENGTH;
+    // Apply roll
+    // TODO Applying roll may cause wrong calculations. Check it.
+    x += -sroll * spitch * ANKLE_LENGTH;
+    y += sroll *          ANKLE_LENGTH;
+    z += sroll * cpitch * ANKLE_LENGTH;
+    // Ankle offset
+    z = LEG_LENGTH - z;
+    const float offset_sqr = z * z + x * x;
+    const float offset_dist = sqrtf(offset_sqr);
+    // Hip yaw
+    out[0] = yaw;
+    // Hip roll
+    out[1] = atan2f(y, z);
+    // Hip pitch
+    out[2] = -atan2f(x, z) -
+            acosf((offset_sqr + THIGH_LENGTH * THIGH_LENGTH - CALF_LENGTH * CALF_LENGTH) /
+                          (2.0f * THIGH_LENGTH * offset_dist));
+    // Knee pitch
+    out[3] = pi - acosf((THIGH_LENGTH * THIGH_LENGTH + CALF_LENGTH * CALF_LENGTH - offset_sqr) /
+                              (2.0f * THIGH_LENGTH * CALF_LENGTH));
+    // Ankle pitch
+    out[4] = -out[3] - out[2] - pitch;
+    // Ankle roll
+    out[5] = -out[1] + roll;
     return true;
 }
-
-
-Kinematics::~Kinematics() {}
 
 void Kinematics::ComputeLegForwardKinematics(Matrix4x4f& out, float pelvis, float tight_roll, float tight_pitch,
                                              float knee_pitch, float ankle_pitch, float ankle_roll) {

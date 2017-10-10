@@ -25,7 +25,7 @@ namespace Robot {
 
         enum {
             RIGHT_LEG = 0,
-            LEFT_FEG = 1
+            LEFT_LEG = 1
         };
 
     public:

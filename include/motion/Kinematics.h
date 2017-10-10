@@ -5,8 +5,7 @@
  *
  */
 
-#ifndef _KINEMATICS_H_
-#define _KINEMATICS_H_
+#pragma once
 
 #include <cstring>
 #include "math/Eigen.h"
@@ -15,11 +14,8 @@
 
 namespace Robot {
     class Kinematics {
-    private:
-        Kinematics() = default;
-
     public:
-        static bool ComputeLegInverseKinematics(float* out, float x, float y, float z, float a, float b, float c);
+        static bool ComputeLegInverseKinematics(float* out, float x, float y, float z, float roll1, float b, float c);
 
         static void ComputeLegForwardKinematics(Matrix4x4f& out, float pelvis, float tight_roll, float tight_pitch,
                                                 float knee_pitch, float ankle_pitch, float ankle_roll);
@@ -73,9 +69,5 @@ namespace Robot {
         static constexpr float CW_LIMIT_HEAD_TILT = -25.0f; // degree
         static constexpr float CCW_LIMIT_HEAD_TILT = 55.0f; // degree
 
-        ~Kinematics();
-
     };
 }
-
-#endif

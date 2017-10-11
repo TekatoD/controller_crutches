@@ -20,19 +20,19 @@ bool Kinematics::ComputeLegInverseKinematics(float* out, float x, float y, float
     const float croll = cosf(roll);
     const float sroll = sinf(roll);
 
-    // Apply yaw
-    const float oldx = x;
-    const float oldy  = y;
-    x = cyaw * oldx + syaw * oldy;
-    y = cyaw * oldy - syaw * oldx;
-    // Apply pitch
-    z += cpitch * ANKLE_LENGTH;
-    x += -spitch * ANKLE_LENGTH;
     // Apply roll
     // TODO Applying roll may cause wrong calculations. Check it.
     x += -sroll * spitch * ANKLE_LENGTH;
     y += sroll *          ANKLE_LENGTH;
     z += sroll * cpitch * ANKLE_LENGTH;
+    // Apply pitch
+    z += cpitch * ANKLE_LENGTH;
+    x += -spitch * ANKLE_LENGTH;
+    // Apply yaw
+    const float oldx = x;
+    const float oldy  = y;
+    x = cyaw * oldx + syaw * oldy;
+    y = cyaw * oldy - syaw * oldx;
     // Ankle offset
     z = LEG_LENGTH - z;
     const float offset_sqr = z * z + x * x;

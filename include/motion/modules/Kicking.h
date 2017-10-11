@@ -152,7 +152,7 @@ namespace Robot {
         float m_kick_yaw_offset{0.0f};
 
         float m_shifting_body_duration{45.0f};
-        float m_kicking_duration{20.0f};
+        float m_kicking_duration{30.0f};
         float m_restoring_duration{45.0f};
 
         float m_body_init_x_offset{-10.0f};
@@ -165,7 +165,7 @@ namespace Robot {
         float m_body_y_offset{-15.0f};
         float m_body_z_offset{7.0f};
 
-        float m_arm_swing_gain{0.0f};
+        float m_arm_swing_amplitude{radians(45.0)};
         float m_balance_roll_gain{0.0f};
         float m_balance_pitch_gain{0.0f};
         bool m_balance_enabled{true};
@@ -193,7 +193,7 @@ namespace Robot {
         float m_cur_body_z_offset{0.0f};
         float m_cur_body_pitch_offset{0.0f};
 
-        float m_cur_arm_swing_gain{0.0f};
+        float m_cur_arm_swing_amplitude{0.0f};
         float m_cur_balance_roll_gain{0.0f};
         float m_cur_balance_pitch_gain{0.0f};
         bool m_cur_balance_enabled{true};

@@ -183,7 +183,7 @@ int main(int argc, char** argv) {
     soccer.LoadINISettings(&ini);
     goalie.LoadINISettings(&ini);
 
-    Action::GetInstance()->Start(9);
+//    Action::GetInstance()->Start(9);
 //    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 
     LOG_INFO << "=== Initialization was finished ===";
@@ -202,6 +202,7 @@ int main(int argc, char** argv) {
             Kicking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
             Kicking::GetInstance()->SetKickingLeg(Kicking::RIGHT_LEG);
             Kicking::GetInstance()->SetKickTargetXOffset(35.0);
+            Kicking::GetInstance()->SetKickYOffset(-35.0);
 //            Kicking::GetInstance()->SetKickXOffset(0.0);
 //            Kicking::GetInstance()->SetBodyInitPitchOffset(radians(13.0f));
             Kicking::GetInstance()->SetBodyInitXOffset(0.0);

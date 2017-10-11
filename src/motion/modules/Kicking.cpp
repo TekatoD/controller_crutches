@@ -30,7 +30,7 @@ void Robot::Kicking::Process() {
     constexpr float TIME_UNIT = MotionModule::TIME_UNIT;
     //                     R_HIP_YAW, R_HIP_ROLL, R_HIP_PITCH, R_KNEE, R_ANKLE_PITCH, R_ANKLE_ROLL, L_HIP_YAW, L_HIP_ROLL, L_HIP_PITCH, L_KNEE, L_ANKLE_PITCH, L_ANKLE_ROLL, R_ARM_SWING, L_ARM_SWING
     constexpr int dir[14] = {-1, -1, 1, 1, -1, 1, -1, -1, -1, -1, 1, 1, 1, -1};
-    constexpr float initAngle[14] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -48.345f, 41.313f};
+    constexpr float initAngle[14] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0f, 0.0f};
     int out_value[14] = {};
     // Left leg endpoint transformation
     float r_joints[6] = {}; // for inverse kinematics calculations
@@ -97,6 +97,9 @@ void Robot::Kicking::Process() {
             body_x = m_cur_body_x_offset;
             body_y = m_cur_body_y_offset;
             body_z = m_cur_body_z_offset;
+
+            r_shoulder = wsin(local_time, period, 0.0, -m_cur_arm_swing_amplitude, 0.0);
+            l_shoulder = wsin(local_time, period, 0.0, m_cur_arm_swing_amplitude, 0.0);
             break;
         case (PHASE_RESTORING):
             period = m_cur_restoring_duration * 4.0f;
@@ -130,17 +133,14 @@ void Robot::Kicking::Process() {
         std::swap(r_shoulder, l_shoulder);
     }
 
-    m_time += TIME_UNIT;
-
     // Shift leg position by body offset
     leg_x_active -= body_x;
     leg_y_active += body_y;
     leg_z_active += body_z;
-
     leg_x_support -= body_x;
     leg_y_support += body_y;
     leg_z_support += body_z;
-
+    // Add y leg offset
     if (m_cur_kicking_leg == RIGHT_LEG) {
         leg_y_active += -m_cur_legs_y_offset / 2.0;
         leg_y_support += m_cur_legs_y_offset / 2.0;
@@ -149,6 +149,7 @@ void Robot::Kicking::Process() {
         leg_y_support -= m_cur_legs_y_offset / 2.0;
     }
 
+    // Compute inverse kinematics for generated positions
     bool ik_status = true;
     ik_status = ik_status && Kinematics::ComputeLegInverseKinematics(
             active_leg,
@@ -171,7 +172,7 @@ void Robot::Kicking::Process() {
     );
 
     if (!ik_status) {
-        return;
+        return; // We can't calculate correct positions of servos
     }
 
     // Add body pitch offset
@@ -180,15 +181,22 @@ void Robot::Kicking::Process() {
     l_joints[1] -= m_cur_body_init_pitch_offset * sinf(l_joints[0]);
     l_joints[2] -= m_cur_body_init_pitch_offset * cosf(l_joints[0]);
 
+    // Convert right leg positions to values
     for (int i = 0; i < 6; ++i) {
         out_value[i] = (int) (r_joints[i] * MX28::RATIO_RADIANS2VALUE * dir[i]) +
                 MX28::Angle2Value(initAngle[i]);
     }
+    // Convert left leg positions to values
     for (int i = 0; i < 6; ++i) {
         out_value[i + 6] = (int) (l_joints[i] * MX28::RATIO_RADIANS2VALUE * dir[i + 6]) +
                 MX28::Angle2Value(initAngle[i + 6]);
     }
-
+    // Convert shoulder positions to values
+    // R_SHOULDER_PITCH
+    out_value[12] = (int) (r_shoulder * MX28::RATIO_RADIANS2VALUE * dir[12]) + MX28::Angle2Value(initAngle[12]);
+    // L_SHOULDER_PITCH
+    out_value[13] = (int) (l_shoulder * MX28::RATIO_RADIANS2VALUE * dir[13]) + MX28::Angle2Value(initAngle[13]);
+    // Send values to motors
     m_Joint.SetValue(JointData::ID_R_HIP_YAW, out_value[0]);
     m_Joint.SetValue(JointData::ID_R_HIP_ROLL, out_value[1]);
     m_Joint.SetValue(JointData::ID_R_HIP_PITCH, out_value[2]);
@@ -201,8 +209,8 @@ void Robot::Kicking::Process() {
     m_Joint.SetValue(JointData::ID_L_KNEE, out_value[9]);
     m_Joint.SetValue(JointData::ID_L_ANKLE_PITCH, out_value[10]);
     m_Joint.SetValue(JointData::ID_L_ANKLE_ROLL, out_value[11]);
-//    m_Joint.SetValue(JointData::ID_R_SHOULDER_PITCH, out_value[12]); // TODO Shoulders
-//    m_Joint.SetValue(JointData::ID_L_SHOULDER_PITCH, out_value[13]); // TODO !!!!!!!!!
+    m_Joint.SetValue(JointData::ID_R_SHOULDER_PITCH, out_value[12]);
+    m_Joint.SetValue(JointData::ID_L_SHOULDER_PITCH, out_value[13]);
 //    m_Joint.SetAngle(JointData::ID_HEAD_PAN, 0.0f); // TODO Head
 }
 
@@ -226,18 +234,21 @@ void Robot::Kicking::UpdateTimeParameters() {
         sum += m_cur_shifting_body_duration;
         if (m_time <= sum) {
             m_phase = PHASE_SHIFTING_BODY;
+            m_time += TIME_UNIT;
             return;
         }
 
         sum += m_cur_kicking_duration;
         if (m_time <= sum) {
             m_phase = PHASE_KICKING;
+            m_time += TIME_UNIT;
             return;
         }
 
         sum += m_cur_restoring_duration;
         if (m_time <= sum) {
             m_phase = PHASE_RESTORING;
+            m_time += TIME_UNIT;
             return;
         }
 
@@ -271,7 +282,7 @@ void Robot::Kicking::UpdateActiveParams() noexcept {
     m_cur_body_y_offset = m_body_y_offset;
     m_cur_body_z_offset = m_body_z_offset;
 
-    m_cur_arm_swing_gain = m_arm_swing_gain;
+    m_cur_arm_swing_amplitude = m_arm_swing_amplitude;
     m_cur_balance_roll_gain = m_balance_roll_gain;
     m_cur_balance_pitch_gain = m_balance_pitch_gain;
     m_cur_balance_enabled = m_balance_enabled;
@@ -470,14 +481,14 @@ void Robot::Kicking::SetBodyZOffset(float body_z_offset) noexcept {
 }
 
 float Robot::Kicking::GetArmSwingGain() const noexcept {
-    return m_arm_swing_gain;
+    return m_arm_swing_amplitude;
 }
 
 void Robot::Kicking::SetArmSwingGain(float arm_swing_gain) noexcept {
     if (m_debug) {
         LOG_DEBUG << "KICKING: arm_swing_gain = " << arm_swing_gain;
     }
-    m_arm_swing_gain = arm_swing_gain;
+    m_arm_swing_amplitude = arm_swing_gain;
 }
 
 float Robot::Kicking::GetBalanceRollGain() const noexcept {

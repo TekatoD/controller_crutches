@@ -47,7 +47,7 @@ GoalieBehavior::~GoalieBehavior() {
 
 void GoalieBehavior::Process() {
     // Update CV
-    Walking::GetInstance()->A_MOVE_AIM_ON = false;
+    Walking::GetInstance()->SetMoveAimOn(false);
     const Pose2D& Spawn = StateMachine::GetInstance()->GetSpawnPosition();
     const Pose2D& Starting = StateMachine::GetInstance()->GetStartingPosition();
     const Pose2D& Odo = Walking::GetInstance()->GetOdo();
@@ -131,7 +131,7 @@ void GoalieBehavior::Process() {
                 float tilt_min = Head::GetInstance()->GetBottomLimitAngle();
 
                 if (pan > m_KickRightAngle && pan < m_KickLeftAngle) {
-                    if (tilt <= (tilt_min + MX28::RATIO_VALUE2ANGLE)) {
+                    if (tilt <= (tilt_min + MX28::RATIO_VALUE2DEGREES)) {
                         if (m_BallTracker.GetBallPosition().Y < m_KickTopAngle) {
                             m_GoalRLTurn = 0;
 
@@ -172,18 +172,18 @@ void GoalieBehavior::Process() {
                 if (!Walking::GetInstance()->IsRunning()) {
                     m_RLTurn = 0;
                     m_KickBallCount = 0;
-                    Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_RLTurn;
-                    Walking::GetInstance()->X_MOVE_AMPLITUDE = m_XCrutch;
-                    Walking::GetInstance()->A_MOVE_AMPLITUDE = -m_ACrutch;
+                    Walking::GetInstance()->SetYMoveAmplitude(m_RLTurn);
+                    Walking::GetInstance()->SetXMoveAmplitude(m_XCrutch);
+                    Walking::GetInstance()->SetAMoveAmplitude(-m_ACrutch);
                     Walking::GetInstance()->Start();
                 } else {
                     if (m_RLTurn < m_GoalRLTurn)
                         m_RLTurn += m_UnitRLTurn;
                     else if (m_RLTurn > m_GoalRLTurn)
                         m_RLTurn -= m_UnitRLTurn;
-                    Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_RLTurn;
-                    Walking::GetInstance()->X_MOVE_AMPLITUDE = m_XCrutch;
-                    Walking::GetInstance()->A_MOVE_AMPLITUDE = m_ACrutch;
+                    Walking::GetInstance()->SetYMoveAmplitude(m_RLTurn);
+                    Walking::GetInstance()->SetXMoveAmplitude(m_XCrutch);
+                    Walking::GetInstance()->SetAMoveAmplitude(m_ACrutch);
                 }
             }
         }

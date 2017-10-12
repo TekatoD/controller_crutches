@@ -64,16 +64,16 @@ void BallSearcher::Process() {
     Head::GetInstance()->MoveByAngle(pan, tilt);
 
     if (m_WalkingEnabled) {
-        m_TurnSpeed = Walking::GetInstance()->A_MOVE_AMPLITUDE;
+        m_TurnSpeed = Walking::GetInstance()->GetAMoveAmplitude();
         m_TurnSpeed += m_TurnStep * m_TurnDirection;
         if (fabs(m_TurnSpeed) > m_MaxTurn) {
             m_TurnSpeed = m_MaxTurn * m_TurnDirection;
         }
 
-        Walking::GetInstance()->X_MOVE_AMPLITUDE = 0;
-        Walking::GetInstance()->Y_MOVE_AMPLITUDE = 0;
-        Walking::GetInstance()->A_MOVE_AMPLITUDE = m_TurnSpeed;
-        Walking::GetInstance()->A_MOVE_AIM_ON = false;
+        Walking::GetInstance()->SetXMoveAmplitude(0);
+        Walking::GetInstance()->SetXMoveAmplitude(0);
+        Walking::GetInstance()->SetXMoveAmplitude(m_TurnSpeed);
+        Walking::GetInstance()->SetMoveAimOn(false);
         Walking::GetInstance()->Start();
     } else {
         Walking::GetInstance()->Stop();

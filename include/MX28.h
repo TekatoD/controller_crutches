@@ -9,20 +9,23 @@
 #ifndef _MX_28_H_
 #define _MX_28_H_
 
-#include <math.h>
+#include <cmath>
 
 namespace Robot {
     class MX28 {
     public:
-        static const int MIN_VALUE;
-        static const int CENTER_VALUE;
-        static const int MAX_VALUE;
-        static const float MIN_ANGLE;
-        static const float MAX_ANGLE;
-        static const float RATIO_VALUE2ANGLE;
-        static const float RATIO_ANGLE2VALUE;
-
-        static const int PARAM_BYTES;
+        static constexpr int MIN_VALUE = 0;
+        static constexpr int CENTER_VALUE = 2048;
+        static constexpr int MAX_VALUE = 4095;
+        static constexpr float MIN_DEGREES = -180.0f; // degree
+        static constexpr float MAX_DEGREES = 180.0f; // degree
+        static constexpr float MIN_RADIANS = -3.1415927f;
+        static constexpr float MAX_RADIANS = 3.1415927f;
+        static constexpr float RATIO_VALUE2DEGREES = 0.088f; // 360 / 4096
+        static constexpr float RATIO_DEGREES2VALUE = 11.378f; // 4096 / 360
+        static constexpr float RATIO_VALUE2RADIANS = 0.00076699042f; // pi / 4096
+        static constexpr float RATIO_RADIANS2VALUE = 1303.7972f; // 4096 / pi
+        static constexpr int PARAM_BYTES = 7;
 
         static constexpr float RATIO_VALUE2SPEED = 0.053;
         static constexpr float RATIO_SPEED2VALUE = 18.87;
@@ -34,9 +37,9 @@ namespace Robot {
 
         static float GetMirrorAngle(float angle) { return -angle; }
 
-        static int Angle2Value(float angle) { return (int) (angle * RATIO_ANGLE2VALUE) + CENTER_VALUE; }
+        static int Angle2Value(float angle) { return (int) (angle * RATIO_DEGREES2VALUE) + CENTER_VALUE; }
 
-        static float Value2Angle(int value) { return (float) (value - CENTER_VALUE) * RATIO_VALUE2ANGLE; }
+        static float Value2Angle(int value) { return (float) (value - CENTER_VALUE) * RATIO_VALUE2DEGREES; }
 
         static float Speed2Value(float speed) {
             int temp = ((int) (fabs(speed) * RATIO_SPEED2VALUE)) & 0x3FF;

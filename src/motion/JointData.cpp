@@ -174,10 +174,10 @@ int JointData::GetValue(int id) {
 
 
 void JointData::SetAngle(int id, float angle) {
-    if (angle < MX28::MIN_ANGLE)
-        angle = MX28::MIN_ANGLE;
-    else if (angle > MX28::MAX_ANGLE)
-        angle = MX28::MAX_ANGLE;
+    if (angle < MX28::MIN_DEGREES)
+        angle = MX28::MIN_DEGREES;
+    else if (angle > MX28::MAX_DEGREES)
+        angle = MX28::MAX_DEGREES;
 
     m_Angle[id] = angle;
     m_Value[id] = MX28::Angle2Value(angle);

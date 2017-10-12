@@ -14,7 +14,7 @@ extern "C" {
 
 
 Robot::VrepCM730::VrepCM730(std::string device_postfix) : m_client_id(-1),
-                                                                         m_device_postfix(device_postfix),
+                                                                         m_device_postfix(std::move(device_postfix)),
                                                                          m_connected(false) {
     for (int i = 0; i < ID_BROADCAST; i++) {
         m_BulkReadData[i] = BulkReadData();

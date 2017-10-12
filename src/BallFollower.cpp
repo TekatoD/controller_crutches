@@ -42,7 +42,7 @@ BallFollower::BallFollower() {
     m_FBStep = 0;
     m_RLStep = 0;
     m_RLTurn = 0;
-    m_TiltOffset = MX28::RATIO_VALUE2ANGLE;
+    m_TiltOffset = MX28::RATIO_VALUE2DEGREES;
     m_KickBall = NO_KICKING;
 
     m_AimTiltOffset = 15;
@@ -156,16 +156,16 @@ void BallFollower::Process(Point2D ball_pos,
             m_KickBallCount = 0;
             m_KickBall = NO_KICKING;
             
-            Walking::GetInstance()->X_MOVE_AMPLITUDE = m_FBStep;
-            Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_RLStep;
-            Walking::GetInstance()->A_MOVE_AMPLITUDE = m_RLTurn;
+            Walking::GetInstance()->SetXMoveAmplitude(m_FBStep);
+            Walking::GetInstance()->SetYMoveAmplitude(m_RLStep);
+            Walking::GetInstance()->SetAMoveAmplitude(m_RLTurn);
             Walking::GetInstance()->Start();
         } else {
             if (m_FBStep < m_GoalFBStep)
                 m_FBStep += m_UnitFBStep;
             else if (m_FBStep > m_GoalFBStep)
                 m_FBStep = m_GoalFBStep;
-            Walking::GetInstance()->X_MOVE_AMPLITUDE = m_FBStep;
+            Walking::GetInstance()->SetXMoveAmplitude(m_FBStep);
 
             if (m_GoalRLStep > 0) {
                 if (m_RLStep < m_GoalRLStep)
@@ -178,14 +178,14 @@ void BallFollower::Process(Point2D ball_pos,
                 else if (m_FBStep < -m_GoalRLStep)
                     m_RLStep = -m_GoalRLStep;
             }
-            Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_RLStep;
+            Walking::GetInstance()->SetYMoveAmplitude(m_RLStep);
 
             if (m_RLTurn < m_GoalRLTurn)
                 m_RLTurn += m_UnitRLTurn;
             else if (m_RLTurn > m_GoalRLTurn)
                 m_RLTurn -= m_UnitRLTurn;
-            Walking::GetInstance()->A_MOVE_AMPLITUDE = m_RLTurn;
-            Walking::GetInstance()->A_MOVE_AIM_ON = aim;
+            Walking::GetInstance()->SetAMoveAmplitude(m_RLTurn);
+            Walking::GetInstance()->SetMoveAimOn(aim);
         }
     }
 }
@@ -249,6 +249,6 @@ bool BallFollower::IsNoBall() const {
     return m_NoBallCount >= m_NoBallCount;
 }
 
-Kicking BallFollower::GetKickingLeg() const {
+KickingAction BallFollower::GetKickingLeg() const {
     return m_KickBall;
 }

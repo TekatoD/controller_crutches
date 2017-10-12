@@ -45,6 +45,7 @@ namespace Robot {
 
         void SetKickingLeg(int kicking_leg) noexcept;
 
+        // Kick endpoint
         float GetKickTargetXOffset() const noexcept;
 
         void SetKickTargetXOffset(float kick_target_x_offset) noexcept;
@@ -53,6 +54,7 @@ namespace Robot {
 
         void SetKickTargetYOffset(float kick_target_y_offset) noexcept;
 
+        // Kick starting point
         float GetKickXOffset() const noexcept;
 
         void SetKickXOffset(float kick_x_offset) noexcept;
@@ -61,7 +63,7 @@ namespace Robot {
 
         void SetKickYOffset(float kick_y_offset) noexcept;
 
-        float GetLickZOffset() const noexcept;
+        float GetKickZOffset() const noexcept;
 
         void SetKickZOffset(float kick_z_offset) noexcept;
 
@@ -81,6 +83,7 @@ namespace Robot {
 
         void SetRestoringDuration(float restoring_duration) noexcept;
 
+        // Body position before shifting COM
         float GetBodyInitXOffset() const noexcept;
 
         void SetBodyInitXOffset(float body_init_x_offset) noexcept;
@@ -97,6 +100,7 @@ namespace Robot {
 
         void SetBodyInitPitchOffset(float body_init_pitch_offset) noexcept;
 
+        // Body position after shifting COM
         float GetBodyXOffset() const noexcept;
 
         void SetBodyXOffset(float body_x_offset) noexcept;

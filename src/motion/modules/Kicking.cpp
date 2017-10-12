@@ -348,7 +348,7 @@ void Robot::Kicking::SetKickYOffset(float kick_y_offset) noexcept {
     m_kick_y_offset = kick_y_offset;
 }
 
-float Robot::Kicking::GetLickZOffset() const noexcept {
+float Robot::Kicking::GetKickZOffset() const noexcept {
     return m_kick_z_offset;
 }
 

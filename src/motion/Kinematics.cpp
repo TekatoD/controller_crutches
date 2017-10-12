@@ -12,13 +12,13 @@
 
 using namespace Robot;
 
-bool Kinematics::ComputeLegInverseKinematics(float* out, float x, float y, float z, float roll, float pitch, float yaw) {
-    const float cyaw = cosf(yaw);
-    const float syaw = sinf(yaw);
-    const float cpitch = cosf(pitch);
-    const float spitch = sinf(pitch);
-    const float croll = cosf(roll);
-    const float sroll = sinf(roll);
+bool Kinematics::ComputeLegInverseKinematics(float* out, float x, float y, float z, float a, float b, float c) {
+    const float cyaw = cosf(c);
+    const float syaw = sinf(c);
+    const float cpitch = cosf(b);
+    const float spitch = sinf(b);
+    const float croll = cosf(a);
+    const float sroll = sinf(a);
 
     // Apply roll
     // TODO Applying roll may cause wrong calculations. Check it.
@@ -43,7 +43,7 @@ bool Kinematics::ComputeLegInverseKinematics(float* out, float x, float y, float
     }
 
     // Hip yaw
-    out[0] = yaw;
+    out[0] = c;
     // Hip roll
     out[1] = atan2f(y, z);
     // Hip pitch
@@ -54,9 +54,9 @@ bool Kinematics::ComputeLegInverseKinematics(float* out, float x, float y, float
     out[3] = pi - acosf((THIGH_LENGTH * THIGH_LENGTH + CALF_LENGTH * CALF_LENGTH - offset_sqr) /
                               (2.0f * THIGH_LENGTH * CALF_LENGTH));
     // Ankle pitch
-    out[4] = -out[3] - out[2] - pitch;
+    out[4] = -out[3] - out[2] - b;
     // Ankle roll
-    out[5] = -out[1] + roll;
+    out[5] = -out[1] + a;
     return true;
 }
 

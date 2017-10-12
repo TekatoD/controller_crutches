@@ -672,7 +672,7 @@ Pose2D Walking::GetOdo() {
 
 void Walking::ResetOdo(const Pose2D& pose) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: Odometry was resseted";
+        LOG_DEBUG << "WALKING: Odometry has been reset";
     }
     m_odometry_collector.Reset();
 }

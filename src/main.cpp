@@ -196,21 +196,21 @@ int main(int argc, char** argv) {
         StateMachine::GetInstance()->Check(&cm730);
 
         if (!Action::GetInstance()->IsRunning() && !Kicking::GetInstance()->IsRunning()) {
-//            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-//            Walking::GetInstance()->m_x_move_amplitude = 10;
-//            Walking::GetInstance()->Start();
-            Kicking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-            Kicking::GetInstance()->SetKickingLeg(Kicking::RIGHT_LEG);
-            Kicking::GetInstance()->SetKickTargetXOffset(35.0);
-            Kicking::GetInstance()->SetKickYOffset(-35.0);
+            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+            Walking::GetInstance()->SetXMoveAmplitude(10);
+            Walking::GetInstance()->Start();
+//            Kicking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+//            Kicking::GetInstance()->SetKickingLeg(Kicking::RIGHT_LEG);
+//            Kicking::GetInstance()->SetKickTargetXOffset(35.0);
+//            Kicking::GetInstance()->SetKickYOffset(-35.0);
 //            Kicking::GetInstance()->SetKickXOffset(0.0);
 //            Kicking::GetInstance()->SetBodyInitPitchOffset(radians(13.0f));
-            Kicking::GetInstance()->SetBodyInitXOffset(0.0);
+//            Kicking::GetInstance()->SetBodyInitXOffset(0.0);
 //            Kicking::GetInstance()->SetBodyInitZOffset(20.0f);
-            Kicking::GetInstance()->SetBodyXOffset(0.0);
+//            Kicking::GetInstance()->SetBodyXOffset(0.0);
 //            Kicking::GetInstance()->SetBodyZOffset(20.0f);
 //            Kicking::GetInstance()->SetKickZOffset(0.0);
-            Kicking::GetInstance()->Kick();
+//            Kicking::GetInstance()->Kick();
         }
 
 //        if (StateMachine::GetInstance()->IsStarted() == 0) {

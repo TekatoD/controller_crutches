@@ -7,24 +7,23 @@
 
 #include <string.h>
 #include <memory>
+#include <log/Logger.h>
 #include "motion/MotionStatus.h"
 #include "motion/modules/Action.h"
 
 using namespace Robot;
 
 
-
-
 Action::Action() {
-    DEBUG_PRINT = false;
-    m_ActionFile = 0;
-    m_Playing = false;
+    m_debug = true;
+    m_action_file = 0;
+    m_playing = false;
 }
 
 
 Action::~Action() {
-    if (m_ActionFile != 0)
-        fclose(m_ActionFile);
+    if (m_action_file != 0)
+        fclose(m_action_file);
 }
 
 
@@ -88,7 +87,7 @@ void Action::ResetPage(PAGE* pPage) {
 
 
 void Action::Initialize() {
-    m_Playing = false;
+    m_playing = false;
 
     for (int id = JointData::ID_R_SHOULDER_PITCH; id < JointData::NUMBER_OF_JOINTS; id++)
         m_Joint.SetValue(id, MotionStatus::m_CurrentJoints.GetValue(id));
@@ -105,23 +104,21 @@ bool Action::LoadFile(char* filename) {
 #endif
 
     if (action == 0) {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, "Can not open Action file!\n");
+        LOG_ERROR << "ACTION: Can not open Action file!";
         return false;
     }
 
     fseek(action, 0, SEEK_END);
     if (ftell(action) != (long) (sizeof(PAGE) * MAXNUM_PAGE)) {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, "It's not an Action file!\n");
+        LOG_ERROR << "ACTION: It's not an Action file!";
         fclose(action);
         return false;
     }
 
-    if (m_ActionFile != 0)
-        fclose(m_ActionFile);
+    if (m_action_file != 0)
+        fclose(m_action_file);
 
-    m_ActionFile = action;
+    m_action_file = action;
     return true;
 }
 
@@ -129,8 +126,7 @@ bool Action::LoadFile(char* filename) {
 bool Action::CreateFile(char* filename) {
     FILE* action = fopen(filename, "ab");
     if (action == 0) {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, "Can not create Action file!\n");
+        LOG_ERROR << "ACTION: Can not create Action file!";
         return false;
     }
 
@@ -139,23 +135,22 @@ bool Action::CreateFile(char* filename) {
     for (int i = 0; i < MAXNUM_PAGE; i++)
         fwrite(&page, 1, sizeof(PAGE), action);
 
-    if (m_ActionFile != 0)
-        fclose(m_ActionFile);
+    if (m_action_file != 0)
+        fclose(m_action_file);
 
-    m_ActionFile = action;
+    m_action_file = action;
     return true;
 }
 
 
 bool Action::Start(int iPage) {
     if (iPage < 1 || iPage >= MAXNUM_PAGE) {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, "Can not play page.(%d is invalid index)\n", iPage);
+        LOG_ERROR << "ACTION: Can not play page.(" << iPage << " is invalid index)";
         return false;
     }
 
     PAGE page;
-    if (LoadPage(iPage, &page) == false)
+    if (!LoadPage(iPage, &page))
         return false;
 
     return Start(iPage, &page);
@@ -179,48 +174,56 @@ bool Action::Start(char* namePage) {
 
 
 bool Action::Start(int index, PAGE* pPage) {
-    if (m_Playing == true) {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, "Can not play page %d.(Now playing)\n", index);
+    if (m_playing) {
+        LOG_WARNING << "ACTION: Can not play page " << index << ".(Now playing)";
         return false;
     }
 
-    m_PlayPage = *pPage;
+    m_play_page = *pPage;
 
-    if (m_PlayPage.header.repeat == 0 || m_PlayPage.header.stepnum == 0) {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, "Page %d has no action\n", index);
+    if (m_play_page.header.repeat == 0 || m_play_page.header.stepnum == 0) {
+        LOG_WARNING << "ACTION: Page " << index << " has no action";
         return false;
     }
 
-    m_IndexPlayingPage = index;
-    m_FirstDrivingStart = true;
-    m_Playing = true;
+    if (m_debug) {
+        LOG_DEBUG << "ACTION: Page " << index << " has been playing";
+    }
+
+    m_index_playing_page = index;
+    m_first_driving_start = true;
+    m_playing = true;
     return true;
 }
 
 
 void Action::Stop() {
-    m_StopPlaying = true;
+    if (m_debug) {
+        LOG_DEBUG << "ACTION: Action was stopped";
+    }
+    m_stop_playing = true;
 }
 
 
 void Action::Brake() {
-    m_Playing = false;
+    if (m_debug) {
+        LOG_DEBUG << "ACTION: Action was broke";
+    }
+    m_playing = false;
 }
 
 
 bool Action::IsRunning() {
-    return m_Playing;
+    return m_playing;
 }
 
 
 bool Action::IsRunning(int* iPage, int* iStep) {
     if (iPage != 0)
-        *iPage = m_IndexPlayingPage;
+        *iPage = m_index_playing_page;
 
     if (iStep != 0)
-        *iStep = m_PageStepCount - 1;
+        *iStep = m_page_step_count - 1;
 
     return IsRunning();
 }
@@ -229,13 +232,13 @@ bool Action::IsRunning(int* iPage, int* iStep) {
 bool Action::LoadPage(int index, PAGE* pPage) {
     long position = (long) (sizeof(PAGE) * index);
 
-    if (fseek(m_ActionFile, position, SEEK_SET) != 0)
+    if (fseek(m_action_file, position, SEEK_SET) != 0)
         return false;
 
-    if (fread(pPage, 1, sizeof(PAGE), m_ActionFile) != sizeof(PAGE))
+    if (fread(pPage, 1, sizeof(PAGE), m_action_file) != sizeof(PAGE))
         return false;
 
-    if (VerifyChecksum(pPage) == false)
+    if (!VerifyChecksum(pPage))
         ResetPage(pPage);
 
     return true;
@@ -245,13 +248,13 @@ bool Action::LoadPage(int index, PAGE* pPage) {
 bool Action::SavePage(int index, PAGE* pPage) {
     long position = (long) (sizeof(PAGE) * index);
 
-    if (VerifyChecksum(pPage) == false)
+    if (!VerifyChecksum(pPage))
         SetChecksum(pPage);
 
-    if (fseek(m_ActionFile, position, SEEK_SET) != 0)
+    if (fseek(m_action_file, position, SEEK_SET) != 0)
         return false;
 
-    if (fwrite(pPage, 1, sizeof(PAGE), m_ActionFile) != sizeof(PAGE))
+    if (fwrite(pPage, 1, sizeof(PAGE), m_action_file) != sizeof(PAGE))
         return false;
 
     return true;
@@ -305,27 +308,31 @@ void Action::Process() {
     * -----/  |        |  |    |   \----
     *      PRE  MAIN   PRE MAIN POST PAUSE
     ***************************************/
-    enum { PRE_SECTION, MAIN_SECTION, POST_SECTION, PAUSE_SECTION };
-    enum { ZERO_FINISH, NONE_ZERO_FINISH };
+    enum {
+        PRE_SECTION, MAIN_SECTION, POST_SECTION, PAUSE_SECTION
+    };
+    enum {
+        ZERO_FINISH, NONE_ZERO_FINISH
+    };
 
-    if (m_Playing == false)
+    if (!m_playing)
         return;
 
-    if (m_FirstDrivingStart == true) // ó�� �����Ҷ�
+    if (m_first_driving_start) // ó�� �����Ҷ�
     {
-        m_FirstDrivingStart = false; //First Process end
-        m_PlayingFinished = false;
-        m_StopPlaying = false;
+        m_first_driving_start = false; //First Process end
+        m_playing_finished = false;
+        m_stop_playing = false;
         wUnitTimeCount = 0;
         wUnitTimeNum = 0;
         wPauseTime = 0;
         bSection = PAUSE_SECTION;
-        m_PageStepCount = 0;
-        bPlayRepeatCount = m_PlayPage.header.repeat;
+        m_page_step_count = 0;
+        bPlayRepeatCount = m_play_page.header.repeat;
         wNextPlayPage = 0;
 
         for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-            if (m_Joint.GetEnable(bID) == true) {
+            if (m_Joint.GetEnable(bID)) {
                 wpTargetAngle1024[bID] = MotionStatus::m_CurrentJoints.GetValue(bID);
                 ipLastOutSpeed1024[bID] = 0;
                 ipMovingAngle1024[bID] = 0;
@@ -341,7 +348,7 @@ void Action::Process() {
         } else {
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
                 // ���� ����ϴ� ������ ���
-                if (m_Joint.GetEnable(bID) == true) {
+                if (m_Joint.GetEnable(bID)) {
                     if (ipMovingAngle1024[bID] == 0)
                         m_Joint.SetValue(bID, wpStartAngle1024[bID]);
                     else {
@@ -387,7 +394,7 @@ void Action::Process() {
 
                     // lastest MX28 firmwares do not support compliance slopes
                     //m_Joint.SetSlope(bID, 1 << (m_PlayPage.header.slope[bID]>>4), 1 << (m_PlayPage.header.slope[bID]&0x0f));                    
-                    m_Joint.SetPGain(bID, (256 >> (m_PlayPage.header.slope[bID] >> 4)) << 2);
+                    m_Joint.SetPGain(bID, (256 >> (m_play_page.header.slope[bID] >> 4)) << 2);
                 }
             }
         }
@@ -396,7 +403,7 @@ void Action::Process() {
         wUnitTimeCount = 0;
 
         for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-            if (m_Joint.GetEnable(bID) == true) {
+            if (m_Joint.GetEnable(bID)) {
                 wpStartAngle1024[bID] = m_Joint.GetValue(bID);
                 ipLastOutSpeed1024[bID] = ipGoalSpeed1024[bID];
             }
@@ -409,7 +416,7 @@ void Action::Process() {
             wUnitTimeNum = wUnitTimeTotalNum - (wAccelStep << 1);
 
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID) == true) {
+                if (m_Joint.GetEnable(bID)) {
                     if (bpFinishType[bID] == NONE_ZERO_FINISH) {
                         if ((wUnitTimeTotalNum - wAccelStep) == 0) // ��� ������ ���� ���ٸ�
                             ipMainAngle1024[bID] = 0;
@@ -428,7 +435,7 @@ void Action::Process() {
             wUnitTimeNum = wAccelStep;
 
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID) == true)
+                if (m_Joint.GetEnable(bID))
                     ipMainAngle1024[bID] = ipMovingAngle1024[bID] - ipMainAngle1024[bID] - ipAccelAngle1024[bID];
             }
         } else if (bSection == POST_SECTION) {
@@ -444,79 +451,83 @@ void Action::Process() {
             bSection = PRE_SECTION;
 
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID) == true)
+                if (m_Joint.GetEnable(bID))
                     ipLastOutSpeed1024[bID] = 0;
             }
         }
 
         // PRE Section�ÿ� ��� �غ� �Ѵ�.
         if (bSection == PRE_SECTION) {
-            if (m_PlayingFinished == true) // ����� �����ٸ�
+            if (m_playing_finished) // ����� �����ٸ�
             {
-                m_Playing = false;
+                if (m_debug && m_playing) {
+                    LOG_DEBUG << "ACTION: Playing  was finished";
+                }
+                m_playing = false;
                 return;
             }
 
-            m_PageStepCount++;
+            m_page_step_count++;
 
-            if (m_PageStepCount > m_PlayPage.header.stepnum) // ���� ������ ����� �����ٸ�
+            if (m_page_step_count > m_play_page.header.stepnum) // ���� ������ ����� �����ٸ�
             {
                 // ���� ������ ����
-                m_PlayPage = m_NextPlayPage;
-                if (m_IndexPlayingPage != wNextPlayPage)
-                    bPlayRepeatCount = m_PlayPage.header.repeat;
-                m_PageStepCount = 1;
-                m_IndexPlayingPage = wNextPlayPage;
+                m_play_page = m_next_play_page;
+                if (m_index_playing_page != wNextPlayPage)
+                    bPlayRepeatCount = m_play_page.header.repeat;
+                m_page_step_count = 1;
+                m_index_playing_page = wNextPlayPage;
             }
 
-            if (m_PageStepCount == m_PlayPage.header.stepnum) // ������ �����̶��
+            if (m_page_step_count == m_play_page.header.stepnum) // ������ �����̶��
             {
                 // ���� ������ �ε�
-                if (m_StopPlaying == true) // ��� ���� ����� �ִٸ�
+                if (m_stop_playing) // ��� ���� ����� �ִٸ�
                 {
-                    wNextPlayPage = m_PlayPage.header.exit; // ���� �������� Exit ��������
+                    wNextPlayPage = m_play_page.header.exit; // ���� �������� Exit ��������
                 } else {
                     bPlayRepeatCount--;
                     if (bPlayRepeatCount > 0) // �ݺ� Ƚ���� ���Ҵٸ�
-                        wNextPlayPage = m_IndexPlayingPage; // ���� �������� ���� ��������
+                        wNextPlayPage = m_index_playing_page; // ���� �������� ���� ��������
                     else // �ݺ��� ���ߴٸ�
-                        wNextPlayPage = m_PlayPage.header.next; // ���� �������� Next ��������
+                        wNextPlayPage = m_play_page.header.next; // ���� �������� Next ��������
                 }
 
                 if (wNextPlayPage == 0) // ����� ���� �������� ���ٸ� ���� ���ܱ����ϰ� ����
-                    m_PlayingFinished = true;
+                    m_playing_finished = true;
                 else {
                     // ���������� �ε�(������ �޸� ����, �ٸ��� ���� �б�)
-                    if (m_IndexPlayingPage != wNextPlayPage)
-                        LoadPage(wNextPlayPage, &m_NextPlayPage);
+                    if (m_index_playing_page != wNextPlayPage)
+                        LoadPage(wNextPlayPage, &m_next_play_page);
                     else
-                        m_NextPlayPage = m_PlayPage;
+                        m_next_play_page = m_play_page;
 
                     // ����� ������ ���ٸ� ���� ���ܱ����ϰ� ����
-                    if (m_NextPlayPage.header.repeat == 0 || m_NextPlayPage.header.stepnum == 0)
-                        m_PlayingFinished = true;
+                    if (m_next_play_page.header.repeat == 0 || m_next_play_page.header.stepnum == 0)
+                        m_playing_finished = true;
                 }
             }
 
             //////// Step �Ķ���� ���
-            wPauseTime = (((unsigned short) m_PlayPage.step[m_PageStepCount - 1].pause) << 5) / m_PlayPage.header.speed;
-            wMaxSpeed256 = ((unsigned short) m_PlayPage.step[m_PageStepCount - 1].time *
-                            (unsigned short) m_PlayPage.header.speed) >> 5;
+            wPauseTime =
+                    (((unsigned short) m_play_page.step[m_page_step_count - 1].pause) << 5) / m_play_page.header.speed;
+            wMaxSpeed256 = ((unsigned short) m_play_page.step[m_page_step_count - 1].time *
+                            (unsigned short) m_play_page.header.speed) >> 5;
             if (wMaxSpeed256 == 0)
                 wMaxSpeed256 = 1;
             wMaxAngle1024 = 0;
 
             ////////// Joint�� �Ķ���� ���
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID) == true) {
+                if (m_Joint.GetEnable(bID)) {
                     // ����, ����, �̷��� �������� ������ ���
                     ipAccelAngle1024[bID] = 0;
 
                     // Find current target angle
-                    if (m_PlayPage.step[m_PageStepCount - 1].position[bID] & INVALID_BIT_MASK)
+                    if (m_play_page.step[m_page_step_count - 1].position[bID] & INVALID_BIT_MASK)
                         wCurrentTargetAngle = wpTargetAngle1024[bID];
                     else
-                        wCurrentTargetAngle = m_PlayPage.step[m_PageStepCount - 1].position[bID];
+                        wCurrentTargetAngle = m_play_page.step[m_page_step_count - 1].position[bID];
 
                     // Update start, prev_target, curr_target
                     wpStartAngle1024[bID] = wpTargetAngle1024[bID];
@@ -527,21 +538,21 @@ void Action::Process() {
                     ipMovingAngle1024[bID] = (int) (wpTargetAngle1024[bID] - wpStartAngle1024[bID]);
 
                     // Find Next target angle
-                    if (m_PageStepCount == m_PlayPage.header.stepnum) // ���� ������ �������̶��
+                    if (m_page_step_count == m_play_page.header.stepnum) // ���� ������ �������̶��
                     {
-                        if (m_PlayingFinished == true) // ���� �����̶��
+                        if (m_playing_finished) // ���� �����̶��
                             wNextTargetAngle = wCurrentTargetAngle;
                         else {
-                            if (m_NextPlayPage.step[0].position[bID] & INVALID_BIT_MASK)
+                            if (m_next_play_page.step[0].position[bID] & INVALID_BIT_MASK)
                                 wNextTargetAngle = wCurrentTargetAngle;
                             else
-                                wNextTargetAngle = m_NextPlayPage.step[0].position[bID];
+                                wNextTargetAngle = m_next_play_page.step[0].position[bID];
                         }
                     } else {
-                        if (m_PlayPage.step[m_PageStepCount].position[bID] & INVALID_BIT_MASK)
+                        if (m_play_page.step[m_page_step_count].position[bID] & INVALID_BIT_MASK)
                             wNextTargetAngle = wCurrentTargetAngle;
                         else
-                            wNextTargetAngle = m_PlayPage.step[m_PageStepCount].position[bID];
+                            wNextTargetAngle = m_play_page.step[m_page_step_count].position[bID];
                     }
 
                     // Find direction change
@@ -554,13 +565,13 @@ void Action::Process() {
                     }
 
                     // Find finish type
-                    if (bDirectionChanged || wPauseTime || m_PlayingFinished == true) {
+                    if (bDirectionChanged || wPauseTime || m_playing_finished) {
                         bpFinishType[bID] = ZERO_FINISH;
                     } else {
                         bpFinishType[bID] = NONE_ZERO_FINISH;
                     }
 
-                    if (m_PlayPage.header.schedule == SPEED_BASE_SCHEDULE) {
+                    if (m_play_page.header.schedule == SPEED_BASE_SCHEDULE) {
                         //MaxAngle1024 update
                         if (ipMovingAngle1024[bID] < 0)
                             wTmp = -ipMovingAngle1024[bID];
@@ -579,12 +590,12 @@ void Action::Process() {
             //wUnitTimeNum = ((wMaxAngle1024*300/1024) /(wMaxSpeed256 * 720/256)) /7.8msec;
             //             = ((128*wMaxAngle1024*300/1024) /(wMaxSpeed256 * 720/256)) ;    (/7.8msec == *128)
             //             = (wMaxAngle1024*40) /(wMaxSpeed256 *3);
-            if (m_PlayPage.header.schedule == TIME_BASE_SCHEDULE)
+            if (m_play_page.header.schedule == TIME_BASE_SCHEDULE)
                 wUnitTimeTotalNum = wMaxSpeed256; //TIME BASE 051025
             else
                 wUnitTimeTotalNum = (wMaxAngle1024 * 40) / (wMaxSpeed256 * 3);
 
-            wAccelStep = m_PlayPage.header.accel;
+            wAccelStep = m_play_page.header.accel;
             if (wUnitTimeTotalNum <= (wAccelStep << 1)) {
                 if (wUnitTimeTotalNum == 0)
                     wAccelStep = 0;
@@ -608,7 +619,7 @@ void Action::Process() {
                 lDivider2 = 1;
 
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID) == true) {
+                if (m_Joint.GetEnable(bID)) {
                     lStartSpeed1024_PreTime_256T =
                             (long) ipLastOutSpeed1024[bID] * ulPreSectionTime256T; //  *300/1024 * 1024/720 * 256 * 2
                     lMovingAngle_Speed1024Scale_256T_2T = (((long) ipMovingAngle1024[bID]) * 2560L) / 12;
@@ -631,4 +642,17 @@ void Action::Process() {
             wUnitTimeNum = wAccelStep; //PreSection
         }
     }
+}
+
+bool Action::GetDebug() const {
+    return m_debug;
+}
+
+void Action::SetDebug(bool debug) {
+    m_debug = debug;
+}
+
+Action* Action::GetInstance() {
+    static Action action;
+    return &action;
 }

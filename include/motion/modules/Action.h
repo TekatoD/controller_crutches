@@ -5,10 +5,9 @@
  *
  */
 
-#ifndef _ACTION_MODULE_H_
-#define _ACTION_MODULE_H_
+#pragma once
 
-#include <stdio.h>
+#include <cstdio>
 #include <memory>
 #include "motion/MotionModule.h"
 #include "motion/JointData.h"
@@ -68,17 +67,17 @@ namespace Robot {
         } PAGE;
 
     private:
-        FILE* m_ActionFile;
-        PAGE m_PlayPage;
-        PAGE m_NextPlayPage;
-        STEP m_CurrentStep;
+        FILE* m_action_file;
+        PAGE m_play_page;
+        PAGE m_next_play_page;
+        STEP m_current_step;
 
-        int m_IndexPlayingPage;
-        bool m_FirstDrivingStart;
-        int m_PageStepCount;
-        bool m_Playing;
-        bool m_StopPlaying;
-        bool m_PlayingFinished;
+        int m_index_playing_page;
+        bool m_first_driving_start;
+        int m_page_step_count;
+        bool m_playing;
+        bool m_stop_playing;
+        bool m_playing_finished;
 
         Action();
 
@@ -86,19 +85,17 @@ namespace Robot {
 
         void SetChecksum(PAGE* pPage);
 
+        bool m_debug;
+
     public:
-        bool DEBUG_PRINT;
 
         ~Action();
 
-        static Action* GetInstance() {
-                static Action action;
-                return &action;
-        }
+        static Action* GetInstance();
 
-        void Initialize();
+        void Initialize() override;
 
-        void Process();
+        void Process() override;
 
         bool LoadFile(char* filename);
 
@@ -123,7 +120,9 @@ namespace Robot {
         bool SavePage(int index, PAGE* pPage);
 
         void ResetPage(PAGE* pPage);
+
+        bool GetDebug() const;
+
+        void SetDebug(bool debug);
     };
 }
-
-#endif

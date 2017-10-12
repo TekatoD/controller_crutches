@@ -266,7 +266,7 @@ void Walking::Initialize() {
 
 
 void Walking::Start() {
-    if (m_debug) {
+    if (m_debug && !m_ctrl_running) {
         LOG_DEBUG << "WALKING: Gait was started";
     }
     m_ctrl_running = true;

@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <math/AngleTools.h>
+#include <log/Logger.h>
 #include "MX28.h"
 #include "motion/MotionStatus.h"
 #include "motion/Kinematics.h"
@@ -15,35 +16,35 @@
 using namespace Robot;
 
 Walking::Walking() {
-    X_OFFSET = -10;
-    Y_OFFSET = 5;
-    Z_OFFSET = 20;
-    R_OFFSET = 0;
-    P_OFFSET = 0;
-    A_OFFSET = 0;
-    HIP_PITCH_OFFSET = 13.0;
-    PERIOD_TIME = 600;
-    DSP_RATIO = 0.1;
-    STEP_FB_RATIO = 0.28;
-    Z_MOVE_AMPLITUDE = 40;
-    Y_SWAP_AMPLITUDE = 20.0;
-    Z_SWAP_AMPLITUDE = 5;
-    PELVIS_OFFSET = 3.0;
-    ARM_SWING_GAIN = 1.5;
-    BALANCE_KNEE_GAIN = 0.3;
-    BALANCE_ANKLE_PITCH_GAIN = 0.9;
-    BALANCE_HIP_ROLL_GAIN = 0.5;
-    BALANCE_ANKLE_ROLL_GAIN = 1.0;
+    m_x_offset = -10;
+    m_y_offset = 5;
+    m_z_offset = 20;
+    m_r_offset = 0;
+    m_p_offset = 0;
+    m_a_offset = 0;
+    m_hip_pitch_offset = 13.0;
+    m_period_time = 600;
+    m_dsp_ratio = 0.1;
+    m_step_fb_ratio = 0.28;
+    m_z_move_amplitude = 40;
+    m_y_swap_amplitude = 20.0;
+    m_z_swap_amplitude = 5;
+    m_pelvis_offset = 3.0;
+    m_arm_swing_gain = 1.5;
+    m_balance_knee_gain = 0.3;
+    m_balance_ankle_pitch_gain = 0.9;
+    m_balance_hip_roll_gain = 0.5;
+    m_balance_ankle_roll_gain = 1.0;
 
-    P_GAIN = JointData::P_GAIN_DEFAULT;
-    I_GAIN = JointData::I_GAIN_DEFAULT;
-    D_GAIN = JointData::D_GAIN_DEFAULT;
+    m_p_gain = JointData::P_GAIN_DEFAULT;
+    m_i_gain = JointData::I_GAIN_DEFAULT;
+    m_d_gain = JointData::D_GAIN_DEFAULT;
 
-    X_MOVE_AMPLITUDE = 0;
-    Y_MOVE_AMPLITUDE = 0;
-    A_MOVE_AMPLITUDE = 0;
-    A_MOVE_AIM_ON = false;
-    BALANCE_ENABLE = true;
+    m_x_move_amplitude = 0;
+    m_y_move_amplitude = 0;
+    m_a_move_amplitude = 0;
+    m_move_aim_on = false;
+    m_balance_enable = true;
 
     m_odo_x = 0.0;
     m_odo_y = 0.0;
@@ -66,12 +67,12 @@ Walking::Walking() {
     m_odo_y_factor = 2.0;
     m_odo_a_factor = 0.8;
 
-    m_Joint.SetAngle(JointData::ID_R_SHOULDER_PITCH, -48.345);
-    m_Joint.SetAngle(JointData::ID_L_SHOULDER_PITCH, 41.313);
-    m_Joint.SetAngle(JointData::ID_R_SHOULDER_ROLL, -17.873);
-    m_Joint.SetAngle(JointData::ID_L_SHOULDER_ROLL, 17.580);
-    m_Joint.SetAngle(JointData::ID_R_ELBOW, 29.300);
-    m_Joint.SetAngle(JointData::ID_L_ELBOW, -29.593);
+    m_Joint.SetAngle(JointData::ID_R_SHOULDER_PITCH, -48.345f);
+    m_Joint.SetAngle(JointData::ID_L_SHOULDER_PITCH, 41.313f);
+    m_Joint.SetAngle(JointData::ID_R_SHOULDER_ROLL, -17.873f);
+    m_Joint.SetAngle(JointData::ID_L_SHOULDER_ROLL, 17.580f);
+    m_Joint.SetAngle(JointData::ID_R_ELBOW, 29.300f);
+    m_Joint.SetAngle(JointData::ID_L_ELBOW, -29.593f);
 
     m_Joint.SetAngle(JointData::ID_HEAD_TILT, Kinematics::EYE_TILT_OFFSET_ANGLE);
 
@@ -84,10 +85,6 @@ Walking::Walking() {
 }
 
 
-Walking::~Walking() {
-}
-
-
 void Walking::LoadINISettings(minIni* ini) {
     LoadINISettings(ini, WALKING_SECTION);
 }
@@ -97,29 +94,29 @@ void Walking::LoadINISettings(minIni* ini, const std::string& section) {
     m_odo_x_factor = ini->getf(section, "odo_x_factor", m_odo_x_factor);
     m_odo_y_factor = ini->getf(section, "odo_y_factor", m_odo_y_factor);
     m_odo_a_factor = ini->getf(section, "odo_a_factor", m_odo_a_factor);
-    X_OFFSET = ini->getf(section, "x_offset", X_OFFSET);
-    Y_OFFSET = ini->getf(section, "y_offset", Y_OFFSET);
-    Z_OFFSET = ini->getf(section, "z_offset", Z_OFFSET);
-    R_OFFSET = ini->getf(section, "roll_offset", R_OFFSET);
-    P_OFFSET = ini->getf(section, "pitch_offset", P_OFFSET);
-    A_OFFSET = ini->getf(section, "yaw_offset", A_OFFSET);
-    HIP_PITCH_OFFSET = ini->getf(section, "hip_pitch_offset", HIP_PITCH_OFFSET);
-    PERIOD_TIME = ini->getf(section, "period_time", PERIOD_TIME);
-    DSP_RATIO = ini->getf(section, "dsp_ratio", DSP_RATIO);
-    STEP_FB_RATIO = ini->getf(section, "step_forward_back_ratio", STEP_FB_RATIO);
-    Z_MOVE_AMPLITUDE = ini->getf(section, "foot_height", Z_MOVE_AMPLITUDE);
-    Y_SWAP_AMPLITUDE = ini->getf(section, "swing_right_left", Y_SWAP_AMPLITUDE);
-    Z_SWAP_AMPLITUDE = ini->getf(section, "swing_top_down", Z_SWAP_AMPLITUDE);
-    PELVIS_OFFSET = ini->getf(section, "pelvis_offset", PELVIS_OFFSET);
-    ARM_SWING_GAIN = ini->getf(section, "arm_swing_gain", ARM_SWING_GAIN );
-    BALANCE_KNEE_GAIN = ini->getf(section, "balance_knee_gain", BALANCE_KNEE_GAIN );
-    BALANCE_ANKLE_PITCH_GAIN = ini->getf(section, "balance_ankle_pitch_gain", BALANCE_ANKLE_PITCH_GAIN);
-    BALANCE_HIP_ROLL_GAIN = ini->getf(section, "balance_hip_roll_gain", BALANCE_HIP_ROLL_GAIN);
-    BALANCE_ANKLE_ROLL_GAIN = ini->getf(section, "balance_ankle_roll_gain", BALANCE_ANKLE_ROLL_GAIN);
+    m_x_offset = ini->getf(section, "x_offset", m_x_offset);
+    m_y_offset = ini->getf(section, "y_offset", m_y_offset);
+    m_z_offset = ini->getf(section, "z_offset", m_z_offset);
+    m_r_offset = ini->getf(section, "roll_offset", m_r_offset);
+    m_p_offset = ini->getf(section, "pitch_offset", m_p_offset);
+    m_a_offset = ini->getf(section, "yaw_offset", m_a_offset);
+    m_hip_pitch_offset = ini->getf(section, "hip_pitch_offset", m_hip_pitch_offset);
+    m_period_time = ini->getf(section, "period_time", m_period_time);
+    m_dsp_ratio = ini->getf(section, "dsp_ratio", m_dsp_ratio);
+    m_step_fb_ratio = ini->getf(section, "step_forward_back_ratio", m_step_fb_ratio);
+    m_z_move_amplitude = ini->getf(section, "foot_height", m_z_move_amplitude);
+    m_y_swap_amplitude = ini->getf(section, "swing_right_left", m_y_swap_amplitude);
+    m_z_swap_amplitude = ini->getf(section, "swing_top_down", m_z_swap_amplitude);
+    m_pelvis_offset = ini->getf(section, "pelvis_offset", m_pelvis_offset);
+    m_arm_swing_gain = ini->getf(section, "arm_swing_gain", m_arm_swing_gain );
+    m_balance_knee_gain = ini->getf(section, "balance_knee_gain", m_balance_knee_gain );
+    m_balance_ankle_pitch_gain = ini->getf(section, "balance_ankle_pitch_gain", m_balance_ankle_pitch_gain);
+    m_balance_hip_roll_gain = ini->getf(section, "balance_hip_roll_gain", m_balance_hip_roll_gain);
+    m_balance_ankle_roll_gain = ini->getf(section, "balance_ankle_roll_gain", m_balance_ankle_roll_gain);
 
-    P_GAIN = ini->geti(section, "p_gain", P_GAIN);
-    I_GAIN = ini->geti(section, "i_gain", I_GAIN);
-    D_GAIN = ini->geti(section, "d_gain", D_GAIN);
+    m_p_gain = ini->geti(section, "p_gain", m_p_gain);
+    m_i_gain = ini->geti(section, "i_gain", m_i_gain);
+    m_d_gain = ini->geti(section, "d_gain", m_d_gain);
 }
 
 
@@ -129,149 +126,164 @@ void Walking::SaveINISettings(minIni* ini) {
 
 
 void Walking::SaveINISettings(minIni* ini, const std::string& section) {
-    ini->put(section, "x_offset", X_OFFSET);
-    ini->put(section, "y_offset", Y_OFFSET);
-    ini->put(section, "z_offset", Z_OFFSET);
-    ini->put(section, "roll_offset", R_OFFSET);
-    ini->put(section, "pitch_offset", P_OFFSET);
-    ini->put(section, "yaw_offset", A_OFFSET);
-    ini->put(section, "hip_pitch_offset", HIP_PITCH_OFFSET);
-    ini->put(section, "period_time", PERIOD_TIME);
-    ini->put(section, "dsp_ratio", DSP_RATIO);
-    ini->put(section, "step_forward_back_ratio", STEP_FB_RATIO);
-    ini->put(section, "foot_height", Z_MOVE_AMPLITUDE);
-    ini->put(section, "swing_right_left", Y_SWAP_AMPLITUDE);
-    ini->put(section, "swing_top_down", Z_SWAP_AMPLITUDE);
-    ini->put(section, "pelvis_offset", PELVIS_OFFSET);
-    ini->put(section, "arm_swing_gain", ARM_SWING_GAIN);
-    ini->put(section, "balance_knee_gain", BALANCE_KNEE_GAIN);
-    ini->put(section, "balance_ankle_pitch_gain", BALANCE_ANKLE_PITCH_GAIN);
-    ini->put(section, "balance_hip_roll_gain", BALANCE_HIP_ROLL_GAIN);
-    ini->put(section, "balance_ankle_roll_gain", BALANCE_ANKLE_ROLL_GAIN);
+    ini->put(section, "x_offset", m_x_offset);
+    ini->put(section, "y_offset", m_y_offset);
+    ini->put(section, "z_offset", m_z_offset);
+    ini->put(section, "roll_offset", m_r_offset);
+    ini->put(section, "pitch_offset", m_p_offset);
+    ini->put(section, "yaw_offset", m_a_offset);
+    ini->put(section, "hip_pitch_offset", m_hip_pitch_offset);
+    ini->put(section, "period_time", m_period_time);
+    ini->put(section, "dsp_ratio", m_dsp_ratio);
+    ini->put(section, "step_forward_back_ratio", m_step_fb_ratio);
+    ini->put(section, "foot_height", m_z_move_amplitude);
+    ini->put(section, "swing_right_left", m_y_swap_amplitude);
+    ini->put(section, "swing_top_down", m_z_swap_amplitude);
+    ini->put(section, "pelvis_offset", m_pelvis_offset);
+    ini->put(section, "arm_swing_gain", m_arm_swing_gain);
+    ini->put(section, "balance_knee_gain", m_balance_knee_gain);
+    ini->put(section, "balance_ankle_pitch_gain", m_balance_ankle_pitch_gain);
+    ini->put(section, "balance_hip_roll_gain", m_balance_hip_roll_gain);
+    ini->put(section, "balance_ankle_roll_gain", m_balance_ankle_roll_gain);
 
-    ini->put(section, "p_gain", P_GAIN);
-    ini->put(section, "i_gain", I_GAIN);
-    ini->put(section, "d_gain", D_GAIN);
+    ini->put(section, "p_gain", m_p_gain);
+    ini->put(section, "i_gain", m_i_gain);
+    ini->put(section, "d_gain", m_d_gain);
 }
 
 
-void Walking::update_param_time() {
-    m_PeriodTime = PERIOD_TIME;
-    m_DSP_Ratio = DSP_RATIO;
-    m_SSP_Ratio = 1 - DSP_RATIO;
+void Walking::UpdateParamTime() {
+    if (m_debug) {
+        LOG_TRACE << "WALKING: Updating time parameters";
+    }
+    m_cur_period_time = m_period_time;
+    m_cur_dsp_ratio = m_dsp_ratio;
+    m_cur_ssp_ratio = 1 - m_dsp_ratio;
 
-    m_X_Swap_PeriodTime = m_PeriodTime / 2;
-    m_X_Move_PeriodTime = m_PeriodTime * m_SSP_Ratio;
-    m_Y_Swap_PeriodTime = m_PeriodTime;
-    m_Y_Move_PeriodTime = m_PeriodTime * m_SSP_Ratio;
-    m_Z_Swap_PeriodTime = m_PeriodTime / 2;
-    m_Z_Move_PeriodTime = m_PeriodTime * m_SSP_Ratio / 2;
-    m_A_Move_PeriodTime = m_PeriodTime * m_SSP_Ratio;
+    m_cur_x_swap_period_time = m_cur_period_time / 2;
+    m_cur_x_move_period_time = m_cur_period_time * m_cur_ssp_ratio;
+    m_cur_y_swap_period_time = m_cur_period_time;
+    m_cur_y_move_period_time = m_cur_period_time * m_cur_ssp_ratio;
+    m_cur_z_swap_period_time = m_cur_period_time / 2;
+    m_cur_z_move_period_time = m_cur_period_time * m_cur_ssp_ratio / 2;
+    m_cur_a_move_period_time = m_cur_period_time * m_cur_ssp_ratio;
 
-    m_SSP_Time = m_PeriodTime * m_SSP_Ratio;
-    m_SSP_Time_Start_L = (1 - m_SSP_Ratio) * m_PeriodTime / 4;
-    m_SSP_Time_End_L = (1 + m_SSP_Ratio) * m_PeriodTime / 4;
-    m_SSP_Time_Start_R = (3 - m_SSP_Ratio) * m_PeriodTime / 4;
-    m_SSP_Time_End_R = (3 + m_SSP_Ratio) * m_PeriodTime / 4;
+    m_cur_ssp_time = m_cur_period_time * m_cur_ssp_ratio;
+    m_cur_ssp_time_start_l = (1 - m_cur_ssp_ratio) * m_cur_period_time / 4;
+    m_cur_ssp_time_end_l = (1 + m_cur_ssp_ratio) * m_cur_period_time / 4;
+    m_cur_ssp_time_start_r = (3 - m_cur_ssp_ratio) * m_cur_period_time / 4;
+    m_cur_ssp_time_end_r = (3 + m_cur_ssp_ratio) * m_cur_period_time / 4;
 
-    m_Phase_Time1 = (m_SSP_Time_End_L + m_SSP_Time_Start_L) / 2;
-    m_Phase_Time2 = (m_SSP_Time_Start_R + m_SSP_Time_End_L) / 2;
-    m_Phase_Time3 = (m_SSP_Time_End_R + m_SSP_Time_Start_R) / 2;
+    m_cur_phase_time1 = (m_cur_ssp_time_end_l + m_cur_ssp_time_start_l) / 2;
+    m_cur_phase_time2 = (m_cur_ssp_time_start_r + m_cur_ssp_time_end_l) / 2;
+    m_cur_phase_time3 = (m_cur_ssp_time_end_r + m_cur_ssp_time_start_r) / 2;
 
-    m_Pelvis_Offset = PELVIS_OFFSET * MX28::RATIO_DEGREES2VALUE;
-    m_Pelvis_Swing = m_Pelvis_Offset * 0.35;
-    m_Arm_Swing_Gain = ARM_SWING_GAIN;
+    m_cur_pelvis_offset = m_pelvis_offset * MX28::RATIO_DEGREES2VALUE;
+    m_cur_pelvis_swing = m_cur_pelvis_offset * 0.35f;
+    m_cur_arm_swing_gain = m_arm_swing_gain;
 }
 
 
-void Walking::update_param_move() {
+void Walking::UpdateParamMove() {
+    if (m_debug) {
+        LOG_TRACE << "WALKING: Updating move parameters";
+    }
     // Forward/Back
-    m_X_Move_Amplitude = X_MOVE_AMPLITUDE;
-    m_X_Swap_Amplitude = X_MOVE_AMPLITUDE * STEP_FB_RATIO;
+    m_cur_x_move_amplitude = m_x_move_amplitude;
+    m_cur_x_swap_amplitude = m_x_move_amplitude * m_step_fb_ratio;
 
     // Right/Left
-    m_Y_Move_Amplitude = Y_MOVE_AMPLITUDE / 2;
-    if (m_Y_Move_Amplitude > 0)
-        m_Y_Move_Amplitude_Shift = m_Y_Move_Amplitude;
+    m_cur_y_move_amplitude = m_y_move_amplitude / 2;
+    if (m_cur_y_move_amplitude > 0)
+        m_cur_y_move_amplitude_shift = m_cur_y_move_amplitude;
     else
-        m_Y_Move_Amplitude_Shift = -m_Y_Move_Amplitude;
-    m_Y_Swap_Amplitude = Y_SWAP_AMPLITUDE + m_Y_Move_Amplitude_Shift * 0.04;
+        m_cur_y_move_amplitude_shift = -m_cur_y_move_amplitude;
+    m_cur_y_swap_amplitude = m_y_swap_amplitude + m_cur_y_move_amplitude_shift * 0.04f;
 
-    m_Z_Move_Amplitude = Z_MOVE_AMPLITUDE / 2;
-    m_Z_Move_Amplitude_Shift = m_Z_Move_Amplitude / 2;
-    m_Z_Swap_Amplitude = Z_SWAP_AMPLITUDE;
-    m_Z_Swap_Amplitude_Shift = m_Z_Swap_Amplitude;
+    m_cur_z_move_amplitude = m_z_move_amplitude / 2;
+    m_cur_z_move_amplitude_shift = m_cur_z_move_amplitude / 2;
+    m_cur_z_swap_amplitude = m_z_swap_amplitude;
+    m_cur_z_swap_amplitude_shift = m_cur_z_swap_amplitude;
 
     // Direction
-    if (A_MOVE_AIM_ON == false) {
-        m_A_Move_Amplitude = radians(A_MOVE_AMPLITUDE) / 2;
-        if (m_A_Move_Amplitude > 0)
-            m_A_Move_Amplitude_Shift = m_A_Move_Amplitude;
+    if (!m_move_aim_on) {
+        m_cur_a_move_amplitude = radians(m_a_move_amplitude) / 2;
+        if (m_cur_a_move_amplitude > 0)
+            m_cur_a_move_amplitude_shift = m_cur_a_move_amplitude;
         else
-            m_A_Move_Amplitude_Shift = -m_A_Move_Amplitude;
+            m_cur_a_move_amplitude_shift = -m_cur_a_move_amplitude;
     } else {
-        m_A_Move_Amplitude = -radians(A_MOVE_AMPLITUDE) / 2;
-        if (m_A_Move_Amplitude > 0)
-            m_A_Move_Amplitude_Shift = -m_A_Move_Amplitude;
+        m_cur_a_move_amplitude = -radians(m_a_move_amplitude) / 2;
+        if (m_cur_a_move_amplitude > 0)
+            m_cur_a_move_amplitude_shift = -m_cur_a_move_amplitude;
         else
-            m_A_Move_Amplitude_Shift = m_A_Move_Amplitude;
+            m_cur_a_move_amplitude_shift = m_cur_a_move_amplitude;
     }
 }
 
 
-void Walking::update_param_balance() {
-    m_X_Offset = X_OFFSET;
-    m_Y_Offset = Y_OFFSET;
-    m_Z_Offset = Z_OFFSET;
-    m_R_Offset = radians(R_OFFSET);
-    m_P_Offset = radians(P_OFFSET);
-    m_A_Offset = radians(A_OFFSET);
-    m_Hip_Pitch_Offset = HIP_PITCH_OFFSET * MX28::RATIO_DEGREES2VALUE;
+void Walking::UpdateParamBalance() {
+    if (m_debug) {
+        LOG_TRACE << "WALKING: Updating balance parameters";
+    }
+    m_cur_x_offset = m_x_offset;
+    m_cur_y_offset = m_y_offset;
+    m_cur_z_offset = m_z_offset;
+    m_cur_r_offset = radians(m_r_offset);
+    m_cur_p_offset = radians(m_p_offset);
+    m_cur_a_offset = radians(m_a_offset);
+    m_cur_hip_pitch_offset = m_hip_pitch_offset * MX28::RATIO_DEGREES2VALUE;
 }
 
 
 void Walking::Initialize() {
-    X_MOVE_AMPLITUDE = 0;
-    Y_MOVE_AMPLITUDE = 0;
-    A_MOVE_AMPLITUDE = 0;
+    m_x_move_amplitude = 0;
+    m_y_move_amplitude = 0;
+    m_a_move_amplitude = 0;
 
-    m_Body_Swing_Y = 0;
-    m_Body_Swing_Z = 0;
+    m_cur_body_swing_y = 0;
+    m_cur_body_swing_z = 0;
 
-    m_X_Swap_Phase_Shift = pi;
-    m_X_Swap_Amplitude_Shift = 0;
-    m_X_Move_Phase_Shift = half_pi;
-    m_X_Move_Amplitude_Shift = 0;
-    m_Y_Swap_Phase_Shift = 0;
-    m_Y_Swap_Amplitude_Shift = 0;
-    m_Y_Move_Phase_Shift = half_pi;
-    m_Z_Swap_Phase_Shift = half_pi * 3;
-    m_Z_Move_Phase_Shift = half_pi;
-    m_A_Move_Phase_Shift = half_pi;
+    m_cur_x_swap_phase_shift = pi;
+    m_cur_x_swap_amplitude_shift = 0;
+    m_cur_x_move_phase_shift = half_pi;
+    m_cur_x_move_amplitude_shift = 0;
+    m_cur_y_swap_phase_shift = 0;
+    m_cur_y_swap_amplitude_shift = 0;
+    m_cur_y_move_phase_shift = half_pi;
+    m_cur_z_swap_phase_shift = half_pi * 3;
+    m_cur_z_move_phase_shift = half_pi;
+    m_cur_a_move_phase_shift = half_pi;
 
-    m_Ctrl_Running = false;
-    m_Real_Running = false;
-    m_Time = 0;
-    update_param_time();
-    update_param_move();
+    m_ctrl_running = false;
+    m_real_running = false;
+    m_time = 0;
+    UpdateParamTime();
+    UpdateParamMove();
 
     Process();
 }
 
 
 void Walking::Start() {
-    m_Ctrl_Running = true;
-    m_Real_Running = true;
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: Gait was started";
+    }
+    m_ctrl_running = true;
+    m_real_running = true;
 }
 
 
 void Walking::Stop() {
-    m_Ctrl_Running = false;
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: Stop signal was received";
+    }
+    m_ctrl_running = false;
 }
 
 
 bool Walking::IsRunning() {
-    return m_Real_Running;
+    return m_real_running;
 }
 
 
@@ -282,200 +294,203 @@ void Walking::Process() {
     float pelvis_offset_r, pelvis_offset_l;
     float angle[14], ep[12];
     float offset;
-    const float TIME_UNIT = MotionModule::TIME_UNIT;
+    constexpr float TIME_UNIT = MotionModule::TIME_UNIT;
     //                     R_HIP_YAW, R_HIP_ROLL, R_HIP_PITCH, R_KNEE, R_ANKLE_PITCH, R_ANKLE_ROLL, L_HIP_YAW, L_HIP_ROLL, L_HIP_PITCH, L_KNEE, L_ANKLE_PITCH, L_ANKLE_ROLL, R_ARM_SWING, L_ARM_SWING
-    const int dir[14] = {-1, -1, 1, 1, -1, 1, -1, -1, -1, -1, 1, 1, 1, -1};
-    const float initAngle[14] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -48.345, 41.313};
+    constexpr int dir[14] = {-1, -1, 1, 1, -1, 1, -1, -1, -1, -1, 1, 1, 1, -1};
+    constexpr float initAngle[14] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -48.345f, 41.313f};
     int outValue[14];
 
     // Update walk parameters
-    if (m_Time == 0) {
-        update_param_time();
-        m_Phase = PHASE0;
-        if (!m_Ctrl_Running) {
-            if (m_X_Move_Amplitude == 0 && m_Y_Move_Amplitude == 0 && m_A_Move_Amplitude == 0) {
-                m_Real_Running = false;
+    if (m_time == 0) {
+        UpdateParamTime();
+        m_phase = PHASE0;
+        if (!m_ctrl_running) {
+            if (m_cur_x_move_amplitude == 0 && m_cur_y_move_amplitude == 0 && m_cur_a_move_amplitude == 0) {
+                if (m_debug && m_real_running) {
+                    LOG_DEBUG << "WALKING: Gait was stopped";
+                }
+                m_real_running = false;
             } else {
-                X_MOVE_AMPLITUDE = 0;
-                Y_MOVE_AMPLITUDE = 0;
-                A_MOVE_AMPLITUDE = 0;
+                m_x_move_amplitude = 0;
+                m_y_move_amplitude = 0;
+                m_a_move_amplitude = 0;
             }
         }
-    } else if (m_Time >= (m_Phase_Time1 - TIME_UNIT / 2) && m_Time < (m_Phase_Time1 + TIME_UNIT / 2)) {
-        update_param_move();
-        m_Phase = PHASE1;
-    } else if (m_Time >= (m_Phase_Time2 - TIME_UNIT / 2) && m_Time < (m_Phase_Time2 + TIME_UNIT / 2)) {
-        update_param_time();
-        m_Time = m_Phase_Time2;
-        m_Phase = PHASE2;
-        if (!m_Ctrl_Running) {
-            if (m_X_Move_Amplitude == 0 && m_Y_Move_Amplitude == 0 && m_A_Move_Amplitude == 0) {
-                m_Real_Running = false;
+    } else if (m_time >= (m_cur_phase_time1 - TIME_UNIT / 2) && m_time < (m_cur_phase_time1 + TIME_UNIT / 2)) {
+        UpdateParamMove();
+        m_phase = PHASE1;
+    } else if (m_time >= (m_cur_phase_time2 - TIME_UNIT / 2) && m_time < (m_cur_phase_time2 + TIME_UNIT / 2)) {
+        UpdateParamTime();
+        m_time = m_cur_phase_time2;
+        m_phase = PHASE2;
+        if (!m_ctrl_running) {
+            if (m_cur_x_move_amplitude == 0 && m_cur_y_move_amplitude == 0 && m_cur_a_move_amplitude == 0) {
+                m_real_running = false;
             } else {
-                X_MOVE_AMPLITUDE = 0;
-                Y_MOVE_AMPLITUDE = 0;
-                A_MOVE_AMPLITUDE = 0;
+                m_x_move_amplitude = 0;
+                m_y_move_amplitude = 0;
+                m_a_move_amplitude = 0;
             }
         }
-    } else if (m_Time >= (m_Phase_Time3 - TIME_UNIT / 2) && m_Time < (m_Phase_Time3 + TIME_UNIT / 2)) {
-        update_param_move();
-        m_Phase = PHASE3;
+    } else if (m_time >= (m_cur_phase_time3 - TIME_UNIT / 2) && m_time < (m_cur_phase_time3 + TIME_UNIT / 2)) {
+        UpdateParamMove();
+        m_phase = PHASE3;
     }
-    update_param_balance();
+    UpdateParamBalance();
 
     // Compute endpoints
-    x_swap = wsin(m_Time, m_X_Swap_PeriodTime, m_X_Swap_Phase_Shift, m_X_Swap_Amplitude, m_X_Swap_Amplitude_Shift);
-    y_swap = wsin(m_Time, m_Y_Swap_PeriodTime, m_Y_Swap_Phase_Shift, m_Y_Swap_Amplitude, m_Y_Swap_Amplitude_Shift);
-    z_swap = wsin(m_Time, m_Z_Swap_PeriodTime, m_Z_Swap_Phase_Shift, m_Z_Swap_Amplitude, m_Z_Swap_Amplitude_Shift);
+    x_swap = wsin(m_time, m_cur_x_swap_period_time, m_cur_x_swap_phase_shift, m_cur_x_swap_amplitude, m_cur_x_swap_amplitude_shift);
+    y_swap = wsin(m_time, m_cur_y_swap_period_time, m_cur_y_swap_phase_shift, m_cur_y_swap_amplitude, m_cur_y_swap_amplitude_shift);
+    z_swap = wsin(m_time, m_cur_z_swap_period_time, m_cur_z_swap_phase_shift, m_cur_z_swap_amplitude, m_cur_z_swap_amplitude_shift);
     a_swap = 0;
     b_swap = 0;
     c_swap = 0;
 
-    if (m_Time <= m_SSP_Time_Start_L) {
-        x_move_l = wsin(m_SSP_Time_Start_L, m_X_Move_PeriodTime,
-                        m_X_Move_Phase_Shift + two_pi / m_X_Move_PeriodTime * m_SSP_Time_Start_L, m_X_Move_Amplitude,
-                        m_X_Move_Amplitude_Shift);
-        y_move_l = wsin(m_SSP_Time_Start_L, m_Y_Move_PeriodTime,
-                        m_Y_Move_Phase_Shift + two_pi / m_Y_Move_PeriodTime * m_SSP_Time_Start_L, m_Y_Move_Amplitude,
-                        m_Y_Move_Amplitude_Shift);
-        z_move_l = wsin(m_SSP_Time_Start_L, m_Z_Move_PeriodTime,
-                        m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_L, m_Z_Move_Amplitude,
-                        m_Z_Move_Amplitude_Shift);
-        c_move_l = wsin(m_SSP_Time_Start_L, m_A_Move_PeriodTime,
-                        m_A_Move_Phase_Shift + two_pi / m_A_Move_PeriodTime * m_SSP_Time_Start_L, m_A_Move_Amplitude,
-                        m_A_Move_Amplitude_Shift);
-        x_move_r = wsin(m_SSP_Time_Start_L, m_X_Move_PeriodTime,
-                        m_X_Move_Phase_Shift + two_pi / m_X_Move_PeriodTime * m_SSP_Time_Start_L, -m_X_Move_Amplitude,
-                        -m_X_Move_Amplitude_Shift);
-        y_move_r = wsin(m_SSP_Time_Start_L, m_Y_Move_PeriodTime,
-                        m_Y_Move_Phase_Shift + two_pi / m_Y_Move_PeriodTime * m_SSP_Time_Start_L, -m_Y_Move_Amplitude,
-                        -m_Y_Move_Amplitude_Shift);
-        z_move_r = wsin(m_SSP_Time_Start_R, m_Z_Move_PeriodTime,
-                        m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_R, m_Z_Move_Amplitude,
-                        m_Z_Move_Amplitude_Shift);
-        c_move_r = wsin(m_SSP_Time_Start_L, m_A_Move_PeriodTime,
-                        m_A_Move_Phase_Shift + two_pi / m_A_Move_PeriodTime * m_SSP_Time_Start_L, -m_A_Move_Amplitude,
-                        -m_A_Move_Amplitude_Shift);
+    if (m_time <= m_cur_ssp_time_start_l) {
+        x_move_l = wsin(m_cur_ssp_time_start_l, m_cur_x_move_period_time,
+                        m_cur_x_move_phase_shift + two_pi / m_cur_x_move_period_time * m_cur_ssp_time_start_l, m_cur_x_move_amplitude,
+                        m_cur_x_move_amplitude_shift);
+        y_move_l = wsin(m_cur_ssp_time_start_l, m_cur_y_move_period_time,
+                        m_cur_y_move_phase_shift + two_pi / m_cur_y_move_period_time * m_cur_ssp_time_start_l, m_cur_y_move_amplitude,
+                        m_cur_y_move_amplitude_shift);
+        z_move_l = wsin(m_cur_ssp_time_start_l, m_cur_z_move_period_time,
+                        m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_l, m_cur_z_move_amplitude,
+                        m_cur_z_move_amplitude_shift);
+        c_move_l = wsin(m_cur_ssp_time_start_l, m_cur_a_move_period_time,
+                        m_cur_a_move_phase_shift + two_pi / m_cur_a_move_period_time * m_cur_ssp_time_start_l, m_cur_a_move_amplitude,
+                        m_cur_a_move_amplitude_shift);
+        x_move_r = wsin(m_cur_ssp_time_start_l, m_cur_x_move_period_time,
+                        m_cur_x_move_phase_shift + two_pi / m_cur_x_move_period_time * m_cur_ssp_time_start_l, -m_cur_x_move_amplitude,
+                        -m_cur_x_move_amplitude_shift);
+        y_move_r = wsin(m_cur_ssp_time_start_l, m_cur_y_move_period_time,
+                        m_cur_y_move_phase_shift + two_pi / m_cur_y_move_period_time * m_cur_ssp_time_start_l, -m_cur_y_move_amplitude,
+                        -m_cur_y_move_amplitude_shift);
+        z_move_r = wsin(m_cur_ssp_time_start_r, m_cur_z_move_period_time,
+                        m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_r, m_cur_z_move_amplitude,
+                        m_cur_z_move_amplitude_shift);
+        c_move_r = wsin(m_cur_ssp_time_start_l, m_cur_a_move_period_time,
+                        m_cur_a_move_phase_shift + two_pi / m_cur_a_move_period_time * m_cur_ssp_time_start_l, -m_cur_a_move_amplitude,
+                        -m_cur_a_move_amplitude_shift);
         pelvis_offset_l = 0;
         pelvis_offset_r = 0;
         m_left_start = true;
-    } else if (m_Time <= m_SSP_Time_End_L) {
-        x_move_l = wsin(m_Time, m_X_Move_PeriodTime,
-                        m_X_Move_Phase_Shift + two_pi / m_X_Move_PeriodTime * m_SSP_Time_Start_L, m_X_Move_Amplitude,
-                        m_X_Move_Amplitude_Shift);
-        y_move_l = wsin(m_Time, m_Y_Move_PeriodTime,
-                        m_Y_Move_Phase_Shift + two_pi / m_Y_Move_PeriodTime * m_SSP_Time_Start_L, m_Y_Move_Amplitude,
-                        m_Y_Move_Amplitude_Shift);
-        z_move_l = wsin(m_Time, m_Z_Move_PeriodTime,
-                        m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_L, m_Z_Move_Amplitude,
-                        m_Z_Move_Amplitude_Shift);
-        c_move_l = wsin(m_Time, m_A_Move_PeriodTime,
-                        m_A_Move_Phase_Shift + two_pi / m_A_Move_PeriodTime * m_SSP_Time_Start_L, m_A_Move_Amplitude,
-                        m_A_Move_Amplitude_Shift);
-        x_move_r = wsin(m_Time, m_X_Move_PeriodTime,
-                        m_X_Move_Phase_Shift + two_pi / m_X_Move_PeriodTime * m_SSP_Time_Start_L, -m_X_Move_Amplitude,
-                        -m_X_Move_Amplitude_Shift);
-        y_move_r = wsin(m_Time, m_Y_Move_PeriodTime,
-                        m_Y_Move_Phase_Shift + two_pi / m_Y_Move_PeriodTime * m_SSP_Time_Start_L, -m_Y_Move_Amplitude,
-                        -m_Y_Move_Amplitude_Shift);
-        z_move_r = wsin(m_SSP_Time_Start_R, m_Z_Move_PeriodTime,
-                        m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_R, m_Z_Move_Amplitude,
-                        m_Z_Move_Amplitude_Shift);
-        c_move_r = wsin(m_Time, m_A_Move_PeriodTime,
-                        m_A_Move_Phase_Shift + two_pi / m_A_Move_PeriodTime * m_SSP_Time_Start_L, -m_A_Move_Amplitude,
-                        -m_A_Move_Amplitude_Shift);
-        pelvis_offset_l = wsin(m_Time, m_Z_Move_PeriodTime,
-                               m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_L,
-                               m_Pelvis_Swing / 2, m_Pelvis_Swing / 2);
-        pelvis_offset_r = wsin(m_Time, m_Z_Move_PeriodTime,
-                               m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_L,
-                               -m_Pelvis_Offset / 2, -m_Pelvis_Offset / 2);
+    } else if (m_time <= m_cur_ssp_time_end_l) {
+        x_move_l = wsin(m_time, m_cur_x_move_period_time,
+                        m_cur_x_move_phase_shift + two_pi / m_cur_x_move_period_time * m_cur_ssp_time_start_l, m_cur_x_move_amplitude,
+                        m_cur_x_move_amplitude_shift);
+        y_move_l = wsin(m_time, m_cur_y_move_period_time,
+                        m_cur_y_move_phase_shift + two_pi / m_cur_y_move_period_time * m_cur_ssp_time_start_l, m_cur_y_move_amplitude,
+                        m_cur_y_move_amplitude_shift);
+        z_move_l = wsin(m_time, m_cur_z_move_period_time,
+                        m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_l, m_cur_z_move_amplitude,
+                        m_cur_z_move_amplitude_shift);
+        c_move_l = wsin(m_time, m_cur_a_move_period_time,
+                        m_cur_a_move_phase_shift + two_pi / m_cur_a_move_period_time * m_cur_ssp_time_start_l, m_cur_a_move_amplitude,
+                        m_cur_a_move_amplitude_shift);
+        x_move_r = wsin(m_time, m_cur_x_move_period_time,
+                        m_cur_x_move_phase_shift + two_pi / m_cur_x_move_period_time * m_cur_ssp_time_start_l, -m_cur_x_move_amplitude,
+                        -m_cur_x_move_amplitude_shift);
+        y_move_r = wsin(m_time, m_cur_y_move_period_time,
+                        m_cur_y_move_phase_shift + two_pi / m_cur_y_move_period_time * m_cur_ssp_time_start_l, -m_cur_y_move_amplitude,
+                        -m_cur_y_move_amplitude_shift);
+        z_move_r = wsin(m_cur_ssp_time_start_r, m_cur_z_move_period_time,
+                        m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_r, m_cur_z_move_amplitude,
+                        m_cur_z_move_amplitude_shift);
+        c_move_r = wsin(m_time, m_cur_a_move_period_time,
+                        m_cur_a_move_phase_shift + two_pi / m_cur_a_move_period_time * m_cur_ssp_time_start_l, -m_cur_a_move_amplitude,
+                        -m_cur_a_move_amplitude_shift);
+        pelvis_offset_l = wsin(m_time, m_cur_z_move_period_time,
+                               m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_l,
+                               m_cur_pelvis_swing / 2, m_cur_pelvis_swing / 2);
+        pelvis_offset_r = wsin(m_time, m_cur_z_move_period_time,
+                               m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_l,
+                               -m_cur_pelvis_offset / 2, -m_cur_pelvis_offset / 2);
         m_left_end = true;
-    } else if (m_Time <= m_SSP_Time_Start_R) {
-        x_move_l = wsin(m_SSP_Time_End_L, m_X_Move_PeriodTime,
-                        m_X_Move_Phase_Shift + two_pi / m_X_Move_PeriodTime * m_SSP_Time_Start_L, m_X_Move_Amplitude,
-                        m_X_Move_Amplitude_Shift);
-        y_move_l = wsin(m_SSP_Time_End_L, m_Y_Move_PeriodTime,
-                        m_Y_Move_Phase_Shift + two_pi / m_Y_Move_PeriodTime * m_SSP_Time_Start_L, m_Y_Move_Amplitude,
-                        m_Y_Move_Amplitude_Shift);
-        z_move_l = wsin(m_SSP_Time_End_L, m_Z_Move_PeriodTime,
-                        m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_L, m_Z_Move_Amplitude,
-                        m_Z_Move_Amplitude_Shift);
-        c_move_l = wsin(m_SSP_Time_End_L, m_A_Move_PeriodTime,
-                        m_A_Move_Phase_Shift + two_pi / m_A_Move_PeriodTime * m_SSP_Time_Start_L, m_A_Move_Amplitude,
-                        m_A_Move_Amplitude_Shift);
-        x_move_r = wsin(m_SSP_Time_End_L, m_X_Move_PeriodTime,
-                        m_X_Move_Phase_Shift + two_pi / m_X_Move_PeriodTime * m_SSP_Time_Start_L, -m_X_Move_Amplitude,
-                        -m_X_Move_Amplitude_Shift);
-        y_move_r = wsin(m_SSP_Time_End_L, m_Y_Move_PeriodTime,
-                        m_Y_Move_Phase_Shift + two_pi / m_Y_Move_PeriodTime * m_SSP_Time_Start_L, -m_Y_Move_Amplitude,
-                        -m_Y_Move_Amplitude_Shift);
-        z_move_r = wsin(m_SSP_Time_Start_R, m_Z_Move_PeriodTime,
-                        m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_R, m_Z_Move_Amplitude,
-                        m_Z_Move_Amplitude_Shift);
-        c_move_r = wsin(m_SSP_Time_End_L, m_A_Move_PeriodTime,
-                        m_A_Move_Phase_Shift + two_pi / m_A_Move_PeriodTime * m_SSP_Time_Start_L, -m_A_Move_Amplitude,
-                        -m_A_Move_Amplitude_Shift);
+    } else if (m_time <= m_cur_ssp_time_start_r) {
+        x_move_l = wsin(m_cur_ssp_time_end_l, m_cur_x_move_period_time,
+                        m_cur_x_move_phase_shift + two_pi / m_cur_x_move_period_time * m_cur_ssp_time_start_l, m_cur_x_move_amplitude,
+                        m_cur_x_move_amplitude_shift);
+        y_move_l = wsin(m_cur_ssp_time_end_l, m_cur_y_move_period_time,
+                        m_cur_y_move_phase_shift + two_pi / m_cur_y_move_period_time * m_cur_ssp_time_start_l, m_cur_y_move_amplitude,
+                        m_cur_y_move_amplitude_shift);
+        z_move_l = wsin(m_cur_ssp_time_end_l, m_cur_z_move_period_time,
+                        m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_l, m_cur_z_move_amplitude,
+                        m_cur_z_move_amplitude_shift);
+        c_move_l = wsin(m_cur_ssp_time_end_l, m_cur_a_move_period_time,
+                        m_cur_a_move_phase_shift + two_pi / m_cur_a_move_period_time * m_cur_ssp_time_start_l, m_cur_a_move_amplitude,
+                        m_cur_a_move_amplitude_shift);
+        x_move_r = wsin(m_cur_ssp_time_end_l, m_cur_x_move_period_time,
+                        m_cur_x_move_phase_shift + two_pi / m_cur_x_move_period_time * m_cur_ssp_time_start_l, -m_cur_x_move_amplitude,
+                        -m_cur_x_move_amplitude_shift);
+        y_move_r = wsin(m_cur_ssp_time_end_l, m_cur_y_move_period_time,
+                        m_cur_y_move_phase_shift + two_pi / m_cur_y_move_period_time * m_cur_ssp_time_start_l, -m_cur_y_move_amplitude,
+                        -m_cur_y_move_amplitude_shift);
+        z_move_r = wsin(m_cur_ssp_time_start_r, m_cur_z_move_period_time,
+                        m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_r, m_cur_z_move_amplitude,
+                        m_cur_z_move_amplitude_shift);
+        c_move_r = wsin(m_cur_ssp_time_end_l, m_cur_a_move_period_time,
+                        m_cur_a_move_phase_shift + two_pi / m_cur_a_move_period_time * m_cur_ssp_time_start_l, -m_cur_a_move_amplitude,
+                        -m_cur_a_move_amplitude_shift);
         pelvis_offset_l = 0;
         pelvis_offset_r = 0;
         m_right_start = true;
-    } else if (m_Time <= m_SSP_Time_End_R) {
-        x_move_l = wsin(m_Time, m_X_Move_PeriodTime,
-                        m_X_Move_Phase_Shift + two_pi / m_X_Move_PeriodTime * m_SSP_Time_Start_R + pi,
-                        m_X_Move_Amplitude, m_X_Move_Amplitude_Shift);
-        y_move_l = wsin(m_Time, m_Y_Move_PeriodTime,
-                        m_Y_Move_Phase_Shift + two_pi / m_Y_Move_PeriodTime * m_SSP_Time_Start_R + pi,
-                        m_Y_Move_Amplitude, m_Y_Move_Amplitude_Shift);
-        z_move_l = wsin(m_SSP_Time_End_L, m_Z_Move_PeriodTime,
-                        m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_L, m_Z_Move_Amplitude,
-                        m_Z_Move_Amplitude_Shift);
-        c_move_l = wsin(m_Time, m_A_Move_PeriodTime,
-                        m_A_Move_Phase_Shift + two_pi / m_A_Move_PeriodTime * m_SSP_Time_Start_R + pi,
-                        m_A_Move_Amplitude, m_A_Move_Amplitude_Shift);
-        x_move_r = wsin(m_Time, m_X_Move_PeriodTime,
-                        m_X_Move_Phase_Shift + two_pi / m_X_Move_PeriodTime * m_SSP_Time_Start_R + pi,
-                        -m_X_Move_Amplitude, -m_X_Move_Amplitude_Shift);
-        y_move_r = wsin(m_Time, m_Y_Move_PeriodTime,
-                        m_Y_Move_Phase_Shift + two_pi / m_Y_Move_PeriodTime * m_SSP_Time_Start_R + pi,
-                        -m_Y_Move_Amplitude, -m_Y_Move_Amplitude_Shift);
-        z_move_r = wsin(m_Time, m_Z_Move_PeriodTime,
-                        m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_R, m_Z_Move_Amplitude,
-                        m_Z_Move_Amplitude_Shift);
-        c_move_r = wsin(m_Time, m_A_Move_PeriodTime,
-                        m_A_Move_Phase_Shift + two_pi / m_A_Move_PeriodTime * m_SSP_Time_Start_R + pi,
-                        -m_A_Move_Amplitude, -m_A_Move_Amplitude_Shift);
-        pelvis_offset_l = wsin(m_Time, m_Z_Move_PeriodTime,
-                               m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_R,
-                               m_Pelvis_Offset / 2, m_Pelvis_Offset / 2);
-        pelvis_offset_r = wsin(m_Time, m_Z_Move_PeriodTime,
-                               m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_R,
-                               -m_Pelvis_Swing / 2, -m_Pelvis_Swing / 2);
+    } else if (m_time <= m_cur_ssp_time_end_r) {
+        x_move_l = wsin(m_time, m_cur_x_move_period_time,
+                        m_cur_x_move_phase_shift + two_pi / m_cur_x_move_period_time * m_cur_ssp_time_start_r + pi,
+                        m_cur_x_move_amplitude, m_cur_x_move_amplitude_shift);
+        y_move_l = wsin(m_time, m_cur_y_move_period_time,
+                        m_cur_y_move_phase_shift + two_pi / m_cur_y_move_period_time * m_cur_ssp_time_start_r + pi,
+                        m_cur_y_move_amplitude, m_cur_y_move_amplitude_shift);
+        z_move_l = wsin(m_cur_ssp_time_end_l, m_cur_z_move_period_time,
+                        m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_l, m_cur_z_move_amplitude,
+                        m_cur_z_move_amplitude_shift);
+        c_move_l = wsin(m_time, m_cur_a_move_period_time,
+                        m_cur_a_move_phase_shift + two_pi / m_cur_a_move_period_time * m_cur_ssp_time_start_r + pi,
+                        m_cur_a_move_amplitude, m_cur_a_move_amplitude_shift);
+        x_move_r = wsin(m_time, m_cur_x_move_period_time,
+                        m_cur_x_move_phase_shift + two_pi / m_cur_x_move_period_time * m_cur_ssp_time_start_r + pi,
+                        -m_cur_x_move_amplitude, -m_cur_x_move_amplitude_shift);
+        y_move_r = wsin(m_time, m_cur_y_move_period_time,
+                        m_cur_y_move_phase_shift + two_pi / m_cur_y_move_period_time * m_cur_ssp_time_start_r + pi,
+                        -m_cur_y_move_amplitude, -m_cur_y_move_amplitude_shift);
+        z_move_r = wsin(m_time, m_cur_z_move_period_time,
+                        m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_r, m_cur_z_move_amplitude,
+                        m_cur_z_move_amplitude_shift);
+        c_move_r = wsin(m_time, m_cur_a_move_period_time,
+                        m_cur_a_move_phase_shift + two_pi / m_cur_a_move_period_time * m_cur_ssp_time_start_r + pi,
+                        -m_cur_a_move_amplitude, -m_cur_a_move_amplitude_shift);
+        pelvis_offset_l = wsin(m_time, m_cur_z_move_period_time,
+                               m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_r,
+                               m_cur_pelvis_offset / 2, m_cur_pelvis_offset / 2);
+        pelvis_offset_r = wsin(m_time, m_cur_z_move_period_time,
+                               m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_r,
+                               -m_cur_pelvis_swing / 2, -m_cur_pelvis_swing / 2);
         m_right_end = true;
     } else {
-        x_move_l = wsin(m_SSP_Time_End_R, m_X_Move_PeriodTime,
-                        m_X_Move_Phase_Shift + two_pi / m_X_Move_PeriodTime * m_SSP_Time_Start_R + pi,
-                        m_X_Move_Amplitude, m_X_Move_Amplitude_Shift);
-        y_move_l = wsin(m_SSP_Time_End_R, m_Y_Move_PeriodTime,
-                        m_Y_Move_Phase_Shift + two_pi / m_Y_Move_PeriodTime * m_SSP_Time_Start_R + pi,
-                        m_Y_Move_Amplitude, m_Y_Move_Amplitude_Shift);
-        z_move_l = wsin(m_SSP_Time_End_L, m_Z_Move_PeriodTime,
-                        m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_L, m_Z_Move_Amplitude,
-                        m_Z_Move_Amplitude_Shift);
-        c_move_l = wsin(m_SSP_Time_End_R, m_A_Move_PeriodTime,
-                        m_A_Move_Phase_Shift + two_pi / m_A_Move_PeriodTime * m_SSP_Time_Start_R + pi,
-                        m_A_Move_Amplitude, m_A_Move_Amplitude_Shift);
-        x_move_r = wsin(m_SSP_Time_End_R, m_X_Move_PeriodTime,
-                        m_X_Move_Phase_Shift + two_pi / m_X_Move_PeriodTime * m_SSP_Time_Start_R + pi,
-                        -m_X_Move_Amplitude, -m_X_Move_Amplitude_Shift);
-        y_move_r = wsin(m_SSP_Time_End_R, m_Y_Move_PeriodTime,
-                        m_Y_Move_Phase_Shift + two_pi / m_Y_Move_PeriodTime * m_SSP_Time_Start_R + pi,
-                        -m_Y_Move_Amplitude, -m_Y_Move_Amplitude_Shift);
-        z_move_r = wsin(m_SSP_Time_End_R, m_Z_Move_PeriodTime,
-                        m_Z_Move_Phase_Shift + two_pi / m_Z_Move_PeriodTime * m_SSP_Time_Start_R, m_Z_Move_Amplitude,
-                        m_Z_Move_Amplitude_Shift);
-        c_move_r = wsin(m_SSP_Time_End_R, m_A_Move_PeriodTime,
-                        m_A_Move_Phase_Shift + two_pi / m_A_Move_PeriodTime * m_SSP_Time_Start_R + pi,
-                        -m_A_Move_Amplitude, -m_A_Move_Amplitude_Shift);
+        x_move_l = wsin(m_cur_ssp_time_end_r, m_cur_x_move_period_time,
+                        m_cur_x_move_phase_shift + two_pi / m_cur_x_move_period_time * m_cur_ssp_time_start_r + pi,
+                        m_cur_x_move_amplitude, m_cur_x_move_amplitude_shift);
+        y_move_l = wsin(m_cur_ssp_time_end_r, m_cur_y_move_period_time,
+                        m_cur_y_move_phase_shift + two_pi / m_cur_y_move_period_time * m_cur_ssp_time_start_r + pi,
+                        m_cur_y_move_amplitude, m_cur_y_move_amplitude_shift);
+        z_move_l = wsin(m_cur_ssp_time_end_l, m_cur_z_move_period_time,
+                        m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_l, m_cur_z_move_amplitude,
+                        m_cur_z_move_amplitude_shift);
+        c_move_l = wsin(m_cur_ssp_time_end_r, m_cur_a_move_period_time,
+                        m_cur_a_move_phase_shift + two_pi / m_cur_a_move_period_time * m_cur_ssp_time_start_r + pi,
+                        m_cur_a_move_amplitude, m_cur_a_move_amplitude_shift);
+        x_move_r = wsin(m_cur_ssp_time_end_r, m_cur_x_move_period_time,
+                        m_cur_x_move_phase_shift + two_pi / m_cur_x_move_period_time * m_cur_ssp_time_start_r + pi,
+                        -m_cur_x_move_amplitude, -m_cur_x_move_amplitude_shift);
+        y_move_r = wsin(m_cur_ssp_time_end_r, m_cur_y_move_period_time,
+                        m_cur_y_move_phase_shift + two_pi / m_cur_y_move_period_time * m_cur_ssp_time_start_r + pi,
+                        -m_cur_y_move_amplitude, -m_cur_y_move_amplitude_shift);
+        z_move_r = wsin(m_cur_ssp_time_end_r, m_cur_z_move_period_time,
+                        m_cur_z_move_phase_shift + two_pi / m_cur_z_move_period_time * m_cur_ssp_time_start_r, m_cur_z_move_amplitude,
+                        m_cur_z_move_amplitude_shift);
+        c_move_r = wsin(m_cur_ssp_time_end_r, m_cur_a_move_period_time,
+                        m_cur_a_move_phase_shift + two_pi / m_cur_a_move_period_time * m_cur_ssp_time_start_r + pi,
+                        -m_cur_a_move_amplitude, -m_cur_a_move_amplitude_shift);
         pelvis_offset_l = 0;
         pelvis_offset_r = 0;
     }
@@ -485,21 +500,21 @@ void Walking::Process() {
     a_move_r = 0;
     b_move_r = 0;
 
-    ep[0] = x_swap + x_move_r + m_X_Offset;
-    ep[1] = y_swap + y_move_r - m_Y_Offset / 2;
-    ep[2] = z_swap + z_move_r + m_Z_Offset;
-    ep[3] = a_swap + a_move_r - m_R_Offset / 2;
-    ep[4] = b_swap + b_move_r + m_P_Offset;
-    ep[5] = c_swap + c_move_r - m_A_Offset / 2;
-    ep[6] = x_swap + x_move_l + m_X_Offset;
-    ep[7] = y_swap + y_move_l + m_Y_Offset / 2;
-    ep[8] = z_swap + z_move_l + m_Z_Offset;
-    ep[9] = a_swap + a_move_l + m_R_Offset / 2;
-    ep[10] = b_swap + b_move_l + m_P_Offset;
-    ep[11] = c_swap + c_move_l + m_A_Offset / 2;
+    ep[0] = x_swap + x_move_r + m_cur_x_offset;
+    ep[1] = y_swap + y_move_r - m_cur_y_offset / 2;
+    ep[2] = z_swap + z_move_r + m_cur_z_offset;
+    ep[3] = a_swap + a_move_r - m_cur_r_offset / 2;
+    ep[4] = b_swap + b_move_r + m_cur_p_offset;
+    ep[5] = c_swap + c_move_r - m_cur_a_offset / 2;
+    ep[6] = x_swap + x_move_l + m_cur_x_offset;
+    ep[7] = y_swap + y_move_l + m_cur_y_offset / 2;
+    ep[8] = z_swap + z_move_l + m_cur_z_offset;
+    ep[9] = a_swap + a_move_l + m_cur_r_offset / 2;
+    ep[10] = b_swap + b_move_l + m_cur_p_offset;
+    ep[11] = c_swap + c_move_l + m_cur_a_offset / 2;
 
     if(m_left_end && m_left_start) {
-        if(X_MOVE_AMPLITUDE != 0 || Y_MOVE_AMPLITUDE != 0) {
+        if(m_x_move_amplitude != 0 || m_y_move_amplitude != 0) {
             m_odo_x += m_left_odo_x;
             m_odo_y += m_left_odo_y;
         }
@@ -509,7 +524,7 @@ void Walking::Process() {
         m_right_end = false;
     }
     else if(m_right_end && m_right_start) {
-        if(X_MOVE_AMPLITUDE != 0 || Y_MOVE_AMPLITUDE != 0) {
+        if(m_x_move_amplitude != 0 || m_y_move_amplitude != 0) {
             m_odo_x += m_right_odo_x;
             m_odo_y += m_right_odo_y;
         }
@@ -518,7 +533,7 @@ void Walking::Process() {
         m_right_start = false;
         m_left_end = false;
     } else {
-        if(X_MOVE_AMPLITUDE > 0) {
+        if(m_x_move_amplitude > 0) {
             m_left_odo_x = -m_odo_x_factor * ep[6];
         }
         else {
@@ -527,7 +542,7 @@ void Walking::Process() {
         m_left_odo_y = -m_odo_y_factor * ep[7];
         m_left_odo_theta = -m_odo_a_factor * ep[11];
 
-        if(X_MOVE_AMPLITUDE > 0) {
+        if(m_x_move_amplitude > 0) {
             m_right_odo_x = -m_odo_x_factor * ep[0];
         }
         else {
@@ -542,28 +557,28 @@ void Walking::Process() {
     m_odometry_collector.odoTranslate(odo_offset);
 
     // Compute body swing
-    if (m_Time <= m_SSP_Time_End_L) {
-        m_Body_Swing_Y = -ep[7];
-        m_Body_Swing_Z = ep[8];
+    if (m_time <= m_cur_ssp_time_end_l) {
+        m_cur_body_swing_y = -ep[7];
+        m_cur_body_swing_z = ep[8];
     } else {
-        m_Body_Swing_Y = -ep[1];
-        m_Body_Swing_Z = ep[2];
+        m_cur_body_swing_y = -ep[1];
+        m_cur_body_swing_z = ep[2];
     }
-    m_Body_Swing_Z -= Kinematics::LEG_LENGTH;
+    m_cur_body_swing_z -= Kinematics::LEG_LENGTH;
 
     // Compute arm swing
-    if (m_X_Move_Amplitude == 0) {
+    if (m_cur_x_move_amplitude == 0) {
         angle[12] = 0; // Right
         angle[13] = 0; // Left
     } else {
-        angle[12] = wsin(m_Time, m_PeriodTime, pi * 1.5, -m_X_Move_Amplitude * m_Arm_Swing_Gain, 0);
-        angle[13] = wsin(m_Time, m_PeriodTime, pi * 1.5, m_X_Move_Amplitude * m_Arm_Swing_Gain, 0);
+        angle[12] = wsin(m_time, m_cur_period_time, pi * 1.5f, -m_cur_x_move_amplitude * m_cur_arm_swing_gain, 0);
+        angle[13] = wsin(m_time, m_cur_period_time, pi * 1.5f, m_cur_x_move_amplitude * m_cur_arm_swing_gain, 0);
     }
 
-    if (m_Real_Running) {
-        m_Time += TIME_UNIT;
-        if (m_Time >= m_PeriodTime)
-            m_Time = 0;
+    if (m_real_running) {
+        m_time += TIME_UNIT;
+        if (m_time >= m_cur_period_time)
+            m_time = 0;
     }
 
     // Compute angles
@@ -579,13 +594,13 @@ void Walking::Process() {
     for (int i = 0; i < 14; i++) {
         offset = (float) dir[i] * angle[i] * MX28::RATIO_DEGREES2VALUE;
         if (i == 1) // R_HIP_ROLL
-            offset += (float) dir[i] * (pelvis_offset_r /** cos(ep[5])*/ - HIP_PITCH_OFFSET * sin(ep[5]) * MX28::RATIO_DEGREES2VALUE);
+            offset += (float) dir[i] * (pelvis_offset_r /** cos(ep[5])*/ - m_hip_pitch_offset * sin(ep[5]) * MX28::RATIO_DEGREES2VALUE);
         else if (i == 7) // L_HIP_ROLL
-            offset += (float) dir[i] * (pelvis_offset_l /** cos(ep[11])*/ - HIP_PITCH_OFFSET * sin(ep[11]) * MX28::RATIO_DEGREES2VALUE);
+            offset += (float) dir[i] * (pelvis_offset_l /** cos(ep[11])*/ - m_hip_pitch_offset * sin(ep[11]) * MX28::RATIO_DEGREES2VALUE);
         else if (i == 2) // R_HIP_PITCH
-            offset += (float) dir[i] * (/*-pelvis_offset_r * sin(ep[5])*/ - HIP_PITCH_OFFSET * cos(ep[5]) ) * MX28::RATIO_DEGREES2VALUE;
+            offset += (float) dir[i] * (/*-pelvis_offset_r * sin(ep[5])*/ - m_hip_pitch_offset * cos(ep[5]) ) * MX28::RATIO_DEGREES2VALUE;
         else if (i == 8) // L_HIP_PITCH
-            offset += (float) dir[i] * (/*-pelvis_offset_l * sin(ep[11])*/ - HIP_PITCH_OFFSET * cos(ep[11])) * MX28::RATIO_DEGREES2VALUE;
+            offset += (float) dir[i] * (/*-pelvis_offset_l * sin(ep[11])*/ - m_hip_pitch_offset * cos(ep[11])) * MX28::RATIO_DEGREES2VALUE;
 
         outValue[i] = MX28::Angle2Value(initAngle[i]) + (int) offset;
     }
@@ -598,26 +613,26 @@ void Walking::Process() {
 //        else if (i == 7) // L_HIP_ROLL
 //            offset += (float) dir[i] * pelvis_offset_l;
 //        else if (i == 2 || i == 8) // R_HIP_PITCH or L_HIP_PITCH
-//            offset -= (float) dir[i] * HIP_PITCH_OFFSET * MX28::RATIO_DEGREES2VALUE;
+//            offset -= (float) dir[i] * m_hip_pitch_offset * MX28::RATIO_DEGREES2VALUE;
 //
 //        outValue[i] = MX28::Angle2Value(initAngle[i]) + (int) offset;
 //    }
 
     // adjust balance offset
-    if (BALANCE_ENABLE) {
+    if (m_balance_enable) {
         float rlGyroErr = MotionStatus::RL_GYRO;
         float fbGyroErr = MotionStatus::FB_GYRO;
-        outValue[1] += (int) (dir[1] * rlGyroErr * BALANCE_HIP_ROLL_GAIN * 4); // R_HIP_ROLL
-        outValue[7] += (int) (dir[7] * rlGyroErr * BALANCE_HIP_ROLL_GAIN * 4); // L_HIP_ROLL
+        outValue[1] += (int) (dir[1] * rlGyroErr * m_balance_hip_roll_gain * 4); // R_HIP_ROLL
+        outValue[7] += (int) (dir[7] * rlGyroErr * m_balance_hip_roll_gain * 4); // L_HIP_ROLL
 
-        outValue[3] -= (int) (dir[3] * fbGyroErr * BALANCE_KNEE_GAIN * 4); // R_KNEE
-        outValue[9] -= (int) (dir[9] * fbGyroErr * BALANCE_KNEE_GAIN * 4); // L_KNEE
+        outValue[3] -= (int) (dir[3] * fbGyroErr * m_balance_knee_gain * 4); // R_KNEE
+        outValue[9] -= (int) (dir[9] * fbGyroErr * m_balance_knee_gain * 4); // L_KNEE
 
-        outValue[4] -= (int) (dir[4] * fbGyroErr * BALANCE_ANKLE_PITCH_GAIN * 4); // R_ANKLE_PITCH
-        outValue[10] -= (int) (dir[10] * fbGyroErr * BALANCE_ANKLE_PITCH_GAIN * 4); // L_ANKLE_PITCH
+        outValue[4] -= (int) (dir[4] * fbGyroErr * m_balance_ankle_pitch_gain * 4); // R_ANKLE_PITCH
+        outValue[10] -= (int) (dir[10] * fbGyroErr * m_balance_ankle_pitch_gain * 4); // L_ANKLE_PITCH
 
-        outValue[5] -= (int) (dir[5] * rlGyroErr * BALANCE_ANKLE_ROLL_GAIN * 4); // R_ANKLE_ROLL
-        outValue[11] -= (int) (dir[11] * rlGyroErr * BALANCE_ANKLE_ROLL_GAIN * 4); // L_ANKLE_ROLL
+        outValue[5] -= (int) (dir[5] * rlGyroErr * m_balance_ankle_roll_gain * 4); // R_ANKLE_ROLL
+        outValue[11] -= (int) (dir[11] * rlGyroErr * m_balance_ankle_roll_gain * 4); // L_ANKLE_ROLL
     }
 
     m_Joint.SetValue(JointData::ID_R_HIP_YAW, outValue[0]);
@@ -634,12 +649,12 @@ void Walking::Process() {
     m_Joint.SetValue(JointData::ID_L_ANKLE_ROLL, outValue[11]);
     m_Joint.SetValue(JointData::ID_R_SHOULDER_PITCH, outValue[12]);
     m_Joint.SetValue(JointData::ID_L_SHOULDER_PITCH, outValue[13]);
-    m_Joint.SetAngle(JointData::ID_HEAD_PAN, A_MOVE_AMPLITUDE);
+    m_Joint.SetAngle(JointData::ID_HEAD_PAN, m_a_move_amplitude);
 
     for (int id = JointData::ID_R_HIP_YAW; id <= JointData::ID_L_ANKLE_ROLL; id++) {
-        m_Joint.SetPGain(id, P_GAIN);
-        m_Joint.SetIGain(id, I_GAIN);
-        m_Joint.SetDGain(id, D_GAIN);
+        m_Joint.SetPGain(id, m_p_gain);
+        m_Joint.SetIGain(id, m_i_gain);
+        m_Joint.SetDGain(id, m_d_gain);
     }
 }
 
@@ -651,43 +666,332 @@ Pose2D Walking::GetOdoOffset() {
     return offset;
 }
 
-float Walking::GetXMoveAmplitude() const {
-    return X_MOVE_AMPLITUDE;
-}
-
-float Walking::GetYMoveAmplitude() const {
-    return Y_MOVE_AMPLITUDE;
-}
-
-float Walking::GetAMoveAmplitude() const {
-    return A_MOVE_AMPLITUDE;
-}
-
-bool Walking::IsAimMode() const {
-    return A_MOVE_AIM_ON;
-}
-
-void Walking::SetMoveAmplitude(float x, float y, float a, bool aim_mode) {
-    X_MOVE_AMPLITUDE = x;
-    Y_MOVE_AMPLITUDE = y;
-    A_MOVE_AMPLITUDE = a;
-    A_MOVE_AIM_ON = aim_mode;
-}
-
-int Walking::GetCurrentPhase() { return m_Phase; }
-
-float Walking::GetBodySwingY() { return m_Body_Swing_Y; }
-
-float Walking::GetBodySwingZ() { return m_Body_Swing_Z; }
-
 Pose2D Walking::GetOdo() {
     return m_odometry_collector.GetPose();
 }
 
-void Walking::ResetOdo(Pose2D pose) {
+void Walking::ResetOdo(const Pose2D& pose) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: Odometry was resseted";
+    }
     m_odometry_collector.Reset();
 }
 
-void Walking::SetOdo(Pose2D pose) {
+void Walking::SetOdo(const Pose2D& pose) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: odo_x = " << pose.X()
+                  << ", odo_y = " << pose.Y()
+                  << ", odo_theta = " << pose.Theta();
+    }
     m_odometry_collector.SetPose(pose);
+}
+
+Walking* Walking::GetInstance() {
+    static Walking walking;
+    return &walking;
+}
+
+float Walking::GetXOffset() const {
+    return m_x_offset;
+}
+
+void Walking::SetXOffset(float x_offset) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: x_offset" << x_offset;
+    }
+    Walking::m_x_offset = x_offset;
+}
+
+float Walking::GetYOffset() const {
+    return m_y_offset;
+}
+
+void Walking::SetYOffset(float y_offset) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: y_offset" << y_offset;
+    }
+    Walking::m_y_offset = y_offset;
+}
+
+float Walking::GetZOffset() const {
+    return m_z_offset;
+}
+
+void Walking::SetZOffset(float z_offset) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: z_offset" << z_offset;
+    }
+    Walking::m_z_offset = z_offset;
+}
+
+float Walking::GetAOffset() const {
+    return m_a_offset;
+}
+
+void Walking::SetAOffset(float a_offset) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: a_offset" << a_offset;
+    }
+    Walking::m_a_offset = a_offset;
+}
+
+float Walking::GetPOffset() const {
+    return m_p_offset;
+}
+
+void Walking::SetPOffset(float p_offset) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: p_offset" << p_offset;
+    }
+    Walking::m_p_offset = p_offset;
+}
+
+float Walking::GetROffset() const {
+    return m_r_offset;
+}
+
+void Walking::SetROffset(float r_offset) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: r_offset" << r_offset;
+    }
+    Walking::m_r_offset = r_offset;
+}
+
+float Walking::GetPeriodTime() const {
+    return m_period_time;
+}
+
+void Walking::SetPeriodTime(float period_time) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: period_time" << period_time;
+    }
+    Walking::m_period_time = period_time;
+}
+
+float Walking::GetDSPRatio() const {
+    return m_dsp_ratio;
+}
+
+void Walking::SetDSPRatio(float dsp_ratio) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: dsp_ratio" << dsp_ratio;
+    }
+    Walking::m_dsp_ratio = dsp_ratio;
+}
+
+float Walking::GetStepFBRatio() const {
+    return m_step_fb_ratio;
+}
+
+void Walking::SetStepFBRatio(float step_fb_ratio) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: step_fb_ration" << step_fb_ratio;
+    }
+    Walking::m_step_fb_ratio = step_fb_ratio;
+}
+
+float Walking::GetXMoveAmplitude() const {
+    return m_x_move_amplitude;
+}
+
+void Walking::SetXMoveAmplitude(float x_move_amplitude) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: x_move_amplitude = " << x_move_amplitude;
+    }
+    Walking::m_x_move_amplitude = x_move_amplitude;
+}
+
+float Walking::GetYMoveAmplitude() const {
+    return m_y_move_amplitude;
+}
+
+void Walking::SetYMoveAmplitude(float y_move_amplitude) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: y_move_amplitude = " << y_move_amplitude;
+    }
+    Walking::m_y_move_amplitude = y_move_amplitude;
+}
+
+float Walking::GetZMoveAmplitude() const {
+    return m_z_move_amplitude;
+}
+
+void Walking::SetZMoveAmplitude(float z_move_amplitude) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: z_move_amplitude = " << z_move_amplitude;
+    }
+    Walking::m_z_move_amplitude = z_move_amplitude;
+}
+
+float Walking::GetAMoveAmplitude() const {
+    return m_a_move_amplitude;
+}
+
+void Walking::SetAMoveAmplitude(float a_move_amplitude) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: a_move_amplitude = " << a_move_amplitude;
+    }
+    Walking::m_a_move_amplitude = a_move_amplitude;
+}
+
+bool Walking::GetAMoveAimOn() const {
+    return m_move_aim_on;
+}
+
+void Walking::SetMoveAimOn(bool move_aim_on) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: move_aim_on = " << std::boolalpha << move_aim_on;
+    }
+    Walking::m_move_aim_on = move_aim_on;
+}
+
+bool Walking::GetBalanceEnable() const {
+    return m_balance_enable;
+}
+
+void Walking::SetBalanceEnable(bool balance_enable) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: balance_enabled = " << std::boolalpha << balance_enable;
+    }
+    Walking::m_balance_enable = balance_enable;
+}
+
+float Walking::GetBalanceKneeGain() const {
+    return m_balance_knee_gain;
+}
+
+void Walking::SetBalanceKneeGain(float balance_knee_gain) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: balance_knee_gain = " << balance_knee_gain;
+    }
+    Walking::m_balance_knee_gain = balance_knee_gain;
+}
+
+float Walking::GetBalanceAnklePitchGain() const {
+    return m_balance_ankle_pitch_gain;
+}
+
+void Walking::SetBalanceAnklePitchGain(float balance_ankle_pitch_gain) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: balance_ankle_pitch_gain = " << balance_ankle_pitch_gain;
+    }
+    Walking::m_balance_ankle_pitch_gain = balance_ankle_pitch_gain;
+}
+
+float Walking::GetBalanceHipRollGain() const {
+    return m_balance_hip_roll_gain;
+}
+
+void Walking::SetBalanceHipRollGain(float balance_hip_roll_gain) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: balance_hip_roll_gain = " << balance_hip_roll_gain;
+    }
+    Walking::m_balance_hip_roll_gain = balance_hip_roll_gain;
+}
+
+float Walking::GetBalanceAnkleRollGain() const {
+    return m_balance_ankle_roll_gain;
+}
+
+void Walking::SetBalanceAnkleRollGain(float balance_ankle_roll_gain) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: balance_ankle_roll_gain = " << balance_ankle_roll_gain;
+    }
+    Walking::m_balance_ankle_roll_gain = balance_ankle_roll_gain;
+}
+
+float Walking::GetYSwapAmplitude() const {
+    return m_y_swap_amplitude;
+}
+
+void Walking::SetYSwapAmplitude(float y_swap_amplitude) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: y_swap_amplitude = " << y_swap_amplitude;
+    }
+    Walking::m_y_swap_amplitude = y_swap_amplitude;
+}
+
+float Walking::GetZSwapAmplitude() const {
+    return m_z_swap_amplitude;
+}
+
+void Walking::SetZSwapAmplitude(float z_swap_amplitude) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: z_swap_amplitude = " << z_swap_amplitude;
+    }
+    Walking::m_z_swap_amplitude = z_swap_amplitude;
+}
+
+float Walking::GetArmSwingGain() const {
+    return m_arm_swing_gain;
+}
+
+void Walking::SetArmSwingGain(float arm_swing_gain) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: arm_swing_gain = " << arm_swing_gain;
+    }
+    Walking::m_arm_swing_gain = arm_swing_gain;
+}
+
+float Walking::GetPelvisOffset() const {
+    return m_pelvis_offset;
+}
+
+void Walking::SetPelvisOffset(float pelvis_offset) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: pelvis_offset = " << pelvis_offset;
+    }
+    Walking::m_pelvis_offset = pelvis_offset;
+}
+
+float Walking::GetHipPitchOffset() const {
+    return m_hip_pitch_offset;
+}
+
+void Walking::SetHipPitchOffset(float hip_pitch_offset) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: hip_pitch_offset = " << hip_pitch_offset;
+    }
+    Walking::m_hip_pitch_offset = hip_pitch_offset;
+}
+
+int Walking::GetPGain() const {
+    return m_p_gain;
+}
+
+void Walking::SetPGain(int p_gain) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: p_gain = " << p_gain;
+    }
+    Walking::m_p_gain = p_gain;
+}
+
+int Walking::GetIGain() const {
+    return m_i_gain;
+}
+
+void Walking::SetIGain(int i_gain) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: i_gain = " << i_gain;
+    }
+    Walking::m_i_gain = i_gain;
+}
+
+int Walking::GetDGain() const {
+    return m_d_gain;
+}
+
+void Walking::SetDGain(int d_gain) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: d_gain = " << d_gain;
+    }
+    Walking::m_d_gain = d_gain;
+}
+
+bool Walking::GetDebug() const {
+    return m_debug;
+}
+
+void Walking::SetDebug(bool debug) {
+    m_debug = debug;
 }

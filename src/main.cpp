@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
 
         if (!Action::GetInstance()->IsRunning() && !Kicking::GetInstance()->IsRunning()) {
 //            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-//            Walking::GetInstance()->X_MOVE_AMPLITUDE = 10;
+//            Walking::GetInstance()->m_x_move_amplitude = 10;
 //            Walking::GetInstance()->Start();
             Kicking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
             Kicking::GetInstance()->SetKickingLeg(Kicking::RIGHT_LEG);

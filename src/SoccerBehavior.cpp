@@ -35,7 +35,7 @@ SoccerBehavior::SoccerBehavior() {
 
 void SoccerBehavior::Process() {
     // Update CV
-    Walking::GetInstance()->A_MOVE_AIM_ON = false;
+    Walking::GetInstance()->SetMoveAimOn(false);
     const Pose2D& Spawn = StateMachine::GetInstance()->GetSpawnPosition();
     const Pose2D& Starting = StateMachine::GetInstance()->GetStartingPosition();
     const Pose2D& Odo = Walking::GetInstance()->GetOdo();

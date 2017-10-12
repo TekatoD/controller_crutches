@@ -31,67 +31,68 @@ namespace Robot {
         };
 
     private:
+        bool m_debug{true};
 
-        float m_PeriodTime;
-        float m_DSP_Ratio;
-        float m_SSP_Ratio;
-        float m_X_Swap_PeriodTime;
-        float m_X_Move_PeriodTime;
-        float m_Y_Swap_PeriodTime;
-        float m_Y_Move_PeriodTime;
-        float m_Z_Swap_PeriodTime;
-        float m_Z_Move_PeriodTime;
-        float m_A_Move_PeriodTime;
-        float m_SSP_Time;
-        float m_SSP_Time_Start_L;
-        float m_SSP_Time_End_L;
-        float m_SSP_Time_Start_R;
-        float m_SSP_Time_End_R;
-        float m_Phase_Time1;
-        float m_Phase_Time2;
-        float m_Phase_Time3;
+        float m_cur_period_time;
+        float m_cur_dsp_ratio;
+        float m_cur_ssp_ratio;
+        float m_cur_x_swap_period_time;
+        float m_cur_x_move_period_time;
+        float m_cur_y_swap_period_time;
+        float m_cur_y_move_period_time;
+        float m_cur_z_swap_period_time;
+        float m_cur_z_move_period_time;
+        float m_cur_a_move_period_time;
+        float m_cur_ssp_time;
+        float m_cur_ssp_time_start_l;
+        float m_cur_ssp_time_end_l;
+        float m_cur_ssp_time_start_r;
+        float m_cur_ssp_time_end_r;
+        float m_cur_phase_time1;
+        float m_cur_phase_time2;
+        float m_cur_phase_time3;
 
-        float m_X_Offset;
-        float m_Y_Offset;
-        float m_Z_Offset;
-        float m_R_Offset;
-        float m_P_Offset;
-        float m_A_Offset;
+        float m_cur_x_offset;
+        float m_cur_y_offset;
+        float m_cur_z_offset;
+        float m_cur_r_offset;
+        float m_cur_p_offset;
+        float m_cur_a_offset;
 
-        float m_X_Swap_Phase_Shift;
-        float m_X_Swap_Amplitude;
-        float m_X_Swap_Amplitude_Shift;
-        float m_X_Move_Phase_Shift;
-        float m_X_Move_Amplitude;
-        float m_X_Move_Amplitude_Shift;
-        float m_Y_Swap_Phase_Shift;
-        float m_Y_Swap_Amplitude;
-        float m_Y_Swap_Amplitude_Shift;
-        float m_Y_Move_Phase_Shift;
-        float m_Y_Move_Amplitude;
-        float m_Y_Move_Amplitude_Shift;
-        float m_Z_Swap_Phase_Shift;
-        float m_Z_Swap_Amplitude;
-        float m_Z_Swap_Amplitude_Shift;
-        float m_Z_Move_Phase_Shift;
-        float m_Z_Move_Amplitude;
-        float m_Z_Move_Amplitude_Shift;
-        float m_A_Move_Phase_Shift;
-        float m_A_Move_Amplitude;
-        float m_A_Move_Amplitude_Shift;
+        float m_cur_x_swap_phase_shift;
+        float m_cur_x_swap_amplitude;
+        float m_cur_x_swap_amplitude_shift;
+        float m_cur_x_move_phase_shift;
+        float m_cur_x_move_amplitude;
+        float m_cur_x_move_amplitude_shift;
+        float m_cur_y_swap_phase_shift;
+        float m_cur_y_swap_amplitude;
+        float m_cur_y_swap_amplitude_shift;
+        float m_cur_y_move_phase_shift;
+        float m_cur_y_move_amplitude;
+        float m_cur_y_move_amplitude_shift;
+        float m_cur_z_swap_phase_shift;
+        float m_cur_z_swap_amplitude;
+        float m_cur_z_swap_amplitude_shift;
+        float m_cur_z_move_phase_shift;
+        float m_cur_z_move_amplitude;
+        float m_cur_z_move_amplitude_shift;
+        float m_cur_a_move_phase_shift;
+        float m_cur_a_move_amplitude;
+        float m_cur_a_move_amplitude_shift;
 
-        float m_Pelvis_Offset;
-        float m_Pelvis_Swing;
-        float m_Hip_Pitch_Offset;
-        float m_Arm_Swing_Gain;
+        float m_cur_pelvis_offset;
+        float m_cur_pelvis_swing;
+        float m_cur_hip_pitch_offset;
+        float m_cur_arm_swing_gain;
 
-        bool m_Ctrl_Running;
-        bool m_Real_Running;
-        float m_Time;
+        bool m_ctrl_running;
+        bool m_real_running;
+        float m_time;
 
-        int m_Phase;
-        float m_Body_Swing_Y;
-        float m_Body_Swing_Z;
+        int m_phase;
+        float m_cur_body_swing_y;
+        float m_cur_body_swing_z;
 
         float m_odo_x;
         float m_odo_y;
@@ -119,81 +120,58 @@ namespace Robot {
 
         Walking();
 
-        void update_param_time();
+        void UpdateParamTime();
 
-        void update_param_move();
+        void UpdateParamMove();
 
-        void update_param_balance();
+        void UpdateParamBalance();
 
         Pose2D GetOdoOffset();
 
-
-    public:
         // Walking initial pose
-        float X_OFFSET;
-        float Y_OFFSET;
-        float Z_OFFSET;
-        float A_OFFSET;
-        float P_OFFSET;
-        float R_OFFSET;
+        float m_x_offset;
+        float m_y_offset;
+        float m_z_offset;
+        float m_a_offset;
+        float m_p_offset;
+        float m_r_offset;
 
         // Walking control
-        float PERIOD_TIME;
-        float DSP_RATIO;
-        float STEP_FB_RATIO;
-        float X_MOVE_AMPLITUDE;
-        float Y_MOVE_AMPLITUDE;
-        float Z_MOVE_AMPLITUDE;
-        float A_MOVE_AMPLITUDE;
-        bool A_MOVE_AIM_ON;
+        float m_period_time;
+        float m_dsp_ratio;
+        float m_step_fb_ratio;
+        float m_x_move_amplitude;
+        float m_y_move_amplitude;
+        float m_z_move_amplitude;
+        float m_a_move_amplitude;
+        bool m_move_aim_on;
 
         // Balance control
-        bool BALANCE_ENABLE;
-        float BALANCE_KNEE_GAIN;
-        float BALANCE_ANKLE_PITCH_GAIN;
-        float BALANCE_HIP_ROLL_GAIN;
-        float BALANCE_ANKLE_ROLL_GAIN;
-        float Y_SWAP_AMPLITUDE;
-        float Z_SWAP_AMPLITUDE;
-        float ARM_SWING_GAIN;
-        float PELVIS_OFFSET;
-        float HIP_PITCH_OFFSET;
+        bool m_balance_enable;
+        float m_balance_knee_gain;
+        float m_balance_ankle_pitch_gain;
+        float m_balance_hip_roll_gain;
+        float m_balance_ankle_roll_gain;
+        float m_y_swap_amplitude;
+        float m_z_swap_amplitude;
+        float m_arm_swing_gain;
+        float m_pelvis_offset;
+        float m_hip_pitch_offset;
 
-        int P_GAIN;
-        int I_GAIN;
-        int D_GAIN;
+        int m_p_gain;
+        int m_i_gain;
+        int m_d_gain;
 
+    public:
+        static Walking* GetInstance();
 
-        float GetXMoveAmplitude() const;
-
-        float GetYMoveAmplitude() const;
-
-        float GetAMoveAmplitude() const;
-
-        bool IsAimMode() const;
-
-        void SetMoveAmplitude(float x, float y, float a, bool aim_mode = false);
-
-        int GetCurrentPhase();
-
-        float GetBodySwingY();
-
-        float GetBodySwingZ();
-
-        virtual ~Walking();
-
-        static Walking* GetInstance() {
-            static Walking walking;
-            return &walking;
-        }
-
-        void Initialize();
+        void Initialize() override;
 
         void Start();
 
         void Stop();
 
-        void Process();
+        void Process() override;
 
         bool IsRunning();
 
@@ -207,9 +185,121 @@ namespace Robot {
 
         Pose2D GetOdo();
 
-        void ResetOdo(Pose2D pose);
+        void ResetOdo(const Pose2D& pose);
 
-        void SetOdo(Pose2D pose);
+        void SetOdo(const Pose2D& pose);
+
+        float GetXOffset() const;
+
+        void SetXOffset(float x_offset);
+
+        float GetYOffset() const;
+
+        void SetYOffset(float y_offset);
+
+        float GetZOffset() const;
+
+        void SetZOffset(float z_offset);
+
+        float GetAOffset() const;
+
+        void SetAOffset(float a_offset);
+
+        float GetPOffset() const;
+
+        void SetPOffset(float p_offset);
+
+        float GetROffset() const;
+
+        void SetROffset(float r_offset);
+
+        float GetPeriodTime() const;
+
+        void SetPeriodTime(float period_time);
+
+        float GetDSPRatio() const;
+
+        void SetDSPRatio(float dsp_ratio);
+
+        float GetStepFBRatio() const;
+
+        void SetStepFBRatio(float step_fb_ratio);
+
+        float GetXMoveAmplitude() const;
+
+        void SetXMoveAmplitude(float x_move_amplitude);
+
+        float GetYMoveAmplitude() const;
+
+        void SetYMoveAmplitude(float y_move_amplitude);
+
+        float GetZMoveAmplitude() const;
+
+        void SetZMoveAmplitude(float z_move_amplitude);
+
+        float GetAMoveAmplitude() const;
+
+        void SetAMoveAmplitude(float a_move_amplitude);
+
+        bool GetAMoveAimOn() const;
+
+        void SetMoveAimOn(bool move_aim_on);
+
+        bool GetBalanceEnable() const;
+
+        void SetBalanceEnable(bool balance_enable);
+
+        float GetBalanceKneeGain() const;
+
+        void SetBalanceKneeGain(float balance_knee_gain);
+
+        float GetBalanceAnklePitchGain() const;
+
+        void SetBalanceAnklePitchGain(float balance_ankle_pitch_gain);
+
+        float GetBalanceHipRollGain() const;
+
+        void SetBalanceHipRollGain(float balance_hip_roll_gain);
+
+        float GetBalanceAnkleRollGain() const;
+
+        void SetBalanceAnkleRollGain(float balance_ankle_roll_gain);
+
+        float GetYSwapAmplitude() const;
+
+        void SetYSwapAmplitude(float y_swap_amplitude);
+
+        float GetZSwapAmplitude() const;
+
+        void SetZSwapAmplitude(float z_swap_amplitude);
+
+        float GetArmSwingGain() const;
+
+        void SetArmSwingGain(float arm_swing_gain);
+
+        float GetPelvisOffset() const;
+
+        void SetPelvisOffset(float pelvis_offset);
+
+        float GetHipPitchOffset() const;
+
+        void SetHipPitchOffset(float hip_pitch_offset);
+
+        int GetPGain() const;
+
+        void SetPGain(int p_gain);
+
+        int GetIGain() const;
+
+        void SetIGain(int i_gain);
+
+        int GetDGain() const;
+
+        void SetDGain(int d_gain);
+
+        bool GetDebug() const;
+
+        void SetDebug(bool debug);
     };
 }
 

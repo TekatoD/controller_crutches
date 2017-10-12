@@ -33,12 +33,12 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
     float angle = atan2(pos.Y(), pos.X()) / M_PI * 180.0;
 
     if (!Walking::GetInstance()->IsRunning() ||
-        Walking::GetInstance()->X_MOVE_AMPLITUDE != m_X ||
-        Walking::GetInstance()->Y_MOVE_AMPLITUDE != m_Y ||
-        Walking::GetInstance()->A_MOVE_AMPLITUDE != m_A) {
-        m_X = Walking::GetInstance()->X_MOVE_AMPLITUDE;
-        m_Y = Walking::GetInstance()->Y_MOVE_AMPLITUDE;
-        m_A = Walking::GetInstance()->A_MOVE_AMPLITUDE;
+        Walking::GetInstance()->GetXMoveAmplitude() != m_X ||
+        Walking::GetInstance()->GetXMoveAmplitude() != m_Y ||
+        Walking::GetInstance()->GetXMoveAmplitude() != m_A) {
+        m_X = Walking::GetInstance()->GetXMoveAmplitude();
+        m_Y = Walking::GetInstance()->GetYMoveAmplitude();
+        m_A = Walking::GetInstance()->GetAMoveAmplitude();
     }
 
 
@@ -87,9 +87,9 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
 
     if (!m_Done) {
         Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-        Walking::GetInstance()->X_MOVE_AMPLITUDE = m_X;
-        Walking::GetInstance()->Y_MOVE_AMPLITUDE = m_Y;
-        Walking::GetInstance()->A_MOVE_AMPLITUDE = m_A;
+        Walking::GetInstance()->SetXMoveAmplitude(m_X);
+        Walking::GetInstance()->SetYMoveAmplitude(m_Y);
+        Walking::GetInstance()->SetAMoveAmplitude(m_A);
         Walking::GetInstance()->Start();
     } else {
         Walking::GetInstance()->Stop();

@@ -135,6 +135,56 @@ set(SRC
         include/detectors/FieldDetector.h
         src/detectors/LineDetector.cpp
         include/detectors/LineDetector.h)
+        
+set(VISION_SRC
+    include/minIni.h
+    src/minIni/minIni.c
+    src/math/Point.cpp
+    src/vision/Camera.cpp
+    src/vision/ColorFinder.cpp
+    src/vision/Image.cpp
+    src/vision/ImgProcess.cpp
+    src/nodes/field_node.cpp
+    src/Vision.cpp
+    include/Vision.h
+    src/VisionUtils.cpp
+    include/VisionUtils.h
+    src/detectors/AngleDetector.cpp
+    include/detectors/AngleDetector.h
+    src/detectors/BallDetector.cpp
+    include/detectors/BallDetector.h
+    src/detectors/BaseDetector.cpp
+    include/detectors/BaseDetector.h
+    src/detectors/FieldDetector.cpp
+    include/detectors/FieldDetector.h
+    src/detectors/LineDetector.cpp
+    include/detectors/LineDetector.h)
+    
+set(VREP_VISION_SRC
+    include/VREPCamera.h
+    src/VREPCamera.cpp
+    include/minIni.h
+    src/minIni/minIni.c
+    src/math/Point.cpp
+    src/vision/Camera.cpp
+    src/vision/ColorFinder.cpp
+    src/vision/Image.cpp
+    src/vision/ImgProcess.cpp
+    src/nodes/vrep_node.cpp
+    src/Vision.cpp
+    include/Vision.h
+    src/VisionUtils.cpp
+    include/VisionUtils.h
+    src/detectors/AngleDetector.cpp
+    include/detectors/AngleDetector.h
+    src/detectors/BallDetector.cpp
+    include/detectors/BallDetector.h
+    src/detectors/BaseDetector.cpp
+    include/detectors/BaseDetector.h
+    src/detectors/FieldDetector.cpp
+    include/detectors/FieldDetector.h
+    src/detectors/LineDetector.cpp
+    include/detectors/LineDetector.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})
@@ -148,6 +198,42 @@ target_link_libraries(controller
         ${VREP_LIBRARIES})
 
 target_include_directories(controller PUBLIC
+        ${JPEG_INCLUDE_DIR}
+        ${VREP_REMOTE}
+        ${VREP_INCLUDE}
+        ${BOOST_INCLUDE_DIR}
+        ${JPEG_INCLUDE_DIR}
+        ${OpenCV_INCLUDE_DIR})
+
+add_executable(vision_test ${VISION_SRC})
+
+target_link_libraries(vision_test
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${JPEG_LIBRARIES}
+        ${BOOST_LIBRARIES}
+        ${OpenCV_LIBRARIES}
+        Eigen3::Eigen
+        ${VREP_LIBRARIES})
+
+target_include_directories(vision_test PUBLIC
+        ${JPEG_INCLUDE_DIR}
+        ${VREP_REMOTE}
+        ${VREP_INCLUDE}
+        ${BOOST_INCLUDE_DIR}
+        ${JPEG_INCLUDE_DIR}
+        ${OpenCV_INCLUDE_DIR})
+        
+add_executable(vrep_vision ${VREP_VISION_SRC})
+
+target_link_libraries(vrep_vision
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${JPEG_LIBRARIES}
+        ${BOOST_LIBRARIES}
+        ${OpenCV_LIBRARIES}
+        Eigen3::Eigen
+        ${VREP_LIBRARIES})
+
+target_include_directories(vrep_vision PUBLIC
         ${JPEG_INCLUDE_DIR}
         ${VREP_REMOTE}
         ${VREP_INCLUDE}

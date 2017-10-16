@@ -2,6 +2,16 @@
 #include "Vision.h"
 #include "VisionUtils.h"
 
+#define MAX_EXT_API_CONNECTIONS 255
+#define NON_MATLAB_PARSING
+extern "C" {
+#include "extApi.h"
+#include "extApi.c"
+#include "extApiPlatform.h"
+#include "extApiPlatform.c"
+}
+
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,9 +21,10 @@ int main(int argc, char** argv)
 {
     int portNb = 19997;
     int clientId = simxStart((const simxChar*)"127.0.0.1", portNb, true, true, 2000, 5);
-    const char* visionSensorName = "Camera";
+    const char* visionSensorName = "camera";
     
-    Robot::VREPCamera camera(320, 240, visionSensorName, clientId);
+    Robot::VREPCamera camera(320, 240, visionSensorName);
+    camera.connect(clientId);
     int w = camera.getWidth();
     int h = camera.getHeight();
     
@@ -30,9 +41,11 @@ int main(int argc, char** argv)
             
             cv::imshow("camera_image", frame);
             
-            ant::vision_utils::rot90(frame, 0);
+            //ant::vision_utils::rot90(frame, 0);
             vision.setFrame(frame);
             std::vector<cv::Vec4i> lines = vision.lineDetect();
+            
+            std::cout << "Line count: " << lines.size() << std::endl;
 
             for (auto& line : lines) {
                 cv::Point p1(line[0], line[1]);

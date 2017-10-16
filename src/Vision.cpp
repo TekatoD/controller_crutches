@@ -39,7 +39,7 @@ namespace ant {
         std::chrono::time_point<std::chrono::system_clock> start, end1, end2;
         
         start = std::chrono::system_clock::now();
-        fieldDetect();
+        //fieldDetect();
         end1 = std::chrono::system_clock::now();
         std::chrono::duration<double> fieldDur = end1 - start;
         

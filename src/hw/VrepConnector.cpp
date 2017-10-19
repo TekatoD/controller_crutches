@@ -3,7 +3,7 @@
  *  @date 9/21/17
  */
 
-#include <VrepConnector.h>
+#include <hw/VrepConnector.h>
 #include <iostream>
 
 

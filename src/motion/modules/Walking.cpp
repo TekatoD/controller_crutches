@@ -8,7 +8,7 @@
 #include <iostream>
 #include <math/AngleTools.h>
 #include <log/Logger.h>
-#include "MX28.h"
+#include "hw/MX28.h"
 #include "motion/MotionStatus.h"
 #include "motion/Kinematics.h"
 #include "motion/modules/Walking.h"

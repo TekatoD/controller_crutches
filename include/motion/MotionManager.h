@@ -13,7 +13,7 @@
 #include <iostream>
 #include "MotionStatus.h"
 #include "MotionModule.h"
-#include "CM730.h"
+#include "hw/CM730.h"
 #include "minIni.h"
 
 #define OFFSET_SECTION "Offset"

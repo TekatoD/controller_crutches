@@ -5,7 +5,7 @@
  *
  */
 
-#include "MX28.h"
+#include "hw/MX28.h"
 #include "motion/Kinematics.h"
 #include "motion/MotionStatus.h"
 #include "motion/modules/Head.h"

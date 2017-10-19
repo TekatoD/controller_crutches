@@ -6,7 +6,6 @@
 
 #include "math/Point.h"
 #include "BallTracker.h"
-#include "ColorFinder.h"
 #include "Field.h"
 #include "GoTo.h"
 #include "BallSearcher.h"
@@ -52,7 +51,6 @@ namespace Robot {
 
         BallSearcher m_BallSearcher;
         BallTracker m_BallTracker;
-        ColorFinder m_BallFinder;
         Field m_Field;
         GoTo m_GoTo;
 

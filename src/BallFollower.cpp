@@ -6,8 +6,7 @@
  */
 
 #include <iostream>
-#include "ImgProcess.h"
-#include "MX28.h"
+#include "hw/MX28.h"
 #include "motion/modules/Head.h"
 #include "motion/modules/Walking.h"
 #include "BallFollower.h"

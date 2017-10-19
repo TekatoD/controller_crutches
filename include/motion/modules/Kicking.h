@@ -10,7 +10,7 @@
 #include <motion/MotionModule.h>
 #include <math/AngleTools.h>
 #include <motion/Kinematics.h>
-#include <MX28.h>
+#include <hw/MX28.h>
 
 namespace Robot {
     class Kicking

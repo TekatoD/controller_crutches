@@ -15,8 +15,8 @@ namespace Robot {
         static constexpr float VIEW_V_ANGLE = 46.0; //degree
         static constexpr float VIEW_H_ANGLE = 58.0; //degree
 
-        static int WIDTH;
-        static int HEIGHT;
+        static constexpr int WIDTH = 320;
+        static constexpr int HEIGHT = 240;
     };
 
 }

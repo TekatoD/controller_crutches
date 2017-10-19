@@ -5,7 +5,6 @@
 
 #include <iostream>
 #include <motion/modules/Action.h>
-#include <LinuxCamera.h>
 #include <GameController.h>
 #include <StateMachine.h>
 #include <motion/MotionStatus.h>
@@ -52,8 +51,7 @@ void GoalieBehavior::Process() {
     const Pose2D& Starting = StateMachine::GetInstance()->GetStartingPosition();
     const Pose2D& Odo = Walking::GetInstance()->GetOdo();
 
-    LinuxCamera::GetInstance()->CaptureFrame();
-    m_BallTracker.Process(m_BallFinder.GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
+//    m_BallTracker.Process(m_BallFinder.GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
 
     const RoboCupGameControlData& State = GameController::GetInstance()->GameCtrlData;
 
@@ -115,8 +113,7 @@ void GoalieBehavior::Process() {
         if (Action::GetInstance()->IsRunning() == 0 && !near_edge) {
             Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-            LinuxCamera::GetInstance()->CaptureFrame();
-            m_BallTracker.Process(m_BallFinder.GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
+//            m_BallTracker.Process(m_BallFinder.GetPosition(LinuxCamera::GetInstance()->fbuffer->m_HSVFrame));
 
             if (m_BallTracker.IsNoBall()) {
                 m_BallSearcher.Process();
@@ -203,7 +200,6 @@ void GoalieBehavior::LoadINISettings(minIni* ini, const std::string& section) {
     if ((value = ini->getd(section, "x_crutch", INVALID_VALUE)) != INVALID_VALUE) m_XCrutch = value;
     if ((value = ini->getd(section, "a_crutch", INVALID_VALUE)) != INVALID_VALUE) m_ACrutch = value;
 
-    m_BallFinder.LoadINISettings(ini);
     m_BallTracker.LoadINISettings(ini);
     m_BallSearcher.LoadINISettings(ini);
     m_Field.LoadINISettings(ini);
@@ -221,7 +217,6 @@ void GoalieBehavior::SaveINISettings(minIni* ini, const std::string& section) {
     ini->put(section, "x_crutch", m_XCrutch);
     ini->put(section, "a_crutch", m_ACrutch);
 
-    m_BallFinder.SaveINISettings(ini);
     m_BallTracker.SaveINISettings(ini);
     m_BallSearcher.SaveINISettings(ini);
     m_Field.SaveINISettings(ini);

@@ -17,7 +17,6 @@
  *  @date 5/5/17
  */
 
-#include <LinuxCamera.h>
 #include <motion/modules/Action.h>
 #include <motion/modules/Head.h>
 #include <motion/modules/Walking.h>
@@ -40,10 +39,7 @@ void SoccerBehavior::Process() {
     const Pose2D& Starting = StateMachine::GetInstance()->GetStartingPosition();
     const Pose2D& Odo = Walking::GetInstance()->GetOdo();
 
-    LinuxCamera::GetInstance()->CaptureFrame();
-    Image* img = LinuxCamera::GetInstance()->fbuffer->m_HSVFrame;
-    Point2D& ball = m_BallFinder.GetPosition(img);
-    m_BallTracker.Process(ball);
+//    m_BallTracker.Process(ball);
 
     const RoboCupGameControlData& State = GameController::GetInstance()->GameCtrlData;
 
@@ -148,7 +144,6 @@ void SoccerBehavior::LoadINISettings(minIni* ini) {
 }
 
 void SoccerBehavior::LoadINISettings(minIni* ini, const std::string& section) {
-    m_BallFinder.LoadINISettings(ini);
     m_BallTracker.LoadINISettings(ini);
     m_BallFollower.LoadINISettings(ini);
     m_BallSearcher.LoadINISettings(ini);
@@ -163,7 +158,6 @@ void SoccerBehavior::SaveINISettings(minIni* ini) {
 
 
 void SoccerBehavior::SaveINISettings(minIni* ini, const std::string& section) {
-    m_BallFinder.SaveINISettings(ini);
     m_BallTracker.SaveINISettings(ini);
     m_BallFollower.SaveINISettings(ini);
     m_GoTo.SaveINISettings(ini);

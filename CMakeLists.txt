@@ -41,25 +41,21 @@ find_package(OpenCV 3.3 REQUIRED)
 set(SRC
         include/motion/modules/Action.h
         include/BallFollower.h
-        include/BallTracker.h
+#        include/BallTracker.h
         include/Camera.h
-        include/VrepCM730.h
-        include/ColorFinder.h
+        include/hw/VrepCM730.h
         include/FSR.h
         include/motion/modules/Head.h
-        include/Image.h
-        include/ImgProcess.h
         include/motion/JointData.h
         include/motion/Kinematics.h
-        include/LinuxCamera.h
-        include/LinuxCM730.h
+        include/hw/LinuxCM730.h
         include/LinuxMotionTimer.h
         include/math/Matrix.h
         include/minIni.h
         include/motion/MotionManager.h
         include/motion/MotionModule.h
         include/motion/MotionStatus.h
-        include/MX28.h
+        include/hw/MX28.h
         include/math/Point.h
         include/StateMachine.h
         include/math/Vector.h
@@ -80,13 +76,8 @@ set(SRC
         src/motion/MotionStatus.cpp
         src/BallFollower.cpp
         src/BallTracker.cpp
-        src/vision/Camera.cpp
-        src/vision/ColorFinder.cpp
-        src/vision/Image.cpp
-        src/vision/ImgProcess.cpp
-        src/VrepCM730.cpp
-        src/LinuxCamera.cpp
-        src/LinuxCM730.cpp
+        src/hw/VrepCM730.cpp
+        src/hw/LinuxCM730.cpp
         src/LinuxMotionTimer.cpp
         src/main.cpp
         src/StateMachine.cpp
@@ -110,12 +101,12 @@ set(SRC
         include/Field.h
         src/BallSearcher.cpp
         include/BallSearcher.h
-        include/RobotCM730.h
-        src/RobotCM730.cpp
-        include/CM730.h
-        src/CM730.cpp
-        include/VrepConnector.h
-        src/VrepConnector.cpp
+        include/hw/RobotCM730.h
+        src/hw/RobotCM730.cpp
+        include/hw/CM730.h
+        src/hw/CM730.cpp
+        include/hw/VrepConnector.h
+        src/hw/VrepConnector.cpp
         include/math/AngleTools.h
         include/math/Eigen.h
         src/math/AngleTools.cpp
@@ -132,7 +123,9 @@ set(SRC
         src/log/ColouredSink.cpp
         include/log/ColouredSink.h
         src/log/Logger.cpp
-        include/log/Logger.h)
+        include/log/Logger.h
+        src/RobotApplication.cpp
+        include/RobotApplication.h include/behavior/Behavior.h src/behavior/BaseBehavior.cpp include/behavior/BaseBehavior.h src/LEDs.cpp include/LEDs.h src/Color.cpp include/Color.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

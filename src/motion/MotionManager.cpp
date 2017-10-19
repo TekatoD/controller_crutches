@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "FSR.h"
-#include "MX28.h"
+#include "hw/MX28.h"
 #include "motion/MotionManager.h"
 
 using namespace Robot;

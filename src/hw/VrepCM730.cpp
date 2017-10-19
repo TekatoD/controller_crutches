@@ -2,7 +2,7 @@
 #include <chrono>
 #include <thread>
 #include <fstream>
-#include "VrepCM730.h"
+#include "hw/VrepCM730.h"
 
 #define MAX_EXT_API_CONNECTIONS 255
 #define NON_MATLAB_PARSING

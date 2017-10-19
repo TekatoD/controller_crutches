@@ -9,7 +9,7 @@
 #define _LINUX_CM730_H_
 
 #include <semaphore.h>
-#include "CM730.h"
+#include "hw/CM730.h"
 
 
 namespace Robot {

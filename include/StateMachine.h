@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "CM730.h"
+#include "hw/CM730.h"
 #include "minIni.h"
 #include "Pose2D.h"
 

@@ -14,11 +14,10 @@
 #include <GameController.h>
 #include <GoTo.h>
 #include <SoccerBehavior.h>
-#include <VrepConnector.h>
-#include <VrepCM730.h>
+#include <hw/VrepConnector.h>
+#include <hw/VrepCM730.h>
 #include <GoalieBehavior.h>
-#include <LinuxCM730.h>
-#include <LinuxCamera.h>
+#include <hw/LinuxCM730.h>
 #include <motion/MotionManager.h>
 #include <motion/modules/Walking.h>
 #include <LinuxMotionTimer.h>
@@ -89,7 +88,7 @@ int main(int argc, char** argv) {
                                 << "] " << expr::smessage);
     logging::core::get()->set_filter(
 #ifdef DEBUG
-            logging::trivial::severity >= logging::trivial::trace
+            logging::trivial::severity >= logging::trivial::debug
 #else
             logging::trivial::severity >= logging::trivial::info
 #endif
@@ -116,10 +115,6 @@ int main(int argc, char** argv) {
     LOG_INFO << "Hardware is ready";
 
     minIni ini(argc == 1 ? INI_FILE_PATH : argv[1]);
-
-    LinuxCamera::GetInstance()->Initialize(0);
-    LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
-    LinuxCamera::GetInstance()->LoadINISettings(&ini);                   // load from ini
 
     //////////////////// Framework Initialize ///////////////////////////
     if (!MotionManager::GetInstance()->Initialize(&cm730)) {

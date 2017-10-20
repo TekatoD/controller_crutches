@@ -6,7 +6,7 @@
  */
 
 #include "motion/MotionModule.h"
-#include "LinuxMotionTimer.h"
+#include "hw/LinuxMotionTimer.h"
 
 #include <stdlib.h>
 #include <string.h>

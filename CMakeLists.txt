@@ -49,7 +49,7 @@ set(SRC
         include/motion/JointData.h
         include/motion/Kinematics.h
         include/hw/LinuxCM730.h
-        include/LinuxMotionTimer.h
+        include/hw/LinuxMotionTimer.h
         include/math/Matrix.h
         include/minIni.h
         include/motion/MotionManager.h
@@ -78,7 +78,7 @@ set(SRC
         src/BallTracker.cpp
         src/hw/VrepCM730.cpp
         src/hw/LinuxCM730.cpp
-        src/LinuxMotionTimer.cpp
+        src/hw/LinuxMotionTimer.cpp
         src/main.cpp
         src/StateMachine.cpp
         include/gamecontroller/RoboCupGameControlData.h
@@ -125,7 +125,16 @@ set(SRC
         src/log/Logger.cpp
         include/log/Logger.h
         src/RobotApplication.cpp
-        include/RobotApplication.h include/behavior/Behavior.h src/behavior/BaseBehavior.cpp include/behavior/BaseBehavior.h src/LEDs.cpp include/LEDs.h src/Color.cpp include/Color.h)
+        include/RobotApplication.h
+        include/behavior/Behavior.h
+        src/behavior/BaseBehavior.cpp
+        include/behavior/BaseBehavior.h
+        src/LEDs.cpp
+        include/LEDs.h
+        src/Color.cpp
+        include/Color.h
+        src/Buttons.cpp
+        include/Buttons.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

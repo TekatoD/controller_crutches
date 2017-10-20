@@ -20,7 +20,7 @@
 #include <hw/LinuxCM730.h>
 #include <motion/MotionManager.h>
 #include <motion/modules/Walking.h>
-#include <LinuxMotionTimer.h>
+#include <hw/LinuxMotionTimer.h>
 #include <motion/modules/Action.h>
 #include <motion/modules/Head.h>
 #include <motion/modules/Kicking.h>

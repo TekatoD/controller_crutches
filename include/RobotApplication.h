@@ -3,7 +3,7 @@
 
 #include <atomic>
 #include <memory>
-#include "LinuxMotionTimer.h"
+#include "hw/LinuxMotionTimer.h"
 #include "hw/CM730.h"
 
 #ifdef CROSSCOMPILE

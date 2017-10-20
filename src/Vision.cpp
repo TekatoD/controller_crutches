@@ -36,34 +36,19 @@ namespace ant {
     }
 
     std::vector<cv::Vec4i> Vision::lineDetect() {
-        std::chrono::time_point<std::chrono::system_clock> start, end1, end2;
-        
-        start = std::chrono::system_clock::now();
         //fieldDetect();
-        end1 = std::chrono::system_clock::now();
-        std::chrono::duration<double> fieldDur = end1 - start;
         
         if (m_lines.empty()) {
-            start = std::chrono::system_clock::now();
             m_preprocImage = m_lineDetector.preproccess(m_image);
-            end1 = std::chrono::system_clock::now();
-            //cv::imshow("preprocess", m_preprocImage);
-            
-            std::chrono::duration<double> procDur = end1 - start;
             
             m_lines = m_lineDetector.detect(m_preprocImage);
-            end2 = std::chrono::system_clock::now();
-            std::chrono::duration<double> lineDur = end2 - start;
             
-            std::cout << "lineDetector.fieldDetect duration: " << fieldDur.count() << "s" << std::endl;
-            std::cout << "lineDetector.preprocess duration: " << procDur.count() << "s" << std::endl;
-            std::cout << "lineDetector.detect duration: " << lineDur.count() << "s" << std::endl;
         }
         return m_lines;
     }
 
     std::vector<cv::Vec4i> Vision::lineDetect_old() {
-        const cv::Mat preprocImage = m_lineDetector.preproccess_old(m_src_image);
+        const cv::Mat preprocImage = m_lineDetector.preproccess_old(m_image);
 
 
         return m_lineDetector.detect_old(preprocImage);

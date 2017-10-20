@@ -32,6 +32,13 @@
 
 #include "StateMachine.h"
 
+#define MAX_EXT_API_CONNECTIONS 255
+#define NON_MATLAB_PARSING
+extern "C" {
+    #include "extApi.h"
+    #include "extApiPlatform.h"
+}
+
 #define MOTION_FILE_PATH    "res/motion_4096.bin"
 #define INI_FILE_PATH       "res/config.ini"
 
@@ -70,8 +77,7 @@ int main(int argc, char** argv) {
 
     change_current_dir();
     
-    int width = 320, height = 240;
-    VREPCamera camera(width, height, "camera");
+    VREPCamera camera(320, 240, "camera");
     
     try {
         VrepCM730* vrepCM730 = static_cast<VrepCM730*>(cm730);
@@ -190,12 +196,10 @@ int main(int argc, char** argv) {
 ////    Action::GetInstance()->Start(12);
 //    Action::GetInstance()->Start(13);
 
-    ant::Vision vision("res/vision_cfg");
-    //cv::namedWindow("camera_image", cv::WINDOW_AUTOSIZE);
-    
     auto DarwinHead = Head::GetInstance();
     // Leg + total torso length
     float HeightFromGround = Robot::Kinematics::LEG_LENGTH + 122.2f + 50.5f + Robot::Kinematics::CAMERA_OFFSET_Z;
+    HeightFromGround /= 1000.0f;
     
     // Z
     float HeadPan = DarwinHead->GetPanAngle();
@@ -247,31 +251,15 @@ int main(int argc, char** argv) {
     cv::Mat Intersection = ant::vision_utils::PlaneRayIntersection(Plane, Line);
     std::cout << "Intersection" << std::endl << Intersection << std::endl;
     
+    std::cout << "Homography testing: " << std::endl;
+    cv::Mat ImagePoint = (cv::Mat_<float>(3, 1) << 160.0f, 120.0f, 1.0f);
+    cv::Mat groundPoint = cameraToGround.ImageToImage(ImagePoint);
+    
+    std::cout << groundPoint << std::endl;
+    
+    ant::Vision vision("./res/vision_cfg/");
+    cv::namedWindow("line_image", cv::WINDOW_AUTOSIZE);
     while (!finish) {
-        camera.CaptureFrame();
-        
-        unsigned char* imgBuff = camera.getBGRFrame()->m_ImageData;
-        
-        if (imgBuff) {
-            cv::Mat frame(cv::Size(width, height), CV_8UC3, imgBuff, cv::Mat::AUTO_STEP);
-            //cv::imshow("camera_image", frame);
-            
-            ant::vision_utils::rot90(frame, 0);
-            vision.setFrame(frame);
-            /*
-            std::vector<cv::Vec4i> lines = vision.lineDetect();
-            
-            for (auto& line : lines) {
-                cv::Point p1(line[0], line[1]);
-                cv::Point p2(line[2], line[3]);
-                
-                cv::line(frame, p1, p2, cv::Scalar(0, 0, 255), 5);
-            }
-            */
-            
-            cv::imshow("camera_image", frame);
-        }
-        
         // Update game controller
 //        GameController::GetInstance()->Update();
 
@@ -300,7 +288,27 @@ int main(int argc, char** argv) {
 //                break;
 //            case ROLES_COUNT:break;
 //        }
-        cv::waitKey(1);
+
+        camera.CaptureFrame();
+        unsigned char* imgBuff = camera.getBGRFrame()->m_ImageData;
+        
+        if (imgBuff) {
+            cv::Mat frame(cv::Size(camera.getWidth(), camera.getHeight()), CV_8UC3, imgBuff, cv::Mat::AUTO_STEP);
+            
+            vision.setFrame(frame);
+            std::vector<cv::Vec4i> lines = vision.lineDetect_old();
+            
+            for (auto& line : lines) {
+                cv::Point p1(line[0], line[1]);
+                cv::Point p2(line[2], line[3]);
+                
+                cv::line(frame, p1, p2, cv::Scalar(0, 0, 255), 5);
+            }
+            
+            cv::imshow("line_image", frame);
+            cv::waitKey(1);
+        }
+        
     }
     vrepConnector.Disconnect();
 

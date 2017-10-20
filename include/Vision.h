@@ -58,11 +58,11 @@ namespace ant {
 //        virtual void disable() override;
 
 //        virtual void enable() override;
-    private:
 
         cv::Rect ballDetect_old();
 
         std::vector<cv::Vec4i> lineDetect_old();
+    private:
 
     };
 

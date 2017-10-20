@@ -9,13 +9,6 @@ namespace Robot {
     public:
 
     protected:
-        static bool IsFallen() {
-            return MotionStatus::FALLEN != STANDUP;
-        }
-
-        static void RaiseUp() {
-
-        }
 
     private:
     };

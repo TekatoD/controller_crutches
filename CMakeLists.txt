@@ -134,7 +134,9 @@ set(SRC
         src/Color.cpp
         include/Color.h
         src/Buttons.cpp
-        include/Buttons.h)
+        include/Buttons.h
+        src/tool/Accumulator.cpp
+        include/tool/Accumulator.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

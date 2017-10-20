@@ -190,6 +190,28 @@ namespace ant {
             {
                 return m_cameraParams.GetExtCalibrationMatrix44().inv() * CameraPoint;
             }
+            
+            cv::Mat ImageToImage(cv::Mat ImagePoint)
+            {
+                cv::Mat H, Ext, Proj, r1, r2, t;
+                
+                Ext = m_cameraParams.GetExtCalibrationMatrix34();
+                
+                H = cv::Mat::zeros(3, 3, CV_32F);
+                
+                r1 = Ext(cv::Range::all(), cv::Range(0, 1));
+                r2 = Ext(cv::Range::all(), cv::Range(1, 2));
+                t = Ext(cv::Range::all(), cv::Range(3, 4));
+                
+                cv::hconcat(r1, r2, H);
+                cv::hconcat(H, t, H);
+                
+                H = m_cameraParams.GetIntCalibrationMatrix33() * H;
+                Proj = H * ImagePoint;
+                Proj /= ImagePoint.at<float>(2, 0);
+                
+                return Proj;
+            }
         private:
             CameraParameters m_cameraParams;
         };

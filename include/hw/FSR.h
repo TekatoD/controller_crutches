@@ -5,14 +5,13 @@
  *      Author: ROBOTIS
  */
 
-#ifndef FSR_H_
-#define FSR_H_
+#pragma once
 
 namespace Robot {
     class FSR {
     public:
-        static const int ID_R_FSR = 111;
-        static const int ID_L_FSR = 112;
+        static constexpr int ID_R_FSR = 111;
+        static constexpr int ID_L_FSR = 112;
 
         enum {
             P_MODEL_NUMBER_L = 0,
@@ -41,5 +40,3 @@ namespace Robot {
         };
     };
 }
-
-#endif /* FSR_H_ */

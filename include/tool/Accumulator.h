@@ -6,7 +6,13 @@ namespace Robot {
     public:
         Accumulator() = default;
 
+        Accumulator(const Accumulator&) = default;
+
+        Accumulator& operator=(const Accumulator&) = default;
+
         explicit Accumulator(unsigned int threshold);
+
+        Accumulator& operator=(Accumulator&&) = delete;
 
         Accumulator& operator++();
 

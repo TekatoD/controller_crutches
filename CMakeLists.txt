@@ -44,7 +44,7 @@ set(SRC
 #        include/BallTracker.h
         include/Camera.h
         include/hw/VrepCM730.h
-        include/FSR.h
+        include/hw/FSR.h
         include/motion/modules/Head.h
         include/motion/JointData.h
         include/motion/Kinematics.h
@@ -84,7 +84,8 @@ set(SRC
         include/gamecontroller/RoboCupGameControlData.h
         include/gamecontroller/SPLCoachMessage.h
         include/gamecontroller/SPLStandardMessage.h
-        src/GameController.cpp include/GameController.h
+        src/gamecontroller/GameController.cpp
+        include/gamecontroller/GameController.h
         include/UdpComm.h
         src/UdpComm.cpp
         src/Pose2D.cpp
@@ -95,8 +96,6 @@ set(SRC
         include/GoTo.h
         include/SoccerBehavior.h
         src/SoccerBehavior.cpp
-        include/GoalieBehavior.h
-        src/GoalieBehavior.cpp
         src/Field.cpp
         include/Field.h
         src/BallSearcher.cpp
@@ -129,12 +128,12 @@ set(SRC
         include/behavior/Behavior.h
         src/behavior/BaseBehavior.cpp
         include/behavior/BaseBehavior.h
-        src/LEDs.cpp
-        include/LEDs.h
+        src/hw/LEDs.cpp
+        include/hw/LEDs.h
         src/Color.cpp
         include/Color.h
-        src/Buttons.cpp
-        include/Buttons.h
+        src/hw/Buttons.cpp
+        include/hw/Buttons.h
         src/tool/Accumulator.cpp
         include/tool/Accumulator.h)
 

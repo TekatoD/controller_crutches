@@ -3,7 +3,7 @@
  *  @date 9/20/17
  */
 #include <stdio.h>
-#include "FSR.h"
+#include "hw/FSR.h"
 #include "hw/CM730.h"
 #include "motion/MotionStatus.h"
 #include "motion/Kinematics.h"

@@ -9,7 +9,7 @@
  *
  */
 #include <stdio.h>
-#include "FSR.h"
+#include "hw/FSR.h"
 #include "hw/RobotCM730.h"
 #include "motion/MotionStatus.h"
 #include "motion/Kinematics.h"

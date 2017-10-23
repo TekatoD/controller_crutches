@@ -13,10 +13,17 @@
 #endif
 
 namespace Robot {
+    enum ExecStatus {
+        EXEC_SUCCESS = 0,
+        EXEC_FAILED = 1
+    };
+
     class RobotApplication {
     public:
         static constexpr char U2D_DEV_NAME0[]{"/dev/ttyUSB0"};
         static constexpr char U2D_DEV_NAME1[]{"/dev/ttyUSB1"};
+        static constexpr char DEFAULT_MOTION_FILE[]{"res/motion_4096.bin"};
+        static constexpr char DEFAULT_CONFIG_FILE[]{"res/config.ini"};
 
         static RobotApplication* GetInstance();
 
@@ -24,23 +31,30 @@ namespace Robot {
 
         void ReadConfiguration();
 
-        int Start();
+        int Exec();
 
         void Stop();
 
-        void Initialize();
+        bool IsRunning() const;
 
         bool IsDebug() const noexcept;
 
         void EnableDebug(bool debug) noexcept;
 
     private:
+
         RobotApplication() = default;
+
+        bool TryStart();
 
         //*** Initialization methods ***//
         void CheckHWStatus();
 
+        void Initialize();
+
         void InitCM730();
+
+        void CheckFirmware();
 
         void InitMotionManager();
 
@@ -63,7 +77,7 @@ namespace Robot {
         std::unique_ptr<VrepConnector> m_vrep_connector{nullptr};
 #endif
 
-        void CheckFirmware();
+        void StartMainLoop();
     };
 }
 

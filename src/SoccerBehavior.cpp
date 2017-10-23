@@ -20,7 +20,7 @@
 #include <motion/modules/Action.h>
 #include <motion/modules/Head.h>
 #include <motion/modules/Walking.h>
-#include <GameController.h>
+#include <gamecontroller/GameController.h>
 #include <StateMachine.h>
 #include <iostream>
 #include <motion/MotionStatus.h>

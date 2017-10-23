@@ -3,7 +3,7 @@
  *  @date 4/21/17
  */
 
-#include "GameController.h"
+#include "gamecontroller/GameController.h"
 
 
 using namespace Robot;

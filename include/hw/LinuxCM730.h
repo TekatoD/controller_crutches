@@ -15,71 +15,75 @@
 namespace Robot {
     class LinuxCM730
             : public PlatformCM730 {
-    private:
-        int m_Socket_fd;
-        double m_PacketStartTime;
-        double m_PacketWaitTime;
-        double m_UpdateStartTime;
-        double m_UpdateWaitTime;
-        double m_ByteTransferTime;
-        char m_PortName[20];
-
-        sem_t m_LowSemID;
-        sem_t m_MidSemID;
-        sem_t m_HighSemID;
-
-        double GetCurrentTime();
-
     public:
-        bool DEBUG_PRINT;
-
         LinuxCM730(const char* name);
 
         ~LinuxCM730();
 
         void SetPortName(const char* name);
 
-        const char* GetPortName() { return (const char*) m_PortName; }
+        const char* GetPortName() { return (const char*) m_port_name; }
 
         ///////////////// Platform Porting //////////////////////
-        bool OpenPort();
+        bool OpenPort() override;
 
-        bool SetBaud(int baud);
+        bool SetBaud(int baud) override;
 
-        void ClosePort();
+        void ClosePort() override;
 
-        void ClearPort();
+        void ClearPort() override;
 
-        int WritePort(unsigned char* packet, int numPacket);
+        int WritePort(unsigned char* packet, int numPacket) override;
 
-        int ReadPort(unsigned char* packet, int numPacket);
+        int ReadPort(unsigned char* packet, int numPacket) override;
 
-        void LowPriorityWait();
+        void LowPriorityWait() override;
 
-        void MidPriorityWait();
+        void MidPriorityWait() override;
 
-        void HighPriorityWait();
+        void HighPriorityWait() override;
 
-        void LowPriorityRelease();
+        void LowPriorityRelease() override;
 
-        void MidPriorityRelease();
+        void MidPriorityRelease() override;
 
-        void HighPriorityRelease();
+        void HighPriorityRelease() override;
 
-        void SetPacketTimeout(int lenPacket);
+        void SetPacketTimeout(int lenPacket) override;
 
-        bool IsPacketTimeout();
+        bool IsPacketTimeout() override;
 
-        double GetPacketTime();
+        double GetPacketTime() override;
 
-        void SetUpdateTimeout(int msec);
+        void SetUpdateTimeout(int msec) override;
 
-        bool IsUpdateTimeout();
+        bool IsUpdateTimeout() override;
 
-        double GetUpdateTime();
+        double GetUpdateTime() override;
 
-        virtual void Sleep(double msec);
-        ////////////////////////////////////////////////////////
+        void Sleep(double msec) override;
+
+        bool IsDebugEnabled() const;
+
+        void EnableDebug(bool debug);
+
+    private:
+        double GetCurrentTime();
+
+    private:
+        bool m_debug{false};
+
+        int m_socket_fd{-1};
+        double m_packet_start_time{0};
+        double m_packet_wait_time{0};
+        double m_update_start_time{0};
+        double m_update_wait_time{0};
+        double m_byte_transfer_time{0};
+        char m_port_name[20];
+
+        sem_t m_LowSemID;
+        sem_t m_MidSemID;
+        sem_t m_HighSemID;
     };
 }
 

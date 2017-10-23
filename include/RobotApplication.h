@@ -21,7 +21,6 @@ namespace Robot {
     class RobotApplication {
     public:
         static constexpr char U2D_DEV_NAME0[]{"/dev/ttyUSB0"};
-        static constexpr char U2D_DEV_NAME1[]{"/dev/ttyUSB1"};
         static constexpr char DEFAULT_MOTION_FILE[]{"res/motion_4096.bin"};
         static constexpr char DEFAULT_CONFIG_FILE[]{"res/config.ini"};
 
@@ -57,6 +56,8 @@ namespace Robot {
         void CheckFirmware();
 
         void InitMotionManager();
+
+        void InitMotionModules();
 
         void InitMotionTimer();
 

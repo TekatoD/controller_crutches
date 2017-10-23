@@ -600,6 +600,9 @@ float Robot::Kicking::GetArmSpreadOffset() const {
 }
 
 void Robot::Kicking::SetArmSpreadOffset(float arm_spread_amplitude) {
+    if (m_debug) {
+        LOG_DEBUG << "KICKING: arm_spread_amplitude = " << arm_spread_amplitude;
+    }
     m_arm_spread_offset = arm_spread_amplitude;
 }
 
@@ -608,6 +611,9 @@ float Robot::Kicking::GetElbowOffset() const {
 }
 
 void Robot::Kicking::SetElbowOffset(float arm_elbow_offset) {
+    if (m_debug) {
+        LOG_DEBUG << "KICKING: arm_elbow_offset = " << arm_elbow_offset;
+    }
     m_elbow_offset = arm_elbow_offset;
 }
 

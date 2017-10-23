@@ -1,6 +1,10 @@
 #include <log/Logger.h>
 #include <motion/MotionManager.h>
 #include <gamecontroller/GameController.h>
+#include <motion/modules/Action.h>
+#include <motion/modules/Kicking.h>
+#include <motion/modules/Walking.h>
+#include <motion/modules/Head.h>
 #include "RobotApplication.h"
 #include "hw/VrepCM730.h"
 
@@ -50,6 +54,7 @@ void RobotApplication::Initialize() {
     CheckHWStatus();
     InitCM730();
     InitMotionManager();
+    InitMotionModules();
     InitMotionTimer();
     InitGameController();
     if (m_debug) LOG_INFO << "=== Initialization was finished ===";
@@ -103,11 +108,18 @@ void RobotApplication::CheckFirmware() {
 void RobotApplication::InitMotionManager() {
     if (m_debug) LOG_DEBUG << "Initializing motion manager...";
     if (!MotionManager::GetInstance()->Initialize(m_cm730.get())) {
-        constexpr char msg[] = "Fail to initialize Motion Manager!";
-        LOG_FATAL << msg;
-        throw std::runtime_error(msg);
+        throw std::runtime_error("Fail to initialize Motion Manager!");
     }
     if (m_debug) LOG_INFO << "Motion manager is ready";
+}
+
+void RobotApplication::InitMotionModules() {
+    if (m_debug) LOG_DEBUG << "Initializing motion modules...";
+    MotionManager::GetInstance()->AddModule((MotionModule*) Action::GetInstance());
+    MotionManager::GetInstance()->AddModule((MotionModule*) Head::GetInstance());
+    MotionManager::GetInstance()->AddModule((MotionModule*) Walking::GetInstance());
+    MotionManager::GetInstance()->AddModule((MotionModule*) Kicking::GetInstance());
+    if (m_debug) LOG_INFO << "Motion modules are ready";
 }
 
 void RobotApplication::InitMotionTimer() {

@@ -7,31 +7,17 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <log/Logger.h>
 #include "hw/FSR.h"
 #include "hw/MX28.h"
 #include "motion/MotionManager.h"
 
 using namespace Robot;
 
-MotionManager* MotionManager::m_UniqueInstance = new MotionManager();
-
-
-MotionManager::MotionManager()
-        : m_CM730(0),
-          m_ProcessEnable(false),
-          m_Enabled(false),
-          m_IsRunning(false),
-          m_IsThreadRunning(false),
-          m_IsLogging(false),
-          DEBUG_PRINT(true) {
+MotionManager::MotionManager() {
     for (int i = 0; i < JointData::NUMBER_OF_JOINTS; i++)
         m_Offset[i] = 0;
 }
-
-
-MotionManager::~MotionManager() {
-}
-
 
 bool MotionManager::Initialize(CM730* cm730) {
     int value, error;
@@ -40,27 +26,23 @@ bool MotionManager::Initialize(CM730* cm730) {
     m_Enabled = false;
     m_ProcessEnable = true;
 
-    if (m_CM730->Connect() == false) {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, "Fail to connect CM-730\n");
+    if (!m_CM730->Connect()) {
+        if (m_debug) LOG_ERROR << "Fail to connect CM-730";
         return false;
     }
 
     for (int id = JointData::ID_R_SHOULDER_PITCH; id < JointData::NUMBER_OF_JOINTS; id++) {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, "ID:%d initializing...", id);
+        if (m_debug) LOG_DEBUG << "MOTION_MANAGER: ID: " << id << " initializing...";
 
         if (m_CM730->ReadWord(id, MX28::P_PRESENT_POSITION_L, &value, &error) == CM730::SUCCESS) {
             MotionStatus::m_CurrentJoints.SetValue(id, value);
             MotionStatus::m_CurrentJoints.SetEnable(id, true);
 
-            if (DEBUG_PRINT == true)
-                fprintf(stderr, "[%d] Success\n", value);
+            if (m_debug) LOG_DEBUG << "MOTION MANAGER: [" << value << "] Success";
         } else {
             MotionStatus::m_CurrentJoints.SetEnable(id, false);
 
-            if (DEBUG_PRINT == true)
-                fprintf(stderr, " Fail\n");
+            if (m_debug) LOG_ERROR << "MOTION MANAGER: Fail";
         }
     }
 
@@ -79,52 +61,22 @@ bool MotionManager::Reinitialize() {
 
     int value, error;
     for (int id = JointData::ID_R_SHOULDER_PITCH; id < JointData::NUMBER_OF_JOINTS; id++) {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, "ID:%d initializing...", id);
+        if (m_debug) LOG_DEBUG << "MOTION MANAGER: ID: " << id << " initializing...";
+
         if (m_CM730->ReadWord(id, MX28::P_PRESENT_POSITION_L, &value, &error) == CM730::SUCCESS) {
             MotionStatus::m_CurrentJoints.SetValue(id, value);
             MotionStatus::m_CurrentJoints.SetEnable(id, true);
 
-            if (DEBUG_PRINT == true)
-                fprintf(stderr, "[%d] Success\n", value);
+            if (m_debug) LOG_DEBUG << "MOTION MANAGERL: [" << value << "] Success";
         } else {
             MotionStatus::m_CurrentJoints.SetEnable(id, false);
 
-            if (DEBUG_PRINT == true)
-                fprintf(stderr, " Fail\n");
+            if (m_debug) LOG_ERROR << "MOTION MANAGER: Fail";
         }
     }
 
     m_ProcessEnable = true;
     return true;
-}
-
-
-void MotionManager::StartLogging() {
-/*    char szFile[32] = {0,};
-
-    int count = 0;
-    while(1)
-    {
-        sprintf(szFile, "Logs/Log%d.csv", count);
-        if(0 != access(szFile, F_OK))
-            break;
-        count++;
-		if(count > 256) return;
-    }
-
-    m_LogFileStream.open(szFile, std::ios::out);
-    for(int id = 1; id < JointData::NUMBER_OF_JOINTS; id++)
-        m_LogFileStream << "ID_" << id << "_GP,ID_" << id << "_PP,";
-    m_LogFileStream << "GyroFB,GyroRL,AccelFB,AccelRL,L_FSR_X,L_FSR_Y,R_FSR_X,R_FSR_Y" << std::endl;
-
-    m_IsLogging = true;
-*/}
-
-
-void MotionManager::StopLogging() {
-    m_IsLogging = false;
-    m_LogFileStream.close();
 }
 
 
@@ -157,14 +109,12 @@ void MotionManager::SaveINISettings(minIni* ini, const std::string& section) {
     }
 }
 
-
-#define GYRO_WINDOW_SIZE    100
-#define ACCEL_WINDOW_SIZE   30
-#define MARGIN_OF_SD        2.0
-
-
 void MotionManager::Process() {
-    if (m_ProcessEnable == false || m_IsRunning == true)
+    constexpr int GYRO_WINDOW_SIZE = 100;
+    constexpr int ACCEL_WINDOW_SIZE = 30;
+    constexpr float MARGIN_OF_SD = 2.0;
+
+    if (!m_ProcessEnable || m_IsRunning)
         return;
 
     m_IsRunning = true;
@@ -211,8 +161,10 @@ void MotionManager::Process() {
                 m_FBGyroCenter = (int) fb_mean;
                 m_RLGyroCenter = (int) rl_mean;
                 m_CalibrationStatus = 1;
-                if (DEBUG_PRINT == true)
-                    fprintf(stderr, "FBGyroCenter:%d , RLGyroCenter:%d \n", m_FBGyroCenter, m_RLGyroCenter);
+                if (m_debug) {
+                    LOG_DEBUG << "MOTION MANAGER: FBGyroCenter: " << m_FBGyroCenter
+                              << ", RLGyroCenter: " << m_RLGyroCenter;
+                }
             } else {
                 m_FBGyroCenter = 512;
                 m_RLGyroCenter = 512;
@@ -221,7 +173,7 @@ void MotionManager::Process() {
         }
     }
 
-    if (m_CalibrationStatus == 1 && m_Enabled == true) {
+    if (m_CalibrationStatus == 1 && m_Enabled) {
         static int fb_array[ACCEL_WINDOW_SIZE] = {512,};
         static int buf_idx = 0;
         if (m_CM730->m_BulkReadData[CM730::ID_CM].error == 0) {
@@ -245,16 +197,16 @@ void MotionManager::Process() {
         else
             MotionStatus::FALLEN = STANDUP;
 
-        if (m_Modules.size() != 0) {
-            for (std::list<MotionModule*>::iterator i = m_Modules.begin(); i != m_Modules.end(); i++) {
-                (*i)->Process();
+        if (!m_Modules.empty()) {
+            for (auto& module : m_Modules) {
+                module->Process();
                 for (int id = JointData::ID_R_SHOULDER_PITCH; id < JointData::NUMBER_OF_JOINTS; id++) {
-                    if ((*i)->m_Joint.GetEnable(id) == true) {
-                        MotionStatus::m_CurrentJoints.SetValue(id, (*i)->m_Joint.GetValue(id));
+                    if (module->m_Joint.GetEnable(id)) {
+                        MotionStatus::m_CurrentJoints.SetValue(id, module->m_Joint.GetValue(id));
 
-                        MotionStatus::m_CurrentJoints.SetPGain(id, (*i)->m_Joint.GetPGain(id));
-                        MotionStatus::m_CurrentJoints.SetIGain(id, (*i)->m_Joint.GetIGain(id));
-                        MotionStatus::m_CurrentJoints.SetDGain(id, (*i)->m_Joint.GetDGain(id));
+                        MotionStatus::m_CurrentJoints.SetPGain(id, module->m_Joint.GetPGain(id));
+                        MotionStatus::m_CurrentJoints.SetIGain(id, module->m_Joint.GetIGain(id));
+                        MotionStatus::m_CurrentJoints.SetDGain(id, module->m_Joint.GetDGain(id));
                     }
                 }
             }
@@ -264,7 +216,7 @@ void MotionManager::Process() {
         int n = 0;
         int joint_num = 0;
         for (int id = JointData::ID_R_SHOULDER_PITCH; id < JointData::NUMBER_OF_JOINTS; id++) {
-            if (MotionStatus::m_CurrentJoints.GetEnable(id) == true) {
+            if (MotionStatus::m_CurrentJoints.GetEnable(id)) {
                 param[n++] = id;
                 param[n++] = MotionStatus::m_CurrentJoints.GetDGain(id);
                 param[n++] = MotionStatus::m_CurrentJoints.GetIGain(id);
@@ -275,8 +227,8 @@ void MotionManager::Process() {
                 joint_num++;
             }
 
-            if (DEBUG_PRINT == true)
-                fprintf(stderr, "ID[%d] : %d \n", id, MotionStatus::m_CurrentJoints.GetValue(id));
+            if (m_debug)
+                LOG_DEBUG << "MOTION MANAGER: ID[" << id << "] : " << MotionStatus::m_CurrentJoints.GetValue(id);
         }
 
         if (joint_num > 0)
@@ -284,22 +236,6 @@ void MotionManager::Process() {
     }
 
     m_CM730->BulkRead();
-
-    if (m_IsLogging) {
-        for (int id = 1; id < JointData::NUMBER_OF_JOINTS; id++)
-            m_LogFileStream << MotionStatus::m_CurrentJoints.GetValue(id) << ","
-                            << m_CM730->m_BulkReadData[id].ReadWord(MX28::P_PRESENT_POSITION_L) << ",";
-
-        m_LogFileStream << m_CM730->m_BulkReadData[CM730::ID_CM].ReadWord(CM730::P_GYRO_Y_L) << ",";
-        m_LogFileStream << m_CM730->m_BulkReadData[CM730::ID_CM].ReadWord(CM730::P_GYRO_X_L) << ",";
-        m_LogFileStream << m_CM730->m_BulkReadData[CM730::ID_CM].ReadWord(CM730::P_ACCEL_Y_L) << ",";
-        m_LogFileStream << m_CM730->m_BulkReadData[CM730::ID_CM].ReadWord(CM730::P_ACCEL_X_L) << ",";
-        m_LogFileStream << m_CM730->m_BulkReadData[FSR::ID_L_FSR].ReadByte(FSR::P_FSR_X) << ",";
-        m_LogFileStream << m_CM730->m_BulkReadData[FSR::ID_L_FSR].ReadByte(FSR::P_FSR_Y) << ",";
-        m_LogFileStream << m_CM730->m_BulkReadData[FSR::ID_R_FSR].ReadByte(FSR::P_FSR_X) << ",";
-        m_LogFileStream << m_CM730->m_BulkReadData[FSR::ID_R_FSR].ReadByte(FSR::P_FSR_Y) << ",";
-        m_LogFileStream << std::endl;
-    }
 
     if (m_CM730->m_BulkReadData[CM730::ID_CM].error == 0)
         MotionStatus::BUTTON = m_CM730->m_BulkReadData[CM730::ID_CM].ReadByte(CM730::P_BUTTON);
@@ -310,7 +246,7 @@ void MotionManager::Process() {
 
 void MotionManager::SetEnable(bool enable) {
     m_Enabled = enable;
-    if (m_Enabled == true)
+    if (m_Enabled)
         m_CM730->WriteWord(CM730::ID_BROADCAST, MX28::P_MOVING_SPEED_L, 0, 0);
 }
 
@@ -327,8 +263,16 @@ void MotionManager::RemoveModule(MotionModule* module) {
 
 
 void MotionManager::SetJointDisable(int index) {
-    if (m_Modules.size() != 0) {
-        for (std::list<MotionModule*>::iterator i = m_Modules.begin(); i != m_Modules.end(); i++)
-            (*i)->m_Joint.SetEnable(index, false);
+    if (!m_Modules.empty()) {
+        for (auto& module : m_Modules)
+            module->m_Joint.SetEnable(index, false);
     }
+}
+
+bool MotionManager::IsDebugEnabled() const {
+    return m_debug;
+}
+
+void MotionManager::EnabledDebug(bool debug) {
+    m_debug = debug;
 }

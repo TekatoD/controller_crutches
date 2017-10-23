@@ -1,11 +1,15 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.8)
 project(darwin-soccer)
 
 #### Project options ####
 option(CROSSCOMPILE "Compile for real Darwin-OP (V-REP build by default)" OFF)
 
+
+message(WARNING ${CROSSCOMPILE})
+
+
 #### Compile properties ####
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 add_definitions(-DBOOST_ALL_DYN_LINK)
 
@@ -21,7 +25,7 @@ if (CROSSCOMPILE)
     add_definitions(-DCROSSCOMPILE) # This definition is used during the initialization in the main
     set(CROSSCOMPILE_FLAGS "-m32 -march=atom -mtune=atom -mfpmath=sse -flto -ffast-math")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -std=gnu++11 -static-libstdc++")
 endif (CROSSCOMPILE)
 
 include_directories(include/)
@@ -29,11 +33,14 @@ include_directories(include/)
 #### External libraries and packages ####
 find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED) # This lib is used by the linux camera
-find_package(VREP REQUIRED)
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+if(NOT CROSSCOMPILE)
+    find_package(VREP REQUIRED)
+endif(NOT CROSSCOMPILE)
+find_package(Eigen3 REQUIRED)
 # Path to Boost and OpenCV needs to be set manually when crosscompiling
-find_package(Boost 1.54 COMPONENTS system log date_time filesystem thread REQUIRED)
+find_package(Boost 1.54 COMPONENTS system log_setup log date_time filesystem thread REQUIRED)
 find_package(OpenCV 3.3 REQUIRED)
+find_package(LibXml2)
 
 #### Sources ####
 # All sources of the project. Insert one file per line.
@@ -43,7 +50,6 @@ set(SRC
         include/BallFollower.h
         include/BallTracker.h
         include/Camera.h
-        include/VrepCM730.h
         include/ColorFinder.h
         include/FSR.h
         include/motion/modules/Head.h
@@ -84,7 +90,6 @@ set(SRC
         src/vision/ColorFinder.cpp
         src/vision/Image.cpp
         src/vision/ImgProcess.cpp
-        src/VrepCM730.cpp
         src/LinuxCamera.cpp
         src/LinuxCM730.cpp
         src/LinuxMotionTimer.cpp
@@ -114,8 +119,6 @@ set(SRC
         src/RobotCM730.cpp
         include/CM730.h
         src/CM730.cpp
-        include/VrepConnector.h
-        src/VrepConnector.cpp
         include/math/AngleTools.h
         include/math/Eigen.h
         src/math/AngleTools.cpp
@@ -134,6 +137,15 @@ set(SRC
         src/log/Logger.cpp
         include/log/Logger.h)
 
+if(NOT CROSSCOMPILE)
+    set(SRC
+            ${SRC}
+            include/VrepCM730.h
+            include/VrepConnector.h
+            src/VrepConnector.cpp
+            src/VrepCM730.cpp)
+endif(NOT CROSSCOMPILE)
+
 #### Build targets #####
 add_executable(controller ${SRC})
 
@@ -141,14 +153,21 @@ target_link_libraries(controller
         ${CMAKE_THREAD_LIBS_INIT}
         ${JPEG_LIBRARIES}
         ${Boost_LIBRARIES}
-#        ${OpenCV_LIBRARIES}
-        Eigen3::Eigen
-        ${VREP_LIBRARIES})
+        ${OpenCV_LIBRARIES}
+        ${LIBXML2_LIBRARIES})
 
 target_include_directories(controller PUBLIC
         ${JPEG_INCLUDE_DIR}
-        ${VREP_REMOTE}
-        ${VREP_INCLUDE}
         ${Boost_INCLUDE_DIR}
         ${JPEG_INCLUDE_DIR}
-        ${OpenCV_INCLUDE_DIR})
+        ${OpenCV_INCLUDE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+        ${LIBXML2_INCLUDE_DIR})
+
+if(NOT CROSSCOMPILE)
+    target_link_libraries(controller
+            ${VREP_LIBRARIES})
+    target_include_directories(controller PUBLIC
+            ${VREP_REMOTE}
+            ${VREP_INCLUDE})
+endif(NOT CROSSCOMPILE)

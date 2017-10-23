@@ -195,17 +195,17 @@ void LinuxCM730::HighPriorityRelease() {
 }
 
 
-float LinuxCM730::GetCurrentTime() {
+double LinuxCM730::GetCurrentTime() {
     struct timeval tv;
     gettimeofday(&tv, NULL);
 
-    return ((float) tv.tv_sec * 1000.0 + (float) tv.tv_usec / 1000.0);
+    return ((double) tv.tv_sec * 1000.0 + (double) tv.tv_usec / 1000.0);
 }
 
 
 void LinuxCM730::SetPacketTimeout(int lenPacket) {
     m_PacketStartTime = GetCurrentTime();
-    m_PacketWaitTime = m_ByteTransferTime * (float) lenPacket + 5.0;
+    m_PacketWaitTime = m_ByteTransferTime * (double) lenPacket + 5.0;
 }
 
 
@@ -217,8 +217,8 @@ bool LinuxCM730::IsPacketTimeout() {
 }
 
 
-float LinuxCM730::GetPacketTime() {
-    float time;
+double LinuxCM730::GetPacketTime() {
+    double time;
 
     time = GetCurrentTime() - m_PacketStartTime;
     if (time < 0.0)
@@ -242,8 +242,8 @@ bool LinuxCM730::IsUpdateTimeout() {
 }
 
 
-float LinuxCM730::GetUpdateTime() {
-    float time;
+double LinuxCM730::GetUpdateTime() {
+    double time;
 
     time = GetCurrentTime() - m_UpdateStartTime;
     if (time < 0.0)
@@ -253,9 +253,9 @@ float LinuxCM730::GetUpdateTime() {
 }
 
 
-void LinuxCM730::Sleep(float msec) {
-    float start_time = GetCurrentTime();
-    float curr_time = start_time;
+void LinuxCM730::Sleep(double msec) {
+    double start_time = GetCurrentTime();
+    double curr_time = start_time;
 
     do {
         usleep((start_time + msec) - curr_time);

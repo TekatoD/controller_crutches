@@ -14,8 +14,6 @@
 #include <GameController.h>
 #include <GoTo.h>
 #include <SoccerBehavior.h>
-#include <VrepConnector.h>
-#include <VrepCM730.h>
 #include <GoalieBehavior.h>
 #include <LinuxCM730.h>
 #include <LinuxCamera.h>
@@ -38,6 +36,15 @@
 #include <boost/log/support/date_time.hpp>
 #include <log/ColouredSink.h>
 #include <log/Logger.h>
+
+#ifdef CROSSCOMPILE
+    #include <RobotCM730.h>
+#else
+    #include <VrepCM730.h>
+    #include <VrepConnector.h>
+#endif
+
+#include <opencv2/videoio.hpp>
 
 
 #include "StateMachine.h"
@@ -94,17 +101,21 @@ int main(int argc, char** argv) {
             logging::trivial::severity >= logging::trivial::info
 #endif
     );
-    logging::core::get()->add_sink(std::move(sink));
+    logging::core::get()->add_sink(sink);
 
     LOG_INFO << "=== Initialization was started ===";
 
 
     change_current_dir();
 
-    //LinuxCM730 linux_cm730(U2D_DEV_NAME0);
-    VrepConnector vrepConnector;
-    VrepCM730 cm730;
-
+    #ifdef CROSSCOMPILE
+        LinuxCM730 linux_cm730(U2D_DEV_NAME0);
+        RobotCM730 cm730(&linux_cm730);
+    #else
+        VrepConnector vrepConnector;
+        VrepCM730 cm730;
+    #endif
+#ifndef CROSSCOMPILE
     try {
         vrepConnector.Connect();
         cm730.SetClientId(vrepConnector.GetClientID());
@@ -113,17 +124,20 @@ int main(int argc, char** argv) {
         LOG_FATAL << "Error: " << e.what();
         return 1;
     }
+#endif
     LOG_INFO << "Hardware is ready";
 
     minIni ini(argc == 1 ? INI_FILE_PATH : argv[1]);
 
-    LinuxCamera::GetInstance()->Initialize(0);
-    LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
-    LinuxCamera::GetInstance()->LoadINISettings(&ini);                   // load from ini
+    LOG_INFO << "Ini is loaded";
+
+//    LinuxCamera::GetInstance()->Initialize(0);
+//    LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
+//    LinuxCamera::GetInstance()->LoadINISettings(&ini);                   // load from ini
 
     //////////////////// Framework Initialize ///////////////////////////
     if (!MotionManager::GetInstance()->Initialize(&cm730)) {
-//        linux_cm730.SetPortName(U2D_DEV_NAME1);
+        linux_cm730.SetPortName(U2D_DEV_NAME1);
         if (!MotionManager::GetInstance()->Initialize(&cm730)) {
             LOG_FATAL << "Fail to initialize Motion Manager!";
             return 1;
@@ -183,11 +197,11 @@ int main(int argc, char** argv) {
     soccer.LoadINISettings(&ini);
     goalie.LoadINISettings(&ini);
 
-//    Action::GetInstance()->Start(9);
 //    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
 
     LOG_INFO << "=== Initialization was finished ===";
     LOG_INFO << "=== Controller was started ===";
+    Action::GetInstance()->Start(9);
     while (!finish) {
         // Update game controller
         GameController::GetInstance()->Update();
@@ -195,22 +209,26 @@ int main(int argc, char** argv) {
         // Update state machine
         StateMachine::GetInstance()->Check(&cm730);
 
-        if (!Action::GetInstance()->IsRunning() && !Kicking::GetInstance()->IsRunning()) {
-            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-            Walking::GetInstance()->SetXMoveAmplitude(10);
-            Walking::GetInstance()->Start();
-//            Kicking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
-//            Kicking::GetInstance()->SetKickingLeg(Kicking::RIGHT_LEG);
-//            Kicking::GetInstance()->SetKickTargetXOffset(35.0);
-//            Kicking::GetInstance()->SetKickYOffset(-35.0);
-//            Kicking::GetInstance()->SetKickXOffset(0.0);
+        if (!Action::GetInstance()->IsRunning() && !Kicking::GetInstance()->IsRunning() && !Walking::GetInstance()->IsRunning()) {
+//            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+//            Walking::GetInstance()->SetXMoveAmplitude(10);
+//            Walking::GetInstance()->Start();
+            Kicking::GetInstance()->SetShiftingBodyDuration(300);
+            Kicking::GetInstance()->SetKickingDuration(150);
+            Kicking::GetInstance()->SetRestoringDuration(200);
+            Kicking::GetInstance()->SetKickingLeg(Kicking::RIGHT_LEG);
+            Kicking::GetInstance()->SetKickTargetXOffset(35.0);
+            Kicking::GetInstance()->SetKickYOffset(-2.0);
+            Kicking::GetInstance()->SetKickXOffset(0.0);
+            Kicking::GetInstance()->SetKickYawOffset(radians(-15));
 //            Kicking::GetInstance()->SetBodyInitPitchOffset(radians(13.0f));
-//            Kicking::GetInstance()->SetBodyInitXOffset(0.0);
+            Kicking::GetInstance()->SetBodyInitXOffset(0.0);
 //            Kicking::GetInstance()->SetBodyInitZOffset(20.0f);
-//            Kicking::GetInstance()->SetBodyXOffset(0.0);
+            Kicking::GetInstance()->SetBodyXOffset(0.0);
 //            Kicking::GetInstance()->SetBodyZOffset(20.0f);
 //            Kicking::GetInstance()->SetKickZOffset(0.0);
-//            Kicking::GetInstance()->Kick();
+            Kicking::GetInstance()->Kick();
+            Kicking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
         }
 
 //        if (StateMachine::GetInstance()->IsStarted() == 0) {

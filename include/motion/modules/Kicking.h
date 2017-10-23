@@ -133,6 +133,14 @@ namespace Robot {
 
         void SetLegsYOffset(float legs_y_offset);
 
+        float GetArmSpreadOffset() const;
+
+        void SetArmSpreadOffset(float arm_spread_amplitude);
+
+        float GetElbowOffset() const;
+
+        void SetElbowOffset(float arm_elbow_offset);
+
         bool GetDebug() const;
 
         void SetDebug(bool debug);
@@ -166,10 +174,12 @@ namespace Robot {
         float m_legs_y_offset{5};
 
         float m_body_x_offset{-15.0f};
-        float m_body_y_offset{-15.0f};
+        float m_body_y_offset{-25.0f};
         float m_body_z_offset{7.0f};
 
-        float m_arm_swing_amplitude{radians(45.0)};
+        float m_arm_swing_amplitude{radians(20.0)};
+        float m_arm_spread_offset{radians(-15.0)};
+        float m_elbow_offset{radians(-25)};
         float m_balance_roll_gain{0.0f};
         float m_balance_pitch_gain{0.0f};
         bool m_balance_enabled{true};
@@ -198,6 +208,8 @@ namespace Robot {
         float m_cur_body_pitch_offset{0.0f};
 
         float m_cur_arm_swing_amplitude{0.0f};
+        float m_cur_arm_spread_offset{0.0f};
+        float m_cur_elbow_swing_offset{0.0f};
         float m_cur_balance_roll_gain{0.0f};
         float m_cur_balance_pitch_gain{0.0f};
         bool m_cur_balance_enabled{true};
@@ -207,5 +219,4 @@ namespace Robot {
         bool m_done{true};
     };
 }
-
 

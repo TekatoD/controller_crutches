@@ -37,7 +37,7 @@ using namespace Robot;
 
 RobotCM730::RobotCM730(PlatformCM730* platform) {
     m_Platform = platform;
-    DEBUG_PRINT = false;
+    DEBUG_PRINT = true;
     m_BulkReadTxPacket[LENGTH] = 0;
     for (int i = 0; i < ID_BROADCAST; i++)
         m_BulkReadData[i] = BulkReadData();
@@ -428,7 +428,9 @@ bool RobotCM730::DXLPowerOn() {
             fprintf(stderr, " Succeed to change Dynamixel power!\n");
 
         WriteWord(CM730::ID_CM, CM730::P_LED_HEAD_L, MakeColor(255, 128, 0), 0);
+	fprintf(stderr, "write word\n");
         m_Platform->Sleep(300); // about 300msec
+	fprintf(stderr, "sleep\n");
     } else {
         if (DEBUG_PRINT == true)
             fprintf(stderr, " Fail to change Dynamixel power!\n");

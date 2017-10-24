@@ -123,6 +123,7 @@ void Robot::GoTo::LoadINISettings(minIni *ini) {
 
 
 void Robot::GoTo::LoadINISettings(minIni *ini, const std::string &section) {
+    constexpr double INVALID_VALUE = -1024;
     float value = -2;
 
     if ((value = ini->getd(section, "max_speed", INVALID_VALUE)) != INVALID_VALUE) m_MaxSpeed = value;

@@ -21,7 +21,7 @@ if (CROSSCOMPILE)
     add_definitions(-DCROSSCOMPILE) # This definition is used during the initialization in the main
     set(CROSSCOMPILE_FLAGS "-m32 -march=atom -mtune=atom -mfpmath=sse -flto -ffast-math")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -std=gnu++14 -static-libstdc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -std=gnu++1y -static-libstdc++")
 
     add_library(hw STATIC
             include/hw/RobotCM730.h
@@ -39,7 +39,13 @@ else (CROSSCOMPILE)
     target_include_directories(hw PUBLIC ${VREP_REMOTE} ${VREP_INCLUDE})
 endif (CROSSCOMPILE)
 
+# Disable deprecated declarations warning
+if (CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
 include_directories(include/)
+
 
 #### External libraries and packages ####
 find_package(Threads REQUIRED)
@@ -116,11 +122,6 @@ set(SRC
         include/math/AngleTools.h
         include/math/Eigen.h
         src/math/AngleTools.cpp
-        src/ServiceLocator.cpp
-        include/ServiceLocator.h
-        src/ServiceInterface.cpp
-        include/ServiceInterface.h
-        include/Singleton.h
         src/PropertyReader.cpp
         include/PropertyReader.h
         src/motion/modules/Kicking.cpp
@@ -142,7 +143,8 @@ set(SRC
         src/hw/Buttons.cpp
         include/hw/Buttons.h
         src/tool/Accumulator.cpp
-        include/tool/Accumulator.h)
+        include/tool/Accumulator.h
+        include/tool/Rate.h include/config/ConfigurationStrategy.h src/config/WalkingConfigurationStrategy.cpp include/config/WalkingConfigurationStrategy.h src/config/ConfigurationFileLoader.cpp include/config/ConfigurationFileLoader.h src/config/ConfigurationParser.cpp include/config/ConfigurationParser.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

@@ -16,9 +16,6 @@
 #include "motion/MotionModule.h"
 #include "OdometryCollector.h"
 
-#define WALKING_SECTION "Walking Config"
-#define INVALID_VALUE   -1024.0
-
 namespace Robot {
     class Walking
             : public MotionModule {
@@ -175,14 +172,6 @@ namespace Robot {
 
         bool IsRunning();
 
-        void LoadINISettings(minIni* ini);
-
-        void LoadINISettings(minIni* ini, const std::string& section);
-
-        void SaveINISettings(minIni* ini);
-
-        void SaveINISettings(minIni* ini, const std::string& section);
-
         Pose2D GetOdo();
 
         void ResetOdo(const Pose2D& pose);
@@ -201,17 +190,17 @@ namespace Robot {
 
         void SetZOffset(float z_offset);
 
-        float GetAOffset() const;
+        float GetYawOffset() const;
 
-        void SetAOffset(float a_offset);
+        void SetYawOffset(float a_offset);
 
-        float GetPOffset() const;
+        float GetPitchOffset() const;
 
-        void SetPOffset(float p_offset);
+        void SetPitchOffset(float p_offset);
 
-        float GetROffset() const;
+        float GetRollOffset() const;
 
-        void SetROffset(float r_offset);
+        void SetRollOffset(float r_offset);
 
         float GetPeriodTime() const;
 
@@ -296,6 +285,18 @@ namespace Robot {
         int GetDGain() const;
 
         void SetDGain(int d_gain);
+
+        float GetOdoXFactor() const;
+
+        void SetOdoXFactor(float odo_x_factor);
+
+        float GetOdoYFactor() const;
+
+        void SetOdoYFactor(float odo_y_factor);
+
+        float GetOdoAFactor() const;
+
+        void SetOdoAFactor(float odo_a_factor);
 
         bool GetDebug() const;
 

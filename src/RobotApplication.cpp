@@ -6,7 +6,11 @@
 #include <motion/modules/Walking.h>
 #include <motion/modules/Head.h>
 #include "RobotApplication.h"
-#include "hw/VrepCM730.h"
+#ifdef CROSSCOMPILE
+	#include "hw/RobotCM730.h"
+#else
+	#include "hw/VrepCM730.h"
+#endif
 
 using namespace Robot;
 
@@ -69,10 +73,10 @@ void RobotApplication::CheckHWStatus() {
 void RobotApplication::InitCM730() {
     if (m_debug) LOG_DEBUG << "Initializing hardware...";
 #ifdef CROSSCOMPILE
-    auto linux_cm730{std::make_unique<LinuxCM730>(U2D_DEV_NAME0)};
-    auto cm730{std::make_unique<RobotCM730>(cm730.get())};
-    m_linux_cm730{std::move(linux_cm730)};
-    m_cm730{std::move(cm730)};
+    auto linux_cm730 = std::make_unique<LinuxCM730>("/dev/ttyUSB0"); //Undefined reference to U2D_DEV_NAME0
+    auto cm730 = std::make_unique<RobotCM730>(linux_cm730.get());
+    m_linux_cm730 = std::move(linux_cm730);
+    m_cm730 = std::move(cm730);
 #else
     auto vrep_connector{std::make_unique<VrepConnector>()};
     auto vrep_cm730{std::make_unique<VrepCM730>()};
@@ -82,14 +86,13 @@ void RobotApplication::InitCM730() {
     m_vrep_connector = move(vrep_connector);
     m_cm730 = move(vrep_cm730);
 #endif
-    CheckFirmware();
-
     if (m_debug) LOG_INFO << "Hardware is ready";
 }
 
 void RobotApplication::CheckFirmware() {
     int firm_ver = 0;
     auto read_result = m_cm730->ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, nullptr);
+	LOG_DEBUG << "Firmware version: " << firm_ver;
     if (read_result != CM730::SUCCESS) {
         throw std::runtime_error("Can't read firmware version from Dynamixel ID " +
                                          std::to_string(JointData::ID_HEAD_PAN));
@@ -128,6 +131,7 @@ void RobotApplication::InitMotionTimer() {
     motion_timer->Start();
     m_motion_timer = std::move(motion_timer);
     if (m_debug) LOG_INFO << "Motion timer is ready";
+    CheckFirmware(); //This was moved here from Cm730 inititialization
 }
 
 void RobotApplication::InitGameController() {

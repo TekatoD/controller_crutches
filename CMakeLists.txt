@@ -1,11 +1,10 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 project(darwin-soccer)
 
 #### Project options ####
 option(CROSSCOMPILE "Compile for real Darwin-OP (V-REP build by default)" OFF)
 
 #### Compile properties ####
-set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 add_definitions(-DBOOST_ALL_DYN_LINK)
 
@@ -19,9 +18,9 @@ endif ()
 
 if (CROSSCOMPILE)
     add_definitions(-DCROSSCOMPILE) # This definition is used during the initialization in the main
-    set(CROSSCOMPILE_FLAGS "-m32 -march=atom -mtune=atom -mfpmath=sse -flto -ffast-math")
+    set(CROSSCOMPILE_FLAGS "-m32 -march=atom -mtune=atom -mfpmath=sse -ffast-math") #-flto was disabled
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -std=gnu++1y -static-libstdc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++ -std=c++17")
 
     add_library(hw STATIC
             include/hw/RobotCM730.h
@@ -29,6 +28,7 @@ if (CROSSCOMPILE)
             include/hw/LinuxCM730.h
             src/hw/LinuxCM730.cpp)
 else (CROSSCOMPILE)
+    set(CMAKE_CXX_STANDARD 17)
     find_package(VREP REQUIRED)
     add_library(hw STATIC
             include/hw/VrepCM730.h
@@ -46,7 +46,6 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 
 include_directories(include/)
 
-
 #### External libraries and packages ####
 find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED) # This lib is used by the linux camera
@@ -55,6 +54,8 @@ find_package(Eigen3 REQUIRED)
 find_package(Boost 1.54 COMPONENTS system log_setup log date_time filesystem thread REQUIRED)
 find_package(OpenCV 3.3 REQUIRED)
 find_package(LibXml2)
+
+include_directories( ${EIGEN3_INCLUDE_DIR}) #Eigen doesn't work either way
 
 #### Sources ####
 # All sources of the project. Insert one file per line.
@@ -144,7 +145,14 @@ set(SRC
         include/hw/Buttons.h
         src/tool/Accumulator.cpp
         include/tool/Accumulator.h
-        include/tool/Rate.h include/config/ConfigurationStrategy.h src/config/WalkingConfigurationStrategy.cpp include/config/WalkingConfigurationStrategy.h src/config/ConfigurationFileLoader.cpp include/config/ConfigurationFileLoader.h src/config/ConfigurationParser.cpp include/config/ConfigurationParser.h)
+        include/tool/Rate.h
+        include/config/ConfigurationStrategy.h
+        src/config/WalkingConfigurationStrategy.cpp
+        include/config/WalkingConfigurationStrategy.h
+        src/config/ConfigurationFileLoader.cpp
+        include/config/ConfigurationFileLoader.h
+        src/config/ConfigurationParser.cpp
+        include/config/ConfigurationParser.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

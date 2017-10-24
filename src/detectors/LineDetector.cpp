@@ -49,6 +49,8 @@ namespace ant {
 //
     __get_skeleton(preprocImage, skeleton); // O(n) n = h*w of img
 //
+    //cv::imshow("preproc_image", preprocImage);
+    
     std::vector<cv::Vec4i> lines;
     cv::HoughLinesP(skeleton, lines,
                     m_conf.HoughLines.rho, m_conf.HoughLines.theta, m_conf.HoughLines.threshold,
@@ -63,6 +65,9 @@ namespace ant {
     cv::Mat skeleton;
 
     __get_skeleton(preprocImage, skeleton); // O(n) n = h*w of img
+    
+    //cv::imshow("preproc_image", preprocImage);
+    
     std::vector<cv::Vec4i> lines;
     cv::HoughLinesP(skeleton, lines,
                     m_conf.HoughLines.rho, m_conf.HoughLines.theta, m_conf.HoughLines.threshold,
@@ -77,7 +82,9 @@ namespace ant {
   cv::Mat LineDetector::preproccess(const cv::Mat &image) {
     cv::Mat hsv_img, gray_img, bgr_img, buffer;
 
-    cv::cvtColor(image, bgr_img, CV_YUV2BGR);
+    // Input used to be a YUV image
+    //cv::cvtColor(image, bgr_img, CV_YUV2BGR);
+    bgr_img = image.clone();
     cv::GaussianBlur(bgr_img,bgr_img,cv::Size(5,5),1.5,1.5);
     cv::cvtColor(bgr_img, gray_img, CV_BGR2GRAY);
     cv::cvtColor(bgr_img, hsv_img, CV_BGR2HSV);
@@ -127,7 +134,8 @@ namespace ant {
   cv::Mat LineDetector::preproccess_old(const cv::Mat &image) {
     cv::Mat hsv_img, gray_img, bgr_img, buffer;
 
-    cv::cvtColor(image, bgr_img, CV_YUV2BGR);
+    //cv::cvtColor(image, bgr_img, CV_YUV2BGR);
+    bgr_img = image.clone();
     cv::cvtColor(bgr_img, gray_img, CV_BGR2GRAY);
     cv::cvtColor(bgr_img, hsv_img, CV_BGR2HSV);
 

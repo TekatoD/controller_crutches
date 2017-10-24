@@ -70,10 +70,11 @@ namespace ant {
             cv::Mat prep = m_fieldDetector.preproccess(m_image);
             m_mask = m_fieldDetector.detect(prep);
             cv::Mat tmp;
-            cvtColor(m_image, m_src_image, CV_BGR2YUV);
+            //cv::cvtColor(m_image, m_src_image, CV_BGR2YUV);
+            m_src_image = m_image.clone();
             m_image.copyTo(tmp, m_mask);
             m_image = tmp;
-            cv::cvtColor(m_image, m_image, CV_BGR2YUV);
+            //cv::cvtColor(m_image, m_image, CV_BGR2YUV);
         }
         return m_mask;
     }

@@ -186,7 +186,8 @@ namespace ant {
 
   cv::Mat BallDetector::preproccess(const cv::Mat &image) {
     cv::Mat preprocImage, prepImage;
-    cv::cvtColor(image, preprocImage, CV_YUV2BGR);
+    //cv::cvtColor(image, preprocImage, CV_YUV2BGR);
+    preprocImage = image.clone();
     cv::Mat medianBlurFrame;
     cv::medianBlur(preprocImage, medianBlurFrame, m_conf.median_blur_size);
     cv::Mat afterGaborRange, gaborImage;

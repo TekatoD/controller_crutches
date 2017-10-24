@@ -240,3 +240,22 @@ target_include_directories(vrep_vision PUBLIC
         ${BOOST_INCLUDE_DIR}
         ${JPEG_INCLUDE_DIR}
         ${OpenCV_INCLUDE_DIR})
+
+add_executable(localization
+    src/localization/localization_test.cpp
+    src/Pose2D.cpp
+    src/localization/DataReader.cpp
+    src/localization/ParticleFilter.cpp
+)
+
+target_link_libraries(localization
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${JPEG_LIBRARIES}
+        ${BOOST_LIBRARIES}
+        ${OpenCV_LIBRARIES}
+        Eigen3::Eigen)
+
+target_include_directories(localization PUBLIC
+        ${BOOST_INCLUDE_DIR}
+        ${JPEG_INCLUDE_DIR}
+        ${OpenCV_INCLUDE_DIR})

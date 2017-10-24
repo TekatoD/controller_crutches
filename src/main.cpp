@@ -266,12 +266,14 @@ int main(int argc, char** argv) {
         // Update state machine
         StateMachine::GetInstance()->Check(cm730);
 //
+        /*
         if (!Action::GetInstance()->IsRunning()) {
             Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
             Walking::GetInstance()->X_MOVE_AMPLITUDE = 20.0;
             Walking::GetInstance()->A_MOVE_AMPLITUDE = 20.0;
             Walking::GetInstance()->Start();
         }
+        */
 
 //        if (StateMachine::GetInstance()->IsStarted() == 0) {
 //            continue;
@@ -293,7 +295,8 @@ int main(int argc, char** argv) {
         unsigned char* imgBuff = camera.getBGRFrame()->m_ImageData;
         
         if (imgBuff) {
-            cv::Mat frame(cv::Size(camera.getWidth(), camera.getHeight()), CV_8UC3, imgBuff, cv::Mat::AUTO_STEP);
+            // Mats that take buffer in the constructor don't release it 
+            cv::Mat frame(camera.getHeight(), camera.getWidth(), CV_8UC3, imgBuff);
             
             vision.setFrame(frame);
             std::vector<cv::Vec4i> lines = vision.lineDetect_old();
@@ -308,6 +311,7 @@ int main(int argc, char** argv) {
             cv::imshow("line_image", frame);
             cv::waitKey(1);
         }
+        
         
     }
     vrepConnector.Disconnect();

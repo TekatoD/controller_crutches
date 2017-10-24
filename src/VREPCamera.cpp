@@ -1,6 +1,7 @@
 #include "VREPCamera.h"
 #include <iostream>
 #include <stdexcept>
+#include <cstring>
 
 #define MAX_EXT_API_CONNECTIONS 255
 #define NON_MATLAB_PARSING
@@ -15,17 +16,20 @@ VREPCamera::VREPCamera(int width, int height, const char* sensorName) :
     m_width(width), m_height(height), m_sensorName((char*)sensorName)
 { 
     m_clientId = -1;
+    m_imageBuffer = 0;
+    m_fbuffer = 0;
 }
 
 VREPCamera::~VREPCamera()
 {
-    simxReleaseBuffer(m_imageBuffer);
+    // Nothing to release if couldn't connect to the sim
+    if (m_imageBuffer) {
+        simxReleaseBuffer(m_imageBuffer);
+    }
     
-    // points to already released imageBuffer ^
-    m_fbuffer->m_RGBFrame->m_ImageData = 0;
-    m_fbuffer->m_BGRFrame->m_ImageData = 0;
-    
-    delete m_fbuffer;
+    if (m_fbuffer) {
+        delete m_fbuffer;
+    }
 }
 
 void VREPCamera::connect(int clientId)
@@ -73,13 +77,20 @@ void VREPCamera::CaptureFrame()
     );
     
     if (visStream == simx_return_ok) {
+        // Received a broken frame
+        if (m_res[0] != m_width || m_res[1] != m_height) {
+            std::cout << "V-rep why? w, h: " << m_res[0] << " " << m_res[1] << std::endl;
+            m_res[0] = m_width;
+            m_res[1] = m_height;
+            return;
+        }
         // Put image to framebuffer, flip it vertically and convert to BGR
-        m_fbuffer->m_RGBFrame->m_ImageData = (unsigned char*)m_imageBuffer;
+        memcpy(m_fbuffer->m_RGBFrame->m_ImageData, m_imageBuffer, m_fbuffer->m_RGBFrame->m_ImageSize);
         ImgProcess::VFlipRGB(m_fbuffer->m_RGBFrame);
         ImgProcess::RGBtoBGR(m_fbuffer);
     }
     
-    simxSynchronousTrigger(m_clientId);
+    //simxSynchronousTrigger(m_clientId);
 }
 
 FrameBuffer* VREPCamera::getFrameBuffer()

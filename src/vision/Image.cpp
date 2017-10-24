@@ -26,10 +26,7 @@ Image::Image(int width, int height, int pixelsize)
 
 
 Image::~Image() {
-    if (m_ImageData) {
-        delete[] m_ImageData;
-        m_ImageData = 0;
-    }
+    delete[] m_ImageData;
 }
 
 
@@ -53,4 +50,5 @@ FrameBuffer::~FrameBuffer() {
     delete m_RGBFrame;
     delete m_HSVFrame;
     delete m_BGRAFrame; // for Webots only
+    delete m_BGRFrame;
 }

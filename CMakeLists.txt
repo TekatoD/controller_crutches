@@ -19,9 +19,9 @@ endif ()
 
 if (CROSSCOMPILE)
     add_definitions(-DCROSSCOMPILE) # This definition is used during the initialization in the main
-    set(CROSSCOMPILE_FLAGS "-m32 -march=atom -mtune=atom -mfpmath=sse -flto -ffast-math")
+    set(CROSSCOMPILE_FLAGS "-m32 -march=atom -mtune=atom -mfpmath=sse -ffast-math") #-flt was disabled
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -std=gnu++14 -static-libstdc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -std=c++14 -static-libstdc++")
 
     add_library(hw STATIC
             include/hw/RobotCM730.h
@@ -49,6 +49,8 @@ find_package(Eigen3 REQUIRED)
 find_package(Boost 1.54 COMPONENTS system log_setup log date_time filesystem thread REQUIRED)
 find_package(OpenCV 3.3 REQUIRED)
 find_package(LibXml2)
+
+include_directories( ${EIGEN3_INCLUDE_DIR}) #Eigen doesn't work either way
 
 #### Sources ####
 # All sources of the project. Insert one file per line.

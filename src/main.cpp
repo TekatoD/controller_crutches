@@ -10,7 +10,9 @@
 #include <libgen.h>
 #include <signal.h>
 #include <memory>
+#include <Eigen/Dense>
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/eigen.hpp>
 
 #include <GameController.h>
 #include <GoTo.h>
@@ -197,65 +199,6 @@ int main(int argc, char** argv) {
 //    Action::GetInstance()->Start(13);
 
     auto DarwinHead = Head::GetInstance();
-    // Leg + total torso length
-    float HeightFromGround = Robot::Kinematics::LEG_LENGTH + 122.2f + 50.5f + Robot::Kinematics::CAMERA_OFFSET_Z;
-    HeightFromGround /= 1000.0f;
-    
-    // Z
-    float HeadPan = DarwinHead->GetPanAngle();
-    // Y
-    float HeadTilt = DarwinHead->GetTiltAngle();
-    
-    cv::Mat Rx = cv::Mat::eye(3, 3, CV_32F);
-    cv::Mat Ry = (cv::Mat_<float>(3, 3) << cos(HeadTilt), 0.0f, sin(HeadTilt), 0.0f, 1.0f, 0.0f, -sin(HeadTilt), 0.0f, cos(HeadTilt));
-    cv::Mat Rz = (cv::Mat_<float>(3, 3) << cos(HeadPan), -sin(HeadPan), 0.0f, sin(HeadPan), cos(HeadPan), 0.0f, 0.0f, 0.0f, 1.0f);
-    
-    cv::Mat R = Rz * (Ry * Rx);
-    cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, HeightFromGround);
-    
-    ant::vision_utils::CameraParameters params(R, t, 2.0);
-    ant::vision_utils::CameraProjection cameraToGround(params);
-    
-    // Testing something
-    // Ray in H.C, 
-    cv::Mat CameraRay = cameraToGround.ImageToCamera(160, 120);
-    cv::Mat HCRow = (cv::Mat_<float>(1, 1) << 1.0f);
-    cv::Mat CameraPoint;
-    cv::vconcat(CameraRay, HCRow, CameraPoint);
-    
-    float scaler = CameraPoint.at<float>(2, 0);
-    CameraPoint.at<float>(0, 0) /= scaler;
-    CameraPoint.at<float>(1, 0) /= scaler;
-    // Testing
-    CameraPoint.at<float>(2, 0) = HeightFromGround;
-    
-    // TODO: Correct translation, rotation
-    std::cout << ":thinking:" << std::endl;
-    std::cout << CameraRay << std::endl;
-    std::cout << CameraPoint << std::endl;
-    
-    cv::Mat WorldPoint = cameraToGround.CameraToWorld(CameraPoint);
-    
-    std::cout << WorldPoint << std::endl;
-    
-    // Plucker line
-    cv::Mat P1 = (cv::Mat_<float>(4, 1) << 1, 2, 3, 1);
-    cv::Mat P2 = (cv::Mat_<float>(4, 1) << 4, 5, 42, 1);
-    cv::Mat L = ant::vision_utils::PluckerLine(P1, P2);
-    std::cout << L << std::endl;
-    
-    // Testing Ray-Plane intersection 
-    cv::Mat Line = (cv::Mat_<float>(6, 1) << 1.0f, 0.0f, 1.0f, 2.0f, 0.0f, -2.0f);
-    cv::Mat Plane = (cv::Mat_<float>(4, 1) << 1.0f, 0.0f, 0.0f, -3.0f);
-    
-    cv::Mat Intersection = ant::vision_utils::PlaneRayIntersection(Plane, Line);
-    std::cout << "Intersection" << std::endl << Intersection << std::endl;
-    
-    std::cout << "Homography testing: " << std::endl;
-    cv::Mat ImagePoint = (cv::Mat_<float>(3, 1) << 160.0f, 120.0f, 1.0f);
-    cv::Mat groundPoint = cameraToGround.ImageToImage(ImagePoint);
-    
-    std::cout << groundPoint << std::endl;
     
     ant::Vision vision("./res/vision_cfg/");
     cv::namedWindow("line_image", cv::WINDOW_AUTOSIZE);
@@ -291,6 +234,36 @@ int main(int argc, char** argv) {
 //            case ROLES_COUNT:break;
 //        }
 
+        float HeightFromGround = Robot::Kinematics::LEG_LENGTH + 122.2f + 50.5f + Robot::Kinematics::CAMERA_OFFSET_Z;
+        HeightFromGround /= 1000.0f;
+        // Z
+        float HeadPan = DarwinHead->GetPanAngle();
+        // Y
+        float HeadTilt = DarwinHead->GetTiltAngle();
+        
+        Matrix4x4f HeadTransformE;
+        cv::Mat HeadTransform;
+        Robot::Kinematics::ComputeHeadForwardKinematics(HeadTransformE, HeadPan, HeadTilt);
+        cv::eigen2cv(HeadTransformE, HeadTransform);
+        
+        /*
+        cv::Mat Rx = cv::Mat::eye(3, 3, CV_32F);
+        cv::Mat Ry = (cv::Mat_<float>(3, 3) << cos(HeadTilt), 0.0f, sin(HeadTilt), 0.0f, 1.0f, 0.0f, -sin(HeadTilt), 0.0f, cos(HeadTilt));
+        cv::Mat Rz = (cv::Mat_<float>(3, 3) << cos(HeadPan), -sin(HeadPan), 0.0f, sin(HeadPan), cos(HeadPan), 0.0f, 0.0f, 0.0f, 1.0f);
+        
+        cv::Mat R = Rz * (Ry * Rx);
+        cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, HeightFromGround);
+        */
+        
+        cv::Mat R = HeadTransform(cv::Range(0, 3), cv::Range(0, 3));
+        // Translation is in mm
+        cv::Mat t = HeadTransform(cv::Range(0, 3), cv::Range(3, 4));
+        t /= 1000.0f;
+        t.at<float>(2, 0) += HeightFromGround;
+        
+        ant::vision_utils::CameraParameters params(R, t, 2.0);
+        ant::vision_utils::CameraProjection cameraToGround(params);
+        
         camera.CaptureFrame();
         unsigned char* imgBuff = camera.getBGRFrame()->m_ImageData;
         
@@ -299,13 +272,25 @@ int main(int argc, char** argv) {
             cv::Mat frame(camera.getHeight(), camera.getWidth(), CV_8UC3, imgBuff);
             
             vision.setFrame(frame);
-            std::vector<cv::Vec4i> lines = vision.lineDetect_old();
+            std::vector<cv::Vec4i> lines = vision.lineDetect();
             
             for (auto& line : lines) {
+                // Point for viz
                 cv::Point p1(line[0], line[1]);
                 cv::Point p2(line[2], line[3]);
                 
                 cv::line(frame, p1, p2, cv::Scalar(0, 0, 255), 5);
+                
+                cv::Mat mp1, mp2, gp1, gp2;
+                mp1 = (cv::Mat_<float>(3, 1) << line[0], line[1], 1);
+                mp2 = (cv::Mat_<float>(3, 1) << line[2], line[3], 1);
+                
+                gp1 = cameraToGround.ImageToImage(mp1);
+                gp2 = cameraToGround.ImageToImage(mp2);
+                
+                std::cout << "========" << std::endl;
+                std::cout << gp1 << std::endl;
+                std::cout << gp2 << std::endl;
             }
             
             cv::imshow("line_image", frame);

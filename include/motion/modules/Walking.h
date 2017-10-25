@@ -12,7 +12,6 @@
 #include <memory>
 #include <fstream>
 
-#include "minIni.h"
 #include "motion/MotionModule.h"
 #include "OdometryCollector.h"
 

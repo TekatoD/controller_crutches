@@ -66,7 +66,7 @@ void BallSearcher::Process() {
     if (m_WalkingEnabled) {
         m_TurnSpeed = Walking::GetInstance()->GetAMoveAmplitude();
         m_TurnSpeed += m_TurnStep * m_TurnDirection;
-        if (fabs(m_TurnSpeed) > m_MaxTurn) {
+        if (fabsf(m_TurnSpeed) > m_MaxTurn) {
             m_TurnSpeed = m_MaxTurn * m_TurnDirection;
         }
 
@@ -78,31 +78,6 @@ void BallSearcher::Process() {
     } else {
         Walking::GetInstance()->Stop();
     }
-}
-
-void BallSearcher::LoadINISettings(minIni* ini) {
-    LoadINISettings(ini, FINDER_SECTION);
-}
-
-void BallSearcher::LoadINISettings(minIni* ini, const std::string& section) {
-    float value;
-    if ((value = ini->getd(section, "tilt_phase_step", INVALID_VALUE)) != INVALID_VALUE) m_TiltPhaseStep = value;
-    if ((value = ini->getd(section, "pan_phase_step", INVALID_VALUE)) != INVALID_VALUE) m_PanPhaseStep = value;
-    if ((value = ini->getd(section, "phase_size", INVALID_VALUE)) != INVALID_VALUE) m_PhaseSize = value;
-    if ((value = ini->getd(section, "turn_step", INVALID_VALUE)) != INVALID_VALUE) m_TurnStep = value;
-    if ((value = ini->getd(section, "max_turn", INVALID_VALUE)) != INVALID_VALUE) m_MaxTurn = value;
-}
-
-void BallSearcher::SaveINISettings(minIni* ini) {
-    SaveINISettings(ini, FINDER_SECTION);
-}
-
-void BallSearcher::SaveINISettings(minIni* ini, const std::string& section) {
-    ini->put(section, "tilt_phase_step", m_TiltPhaseStep);
-    ini->put(section, "pan_phase_step", m_PanPhaseStep);
-    ini->put(section, "phase_size", m_PhaseSize);
-    ini->put(section, "turn_step", m_TurnStep);
-    ini->put(section, "max_turn", m_MaxTurn);
 }
 
 void BallSearcher::EnableWalking() {

@@ -11,7 +11,6 @@
 #include <string.h>
 #include <memory>
 
-#include "minIni.h"
 #include "motion/MotionModule.h"
 #include "math/Point.h"
 
@@ -77,16 +76,6 @@ namespace Robot {
 
         void MoveTracking(Point2D err); // For image processing
         void MoveTracking();
-
-/*Read/write from a INI file*/
-
-        void LoadINISettings(minIni* ini);
-
-        void LoadINISettings(minIni* ini, const std::string& section);
-
-        void SaveINISettings(minIni* ini);
-
-        void SaveINISettings(minIni* ini, const std::string& section);
     };
 }
 

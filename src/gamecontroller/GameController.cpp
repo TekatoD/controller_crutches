@@ -88,29 +88,6 @@ void GameController::SendAlive() {
 }
 
 
-void GameController::LoadINISettings(minIni* ini) {
-    LoadINISettings(ini, GAME_CONTROLLER_SECTION);
-}
-
-
-void GameController::LoadINISettings(minIni* ini, const std::string& section) {
-    int value = INVALID_VALUE;
-    if ((value = ini->geti(section, "team_number", INVALID_VALUE)) != INVALID_VALUE) TeamNumber = value;
-    if ((value = ini->geti(section, "player_number", INVALID_VALUE)) != INVALID_VALUE) PlayerNumber = value;
-}
-
-
-void GameController::SaveINISettings(minIni* ini) {
-    SaveINISettings(ini, GAME_CONTROLLER_SECTION);
-}
-
-
-void GameController::SaveINISettings(minIni* ini, const std::string& section) {
-    ini->put(section, "team_number", TeamNumber);
-    ini->put(section, "player_number", PlayerNumber);
-}
-
-
 GameController::~GameController() {
     Disconnect();
 }

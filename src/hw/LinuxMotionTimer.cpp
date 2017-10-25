@@ -10,19 +10,20 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdexcept>
 
 using namespace Robot;
 
 
 LinuxMotionTimer::LinuxMotionTimer(MotionManager* manager)
         : m_Manager(manager) {
-    this->m_FinishTimer = false;
-    this->m_TimerRunning = false;
+    m_FinishTimer = false;
+    m_TimerRunning = false;
 }
 
 
 void* LinuxMotionTimer::TimerProc(void* param) {
-    LinuxMotionTimer* timer = (LinuxMotionTimer*) param;
+    auto* timer = (LinuxMotionTimer*) param;
     static struct timespec next_time;
     clock_gettime(CLOCK_MONOTONIC, &next_time);
 
@@ -30,35 +31,38 @@ void* LinuxMotionTimer::TimerProc(void* param) {
         next_time.tv_sec += (next_time.tv_nsec + MotionModule::TIME_UNIT * 1000000) / 1000000000;
         next_time.tv_nsec = (next_time.tv_nsec + MotionModule::TIME_UNIT * 1000000) % 1000000000;
 
-        if (timer->m_Manager != NULL)
+        if (timer->m_Manager != nullptr)
             timer->m_Manager->Process();
 
-        clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_time, NULL);
+        clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_time, nullptr);
     }
 
-    pthread_exit(NULL);
+    pthread_exit(nullptr);
 }
 
 
-void LinuxMotionTimer::Start(void) {
+void LinuxMotionTimer::Start() {
     int error;
-    struct sched_param param;
+    sched_param param;
     pthread_attr_t attr;
 
     pthread_attr_init(&attr);
 
     error = pthread_attr_setschedpolicy(&attr, SCHED_RR);
     if (error != 0)
-        printf("error = %d\n", error);
+        throw std::runtime_error("Linux motion timer can't call pthread_attr_setschedpolicy. Error = " +
+                                         std::to_string(error));
     error = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
     if (error != 0)
-        printf("error = %d\n", error);
+        throw std::runtime_error("Linux motion timer can't call pthread_attr_setinheritsched. Error = " +
+                                         std::to_string(error));
 
     memset(&param, 0, sizeof(param));
     param.sched_priority = 31;// RT
     error = pthread_attr_setschedparam(&attr, &param);
     if (error != 0)
-        printf("error = %d\n", error);
+        throw std::runtime_error("Linux motion timer can't call pthread_attr_setschedparam. Error = " +
+                                         std::to_string(error));
 
     // create and start the thread
     if ((error = pthread_create(&this->m_Thread, &attr, this->TimerProc, this)) != 0)
@@ -69,14 +73,14 @@ void LinuxMotionTimer::Start(void) {
 }
 
 
-void LinuxMotionTimer::Stop(void) {
+void LinuxMotionTimer::Stop() {
     int error = 0;
 
     // seti the flag to end the thread
     if (this->m_TimerRunning) {
         this->m_FinishTimer = true;
         // wait for the thread to end
-        if ((error = pthread_join(this->m_Thread, NULL)) != 0)
+        if ((error = pthread_join(this->m_Thread, nullptr)) != 0)
             exit(-1);
         this->m_FinishTimer = false;
         this->m_TimerRunning = false;
@@ -84,12 +88,12 @@ void LinuxMotionTimer::Stop(void) {
 }
 
 
-bool LinuxMotionTimer::IsRunning(void) {
+bool LinuxMotionTimer::IsRunning() {
     return this->m_TimerRunning;
 }
 
 
 LinuxMotionTimer::~LinuxMotionTimer() {
     this->Stop();
-    this->m_Manager = NULL;
+    this->m_Manager = nullptr;
 }

@@ -8,8 +8,6 @@
 
 #include <vector>
 #include <math/Point.h>
-#include "minIni.h"
-
 
 #define FINDER_SECTION "Ball Searcher"
 
@@ -29,14 +27,6 @@ namespace Robot {
         bool IsWalkingEnabled() const;
 
         const Point2D& GetLastPosition() const;
-
-        void LoadINISettings(minIni* ini);
-
-        void LoadINISettings(minIni* ini, const std::string& section);
-
-        void SaveINISettings(minIni* ini);
-
-        void SaveINISettings(minIni* ini, const std::string& section);
 
     private:
         bool m_Active;

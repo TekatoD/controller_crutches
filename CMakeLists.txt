@@ -71,7 +71,6 @@ set(SRC
         include/motion/Kinematics.h
         include/hw/LinuxMotionTimer.h
         include/math/Matrix.h
-        include/minIni.h
         include/motion/MotionManager.h
         include/motion/MotionModule.h
         include/motion/MotionStatus.h
@@ -83,10 +82,6 @@ set(SRC
         src/math/Matrix.cpp
         src/math/Point.cpp
         src/math/Vector.cpp
-        include/minIni/minGlue.h
-        src/minIni/minIni.c
-        include/minIni/minIni.h
-        include/minIni/wxMinIni.h
         src/motion/modules/Walking.cpp
         src/motion/modules/Head.cpp
         src/motion/modules/Action.cpp

@@ -10,7 +10,6 @@
 #include "gamecontroller/SPLStandardMessage.h"
 #include "gamecontroller/SPLCoachMessage.h"
 #include "UdpComm.h"
-#include "minIni.h"
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -45,14 +44,6 @@ namespace Robot {
         void SendUnpenalise();
 
         void SendAlive();
-
-        void LoadINISettings(minIni* ini);
-
-        void LoadINISettings(minIni* ini, const std::string& section);
-
-        void SaveINISettings(minIni* ini);
-
-        void SaveINISettings(minIni* ini, const std::string& section);
 
         ~GameController();
 

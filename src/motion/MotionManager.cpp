@@ -79,36 +79,6 @@ bool MotionManager::Reinitialize() {
     return true;
 }
 
-
-void MotionManager::LoadINISettings(minIni* ini) {
-    LoadINISettings(ini, OFFSET_SECTION);
-}
-
-
-void MotionManager::LoadINISettings(minIni* ini, const std::string& section) {
-    int ivalue = INVALID_VALUE;
-
-    for (int i = 1; i < JointData::NUMBER_OF_JOINTS; i++) {
-        char key[10];
-        sprintf(key, "ID_%.2d", i);
-        if ((ivalue = ini->geti(section, key, INVALID_VALUE)) != INVALID_VALUE) m_Offset[i] = ivalue;
-    }
-}
-
-
-void MotionManager::SaveINISettings(minIni* ini) {
-    SaveINISettings(ini, OFFSET_SECTION);
-}
-
-
-void MotionManager::SaveINISettings(minIni* ini, const std::string& section) {
-    for (int i = 1; i < JointData::NUMBER_OF_JOINTS; i++) {
-        char key[10];
-        sprintf(key, "ID_%.2d", i);
-        ini->put(section, key, m_Offset[i]);
-    }
-}
-
 void MotionManager::Process() {
     constexpr int GYRO_WINDOW_SIZE = 100;
     constexpr int ACCEL_WINDOW_SIZE = 30;
@@ -280,12 +250,15 @@ void MotionManager::EnabledDebug(bool debug) {
 void MotionManager::SetJointOffset(int id, int offset) {
     if(id >= 1 && id < JointData::NUMBER_OF_JOINTS) {
         m_Offset[id] = offset;
+    } else {
+        throw std::runtime_error("Can't set joint offset. Wrong joint ID: " + std::to_string(id));
     }
 }
 
 int MotionManager::GetJointOffset(int id) const {
     if(id >= 1 && id < JointData::NUMBER_OF_JOINTS) {
         return m_Offset[id];
+    } else {
+        throw std::runtime_error("Can't get joint offset. Wrong joint ID: " + std::to_string(id));
     }
-    return INVALID_VALUE;
 }

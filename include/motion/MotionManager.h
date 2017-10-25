@@ -4,10 +4,6 @@
 #include "MotionStatus.h"
 #include "MotionModule.h"
 #include "hw/CM730.h"
-#include "minIni.h"
-
-#define OFFSET_SECTION "Offset"
-#define INVALID_VALUE   -1024.0
 
 namespace Robot {
     class MotionManager {
@@ -42,14 +38,6 @@ namespace Robot {
         int GetCalibrationStatus() const { return m_CalibrationStatus; }
 
         void SetJointDisable(int index);
-
-        void LoadINISettings(minIni* ini);
-
-        void LoadINISettings(minIni* ini, const std::string& section);
-
-        void SaveINISettings(minIni* ini);
-
-        void SaveINISettings(minIni* ini, const std::string& section);
 
         bool IsDebugEnabled() const;
 

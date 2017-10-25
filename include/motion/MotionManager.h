@@ -55,6 +55,10 @@ namespace Robot {
 
         void EnabledDebug(bool debug);
 
+        void SetJointOffset(int id, int offset);
+
+        int GetJointOffset(int id) const;
+
     private:
         bool m_debug{false};
 

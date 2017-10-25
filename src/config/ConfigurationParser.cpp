@@ -12,7 +12,7 @@
 using namespace Robot;
 
 boost::property_tree::ptree ConfigurationParser::ReadFromFile(const std::string& path) {
-    ConfigFormat format = GetFileFormat(path);
+    auto format = GetFileFormat(path);
     std::ifstream stream(path);
     return ReadFromStream(stream, format);
 }
@@ -27,6 +27,23 @@ boost::property_tree::ptree ConfigurationParser::ReadFromStream(std::istream& st
     }
 
     return prop;
+}
+
+void ConfigurationParser::WriteToFile(const std::string& path,
+                                      const boost::property_tree::ptree& prop) {
+    auto format = GetFileFormat(path);
+    std::ofstream stream(path);
+    WriteToStream(stream, format, prop);
+}
+
+void ConfigurationParser::WriteToStream(std::ostream& stream,
+                                        ConfigFormat format,
+                                        const boost::property_tree::ptree& prop) {
+    switch (format) {
+        case ConfigFormat::INI: boost::property_tree::write_ini(stream, prop); break;
+        case ConfigFormat::XML: boost::property_tree::write_xml(stream, prop); break;
+        case ConfigFormat::JSON: boost::property_tree::write_json(stream, prop); break;
+    }
 }
 
 ConfigFormat ConfigurationParser::GetFileFormat(const std::string& path) {

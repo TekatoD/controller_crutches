@@ -2,12 +2,12 @@
 
 
 #include <unordered_map>
-#include <vector>
+#include <list>
 #include <map>
 #include "ConfigurationStrategy.h"
 
 namespace Robot {
-    struct SectionNode {
+    struct ConfigurationFileLoaderNode {
         ConfigurationStrategy* strategy{nullptr};
         std::string path{};
     };
@@ -37,15 +37,17 @@ namespace Robot {
         void SetDefaultPath(std::string path);
 
     private:
-        static boost::property_tree::ptree ReadFile(const std::string& path);
+        static boost::property_tree::ptree ReadPropertyFromFile(const std::string& path);
 
-        static void WriteFile(const boost::property_tree::ptree& ptree, const std::string& path);
+        static void WritePropertyToFile(const boost::property_tree::ptree& prop, const std::string& path);
+
+        std::map<std::string, std::list<ConfigurationStrategy*>> GetFileAssotiatedStrategies() const;;
 
     private:
         bool m_debug{true};
 
         std::string m_default_path{DEFAULT_PATH};
-        std::unordered_map<std::string, SectionNode> m_section_nodes{};
+        std::unordered_map<std::string, ConfigurationFileLoaderNode> m_section_nodes{};
     };
 }
 

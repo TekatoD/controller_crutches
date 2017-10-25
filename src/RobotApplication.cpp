@@ -5,6 +5,7 @@
 #include <motion/modules/Kicking.h>
 #include <motion/modules/Walking.h>
 #include <motion/modules/Head.h>
+#include <tool/CommandArguments.h>
 #include "RobotApplication.h"
 #ifdef CROSSCOMPILE
 	#include "hw/RobotCM730.h"
@@ -20,7 +21,7 @@ RobotApplication* RobotApplication::GetInstance() {
     return &instance;
 }
 
-void RobotApplication::ParseArguments(int argc, const char** argv) {
+void RobotApplication::SetProgramArguments(const CommandArguments& arguments) {
     if (m_debug) LOG_DEBUG << "=== Parsing command line arguments ===";
 }
 
@@ -61,6 +62,8 @@ void RobotApplication::Initialize() {
     InitMotionModules();
     InitMotionTimer();
     InitGameController();
+    ParseCommandLineArguments();
+    ReadConfiguraion();
     if (m_debug) LOG_INFO << "=== Initialization was finished ===";
 }
 
@@ -137,15 +140,20 @@ void RobotApplication::InitMotionTimer() {
 void RobotApplication::InitGameController() {
     if (m_debug) LOG_DEBUG << "Initializing game controller client...";
     if (!GameController::GetInstance()->Connect()) {
-        constexpr char msg[]{"Can't connect to game controller!"};
-        LOG_ERROR << msg;
-        throw std::runtime_error(msg);
+        throw std::runtime_error("Can't connect to game controller!");
     }
     if (m_debug) LOG_INFO << "Game controller client is ready";
 }
 
-void RobotApplication::ReadConfiguration() {
-    if (m_debug) LOG_DEBUG << "=== Read configurations ===";
+void RobotApplication::ParseCommandLineArguments() {
+    if (m_debug) LOG_DEBUG << "Parsing command line arguments...";
+    if (m_debug) LOG_INFO << "Command line arguments was parsed";
+}
+
+void RobotApplication::ReadConfiguraion() {
+    if (m_debug) LOG_DEBUG << "Reading configuration...";
+    m_configuration_loader.AddStrategy("Walking Config", m_walking_configuration_strategy);
+    if (m_debug) LOG_INFO << "Configuration was read";
 }
 
 void RobotApplication::StartMainLoop() {

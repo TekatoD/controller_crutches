@@ -3,6 +3,9 @@
 
 #include <atomic>
 #include <memory>
+#include <tool/CommandArguments.h>
+#include "config/ConfigurationFileLoader.h"
+#include "config/WalkingConfigurationStrategy.h"
 #include "hw/LinuxMotionTimer.h"
 #include "hw/CM730.h"
 
@@ -26,9 +29,7 @@ namespace Robot {
 
         static RobotApplication* GetInstance();
 
-        void ParseArguments(int argc, const char** argv);
-
-        void ReadConfiguration();
+        void SetProgramArguments(const CommandArguments& arguments);
 
         int Exec();
 
@@ -63,12 +64,23 @@ namespace Robot {
 
         void InitGameController();
 
+        void ReadConfiguraion();
+
+        void ParseCommandLineArguments();
+
     private:
         bool m_debug{true}; // Debug output to console
+
+        CommandArguments m_arguments;
 
         std::atomic<bool> m_started{ATOMIC_VAR_INIT(false)};
         std::unique_ptr<CM730> m_cm730{nullptr};
         std::unique_ptr<LinuxMotionTimer> m_motion_timer{nullptr};
+
+        //*** Configuration members ***//
+        ConfigurationFileLoader m_configuration_loader;
+
+        WalkingConfigurationStrategy m_walking_configuration_strategy;
 
         //*** Platform specific members ***//
 

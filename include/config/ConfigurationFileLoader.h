@@ -18,7 +18,7 @@ namespace Robot {
 
         ConfigurationFileLoader() = default;
 
-        void AddStrategy(std::string section, ConfigurationStrategy* strategy, std::string path = "");
+        void AddStrategy(std::string section, ConfigurationStrategy& strategy, std::string path = "");
 
         void RemoveStrategy(const std::string& section);
 

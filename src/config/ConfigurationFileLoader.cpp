@@ -5,12 +5,12 @@
 using namespace Robot;
 
 void ConfigurationFileLoader::AddStrategy(std::string section,
-                                      Robot::ConfigurationStrategy* strategy,
-                                      std::string path) {
+                                          ConfigurationStrategy& strategy,
+                                          std::string path) {
     if (path.empty()) {
-        m_section_nodes.emplace(std::move(section), ConfigurationFileLoaderNode{strategy, m_default_path});
+        m_section_nodes.emplace(std::move(section), ConfigurationFileLoaderNode{&strategy, m_default_path});
     } else {
-        m_section_nodes.emplace(std::move(section), ConfigurationFileLoaderNode{strategy, std::move(path)});
+        m_section_nodes.emplace(std::move(section), ConfigurationFileLoaderNode{&strategy, std::move(path)});
     }
 }
 

@@ -152,7 +152,7 @@ set(SRC
         src/config/ConfigurationFileLoader.cpp
         include/config/ConfigurationFileLoader.h
         src/config/ConfigurationParser.cpp
-        include/config/ConfigurationParser.h)
+        include/config/ConfigurationParser.h src/tool/CommandArguments.cpp include/tool/CommandArguments.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

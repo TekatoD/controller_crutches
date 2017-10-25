@@ -53,7 +53,7 @@ void sighandler(int /*sig*/) {
 }
 
 
-int main(int argc, const char** argv) {
+int main(int argc, char** argv) {
     signal(SIGABRT, &sighandler);
     signal(SIGTERM, &sighandler);
     signal(SIGQUIT, &sighandler);
@@ -62,6 +62,7 @@ int main(int argc, const char** argv) {
     change_current_dir();
     init_logger();
 
-    Robot::RobotApplication::GetInstance()->ParseArguments(argc, argv);
+    Robot::CommandArguments args{argc, argv};
+    Robot::RobotApplication::GetInstance()->SetProgramArguments(args);
     return Robot::RobotApplication::GetInstance()->Exec();
 }

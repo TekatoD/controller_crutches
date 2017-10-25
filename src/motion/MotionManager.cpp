@@ -276,3 +276,16 @@ bool MotionManager::IsDebugEnabled() const {
 void MotionManager::EnabledDebug(bool debug) {
     m_debug = debug;
 }
+
+void MotionManager::SetJointOffset(int id, int offset) {
+    if(id >= 1 && id < JointData::NUMBER_OF_JOINTS) {
+        m_Offset[id] = offset;
+    }
+}
+
+int MotionManager::GetJointOffset(int id) const {
+    if(id >= 1 && id < JointData::NUMBER_OF_JOINTS) {
+        return m_Offset[id];
+    }
+    return INVALID_VALUE;
+}

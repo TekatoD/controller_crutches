@@ -152,7 +152,9 @@ set(SRC
         src/config/ConfigurationFileLoader.cpp
         include/config/ConfigurationFileLoader.h
         src/config/ConfigurationParser.cpp
-        include/config/ConfigurationParser.h)
+        include/config/ConfigurationParser.h
+        include/config/MotionManagerConfigurationStrategy.h
+        src/config/MotionManagerConfigurationStrategy.cpp)
 
 #### Build targets #####
 add_executable(controller ${SRC})

@@ -87,6 +87,46 @@ namespace Robot {
         void SaveINISettings(minIni* ini);
 
         void SaveINISettings(minIni* ini, const std::string& section);
+
+        float GetLeftLimit() const;
+
+        void SetLeftLimit(float left_limit);
+
+        float GetRightLimit() const;
+
+        void SetRightLimit(float right_limit);
+
+        float GetTopLimit() const;
+
+        void SetTopLimit(float top_limit);
+
+        float GetBottomLimit() const;
+
+        void SetBottomLimit(float bottom_limit);
+
+        float GetPanHome() const;
+
+        void SetPanHome(float pan_home);
+
+        float GetTiltHome() const;
+
+        void SetTiltHome(float tilit_home);
+
+        float GetPanPGain() const;
+
+        void SetPanPGain(float pan_p_gain);
+
+        float GetPanDGain() const;
+
+        void SetPanDGain(float pan_d_gain);
+
+        float GetTiltPGain() const;
+
+        void SetTiltPGain(float tilt_p_gain);
+
+        float GetTiltDGain() const;
+
+        void SetTiltDGain(float tilt_d_gain);
     };
 }
 

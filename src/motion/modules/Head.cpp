@@ -65,6 +65,86 @@ void Head::LoadINISettings(minIni* ini) {
     LoadINISettings(ini, HEAD_SECTION);
 }
 
+float Head::GetLeftLimit() const {
+    return m_LeftLimit;
+}
+
+void Head::SetLeftLimit(float left_limit) {
+    m_LeftLimit = left_limit;
+}
+
+float Head::GetRightLimit() const {
+    return m_RightLimit;
+}
+
+void Head::SetRightLimit(float right_limit) {
+    m_RightLimit = right_limit;
+}
+
+float Head::GetTopLimit() const {
+    return m_TopLimit;
+}
+
+void Head::SetTopLimit(float top_limit) {
+    Head::m_TopLimit = top_limit;
+}
+
+float Head::GetBottomLimit() const {
+    return m_BottomLimit;
+}
+
+void Head::SetBottomLimit(float bottom_limit) {
+    m_BottomLimit = bottom_limit;
+}
+
+float Head::GetPanHome() const {
+    return m_Pan_Home;
+}
+
+void Head::SetPanHome(float pan_home) {
+    m_Pan_Home = pan_home;
+}
+
+float Head::GetTiltHome() const {
+    return m_Tilt_Home;
+}
+
+void Head::SetTiltHome(float tilit_home) {
+    m_Tilt_Home = tilit_home;
+}
+
+float Head::GetPanPGain() const {
+    return m_Pan_p_gain;
+}
+
+void Head::SetPanPGain(float pan_p_gain) {
+    m_Pan_p_gain = pan_p_gain;
+}
+
+float Head::GetPanDGain() const {
+    return m_Pan_d_gain;
+}
+
+void Head::SetPanDGain(float pan_d_gain) {
+    m_Pan_d_gain = pan_d_gain;
+}
+
+float Head::GetTiltPGain() const {
+    return m_Tilt_p_gain;
+}
+
+void Head::SetTiltPGain(float tilt_p_gain) {
+    m_Tilt_p_gain = tilt_p_gain;
+}
+
+float Head::GetTiltDGain() const {
+    return m_Tilt_d_gain;
+}
+
+void Head::SetTiltDGain(float tilt_d_gain) {
+    m_Tilt_d_gain = tilt_d_gain;
+}
+
 
 void Head::LoadINISettings(minIni* ini, const std::string& section) {
     float value = INVALID_VALUE;

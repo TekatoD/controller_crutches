@@ -38,6 +38,27 @@ namespace Robot {
 
         void SaveINISettings(minIni* ini, const std::string& section);
 
+        float GetTiltPhaseStep() const;
+
+        void SetTiltPhaseStep(float tilt_phase_step);
+
+        float GetPanPhaseStep() const;
+
+        void SetPanPhaseStep(float pan_phase_step);
+
+        float GetPhaseSize() const;
+
+        void SetPhaseSize(float phase_size);
+
+        float GetTurnStep() const;
+
+        void SetTurnStep(float turn_step);
+
+        float GetMaxTurn() const;
+
+        void SetMaxTurn(float max_turn);
+
+
     private:
         bool m_Active;
         Point2D m_LastPosition;

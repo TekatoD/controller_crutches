@@ -56,6 +56,14 @@ namespace Robot {
 
         ~GameController();
 
+        int GetPlayerNumber() const;
+
+        void SetPlayerNumber(int player_number);
+
+        int GetTeamNumber() const;
+
+        void SetTeamNumber(int team_number);
+
 
     public:
         int PlayerNumber;

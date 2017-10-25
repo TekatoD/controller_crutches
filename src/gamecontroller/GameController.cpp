@@ -110,6 +110,22 @@ void GameController::SaveINISettings(minIni* ini, const std::string& section) {
     ini->put(section, "player_number", PlayerNumber);
 }
 
+int GameController::GetPlayerNumber() const {
+    return PlayerNumber;
+}
+
+void GameController::SetPlayerNumber(int player_number) {
+    PlayerNumber = player_number;
+}
+
+int GameController::GetTeamNumber() const {
+    return TeamNumber;
+}
+
+void GameController::SetTeamNumber(int team_number) {
+    TeamNumber = team_number;
+}
+
 
 GameController::~GameController() {
     Disconnect();

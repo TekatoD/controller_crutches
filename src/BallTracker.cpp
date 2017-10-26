@@ -52,3 +52,11 @@ const Point2D& BallTracker::GetBallPosition() const {
 bool BallTracker::IsNoBall() const {
     return m_NoBallCount >= m_NoBallMaxCount;
 }
+
+int BallTracker::GetNoBallMaxCount() const {
+    return m_NoBallMaxCount;
+}
+
+void BallTracker::SetNoBallMaxCount(int no_ball_max_count) {
+    m_NoBallMaxCount = no_ball_max_count;
+}

@@ -102,3 +102,43 @@ void BallSearcher::SetLastPosition(const Point2D& pos) {
         m_Active = false;
     }
 }
+
+float BallSearcher::GetTiltPhaseStep() const {
+    return m_TiltPhaseStep;
+}
+
+void BallSearcher::SetTiltPhaseStep(float tilt_phase_step) {
+    m_TiltPhaseStep = tilt_phase_step;
+}
+
+float BallSearcher::GetPanPhaseStep() const {
+    return m_PanPhaseStep;
+}
+
+void BallSearcher::SetPanPhaseStep(float pan_phase_step) {
+    m_PanPhaseStep = pan_phase_step;
+}
+
+float BallSearcher::GetPhaseSize() const {
+    return m_PhaseSize;
+}
+
+void BallSearcher::SetPhaseSize(float phase_size) {
+    m_PhaseSize = phase_size;
+}
+
+float BallSearcher::GetTurnStep() const {
+    return m_TurnStep;
+}
+
+void BallSearcher::SetTurnStep(float turn_step) {
+    m_TurnStep = turn_step;
+}
+
+float BallSearcher::GetMaxTurn() const {
+    return m_MaxTurn;
+}
+
+void BallSearcher::SetMaxTurn(float max_turn) {
+    m_MaxTurn = max_turn;
+}

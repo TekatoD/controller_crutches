@@ -154,7 +154,17 @@ set(SRC
         src/tool/CommandArguments.cpp
         include/tool/CommandArguments.h
         src/config/ActionConfigurationFileLoader.cpp
-        include/config/ActionConfigurationFileLoader.h)
+        include/config/ActionConfigurationFileLoader.h
+        include/tool/CommandArguments.h
+        include/BallTracker.h
+        include/config/BallSearcherConfigurationStrategy.h
+        include/config/BallTrackerConfigurationStrategy.h
+        include/config/HeadConfigurationStrategy.h
+        include/config/GameControllerConfigurationStrategy.h
+        src/config/BallSearcherConfigurationStrategy.cpp
+        src/config/BallTrackerConfigurationStrategy.cpp
+        src/config/HeadConfigurationStrategy.cpp
+        src/config/GameControllerConfigurationStrategy.cpp)
 
 #### Build targets #####
 add_executable(controller ${SRC})

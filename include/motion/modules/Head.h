@@ -1,21 +1,10 @@
-/*
- *   Head.h
- *   represents the head of the robot
- *   Author: ROBOTIS
- *
- */
+#pragma once
 
-#ifndef _HEAD_H_
-#define _HEAD_H_
-
-#include <string.h>
+#include <cstring>
 #include <memory>
 
 #include "motion/MotionModule.h"
 #include "math/Point.h"
-
-#define HEAD_SECTION    "Head Pan/Tilt"
-#define INVALID_VALUE   -1024.0
 
 namespace Robot {
     class Head
@@ -76,7 +65,45 @@ namespace Robot {
 
         void MoveTracking(Point2D err); // For image processing
         void MoveTracking();
+
+        float GetLeftLimit() const;
+
+        void SetLeftLimit(float left_limit);
+
+        float GetRightLimit() const;
+
+        void SetRightLimit(float right_limit);
+
+        float GetTopLimit() const;
+
+        void SetTopLimit(float top_limit);
+
+        float GetBottomLimit() const;
+
+        void SetBottomLimit(float bottom_limit);
+
+        float GetPanHome() const;
+
+        void SetPanHome(float pan_home);
+
+        float GetTiltHome() const;
+
+        void SetTiltHome(float tilit_home);
+
+        float GetPanPGain() const;
+
+        void SetPanPGain(float pan_p_gain);
+
+        float GetPanDGain() const;
+
+        void SetPanDGain(float pan_d_gain);
+
+        float GetTiltPGain() const;
+
+        void SetTiltPGain(float tilt_p_gain);
+
+        float GetTiltDGain() const;
+
+        void SetTiltDGain(float tilt_d_gain);
     };
 }
-
-#endif

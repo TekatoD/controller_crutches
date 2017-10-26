@@ -953,10 +953,10 @@ void Walking::SetOdoAFactor(float odo_a_factor) {
     m_odo_a_factor = odo_a_factor;
 }
 
-bool Walking::GetDebug() const {
+bool Walking::IsDebugEnabled() const {
     return m_debug;
 }
 
-void Walking::SetDebug(bool debug) {
+void Walking::EnableDebug(bool debug) {
     m_debug = debug;
 }

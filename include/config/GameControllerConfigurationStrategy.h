@@ -13,7 +13,7 @@ namespace Robot {
 
         static constexpr char DEFAULT_SECTION[] = "Game Controller";
 
-        GameControllerConfigurationStrategy(std::string section = DEFAULT_SECTION);
+        explicit GameControllerConfigurationStrategy(std::string section = DEFAULT_SECTION);
 
         void ReadConfig(const boost::property_tree::ptree& prop) override;
 

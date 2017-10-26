@@ -17,10 +17,15 @@ namespace Robot {
 
         void SetSection(std::string section);
 
+        void EnableDebug(bool debug);
+
+        bool IsDebugEnabled() const;
+
         virtual ~ConfigurationStrategy() = default;
 
     private:
         std::string m_section{};
+        bool m_debug{true};
     };
 }
 

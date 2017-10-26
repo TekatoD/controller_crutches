@@ -248,6 +248,7 @@ void MotionManager::EnabledDebug(bool debug) {
 }
 
 void MotionManager::SetJointOffset(int id, int offset) {
+    LOG_DEBUG << "MOTION MANAGER ID: " << id << " offset = " << offset;
     if(id >= 1 && id < JointData::NUMBER_OF_JOINTS) {
         m_Offset[id] = offset;
     } else {

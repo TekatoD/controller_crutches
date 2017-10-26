@@ -48,8 +48,13 @@ namespace Robot {
 
         void SetMaxTurn(float max_turn);
 
+        void IsDebugEnabled(bool debug);
+
+        bool EnableDebug() const;
+
 
     private:
+        bool m_debug{true};
         bool m_Active;
         Point2D m_LastPosition;
 

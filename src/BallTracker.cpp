@@ -5,6 +5,7 @@
  *
  */
 
+#include <log/Logger.h>
 #include "motion/modules/Head.h"
 #include "Camera.h"
 #include "BallTracker.h"
@@ -58,5 +59,16 @@ int BallTracker::GetNoBallMaxCount() const {
 }
 
 void BallTracker::SetNoBallMaxCount(int no_ball_max_count) {
+    if(m_debug) {
+        LOG_DEBUG << "BALL TRACKER: no_ball_max_count = " << no_ball_max_count;
+    }
     m_NoBallMaxCount = no_ball_max_count;
+}
+
+bool BallTracker::IsDebugEnabled() const {
+    return m_debug;
+}
+
+void BallTracker::EnableDebug(bool debug) {
+    m_debug = debug;
 }

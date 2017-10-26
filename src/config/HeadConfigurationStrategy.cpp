@@ -11,6 +11,8 @@ HeadConfigurationStrategy::HeadConfigurationStrategy(std::string section)
         : ConfigurationStrategy(std::move(section)) { }
 
 void HeadConfigurationStrategy::ReadConfig(const boost::property_tree::ptree& prop) {
+    if (prop.count(GetSection()) == 0) return; // Section doesn't exist
+
     Head* head = Head::GetInstance();
     auto& head_section = prop.get_child(this->GetSection());
 
@@ -38,6 +40,8 @@ void HeadConfigurationStrategy::ReadConfig(const boost::property_tree::ptree& pr
 }
 
 void HeadConfigurationStrategy::WriteConfig(boost::property_tree::ptree& prop) const {
+    if (prop.count(GetSection()) == 0) prop.add_child(GetSection(), {});
+
     Head* head = Head::GetInstance();
     auto& head_section = prop.get_child(this->GetSection());
 

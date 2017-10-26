@@ -7,6 +7,8 @@ WalkingConfigurationStrategy::WalkingConfigurationStrategy(std::string section)
         : ConfigurationStrategy(std::move(section)) { }
 
 void WalkingConfigurationStrategy::ReadConfig(const boost::property_tree::ptree& prop) {
+    if (prop.count(GetSection()) == 0) return; // Section doesn't exist
+
     Walking* walking = Walking::GetInstance();
     auto& walking_section = prop.get_child(this->GetSection());
 
@@ -66,6 +68,8 @@ void WalkingConfigurationStrategy::ReadConfig(const boost::property_tree::ptree&
 }
 
 void WalkingConfigurationStrategy::WriteConfig(boost::property_tree::ptree& prop) const {
+    if (prop.count(GetSection()) == 0) prop.add_child(GetSection(), {});
+
     Walking* walking = Walking::GetInstance();
     auto& walking_section = prop.get_child(this->GetSection());
 

@@ -15,7 +15,9 @@ MotionManagerConfigurationStrategy::MotionManagerConfigurationStrategy(std::stri
 
 void MotionManagerConfigurationStrategy::ReadConfig(const boost::property_tree::ptree& prop) {
     MotionManager* motionManager = MotionManager::GetInstance();
-    auto& motion_manager_section = prop.get_child(this->GetSection());
+    if (prop.count(GetSection()) == 0) return; // Section doesn't exist
+
+    auto& motion_manager_section = prop.get_child(GetSection());
     for (int i = 1; i < JointData::NUMBER_OF_JOINTS; ++i) {
         std::stringstream keyStream;
         keyStream << "ID_" << std::setw(2) << std::setfill('0') << i;
@@ -26,7 +28,9 @@ void MotionManagerConfigurationStrategy::ReadConfig(const boost::property_tree::
 
 void MotionManagerConfigurationStrategy::WriteConfig(boost::property_tree::ptree& prop) const {
     MotionManager* motionManager = MotionManager::GetInstance();
-    auto& motion_manager_section = prop.get_child(this->GetSection());
+    if (prop.count(GetSection()) == 0) prop.add_child(GetSection(), {});
+
+    auto& motion_manager_section = prop.get_child(GetSection());
     for (int i = 1; i < JointData::NUMBER_OF_JOINTS; ++i) {
         std::stringstream keyStream;
         keyStream << "ID_" << std::setw(2) << std::setfill('0') << i;

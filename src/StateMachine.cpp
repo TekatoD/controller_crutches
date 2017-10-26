@@ -146,58 +146,6 @@ void StateMachine::Disable() {
     while (Action::GetInstance()->IsRunning()) usleep(8000);
 }
 
-
-void StateMachine::LoadINISettings(minIni *ini) {
-    LoadINISettings(ini, CNTRL_SECTION);
-}
-
-
-void StateMachine::LoadINISettings(minIni *ini, const std::string& section) {
-    int value = -2;
-    if ((value = ini->geti(section, "role", INVALID_VALUE)) != INVALID_VALUE) {
-        switch (value) {
-            case (ROLE_SOCCER):
-                m_role = ROLE_SOCCER;
-                break;
-            case (ROLE_PENALTY):
-                m_role = ROLE_PENALTY;
-                break;
-            case (ROLE_GOALKEEPER):
-                m_role = ROLE_GOALKEEPER;
-                break;
-            default:
-                m_role = ROLE_IDLE;
-        }
-    }
-
-    float dvalue = -2;
-    if ((dvalue = ini->getd(section, "spawn_x", INVALID_VALUE)) != INVALID_VALUE) m_spawn_pos.setX(dvalue);
-    if ((dvalue = ini->getd(section, "spawn_y", INVALID_VALUE)) != INVALID_VALUE) m_spawn_pos.setY(dvalue);
-    if ((dvalue = ini->getd(section, "spawn_theta", INVALID_VALUE)) != INVALID_VALUE)
-        m_spawn_pos.setTheta(dvalue / 180.0 * M_PI);
-
-    if ((dvalue = ini->getd(section, "starting_x", INVALID_VALUE)) != INVALID_VALUE) m_starting_pos.setX(dvalue);
-    if ((dvalue = ini->getd(section, "starting_y", INVALID_VALUE)) != INVALID_VALUE) m_starting_pos.setY(dvalue);
-    if ((dvalue = ini->getd(section, "starting_theta", INVALID_VALUE)) != INVALID_VALUE)
-        m_starting_pos.setTheta(dvalue / 180.0 * M_PI);
-}
-
-
-void StateMachine::SaveINISettings(minIni *ini) {
-    SaveINISettings(ini, CNTRL_SECTION);
-}
-
-
-void StateMachine::SaveINISettings(minIni *ini, const std::string& section) {
-    ini->put(section, "role", m_role);
-    ini->put(section, "spawn_x", m_spawn_pos.X());
-    ini->put(section, "spawn_y", m_spawn_pos.Y());
-    ini->put(section, "spawn_theta", m_spawn_pos.Theta() / M_PI * 180.0);
-    ini->put(section, "starting_x", m_starting_pos.X());
-    ini->put(section, "starting_y", m_starting_pos.Y());
-    ini->put(section, "starting_theta", m_starting_pos.Theta() / M_PI * 180.0);
-}
-
 int StateMachine::IsStarted() {
     return m_is_started;
 }

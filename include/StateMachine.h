@@ -8,7 +8,6 @@
 #pragma once
 
 #include "hw/CM730.h"
-#include "minIni.h"
 #include "Pose2D.h"
 
 #define CNTRL_SECTION "State Machine"
@@ -60,14 +59,6 @@ namespace Robot {
         void SetRole(Role role);
 
         void Check(CM730* cm730);
-
-        void LoadINISettings(minIni* ini);
-
-        void LoadINISettings(minIni* ini, const std::string& section);
-
-        void SaveINISettings(minIni* ini);
-
-        void SaveINISettings(minIni* ini, const std::string& section);
 
         void Disable();
 

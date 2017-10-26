@@ -97,7 +97,7 @@ namespace Robot {
 
         void Process() override;
 
-        bool LoadFile(char* filename);
+        bool LoadFile(const char* filename);
 
         bool CreateFile(char* filename);
 

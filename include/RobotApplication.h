@@ -6,6 +6,7 @@
 #include <tool/CommandArguments.h>
 #include "config/ConfigurationFileLoader.h"
 #include "config/WalkingConfigurationStrategy.h"
+#include "config/MotionManagerConfigurationStrategy.h"
 #include "hw/LinuxMotionTimer.h"
 #include "hw/CM730.h"
 
@@ -64,9 +65,11 @@ namespace Robot {
 
         void InitGameController();
 
-        void ReadConfiguraion();
+        void InitConfiguraionLoader();
 
         void ParseCommandLineArguments();
+
+        void ReadConfiguration();
 
     private:
         bool m_debug{true}; // Debug output to console
@@ -81,6 +84,7 @@ namespace Robot {
         ConfigurationFileLoader m_configuration_loader;
 
         WalkingConfigurationStrategy m_walking_configuration_strategy;
+        MotionManagerConfigurationStrategy m_motion_manager_configuration_strategy;
 
         //*** Platform specific members ***//
 

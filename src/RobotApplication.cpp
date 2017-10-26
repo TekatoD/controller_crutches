@@ -62,8 +62,9 @@ void RobotApplication::Initialize() {
     InitMotionModules();
     InitMotionTimer();
     InitGameController();
+    InitConfiguraionLoader();
     ParseCommandLineArguments();
-    ReadConfiguraion();
+    ReadConfiguration();
     if (m_debug) LOG_INFO << "=== Initialization was finished ===";
 }
 
@@ -145,15 +146,22 @@ void RobotApplication::InitGameController() {
     if (m_debug) LOG_INFO << "Game controller client is ready";
 }
 
+void RobotApplication::InitConfiguraionLoader() {
+    if (m_debug) LOG_DEBUG << "Initializing configuration loader...";
+    m_configuration_loader.AddStrategy(m_walking_configuration_strategy, std::__cxx11::string());
+    m_configuration_loader.AddStrategy(m_motion_manager_configuration_strategy, std::__cxx11::string());
+    if (m_debug) LOG_INFO << "Configuration loader is ready";
+}
+
 void RobotApplication::ParseCommandLineArguments() {
     if (m_debug) LOG_DEBUG << "Parsing command line arguments...";
     if (m_debug) LOG_INFO << "Command line arguments was parsed";
 }
 
-void RobotApplication::ReadConfiguraion() {
+void RobotApplication::ReadConfiguration() {
     if (m_debug) LOG_DEBUG << "Reading configuration...";
-    m_configuration_loader.AddStrategy("Walking Config", m_walking_configuration_strategy);
-    if (m_debug) LOG_INFO << "Configuration was read";
+    m_configuration_loader.ConfigureAll();
+    if (m_debug) LOG_INFO << "Reading configuration was finished";
 }
 
 void RobotApplication::StartMainLoop() {

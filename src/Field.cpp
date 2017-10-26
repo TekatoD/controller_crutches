@@ -34,31 +34,6 @@ void Field::SetGateWidth(float gate_width) {
     m_GateWidth = gate_width;
 }
 
-void Field::LoadINISettings(minIni *ini) {
-    LoadINISettings(ini, FIELD_SECTION);
-}
-
-
-void Field::LoadINISettings(minIni *ini, const std::string &section) {
-    float value = -2;
-
-    if ((value = ini->getd(section, "field_width", INVALID_VALUE)) != INVALID_VALUE) SetWidth(value);
-    if ((value = ini->getd(section, "field_length", INVALID_VALUE)) != INVALID_VALUE) SetLength(value);
-    if ((value = ini->getd(section, "gate_width", INVALID_VALUE)) != INVALID_VALUE) SetGateWidth(value);
-}
-
-
-void Field::SaveINISettings(minIni *ini) {
-    SaveINISettings(ini, FIELD_SECTION);
-}
-
-
-void Field::SaveINISettings(minIni *ini, const std::string &section) {
-    ini->put(section, "field_width", m_FieldWidth);
-    ini->put(section, "field_length", m_FieldLength);
-    ini->put(section, "gate_width", m_GateWidth);
-}
-
 std::ostream& operator<<(std::ostream& os, const Field& field) {
     os << "field width: " << field.m_FieldWidth << " field length: " << field.m_FieldLength << " gate width: "
        << field.m_GateWidth;

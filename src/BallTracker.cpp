@@ -45,24 +45,6 @@ void BallTracker::Process(Point2D pos) {
     }
 }
 
-
-void BallTracker::LoadINISettings(minIni* ini) {
-    LoadINISettings(ini, TRACKER_SECTION);
-}
-
-void BallTracker::LoadINISettings(minIni* ini, const std::string& section) {
-    int value;
-    if ((value = ini->geti(section, "no_ball_max_count", INVALID_VALUE)) != INVALID_VALUE) m_NoBallMaxCount = value;
-}
-
-void BallTracker::SaveINISettings(minIni* ini) {
-    SaveINISettings(ini, TRACKER_SECTION);
-}
-
-void BallTracker::SaveINISettings(minIni* ini, const std::string& section) {
-    ini->put(section, "no_ball_max_count", m_NoBallCount);
-}
-
 const Point2D& BallTracker::GetBallPosition() const {
     return BallPosition;
 }

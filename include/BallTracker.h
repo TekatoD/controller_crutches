@@ -1,19 +1,7 @@
-/*
- *   BallTracker.h
- *
- *   Author: ROBOTIS
- *
- */
+#pragma once
 
-#ifndef _BALL_TRACKER_H_
-#define _BALL_TRACKER_H_
-
-#include <string.h>
-
+#include <cstring>
 #include "math/Point.h"
-#include "minIni.h"
-
-#define TRACKER_SECTION "Ball Tracker"
 
 namespace Robot {
     class BallTracker {
@@ -38,14 +26,5 @@ namespace Robot {
 
         void SetNoBallMaxCount(int no_ball_max_count);
 
-        void LoadINISettings(minIni* ini);
-
-        void LoadINISettings(minIni* ini, const std::string& section);
-
-        void SaveINISettings(minIni* ini);
-
-        void SaveINISettings(minIni* ini, const std::string& section);
     };
 }
-
-#endif

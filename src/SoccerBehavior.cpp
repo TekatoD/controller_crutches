@@ -138,28 +138,3 @@ void SoccerBehavior::normalize(float& m_theta) const {
     while (m_theta < -180.0) m_theta += 2.0 * 180.0;
     while (m_theta > 180.0) m_theta -= 2.0 * 180.0;
 }
-
-void SoccerBehavior::LoadINISettings(minIni* ini) {
-    LoadINISettings(ini, SOCCER_SECTION);
-}
-
-void SoccerBehavior::LoadINISettings(minIni* ini, const std::string& section) {
-    m_BallTracker.LoadINISettings(ini);
-    m_BallFollower.LoadINISettings(ini);
-    m_BallSearcher.LoadINISettings(ini);
-    m_GoTo.LoadINISettings(ini);
-    m_Field.LoadINISettings(ini);
-}
-
-
-void SoccerBehavior::SaveINISettings(minIni* ini) {
-    SaveINISettings(ini, SOCCER_SECTION);
-}
-
-
-void SoccerBehavior::SaveINISettings(minIni* ini, const std::string& section) {
-    m_BallTracker.SaveINISettings(ini);
-    m_BallFollower.SaveINISettings(ini);
-    m_GoTo.SaveINISettings(ini);
-    m_Field.SaveINISettings(ini);
-}

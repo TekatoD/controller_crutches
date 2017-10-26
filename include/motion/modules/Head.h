@@ -1,22 +1,10 @@
-/*
- *   Head.h
- *   represents the head of the robot
- *   Author: ROBOTIS
- *
- */
+#pragma once
 
-#ifndef _HEAD_H_
-#define _HEAD_H_
-
-#include <string.h>
+#include <cstring>
 #include <memory>
 
-#include "minIni.h"
 #include "motion/MotionModule.h"
 #include "math/Point.h"
-
-#define HEAD_SECTION    "Head Pan/Tilt"
-#define INVALID_VALUE   -1024.0
 
 namespace Robot {
     class Head
@@ -78,16 +66,6 @@ namespace Robot {
         void MoveTracking(Point2D err); // For image processing
         void MoveTracking();
 
-/*Read/write from a INI file*/
-
-        void LoadINISettings(minIni* ini);
-
-        void LoadINISettings(minIni* ini, const std::string& section);
-
-        void SaveINISettings(minIni* ini);
-
-        void SaveINISettings(minIni* ini, const std::string& section);
-
         float GetLeftLimit() const;
 
         void SetLeftLimit(float left_limit);
@@ -129,5 +107,3 @@ namespace Robot {
         void SetTiltDGain(float tilt_d_gain);
     };
 }
-
-#endif

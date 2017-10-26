@@ -189,61 +189,6 @@ void BallFollower::Process(Point2D ball_pos,
     }
 }
 
-
-void BallFollower::LoadINISettings(minIni* ini) {
-    LoadINISettings(ini, FOLLOWER_SECTION);
-}
-
-
-void BallFollower::LoadINISettings(minIni* ini, const std::string& section) {
-    int value = -2;
-    if ((value = ini->geti(section, "no_ball_max_count", INVALID_VALUE)) != INVALID_VALUE) m_NoBallMaxCount = value;
-    if ((value = ini->geti(section, "kick_ball_max_count", INVALID_VALUE)) != INVALID_VALUE) m_KickBallMaxCount = value;
-
-    float dvalue = -2.0;
-    if ((dvalue = ini->getd(section, "kick_top_angle", INVALID_VALUE)) != INVALID_VALUE) m_KickTopAngle = dvalue;
-    if ((dvalue = ini->getd(section, "kick_right_angle", INVALID_VALUE)) != INVALID_VALUE) m_KickRightAngle = dvalue;
-    if ((dvalue = ini->getd(section, "kick_left_angle", INVALID_VALUE)) != INVALID_VALUE) m_KickLeftAngle = dvalue;
-    if ((dvalue = ini->getd(section, "follow_max_fb_step", INVALID_VALUE)) != INVALID_VALUE) m_FollowMaxFBStep = dvalue;
-    if ((dvalue = ini->getd(section, "follow_min_fb_step", INVALID_VALUE)) != INVALID_VALUE) m_FollowMinFBStep = dvalue;
-    if ((dvalue = ini->getd(section, "follow_max_rl_turn", INVALID_VALUE)) != INVALID_VALUE) m_FollowMaxRLTurn = dvalue;
-    if ((dvalue = ini->getd(section, "fit_fb_step", INVALID_VALUE)) != INVALID_VALUE) m_FitFBStep = dvalue;
-    if ((dvalue = ini->getd(section, "fit_max_rl_turn", INVALID_VALUE)) != INVALID_VALUE) m_FitMaxRLTurn = dvalue;
-    if ((dvalue = ini->getd(section, "unit_fb_step", INVALID_VALUE)) != INVALID_VALUE) m_UnitFBStep = dvalue;
-    if ((dvalue = ini->getd(section, "unit_rl_step", INVALID_VALUE)) != INVALID_VALUE) m_UnitRLStep = dvalue;
-    if ((dvalue = ini->getd(section, "unit_rl_turn", INVALID_VALUE)) != INVALID_VALUE) m_UnitRLTurn = dvalue;
-    if ((dvalue = ini->getd(section, "tilt_offset", INVALID_VALUE)) != INVALID_VALUE) m_TiltOffset = dvalue;
-    if ((dvalue = ini->getd(section, "aim_tilt_offset", INVALID_VALUE)) != INVALID_VALUE) m_AimTiltOffset = dvalue;
-    if ((dvalue = ini->getd(section, "aim_rl_step", INVALID_VALUE)) != INVALID_VALUE) m_AimRLStep = dvalue;
-    if ((dvalue = ini->getd(section, "aim_rl_turn", INVALID_VALUE)) != INVALID_VALUE) m_AimRLTurn = dvalue;
-}
-
-
-void BallFollower::SaveINISettings(minIni* ini) {
-    SaveINISettings(ini, FOLLOWER_SECTION);
-}
-
-
-void BallFollower::SaveINISettings(minIni* ini, const std::string& section) {
-    ini->put(section, "no_ball_max_count", m_NoBallMaxCount);
-    ini->put(section, "kick_ball_max_count", m_KickBallMaxCount);
-    ini->put(section, "kick_top_angle", m_KickTopAngle);
-    ini->put(section, "kick_right_angle", m_KickRightAngle);
-    ini->put(section, "kick_left_angle", m_KickLeftAngle);
-    ini->put(section, "follow_max_fb_step", m_FollowMaxFBStep);
-    ini->put(section, "follow_min_fb_step", m_FollowMinFBStep);
-    ini->put(section, "follow_max_rl_turn", m_FollowMaxRLTurn);
-    ini->put(section, "fit_fb_step", m_FitFBStep);
-    ini->put(section, "fit_max_rl_turn", m_FitMaxRLTurn);
-    ini->put(section, "unit_fb_step", m_UnitFBStep);
-    ini->put(section, "unit_rl_step", m_UnitRLStep);
-    ini->put(section, "unit_rl_turn", m_UnitRLTurn);
-    ini->put(section, "tilt_offset", m_TiltOffset);
-    ini->put(section, "aim_tilt_offset", m_AimTiltOffset);
-    ini->put(section, "aim_rl_step", m_AimRLStep);
-    ini->put(section, "aim_rl_turn", m_AimRLTurn);
-}
-
 bool BallFollower::IsNoBall() const {
     return m_NoBallCount >= m_NoBallCount;
 }

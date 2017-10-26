@@ -29,7 +29,7 @@ void ConfigurationFileLoader::ConfigureAll() {
                 strategy->ReadConfig(prop);
             }
             if (m_debug)
-                LOG_INFO << "CONFIGURATION FILE LOADER: Reading configuration from file " << path << " was done successfully";
+                LOG_DEBUG << "CONFIGURATION FILE LOADER: Reading configuration from file " << path << " was done successfully";
         } else {
            if (m_debug) LOG_WARNING << "CONFIGURATION FILE LOADER: File " << path << " doesn't exist";
         }
@@ -51,7 +51,7 @@ void ConfigurationFileLoader::DumpAll() {
         }
         WritePropertyToFile(prop, path);
         if (m_debug)
-            LOG_INFO << "CONFIGURATION FILE LOADER: Dump configuration to file " << path << " was done successfully";
+            LOG_DEBUG << "CONFIGURATION FILE LOADER: Dump configuration to file " << path << " was done successfully";
     }
 }
 

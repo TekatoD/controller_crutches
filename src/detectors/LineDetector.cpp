@@ -288,8 +288,8 @@ namespace ant {
       m_conf.HoughLines.theta = ini->getf("HoughLines", "theta");
       m_conf.HoughLines.threshold = ini->geti("HoughLines", "threshold");
       
-      m_conf.LineEqualPredicate.angle_eps = ini->getf("LineEqualpredicate", "angle_eps");
-      m_conf.LineEqualPredicate.error_px = ini->geti("LineEqualPredicate", "error_px");
+      m_conf.LineEqualPredicate.angle_eps = ini->getf("LineEqualsPredicate", "angle_eps");
+      m_conf.LineEqualPredicate.error_px = ini->geti("LineEqualsPredicate", "error_px");
       
       m_conf.Preproc.kernel_size = ini->geti("Preproc", "kernel_size");
       m_conf.Preproc.min_thresh = ini->geti("Preproc", "min_thresh");
@@ -300,8 +300,8 @@ namespace ant {
       m_conf.Preproc.ColorThresh.max_2 = ini->geti("ColorThresh", "max_2");
       m_conf.Preproc.ColorThresh.max_3 = ini->geti("ColorThresh", "max_3");
       
-      m_conf.Preproc_new.kernel_size = ini->geti("Preproc_new", "kernel_size");
-      m_conf.Preproc_new.min_thresh = ini->geti("Preproc_new", "min_thresh");
+      m_conf.Preproc_new.kernel_size = ini->geti("PreprocNew", "kernel_size");
+      m_conf.Preproc_new.min_thresh = ini->geti("PreprocNew", "min_thresh");
       m_conf.Preproc_new.ColorThresh.min_1 = ini->geti("ColorThresh1", "min_1");
       m_conf.Preproc_new.ColorThresh.min_2 = ini->geti("ColorThresh1", "min_2");
       m_conf.Preproc_new.ColorThresh.min_3 = ini->geti("ColorThresh1", "min_3");

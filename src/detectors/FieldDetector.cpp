@@ -81,11 +81,11 @@ void ant::FieldDetector::load(minIni* ini)
     int defMinThresh = 0, defMaxThresh = 255;
     int val = -1;
     
-    val = ini->geti("FieldDetector", "kernel_size", defKernelSize);
     //set kernel size
+    val = ini->geti("FieldDetector", "kernel_size", defKernelSize);
     
-    val = ini->geti("FieldDetector", "min_threshold", defMinThresh);
     // set min thresh
+    val = ini->geti("FieldDetector", "min_threshold", defMinThresh);
     
     ColorThresh.min_1 = ini->geti("ColorThresh1", "min_1", defMinThresh);
     ColorThresh.min_2 = ini->geti("ColorThresh1", "min_2", defMinThresh);
@@ -93,6 +93,7 @@ void ant::FieldDetector::load(minIni* ini)
     ColorThresh.max_1 = ini->geti("ColorThresh1", "max_1", defMinThresh);
     ColorThresh.max_2 = ini->geti("ColorThresh1", "max_2", defMinThresh);
     ColorThresh.max_3 = ini->geti("ColorThresh1", "max_3", defMinThresh);
+    
     ColorThresh2.min_1 = ini->geti("ColorThresh2", "min_1", defMinThresh);
     ColorThresh2.min_2 = ini->geti("ColorThresh2", "min_2", defMinThresh);
     ColorThresh2.min_3 = ini->geti("ColorThresh2", "min_3", defMinThresh);

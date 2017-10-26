@@ -13,6 +13,8 @@ BallSearcherConfigurationStrategy::BallSearcherConfigurationStrategy(BallSearche
 
 void BallSearcherConfigurationStrategy::ReadConfig(const boost::property_tree::ptree& prop) {
     if (m_ball_searcher != nullptr) {
+        if (prop.count(GetSection()) == 0) return; // Section doesn't exist
+
         auto& searcher_section = prop.get_child(this->GetSection());
         auto tilt_phase_step = searcher_section.get_optional<float>("tilt_phase_step");
         auto pan_phase_step = searcher_section.get_optional<float>("pan_phase_step");
@@ -33,6 +35,8 @@ void BallSearcherConfigurationStrategy::ReadConfig(const boost::property_tree::p
 
 void BallSearcherConfigurationStrategy::WriteConfig(boost::property_tree::ptree& prop) const {
     if (m_ball_searcher != nullptr) {
+        if (prop.count(GetSection()) == 0) prop.add_child(GetSection(), {});
+
         auto& searcher_section = prop.get_child(this->GetSection());
         searcher_section.put("tilt_phase_step", m_ball_searcher->GetTiltPhaseStep());
         searcher_section.put("pan_phase_step", m_ball_searcher->GetPanPhaseStep());

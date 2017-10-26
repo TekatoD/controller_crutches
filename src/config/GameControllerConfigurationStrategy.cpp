@@ -11,6 +11,7 @@ GameControllerConfigurationStrategy::GameControllerConfigurationStrategy(std::st
         : ConfigurationStrategy(std::move(section)) { }
 
 void GameControllerConfigurationStrategy::ReadConfig(const boost::property_tree::ptree& prop) {
+    if (prop.count(GetSection()) == 0) return; // Section doesn't exist
     GameController* gameController = GameController::GetInstance();
     auto& game_controller_section = prop.get_child(DEFAULT_SECTION);
 
@@ -22,6 +23,7 @@ void GameControllerConfigurationStrategy::ReadConfig(const boost::property_tree:
 }
 
 void GameControllerConfigurationStrategy::WriteConfig(boost::property_tree::ptree& prop) const {
+    if (prop.count(GetSection()) == 0) prop.add_child(GetSection(), {});
     GameController* gameController = GameController::GetInstance();
     auto& game_controller_section = prop.get_child(DEFAULT_SECTION);
 

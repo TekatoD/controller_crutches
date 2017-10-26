@@ -13,15 +13,15 @@ namespace Robot {
             : public ConfigurationStrategy {
     public:
 
-        BallSearcherConfigurationStrategy();
+        static constexpr char DEFAULT_SECTION[] = "Ball Searcher";
 
-        explicit BallSearcherConfigurationStrategy(BallSearcher* ballSearcher);
+        explicit BallSearcherConfigurationStrategy(BallSearcher* ballSearcher = nullptr, std::string section = DEFAULT_SECTION);
 
         void ReadConfig(const boost::property_tree::ptree& prop) override;
 
         void WriteConfig(boost::property_tree::ptree& prop) const override;
 
     private:
-        BallSearcher* m_ball_searcher;
+        BallSearcher* m_ball_searcher{nullptr};
     };
 }

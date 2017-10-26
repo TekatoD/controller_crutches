@@ -7,19 +7,23 @@
 
 using namespace Robot;
 
+HeadConfigurationStrategy::HeadConfigurationStrategy(std::string section)
+        : ConfigurationStrategy(std::move(section)) { }
+
 void HeadConfigurationStrategy::ReadConfig(const boost::property_tree::ptree& prop) {
     Head* head = Head::GetInstance();
+    auto& head_section = prop.get_child(this->GetSection());
 
-    auto pan_p_gain = prop.get_optional<float>("pan_p_gain");
-    auto pan_d_gain = prop.get_optional<float>("pan_d_gain");
-    auto tilt_p_gain = prop.get_optional<float>("tilt_p_gain");
-    auto tilt_d_gain = prop.get_optional<float>("tilt_d_gain");
-    auto left_limit = prop.get_optional<float>("left_limit");
-    auto right_limit = prop.get_optional<float>("right_limit");
-    auto top_limit = prop.get_optional<float>("top_limit");
-    auto bottom_limit = prop.get_optional<float>("bottom_limit");
-    auto pan_home = prop.get_optional<float>("pan_home");
-    auto tilt_home = prop.get_optional<float>("tilt_home");
+    auto pan_p_gain = head_section.get_optional<float>("pan_p_gain");
+    auto pan_d_gain = head_section.get_optional<float>("pan_d_gain");
+    auto tilt_p_gain = head_section.get_optional<float>("tilt_p_gain");
+    auto tilt_d_gain = head_section.get_optional<float>("tilt_d_gain");
+    auto left_limit = head_section.get_optional<float>("left_limit");
+    auto right_limit = head_section.get_optional<float>("right_limit");
+    auto top_limit = head_section.get_optional<float>("top_limit");
+    auto bottom_limit = head_section.get_optional<float>("bottom_limit");
+    auto pan_home = head_section.get_optional<float>("pan_home");
+    auto tilt_home = head_section.get_optional<float>("tilt_home");
 
     if (pan_p_gain) head->SetPanPGain(pan_p_gain.get());
     if (pan_d_gain) head->SetPanDGain(pan_d_gain.get());
@@ -35,15 +39,16 @@ void HeadConfigurationStrategy::ReadConfig(const boost::property_tree::ptree& pr
 
 void HeadConfigurationStrategy::WriteConfig(boost::property_tree::ptree& prop) const {
     Head* head = Head::GetInstance();
+    auto& head_section = prop.get_child(this->GetSection());
 
-    prop.put("pan_p_gain", head->GetPanPGain());
-    prop.put("pan_d_gain", head->GetPanDGain());
-    prop.put("tilt_p_gain", head->GetTiltPGain());
-    prop.put("tilt_d_gain", head->GetTiltDGain());
-    prop.put("left_limit", head->GetLeftLimit());
-    prop.put("right_limit", head->GetRightLimit());
-    prop.put("top_limit", head->GetTopLimit());
-    prop.put("bottom_limit", head->GetBottomLimit());
-    prop.put("pan_home", head->GetPanHome());
-    prop.put("tilt_home", head->GetTiltHome());
+    head_section.put("pan_p_gain", head->GetPanPGain());
+    head_section.put("pan_d_gain", head->GetPanDGain());
+    head_section.put("tilt_p_gain", head->GetTiltPGain());
+    head_section.put("tilt_d_gain", head->GetTiltDGain());
+    head_section.put("left_limit", head->GetLeftLimit());
+    head_section.put("right_limit", head->GetRightLimit());
+    head_section.put("top_limit", head->GetTopLimit());
+    head_section.put("bottom_limit", head->GetBottomLimit());
+    head_section.put("pan_home", head->GetPanHome());
+    head_section.put("tilt_home", head->GetTiltHome());
 }

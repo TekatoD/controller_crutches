@@ -8,13 +8,13 @@
 
 using namespace Robot;
 
-BallTrackerConfigurationStrategy::BallTrackerConfigurationStrategy() : m_ball_tracker(nullptr) { }
-
-BallTrackerConfigurationStrategy::BallTrackerConfigurationStrategy(BallTracker* ballTracker) : m_ball_tracker(ballTracker) { }
+BallTrackerConfigurationStrategy::BallTrackerConfigurationStrategy(BallTracker* ballTracker, std::string section)
+        : ConfigurationStrategy(std::move(section)), m_ball_tracker(ballTracker) { }
 
 void BallTrackerConfigurationStrategy::ReadConfig(const boost::property_tree::ptree& prop) {
     if (m_ball_tracker != nullptr) {
-        auto no_ball_max_count = prop.get_optional<float>("no_ball_max_count");
+        auto& tracker_section = prop.get_child(this->GetSection());
+        auto no_ball_max_count = tracker_section.get_optional<int>("no_ball_max_count");
 
         if (no_ball_max_count) m_ball_tracker->SetNoBallMaxCount(no_ball_max_count.get());
     }
@@ -25,7 +25,8 @@ void BallTrackerConfigurationStrategy::ReadConfig(const boost::property_tree::pt
 
 void BallTrackerConfigurationStrategy::WriteConfig(boost::property_tree::ptree& prop) const {
     if (m_ball_tracker != nullptr) {
-        prop.put("tilt_phase_step", m_ball_tracker->GetNoBallMaxCount());
+        auto& tracker_section = prop.get_child(this->GetSection());
+        tracker_section.put("tilt_phase_step", m_ball_tracker->GetNoBallMaxCount());
     }
     else {
         throw std::runtime_error("Ball Tracker configuration write fail: BallTracker nullptr");

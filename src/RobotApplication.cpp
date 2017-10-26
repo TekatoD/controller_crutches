@@ -148,8 +148,8 @@ void RobotApplication::InitGameController() {
 
 void RobotApplication::InitConfiguraionLoader() {
     if (m_debug) LOG_DEBUG << "Initializing configuration loader...";
-    m_configuration_loader.AddStrategy("Walking Config", m_walking_configuration_strategy);
-    m_configuration_loader.AddStrategy("Offset", m_motion_manager_configuration_strategy);
+    m_configuration_loader.AddStrategy(m_walking_configuration_strategy, std::__cxx11::string());
+    m_configuration_loader.AddStrategy(m_motion_manager_configuration_strategy, std::__cxx11::string());
     if (m_debug) LOG_INFO << "Configuration loader is ready";
 }
 
@@ -161,7 +161,7 @@ void RobotApplication::ParseCommandLineArguments() {
 void RobotApplication::ReadConfiguration() {
     if (m_debug) LOG_DEBUG << "Reading configuration...";
     m_configuration_loader.ConfigureAll();
-    if (m_debug) LOG_INFO << "Configuration was read";
+    if (m_debug) LOG_INFO << "Reading configuration was finished";
 }
 
 void RobotApplication::StartMainLoop() {

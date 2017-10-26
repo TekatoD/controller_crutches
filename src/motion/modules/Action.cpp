@@ -94,10 +94,10 @@ void Action::Initialize() {
 }
 
 
-bool Action::LoadFile(char* filename) {
+bool Action::LoadFile(const char* filename) {
     FILE* action = fopen(filename, "r+b");
 
-    if (action == 0) {
+    if (action == nullptr) {
         LOG_ERROR << "ACTION: Can not open Action file!";
         return false;
     }
@@ -109,7 +109,7 @@ bool Action::LoadFile(char* filename) {
         return false;
     }
 
-    if (m_action_file != 0)
+    if (m_action_file != nullptr)
         fclose(m_action_file);
 
     m_action_file = action;
@@ -119,17 +119,17 @@ bool Action::LoadFile(char* filename) {
 
 bool Action::CreateFile(char* filename) {
     FILE* action = fopen(filename, "ab");
-    if (action == 0) {
+    if (action == nullptr) {
         LOG_ERROR << "ACTION: Can not create Action file!";
         return false;
     }
 
-    PAGE page;
+    PAGE page{};
     ResetPage(&page);
     for (int i = 0; i < MAXNUM_PAGE; i++)
         fwrite(&page, 1, sizeof(PAGE), action);
 
-    if (m_action_file != 0)
+    if (m_action_file != nullptr)
         fclose(m_action_file);
 
     m_action_file = action;
@@ -143,7 +143,7 @@ bool Action::Start(int iPage) {
         return false;
     }
 
-    PAGE page;
+    PAGE page{};
     if (!LoadPage(iPage, &page))
         return false;
 
@@ -153,10 +153,10 @@ bool Action::Start(int iPage) {
 
 bool Action::Start(char* namePage) {
     int index;
-    PAGE page;
+    PAGE page{};
 
     for (index = 1; index < MAXNUM_PAGE; index++) {
-        if (LoadPage(index, &page) == false)
+        if (!LoadPage(index, &page))
             return false;
 
         if (strcmp(namePage, (char*) page.header.name) == 0)
@@ -248,10 +248,7 @@ bool Action::SavePage(int index, PAGE* pPage) {
     if (fseek(m_action_file, position, SEEK_SET) != 0)
         return false;
 
-    if (fwrite(pPage, 1, sizeof(PAGE), m_action_file) != sizeof(PAGE))
-        return false;
-
-    return true;
+    return fwrite(pPage, 1, sizeof(PAGE), m_action_file) == sizeof(PAGE);
 }
 
 

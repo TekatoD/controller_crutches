@@ -129,21 +129,21 @@ namespace Robot {
 
         void SetBalanceEnabled(bool balance_enabled) noexcept;
 
-        float GetLegsYOffset() const;
+        float GetLegsYOffset() const noexcept ;
 
         void SetLegsYOffset(float legs_y_offset);
 
-        float GetArmSpreadOffset() const;
+        float GetArmSpreadOffset() const noexcept ;
 
         void SetArmSpreadOffset(float arm_spread_amplitude);
 
-        float GetElbowOffset() const;
+        float GetElbowOffset() const noexcept;
 
         void SetElbowOffset(float arm_elbow_offset);
 
-        bool GetDebug() const;
+        bool IsDebugEnabled() const noexcept;
 
-        void SetDebug(bool debug);
+        void EnableDebug(bool debug) noexcept;
 
     private:
         Kicking() = default;

@@ -24,14 +24,14 @@ void ConfigurationFileLoader::ConfigureAll() {
         if (fs::exists(fs::path(path))) {
             auto prop = ReadPropertyFromFile(path);
             if (m_debug)
-                LOG_DEBUG << "CONFIGURATION READER: Reading configuration from file " << path << "...";
+                LOG_DEBUG << "CONFIGURATION FILE LOADER: Reading configuration from file " << path << "...";
             for (auto& strategy : strategies) {
                 strategy->ReadConfig(prop);
             }
             if (m_debug)
-                LOG_INFO << "CONFIGURATION READER: Read configuration from file " << path << " was done successfully";
+                LOG_INFO << "CONFIGURATION FILE LOADER: Reading configuration from file " << path << " was done successfully";
         } else {
-           if (m_debug) LOG_WARNING << "CONFIGURATION READER: File " << path << " doesn't exists";
+           if (m_debug) LOG_WARNING << "CONFIGURATION FILE LOADER: File " << path << " doesn't exist";
         }
     }
 }
@@ -45,13 +45,13 @@ void ConfigurationFileLoader::DumpAll() {
             prop = ReadPropertyFromFile(path); // For avoid data loss in file
         }
         if (m_debug)
-            LOG_DEBUG << "CONFIGURATION READER: Dumping configuration to file " << path << "...";
+            LOG_DEBUG << "CONFIGURATION FILE LOADER: Dumping configuration to file " << path << "...";
         for (auto& strategy : strategies) {
             strategy->WriteConfig(prop);
         }
         WritePropertyToFile(prop, path);
         if (m_debug)
-            LOG_INFO << "CONFIGURATION READER: Dump configuration to file " << path << " was done successfully";
+            LOG_INFO << "CONFIGURATION FILE LOADER: Dump configuration to file " << path << " was done successfully";
     }
 }
 

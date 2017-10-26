@@ -121,8 +121,8 @@ namespace Robot {
 
         void ResetPage(PAGE* pPage);
 
-        bool GetDebug() const;
+        bool IsDebugEnabled() const noexcept;
 
-        void SetDebug(bool debug);
+        void EnableDebug(bool debug) noexcept;
     };
 }

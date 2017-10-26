@@ -635,11 +635,11 @@ void Action::Process() {
     }
 }
 
-bool Action::GetDebug() const {
+bool Action::IsDebugEnabled() const noexcept {
     return m_debug;
 }
 
-void Action::SetDebug(bool debug) {
+void Action::EnableDebug(bool debug) noexcept {
     m_debug = debug;
 }
 

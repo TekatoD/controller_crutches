@@ -54,7 +54,6 @@ void Robot::VrepCM730::init_devices() {
     m_joints[JointData::ID_L_ANKLE_ROLL - 1] = this->connect_device("j_ankle_roll_l" + m_device_postfix);
     m_joints[JointData::ID_HEAD_PAN - 1] = this->connect_device("j_head_yaw" + m_device_postfix);
     m_joints[JointData::ID_HEAD_TILT - 1] = this->connect_device("j_head_pitch" + m_device_postfix);
-    std::cout << "\033[32mDevices initialized\033[0m" << std::endl;
 }
 
 void Robot::VrepCM730::SetClientId(int client_id) {

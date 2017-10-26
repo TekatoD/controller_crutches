@@ -51,7 +51,7 @@ find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED) # This lib is used by the linux camera
 find_package(Eigen3 REQUIRED)
 # Path to Boost and OpenCV needs to be set manually when crosscompiling
-find_package(Boost 1.54 COMPONENTS system log_setup log date_time filesystem thread REQUIRED)
+find_package(Boost 1.54 COMPONENTS system log_setup log date_time filesystem thread program_options REQUIRED)
 find_package(OpenCV 3.3 REQUIRED)
 find_package(LibXml2)
 

@@ -3,7 +3,13 @@
 
 #include <atomic>
 #include <memory>
+#include <boost/program_options.hpp>
 #include <tool/CommandArguments.h>
+#include <config/ActionConfigurationFileLoader.h>
+#include <config/BallSearcherConfigurationStrategy.h>
+#include <config/BallTrackerConfigurationStrategy.h>
+#include <config/GameControllerConfigurationStrategy.h>
+#include <config/HeadConfigurationStrategy.h>
 #include "config/ConfigurationFileLoader.h"
 #include "config/WalkingConfigurationStrategy.h"
 #include "config/MotionManagerConfigurationStrategy.h"
@@ -43,10 +49,13 @@ namespace Robot {
         void EnableDebug(bool debug) noexcept;
 
     private:
-
         RobotApplication() = default;
 
+        bool HelpMessageRequested() const noexcept;
+
         bool TryStart();
+
+        void StartMainLoop();
 
         //*** Initialization methods ***//
         void CheckHWStatus();
@@ -73,6 +82,7 @@ namespace Robot {
 
     private:
         bool m_debug{true}; // Debug output to console
+        bool m_show_help_message{false};
 
         CommandArguments m_arguments;
 
@@ -83,8 +93,24 @@ namespace Robot {
         //*** Configuration members ***//
         ConfigurationFileLoader m_configuration_loader;
 
+        BallSearcherConfigurationStrategy m_ball_searcher_configuration_strategy;
+        BallTrackerConfigurationStrategy m_ball_tracker_configuration_strategy;
+        GameControllerConfigurationStrategy m_game_controller_configuration_strategy;
+        HeadConfigurationStrategy m_head_configuration_strategy;
         WalkingConfigurationStrategy m_walking_configuration_strategy;
         MotionManagerConfigurationStrategy m_motion_manager_configuration_strategy;
+
+        std::string m_config_default;
+        std::string m_config_ball_searcher;
+        std::string m_config_ball_tracker;
+        std::string m_config_game_controller;
+        std::string m_config_motion_manager;
+        std::string m_config_head;
+        std::string m_config_walking;
+        std::string m_config_action;
+        std::string m_config_kicking;
+
+        ActionConfigurationFileLoader m_action_configuration_loader;
 
         //*** Platform specific members ***//
 
@@ -93,8 +119,6 @@ namespace Robot {
 #else
         std::unique_ptr<VrepConnector> m_vrep_connector{nullptr};
 #endif
-
-        void StartMainLoop();
     };
 }
 

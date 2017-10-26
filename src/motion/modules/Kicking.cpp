@@ -576,7 +576,7 @@ void Robot::Kicking::SetBalanceEnabled(bool balance_enabled) noexcept {
     m_balance_enabled = balance_enabled;
 }
 
-float Robot::Kicking::GetLegsYOffset() const {
+float Robot::Kicking::GetLegsYOffset() const noexcept {
     return m_legs_y_offset;
 }
 
@@ -587,15 +587,15 @@ void Robot::Kicking::SetLegsYOffset(float legs_y_offset) {
     m_legs_y_offset = legs_y_offset;
 }
 
-bool Robot::Kicking::GetDebug() const {
+bool Robot::Kicking::IsDebugEnabled() const noexcept {
     return m_debug;
 }
 
-void Robot::Kicking::SetDebug(bool debug) {
+void Robot::Kicking::EnableDebug(bool debug) noexcept {
     m_debug = debug;
 }
 
-float Robot::Kicking::GetArmSpreadOffset() const {
+float Robot::Kicking::GetArmSpreadOffset() const noexcept {
     return m_arm_spread_offset;
 }
 
@@ -606,7 +606,7 @@ void Robot::Kicking::SetArmSpreadOffset(float arm_spread_amplitude) {
     m_arm_spread_offset = arm_spread_amplitude;
 }
 
-float Robot::Kicking::GetElbowOffset() const {
+float Robot::Kicking::GetElbowOffset() const noexcept {
     return m_elbow_offset;
 }
 

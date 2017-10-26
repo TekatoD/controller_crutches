@@ -5,11 +5,6 @@
 
 namespace Robot {
     class BallTracker {
-    private:
-        int m_NoBallCount;
-        int m_NoBallMaxCount;
-        Point2D BallPosition;
-
     public:
 
         BallTracker();
@@ -25,6 +20,17 @@ namespace Robot {
         int GetNoBallMaxCount() const;
 
         void SetNoBallMaxCount(int no_ball_max_count);
+
+        bool IsDebugEnabled() const;
+
+        void EnableDebug(bool debug);
+
+    private:
+
+        int m_NoBallCount;
+        int m_NoBallMaxCount;
+        Point2D BallPosition;
+        bool m_debug{true};
 
     };
 }

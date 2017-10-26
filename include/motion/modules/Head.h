@@ -9,28 +9,6 @@
 namespace Robot {
     class Head
             : public MotionModule {
-    private:
-        float m_LeftLimit;
-        float m_RightLimit;
-        float m_TopLimit;
-        float m_BottomLimit;
-        float m_Pan_Home;
-        float m_Tilt_Home;
-        float m_Pan_err;
-        float m_Pan_err_diff;
-        float m_Pan_p_gain;
-        float m_Pan_d_gain;
-        float m_Tilt_err;
-        float m_Tilt_err_diff;
-        float m_Tilt_p_gain;
-        float m_Tilt_d_gain;
-        float m_PanAngle;
-        float m_TiltAngle;
-
-        Head();
-
-        void CheckLimit();
-
     public:
         static Head* GetInstance() {
             static Head head;
@@ -88,7 +66,7 @@ namespace Robot {
 
         float GetTiltHome() const;
 
-        void SetTiltHome(float tilit_home);
+        void SetTiltHome(float tilt_home);
 
         float GetPanPGain() const;
 
@@ -105,5 +83,33 @@ namespace Robot {
         float GetTiltDGain() const;
 
         void SetTiltDGain(float tilt_d_gain);
+
+        bool IsDebugEnabled() const;
+
+        void EnableDebug(bool debug);
+
+    private:
+        float m_LeftLimit;
+        float m_RightLimit;
+        float m_TopLimit;
+        float m_BottomLimit;
+        float m_Pan_Home;
+        float m_Tilt_Home;
+        float m_Pan_err;
+        float m_Pan_err_diff;
+        float m_Pan_p_gain;
+        float m_Pan_d_gain;
+        float m_Tilt_err;
+        float m_Tilt_err_diff;
+        float m_Tilt_p_gain;
+        float m_Tilt_d_gain;
+        float m_PanAngle;
+        float m_TiltAngle;
+        bool m_debug{true};
+
+        Head();
+
+        void CheckLimit();
+
     };
 }

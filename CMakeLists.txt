@@ -164,7 +164,8 @@ set(SRC
         src/config/BallSearcherConfigurationStrategy.cpp
         src/config/BallTrackerConfigurationStrategy.cpp
         src/config/HeadConfigurationStrategy.cpp
-        src/config/GameControllerConfigurationStrategy.cpp)
+        src/config/GameControllerConfigurationStrategy.cpp
+        src/config/ConfigurationStrategy.cpp)
 
 #### Build targets #####
 add_executable(controller ${SRC})

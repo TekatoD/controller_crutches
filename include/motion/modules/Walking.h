@@ -297,9 +297,9 @@ namespace Robot {
 
         void SetOdoAFactor(float odo_a_factor);
 
-        bool GetDebug() const;
+        bool IsDebugEnabled() const;
 
-        void SetDebug(bool debug);
+        void EnableDebug(bool debug);
     };
 }
 

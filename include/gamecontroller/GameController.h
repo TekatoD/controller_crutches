@@ -55,6 +55,10 @@ namespace Robot {
 
         void SetTeamNumber(int team_number);
 
+        bool IsDebugEnabled() const;
+
+        void EnableDebug(bool debug);
+
 
     public:
         int PlayerNumber;
@@ -74,6 +78,7 @@ namespace Robot {
         in_addr m_GameControllerAddress;
         clock_t m_WhenPacketWasReceived;
         clock_t m_WhenPacketWasSent;
+        bool m_debug{true};
 
     };
 }

@@ -5,6 +5,7 @@
  *
  */
 
+#include <log/Logger.h>
 #include "hw/MX28.h"
 #include "motion/Kinematics.h"
 #include "motion/MotionStatus.h"
@@ -66,6 +67,9 @@ float Head::GetLeftLimit() const {
 }
 
 void Head::SetLeftLimit(float left_limit) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: left_limit = " << left_limit;
+    }
     m_LeftLimit = left_limit;
 }
 
@@ -74,6 +78,9 @@ float Head::GetRightLimit() const {
 }
 
 void Head::SetRightLimit(float right_limit) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: right_limit = " << right_limit;
+    }
     m_RightLimit = right_limit;
 }
 
@@ -82,6 +89,9 @@ float Head::GetTopLimit() const {
 }
 
 void Head::SetTopLimit(float top_limit) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: top_limit = " << top_limit;
+    }
     Head::m_TopLimit = top_limit;
 }
 
@@ -90,6 +100,9 @@ float Head::GetBottomLimit() const {
 }
 
 void Head::SetBottomLimit(float bottom_limit) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: bottom_limit = " << bottom_limit;
+    }
     m_BottomLimit = bottom_limit;
 }
 
@@ -98,6 +111,9 @@ float Head::GetPanHome() const {
 }
 
 void Head::SetPanHome(float pan_home) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: pan_home = " << pan_home;
+    }
     m_Pan_Home = pan_home;
 }
 
@@ -105,8 +121,11 @@ float Head::GetTiltHome() const {
     return m_Tilt_Home;
 }
 
-void Head::SetTiltHome(float tilit_home) {
-    m_Tilt_Home = tilit_home;
+void Head::SetTiltHome(float tilt_home) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: tilt_home = " << tilt_home;
+    }
+    m_Tilt_Home = tilt_home;
 }
 
 float Head::GetPanPGain() const {
@@ -114,6 +133,9 @@ float Head::GetPanPGain() const {
 }
 
 void Head::SetPanPGain(float pan_p_gain) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: pan_p_gain = " << pan_p_gain;
+    }
     m_Pan_p_gain = pan_p_gain;
 }
 
@@ -122,6 +144,9 @@ float Head::GetPanDGain() const {
 }
 
 void Head::SetPanDGain(float pan_d_gain) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: pan_d_gain = " << pan_d_gain;
+    }
     m_Pan_d_gain = pan_d_gain;
 }
 
@@ -130,6 +155,9 @@ float Head::GetTiltPGain() const {
 }
 
 void Head::SetTiltPGain(float tilt_p_gain) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: tilt_p_gain = " << tilt_p_gain;
+    }
     m_Tilt_p_gain = tilt_p_gain;
 }
 
@@ -138,6 +166,9 @@ float Head::GetTiltDGain() const {
 }
 
 void Head::SetTiltDGain(float tilt_d_gain) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: tilt_d_gain = " << tilt_d_gain;
+    }
     m_Tilt_d_gain = tilt_d_gain;
 }
 
@@ -212,4 +243,12 @@ void Head::Process() {
 
     if (m_Joint.GetEnable(JointData::ID_HEAD_TILT) == true)
         m_Joint.SetAngle(JointData::ID_HEAD_TILT, m_TiltAngle);
+}
+
+bool Head::IsDebugEnabled() const {
+    return m_debug;
+}
+
+void Head::EnableDebug(bool debug) {
+    m_debug = debug;
 }

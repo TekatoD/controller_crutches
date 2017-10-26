@@ -3,6 +3,7 @@
  *  @date 4/21/17
  */
 
+#include <log/Logger.h>
 #include "gamecontroller/GameController.h"
 
 
@@ -93,6 +94,9 @@ int GameController::GetPlayerNumber() const {
 }
 
 void GameController::SetPlayerNumber(int player_number) {
+    if(m_debug) {
+        LOG_DEBUG << "GAME CONTROLLER: player_number = " << player_number;
+    }
     PlayerNumber = player_number;
 }
 
@@ -101,6 +105,9 @@ int GameController::GetTeamNumber() const {
 }
 
 void GameController::SetTeamNumber(int team_number) {
+    if(m_debug) {
+        LOG_DEBUG << "GAME CONTROLLER: team_number = " << team_number;
+    }
     TeamNumber = team_number;
 }
 
@@ -147,4 +154,12 @@ bool GameController::Receive() {
         }
     }
     return received;
+}
+
+bool GameController::IsDebugEnabled() const {
+    return m_debug;
+}
+
+void GameController::EnableDebug(bool debug) {
+    m_debug= debug;
 }

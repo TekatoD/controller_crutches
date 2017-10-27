@@ -206,8 +206,8 @@ namespace ant {
                 cv::hconcat(r1, r2, H);
                 cv::hconcat(H, t, H);
                 
-                H = m_cameraParams.GetIntCalibrationMatrix33() * H;
-                Proj = H * ImagePoint;
+                cv::Mat Ht = m_cameraParams.GetIntCalibrationMatrix33() * H;
+                Proj = Ht * ImagePoint;
                 Proj /= ImagePoint.at<float>(2, 0);
                 
                 return Proj;

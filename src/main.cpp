@@ -237,9 +237,9 @@ int main(int argc, char** argv) {
         float HeightFromGround = Robot::Kinematics::LEG_LENGTH + 122.2f + 50.5f + Robot::Kinematics::CAMERA_OFFSET_Z;
         HeightFromGround /= 1000.0f;
         // Z
-        float HeadPan = DarwinHead->GetPanAngle();
+        float HeadPan = DarwinHead->GetPanAngle() * M_PI / 180.0f;
         // Y
-        float HeadTilt = DarwinHead->GetTiltAngle();
+        float HeadTilt = (90.0f + DarwinHead->GetTiltAngle()) * M_PI / 180.0f;
         
         Matrix4x4f HeadTransformE;
         cv::Mat HeadTransform;
@@ -257,11 +257,15 @@ int main(int argc, char** argv) {
         
         cv::Mat R = HeadTransform(cv::Range(0, 3), cv::Range(0, 3));
         // Translation is in mm
+        /*
         cv::Mat t = HeadTransform(cv::Range(0, 3), cv::Range(3, 4));
         t /= 1000.0f;
         t.at<float>(2, 0) += HeightFromGround;
+        */
         
-        ant::vision_utils::CameraParameters params(R, t, 2.0);
+        cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, HeightFromGround);
+        
+        ant::vision_utils::CameraParameters params(R, t, 0.002);
         ant::vision_utils::CameraProjection cameraToGround(params);
         
         camera.CaptureFrame();
@@ -274,10 +278,12 @@ int main(int argc, char** argv) {
             vision.setFrame(frame);
             std::vector<cv::Vec4i> lines = vision.lineDetect();
             
+            std::cout << "== Lines ==" << std::endl;
             for (auto& line : lines) {
                 // Point for viz
                 cv::Point p1(line[0], line[1]);
                 cv::Point p2(line[2], line[3]);
+                
                 
                 cv::line(frame, p1, p2, cv::Scalar(0, 0, 255), 5);
                 
@@ -288,13 +294,21 @@ int main(int argc, char** argv) {
                 gp1 = cameraToGround.ImageToImage(mp1);
                 gp2 = cameraToGround.ImageToImage(mp2);
                 
+                gp1 /= gp1.at<float>(2, 0);
+                gp2 /= gp2.at<float>(2, 0);
+                
                 std::cout << "========" << std::endl;
+                std::cout << camera.getWidth() << " " << camera.getHeight() << std::endl;
+                std::cout << p1 << std::endl;
+                std::cout << p2 << std::endl;
+                std::cout << "--------" << std::endl;
                 std::cout << gp1 << std::endl;
                 std::cout << gp2 << std::endl;
+                std::cout << "========" << std::endl;
             }
             
             cv::imshow("line_image", frame);
-            cv::waitKey(1);
+            cv::waitKey(0);
         }
         
         

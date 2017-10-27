@@ -67,9 +67,9 @@ namespace ant {
     cv::Mat Vision::fieldDetect() {
         if (m_mask.empty()) {
             cv::Mat prep = m_fieldDetector.preproccess(m_image);
-            //cv::imshow("fieldDetect prep", prep);
+            cv::imshow("fieldDetect prep", prep);
             m_mask = m_fieldDetector.detect(prep);
-            //cv::imshow("fieldDetect m_mask", m_mask);
+            cv::imshow("fieldDetect m_mask", m_mask);
             cv::Mat tmp;
             //cv::cvtColor(m_image, m_src_image, CV_BGR2YUV);
             m_src_image = m_image.clone();

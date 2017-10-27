@@ -239,7 +239,7 @@ int main(int argc, char** argv) {
         // Z
         float HeadPan = DarwinHead->GetPanAngle() * M_PI / 180.0f;
         // Y
-        float HeadTilt = (90.0f + DarwinHead->GetTiltAngle()) * M_PI / 180.0f;
+        float HeadTilt = (DarwinHead->GetTiltAngle()-90.0f) * M_PI / 180.0f;
         
         Matrix4x4f HeadTransformE;
         cv::Mat HeadTransform;
@@ -263,7 +263,7 @@ int main(int argc, char** argv) {
         t.at<float>(2, 0) += HeightFromGround;
         */
         
-        cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, HeightFromGround);
+        cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, -HeightFromGround);
         
         ant::vision_utils::CameraParameters params(R, t, 0.002);
         ant::vision_utils::CameraProjection cameraToGround(params);

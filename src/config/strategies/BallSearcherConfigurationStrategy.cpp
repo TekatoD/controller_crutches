@@ -4,7 +4,7 @@
  */
 #include <motion/modules/Walking.h>
 #include <motion/MotionManager.h>
-#include "config/BallSearcherConfigurationStrategy.h"
+#include "config/strategies/BallSearcherConfigurationStrategy.h"
 
 using namespace Robot;
 

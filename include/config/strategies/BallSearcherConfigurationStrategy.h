@@ -5,7 +5,7 @@
 #pragma once
 
 #include <BallSearcher.h>
-#include "ConfigurationStrategy.h"
+#include "config/ConfigurationStrategy.h"
 
 
 namespace Robot {

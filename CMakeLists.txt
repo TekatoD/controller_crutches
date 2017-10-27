@@ -142,30 +142,32 @@ set(SRC
         include/tool/Accumulator.h
         include/tool/Rate.h
         include/config/ConfigurationStrategy.h
-        src/config/WalkingConfigurationStrategy.cpp
-        include/config/WalkingConfigurationStrategy.h
+        src/config/strategies/WalkingConfigurationStrategy.cpp
+        include/config/strategies/WalkingConfigurationStrategy.h
         src/config/ConfigurationFileLoader.cpp
         include/config/ConfigurationFileLoader.h
         src/config/ConfigurationParser.cpp
         include/config/ConfigurationParser.h
-        include/config/MotionManagerConfigurationStrategy.h
-        src/config/MotionManagerConfigurationStrategy.cpp
+        include/config/strategies/MotionManagerConfigurationStrategy.h
+        src/config/strategies/MotionManagerConfigurationStrategy.cpp
         include/config/ConfigurationParser.h
-        src/tool/CommandArguments.cpp
-        include/tool/CommandArguments.h
+        src/config/CommandArguments.cpp
+        include/config/CommandArguments.h
         src/config/ActionConfigurationFileLoader.cpp
         include/config/ActionConfigurationFileLoader.h
-        include/tool/CommandArguments.h
+        include/config/CommandArguments.h
         include/BallTracker.h
-        include/config/BallSearcherConfigurationStrategy.h
-        include/config/BallTrackerConfigurationStrategy.h
-        include/config/HeadConfigurationStrategy.h
-        include/config/GameControllerConfigurationStrategy.h
-        src/config/BallSearcherConfigurationStrategy.cpp
-        src/config/BallTrackerConfigurationStrategy.cpp
-        src/config/HeadConfigurationStrategy.cpp
-        src/config/GameControllerConfigurationStrategy.cpp
-        src/config/ConfigurationStrategy.cpp)
+        include/config/strategies/BallSearcherConfigurationStrategy.h
+        include/config/strategies/BallTrackerConfigurationStrategy.h
+        include/config/strategies/HeadConfigurationStrategy.h
+        include/config/strategies/GameControllerConfigurationStrategy.h
+        src/config/strategies/BallSearcherConfigurationStrategy.cpp
+        src/config/strategies/BallTrackerConfigurationStrategy.cpp
+        src/config/strategies/HeadConfigurationStrategy.cpp
+        src/config/strategies/GameControllerConfigurationStrategy.cpp
+        src/config/strategies/ConfigurationStrategy.cpp
+        src/config/ArgumentsParser.cpp
+        include/config/ArgumentsParser.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

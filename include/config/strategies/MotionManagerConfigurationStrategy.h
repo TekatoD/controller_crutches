@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include "ConfigurationStrategy.h"
+#include "config/ConfigurationStrategy.h"
 
 namespace Robot {
     class MotionManagerConfigurationStrategy

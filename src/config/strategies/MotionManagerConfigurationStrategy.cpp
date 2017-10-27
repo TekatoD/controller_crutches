@@ -6,7 +6,7 @@
 #include <motion/MotionManager.h>
 #include <iomanip>
 #include <sstream>
-#include "config/MotionManagerConfigurationStrategy.h"
+#include "config/strategies/MotionManagerConfigurationStrategy.h"
 
 using namespace Robot;
 

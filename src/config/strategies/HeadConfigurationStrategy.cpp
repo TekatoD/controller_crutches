@@ -2,7 +2,7 @@
  *  @autor tekatod
  *  @date 10/25/17
  */
-#include "config/HeadConfigurationStrategy.h"
+#include "config/strategies/HeadConfigurationStrategy.h"
 #include "motion/modules/Head.h"
 
 using namespace Robot;

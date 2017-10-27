@@ -4,15 +4,15 @@
 #include <atomic>
 #include <memory>
 #include <boost/program_options.hpp>
-#include <tool/CommandArguments.h>
+#include <config/CommandArguments.h>
 #include <config/ActionConfigurationFileLoader.h>
-#include <config/BallSearcherConfigurationStrategy.h>
-#include <config/BallTrackerConfigurationStrategy.h>
-#include <config/GameControllerConfigurationStrategy.h>
-#include <config/HeadConfigurationStrategy.h>
+#include <config/strategies/BallSearcherConfigurationStrategy.h>
+#include <config/strategies/BallTrackerConfigurationStrategy.h>
+#include <config/strategies/GameControllerConfigurationStrategy.h>
+#include <config/strategies/HeadConfigurationStrategy.h>
 #include "config/ConfigurationFileLoader.h"
-#include "config/WalkingConfigurationStrategy.h"
-#include "config/MotionManagerConfigurationStrategy.h"
+#include "config/strategies/WalkingConfigurationStrategy.h"
+#include "config/strategies/MotionManagerConfigurationStrategy.h"
 #include "hw/LinuxMotionTimer.h"
 #include "hw/CM730.h"
 

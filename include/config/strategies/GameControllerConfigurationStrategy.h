@@ -4,16 +4,16 @@
  */
 #pragma once
 
-#include "ConfigurationStrategy.h"
+#include "config/ConfigurationStrategy.h"
 
 namespace Robot {
-    class HeadConfigurationStrategy
+    class GameControllerConfigurationStrategy
             : public ConfigurationStrategy {
     public:
 
-        static constexpr char DEFAULT_SECTION[] = "Head";
+        static constexpr char DEFAULT_SECTION[] = "Game Controller";
 
-        explicit HeadConfigurationStrategy(std::string section = DEFAULT_SECTION);
+        explicit GameControllerConfigurationStrategy(std::string section = DEFAULT_SECTION);
 
         void ReadConfig(const boost::property_tree::ptree& prop) override;
 

@@ -3,7 +3,7 @@
  *  @date 10/25/17
  */
 #include <gamecontroller/GameController.h>
-#include "config/GameControllerConfigurationStrategy.h"
+#include "config/strategies/GameControllerConfigurationStrategy.h"
 
 using namespace Robot;
 

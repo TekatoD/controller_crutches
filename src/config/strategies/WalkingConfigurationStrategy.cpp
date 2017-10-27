@@ -1,5 +1,5 @@
 #include <motion/modules/Walking.h>
-#include "config/WalkingConfigurationStrategy.h"
+#include "config/strategies/WalkingConfigurationStrategy.h"
 
 using namespace Robot;
 

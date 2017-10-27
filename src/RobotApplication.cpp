@@ -5,7 +5,7 @@
 #include "motion/modules/Kicking.h"
 #include "motion/modules/Walking.h"
 #include "motion/modules/Head.h"
-#include "tool/CommandArguments.h"
+#include "config/CommandArguments.h"
 #include "RobotApplication.h"
 #ifdef CROSSCOMPILE
 	#include "hw/RobotCM730.h"

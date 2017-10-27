@@ -2,7 +2,7 @@
  *  \autor arssivka
  *  \date 10/25/17
  */
-#include "tool/CommandArguments.h"
+#include "config/CommandArguments.h"
 
 Robot::CommandArguments::CommandArguments(int argc, char** argv)
         : m_argc(argc), m_argv(argv) {}

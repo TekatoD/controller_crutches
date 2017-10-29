@@ -239,12 +239,14 @@ int main(int argc, char** argv) {
         // Z
         float HeadPan = DarwinHead->GetPanAngle() * M_PI / 180.0f;
         // Y
-        float HeadTilt = (DarwinHead->GetTiltAngle()-90.0f) * M_PI / 180.0f;
+        float HeadTilt = (90.0f + DarwinHead->GetTiltAngle()) * M_PI / 180.0f;
         
         Matrix4x4f HeadTransformE;
         cv::Mat HeadTransform;
         Robot::Kinematics::ComputeHeadForwardKinematics(HeadTransformE, HeadPan, HeadTilt);
         cv::eigen2cv(HeadTransformE, HeadTransform);
+        
+        HeadTransform = HeadTransform.inv();
         
         /*
         cv::Mat Rx = cv::Mat::eye(3, 3, CV_32F);
@@ -291,11 +293,8 @@ int main(int argc, char** argv) {
                 mp1 = (cv::Mat_<float>(3, 1) << line[0], line[1], 1);
                 mp2 = (cv::Mat_<float>(3, 1) << line[2], line[3], 1);
                 
-                gp1 = cameraToGround.ImageToImage(mp1);
-                gp2 = cameraToGround.ImageToImage(mp2);
-                
-                gp1 /= gp1.at<float>(2, 0);
-                gp2 /= gp2.at<float>(2, 0);
+                gp1 = cameraToGround.ImageToWorld_explicit(mp1, R, t);
+                gp2 = cameraToGround.ImageToWorld_explicit(mp2, R, t);
                 
                 std::cout << "========" << std::endl;
                 std::cout << camera.getWidth() << " " << camera.getHeight() << std::endl;

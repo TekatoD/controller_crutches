@@ -207,10 +207,38 @@ namespace ant {
                 cv::hconcat(H, t, H);
                 
                 cv::Mat Ht = m_cameraParams.GetIntCalibrationMatrix33() * H;
+                Ht /= t.at<float>(2, 0);
+                
                 Proj = Ht * ImagePoint;
-                Proj /= ImagePoint.at<float>(2, 0);
+                Proj /= Proj.at<float>(2, 0);
                 
                 return Proj;
+            } 
+            
+            cv::Mat ImageToWorld_explicit(const cv::Mat& ImagePoint, const cv::Mat& R, const cv::Mat& t) {
+                // Same functionality as in CamGeom in naomech behaviour
+                
+                float f = m_cameraParams.f;
+                float ix, iy;
+                ix = ImagePoint.at<float>(0, 0);
+                iy = ImagePoint.at<float>(1, 0);
+                // Magic number: height in pixels
+                // From top left origin (y downwards) to bottom left origin (y upwards)
+                iy = -iy + 240;
+                
+                // Something like image to camera conversion?
+                // x axis in camera coordinates: points forward (focal length)
+                // y axis in camera coordinates: opposite to x axis in image coordinates (+offsets which are equal to 0)
+                // z axis in camera coordinates: z axis in image coordinates (+offsets which are equal to 0)
+                cv::Mat Pixel = (cv::Mat_<float>(3, 1) << f, -ix, iy);
+                
+                std::cout << "Pixel: " << std::endl << Pixel << std::endl;
+                
+                Pixel = R * Pixel;
+                Pixel *= (-t.at<float>(2, 0) / Pixel.at<float>(2, 0));
+                Pixel += t;
+                
+                return Pixel;
             }
         private:
             CameraParameters m_cameraParams;

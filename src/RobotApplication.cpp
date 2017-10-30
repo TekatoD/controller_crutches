@@ -103,6 +103,8 @@ void RobotApplication::InitCM730() {
     m_vrep_connector = move(vrep_connector);
     m_cm730 = move(vrep_cm730);
 #endif
+
+    LEDs::GetInstance()->Initialize(m_cm730.get());
     if (m_debug) LOG_INFO << "Hardware is ready";
 }
 

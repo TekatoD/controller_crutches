@@ -5,7 +5,7 @@
  *
  */
 
-#include "MX28.h"
+#include "hw/MX28.h"
 #include "motion/JointData.h"
 #include "motion/MotionManager.h"
 

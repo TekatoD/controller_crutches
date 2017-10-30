@@ -66,29 +66,6 @@ namespace Robot {
             STEP step[MAXNUM_STEP];        // Page step    65~511
         } PAGE;
 
-    private:
-        FILE* m_action_file;
-        PAGE m_play_page;
-        PAGE m_next_play_page;
-        STEP m_current_step;
-
-        int m_index_playing_page;
-        bool m_first_driving_start;
-        int m_page_step_count;
-        bool m_playing;
-        bool m_stop_playing;
-        bool m_playing_finished;
-
-        Action();
-
-        bool VerifyChecksum(PAGE* pPage);
-
-        void SetChecksum(PAGE* pPage);
-
-        bool m_debug;
-
-    public:
-
         ~Action();
 
         static Action* GetInstance();
@@ -97,7 +74,7 @@ namespace Robot {
 
         void Process() override;
 
-        bool LoadFile(char* filename);
+        void LoadFile(const char* filename);
 
         bool CreateFile(char* filename);
 
@@ -121,8 +98,29 @@ namespace Robot {
 
         void ResetPage(PAGE* pPage);
 
-        bool GetDebug() const;
+        bool IsDebugEnabled() const noexcept;
 
-        void SetDebug(bool debug);
+        void EnableDebug(bool debug) noexcept;
+
+    private:
+        Action();
+
+        bool VerifyChecksum(PAGE* pPage);
+
+        void SetChecksum(PAGE* pPage);
+
+    private:
+        FILE* m_action_file;
+        PAGE m_play_page;
+        PAGE m_next_play_page;
+
+        int m_index_playing_page;
+        bool m_first_driving_start;
+        int m_page_step_count;
+        bool m_playing;
+        bool m_stop_playing;
+        bool m_playing_finished;
+
+        bool m_debug{false};
     };
 }

@@ -23,12 +23,12 @@ void Robot::Kicking::Initialize() {
     m_time = 0;
     m_done = true;
 
-    m_Joint.SetAngle(JointData::ID_R_SHOULDER_PITCH, -48.345f);
-    m_Joint.SetAngle(JointData::ID_L_SHOULDER_PITCH, 41.313f);
-    m_Joint.SetAngle(JointData::ID_R_SHOULDER_ROLL, -17.873f);
-    m_Joint.SetAngle(JointData::ID_L_SHOULDER_ROLL, 17.580f);
-    m_Joint.SetAngle(JointData::ID_R_ELBOW, 29.300f);
-    m_Joint.SetAngle(JointData::ID_L_ELBOW, -29.593f);
+    Joint.SetAngle(JointData::ID_R_SHOULDER_PITCH, -48.345f);
+    Joint.SetAngle(JointData::ID_L_SHOULDER_PITCH, 41.313f);
+    Joint.SetAngle(JointData::ID_R_SHOULDER_ROLL, -17.873f);
+    Joint.SetAngle(JointData::ID_L_SHOULDER_ROLL, 17.580f);
+    Joint.SetAngle(JointData::ID_R_ELBOW, 29.300f);
+    Joint.SetAngle(JointData::ID_L_ELBOW, -29.593f);
 
 }
 
@@ -239,25 +239,25 @@ void Robot::Kicking::Process() {
 
 
     // Send values to motors
-    m_Joint.SetValue(JointData::ID_R_HIP_YAW, out_value[0]);
-    m_Joint.SetValue(JointData::ID_R_HIP_ROLL, out_value[1]);
-    m_Joint.SetValue(JointData::ID_R_HIP_PITCH, out_value[2]);
-    m_Joint.SetValue(JointData::ID_R_KNEE, out_value[3]);
-    m_Joint.SetValue(JointData::ID_R_ANKLE_PITCH, out_value[4]);
-    m_Joint.SetValue(JointData::ID_R_ANKLE_ROLL, out_value[5]);
-    m_Joint.SetValue(JointData::ID_L_HIP_YAW, out_value[6]);
-    m_Joint.SetValue(JointData::ID_L_HIP_ROLL, out_value[7]);
-    m_Joint.SetValue(JointData::ID_L_HIP_PITCH, out_value[8]);
-    m_Joint.SetValue(JointData::ID_L_KNEE, out_value[9]);
-    m_Joint.SetValue(JointData::ID_L_ANKLE_PITCH, out_value[10]);
-    m_Joint.SetValue(JointData::ID_L_ANKLE_ROLL, out_value[11]);
-    m_Joint.SetValue(JointData::ID_R_SHOULDER_PITCH, out_value[12]);
-    m_Joint.SetValue(JointData::ID_L_SHOULDER_PITCH, out_value[13]);
-    m_Joint.SetValue(JointData::ID_R_SHOULDER_ROLL, out_value[14]);
-    m_Joint.SetValue(JointData::ID_L_SHOULDER_ROLL, out_value[15]);
-    m_Joint.SetValue(JointData::ID_R_ELBOW, out_value[16]);
-    m_Joint.SetValue(JointData::ID_L_ELBOW, out_value[17]);
-//    m_Joint.SetAngle(JointData::ID_HEAD_PAN, 0.0f); // TODO Head
+    Joint.SetValue(JointData::ID_R_HIP_YAW, out_value[0]);
+    Joint.SetValue(JointData::ID_R_HIP_ROLL, out_value[1]);
+    Joint.SetValue(JointData::ID_R_HIP_PITCH, out_value[2]);
+    Joint.SetValue(JointData::ID_R_KNEE, out_value[3]);
+    Joint.SetValue(JointData::ID_R_ANKLE_PITCH, out_value[4]);
+    Joint.SetValue(JointData::ID_R_ANKLE_ROLL, out_value[5]);
+    Joint.SetValue(JointData::ID_L_HIP_YAW, out_value[6]);
+    Joint.SetValue(JointData::ID_L_HIP_ROLL, out_value[7]);
+    Joint.SetValue(JointData::ID_L_HIP_PITCH, out_value[8]);
+    Joint.SetValue(JointData::ID_L_KNEE, out_value[9]);
+    Joint.SetValue(JointData::ID_L_ANKLE_PITCH, out_value[10]);
+    Joint.SetValue(JointData::ID_L_ANKLE_ROLL, out_value[11]);
+    Joint.SetValue(JointData::ID_R_SHOULDER_PITCH, out_value[12]);
+    Joint.SetValue(JointData::ID_L_SHOULDER_PITCH, out_value[13]);
+    Joint.SetValue(JointData::ID_R_SHOULDER_ROLL, out_value[14]);
+    Joint.SetValue(JointData::ID_L_SHOULDER_ROLL, out_value[15]);
+    Joint.SetValue(JointData::ID_R_ELBOW, out_value[16]);
+    Joint.SetValue(JointData::ID_L_ELBOW, out_value[17]);
+//    Joint.SetAngle(JointData::ID_HEAD_PAN, 0.0f); // TODO Head
 }
 
 void Robot::Kicking::Break() {
@@ -576,7 +576,7 @@ void Robot::Kicking::SetBalanceEnabled(bool balance_enabled) noexcept {
     m_balance_enabled = balance_enabled;
 }
 
-float Robot::Kicking::GetLegsYOffset() const {
+float Robot::Kicking::GetLegsYOffset() const noexcept {
     return m_legs_y_offset;
 }
 
@@ -587,27 +587,33 @@ void Robot::Kicking::SetLegsYOffset(float legs_y_offset) {
     m_legs_y_offset = legs_y_offset;
 }
 
-bool Robot::Kicking::GetDebug() const {
+bool Robot::Kicking::IsDebugEnabled() const noexcept {
     return m_debug;
 }
 
-void Robot::Kicking::SetDebug(bool debug) {
+void Robot::Kicking::EnableDebug(bool debug) noexcept {
     m_debug = debug;
 }
 
-float Robot::Kicking::GetArmSpreadOffset() const {
+float Robot::Kicking::GetArmSpreadOffset() const noexcept {
     return m_arm_spread_offset;
 }
 
 void Robot::Kicking::SetArmSpreadOffset(float arm_spread_amplitude) {
+    if (m_debug) {
+        LOG_DEBUG << "KICKING: arm_spread_amplitude = " << arm_spread_amplitude;
+    }
     m_arm_spread_offset = arm_spread_amplitude;
 }
 
-float Robot::Kicking::GetElbowOffset() const {
+float Robot::Kicking::GetElbowOffset() const noexcept {
     return m_elbow_offset;
 }
 
 void Robot::Kicking::SetElbowOffset(float arm_elbow_offset) {
+    if (m_debug) {
+        LOG_DEBUG << "KICKING: arm_elbow_offset = " << arm_elbow_offset;
+    }
     m_elbow_offset = arm_elbow_offset;
 }
 

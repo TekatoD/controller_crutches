@@ -8,7 +8,7 @@
 #include <iostream>
 #include <math/AngleTools.h>
 #include <log/Logger.h>
-#include "MX28.h"
+#include "hw/MX28.h"
 #include "motion/MotionStatus.h"
 #include "motion/Kinematics.h"
 #include "motion/modules/Walking.h"
@@ -67,90 +67,22 @@ Walking::Walking() {
     m_odo_y_factor = 2.0;
     m_odo_a_factor = 0.8;
 
-    m_Joint.SetAngle(JointData::ID_R_SHOULDER_PITCH, -48.345f);
-    m_Joint.SetAngle(JointData::ID_L_SHOULDER_PITCH, 41.313f);
-    m_Joint.SetAngle(JointData::ID_R_SHOULDER_ROLL, -17.873f);
-    m_Joint.SetAngle(JointData::ID_L_SHOULDER_ROLL, 17.580f);
-    m_Joint.SetAngle(JointData::ID_R_ELBOW, 29.300f);
-    m_Joint.SetAngle(JointData::ID_L_ELBOW, -29.593f);
+    Joint.SetAngle(JointData::ID_R_SHOULDER_PITCH, -48.345f);
+    Joint.SetAngle(JointData::ID_L_SHOULDER_PITCH, 41.313f);
+    Joint.SetAngle(JointData::ID_R_SHOULDER_ROLL, -17.873f);
+    Joint.SetAngle(JointData::ID_L_SHOULDER_ROLL, 17.580f);
+    Joint.SetAngle(JointData::ID_R_ELBOW, 29.300f);
+    Joint.SetAngle(JointData::ID_L_ELBOW, -29.593f);
 
-    m_Joint.SetAngle(JointData::ID_HEAD_TILT, Kinematics::EYE_TILT_OFFSET_ANGLE);
+    Joint.SetAngle(JointData::ID_HEAD_TILT, Kinematics::EYE_TILT_OFFSET_ANGLE);
 
-    m_Joint.SetPGain(JointData::ID_R_SHOULDER_PITCH, 8);
-    m_Joint.SetPGain(JointData::ID_L_SHOULDER_PITCH, 8);
-    m_Joint.SetPGain(JointData::ID_R_SHOULDER_ROLL, 8);
-    m_Joint.SetPGain(JointData::ID_L_SHOULDER_ROLL, 8);
-    m_Joint.SetPGain(JointData::ID_R_ELBOW, 8);
-    m_Joint.SetPGain(JointData::ID_L_ELBOW, 8);
+    Joint.SetPGain(JointData::ID_R_SHOULDER_PITCH, 8);
+    Joint.SetPGain(JointData::ID_L_SHOULDER_PITCH, 8);
+    Joint.SetPGain(JointData::ID_R_SHOULDER_ROLL, 8);
+    Joint.SetPGain(JointData::ID_L_SHOULDER_ROLL, 8);
+    Joint.SetPGain(JointData::ID_R_ELBOW, 8);
+    Joint.SetPGain(JointData::ID_L_ELBOW, 8);
 }
-
-
-void Walking::LoadINISettings(minIni* ini) {
-    LoadINISettings(ini, WALKING_SECTION);
-}
-
-
-void Walking::LoadINISettings(minIni* ini, const std::string& section) {
-    m_odo_x_factor = ini->getf(section, "odo_x_factor", m_odo_x_factor);
-    m_odo_y_factor = ini->getf(section, "odo_y_factor", m_odo_y_factor);
-    m_odo_a_factor = ini->getf(section, "odo_a_factor", m_odo_a_factor);
-    m_x_offset = ini->getf(section, "x_offset", m_x_offset);
-    m_y_offset = ini->getf(section, "y_offset", m_y_offset);
-    m_z_offset = ini->getf(section, "z_offset", m_z_offset);
-    m_r_offset = ini->getf(section, "roll_offset", m_r_offset);
-    m_p_offset = ini->getf(section, "pitch_offset", m_p_offset);
-    m_a_offset = ini->getf(section, "yaw_offset", m_a_offset);
-    m_hip_pitch_offset = ini->getf(section, "hip_pitch_offset", m_hip_pitch_offset);
-    m_period_time = ini->getf(section, "period_time", m_period_time);
-    m_dsp_ratio = ini->getf(section, "dsp_ratio", m_dsp_ratio);
-    m_step_fb_ratio = ini->getf(section, "step_forward_back_ratio", m_step_fb_ratio);
-    m_z_move_amplitude = ini->getf(section, "foot_height", m_z_move_amplitude);
-    m_y_swap_amplitude = ini->getf(section, "swing_right_left", m_y_swap_amplitude);
-    m_z_swap_amplitude = ini->getf(section, "swing_top_down", m_z_swap_amplitude);
-    m_pelvis_offset = ini->getf(section, "pelvis_offset", m_pelvis_offset);
-    m_arm_swing_gain = ini->getf(section, "arm_swing_gain", m_arm_swing_gain );
-    m_balance_knee_gain = ini->getf(section, "balance_knee_gain", m_balance_knee_gain );
-    m_balance_ankle_pitch_gain = ini->getf(section, "balance_ankle_pitch_gain", m_balance_ankle_pitch_gain);
-    m_balance_hip_roll_gain = ini->getf(section, "balance_hip_roll_gain", m_balance_hip_roll_gain);
-    m_balance_ankle_roll_gain = ini->getf(section, "balance_ankle_roll_gain", m_balance_ankle_roll_gain);
-
-    m_p_gain = ini->geti(section, "p_gain", m_p_gain);
-    m_i_gain = ini->geti(section, "i_gain", m_i_gain);
-    m_d_gain = ini->geti(section, "d_gain", m_d_gain);
-}
-
-
-void Walking::SaveINISettings(minIni* ini) {
-    SaveINISettings(ini, WALKING_SECTION);
-}
-
-
-void Walking::SaveINISettings(minIni* ini, const std::string& section) {
-    ini->put(section, "x_offset", m_x_offset);
-    ini->put(section, "y_offset", m_y_offset);
-    ini->put(section, "z_offset", m_z_offset);
-    ini->put(section, "roll_offset", m_r_offset);
-    ini->put(section, "pitch_offset", m_p_offset);
-    ini->put(section, "yaw_offset", m_a_offset);
-    ini->put(section, "hip_pitch_offset", m_hip_pitch_offset);
-    ini->put(section, "period_time", m_period_time);
-    ini->put(section, "dsp_ratio", m_dsp_ratio);
-    ini->put(section, "step_forward_back_ratio", m_step_fb_ratio);
-    ini->put(section, "foot_height", m_z_move_amplitude);
-    ini->put(section, "swing_right_left", m_y_swap_amplitude);
-    ini->put(section, "swing_top_down", m_z_swap_amplitude);
-    ini->put(section, "pelvis_offset", m_pelvis_offset);
-    ini->put(section, "arm_swing_gain", m_arm_swing_gain);
-    ini->put(section, "balance_knee_gain", m_balance_knee_gain);
-    ini->put(section, "balance_ankle_pitch_gain", m_balance_ankle_pitch_gain);
-    ini->put(section, "balance_hip_roll_gain", m_balance_hip_roll_gain);
-    ini->put(section, "balance_ankle_roll_gain", m_balance_ankle_roll_gain);
-
-    ini->put(section, "p_gain", m_p_gain);
-    ini->put(section, "i_gain", m_i_gain);
-    ini->put(section, "d_gain", m_d_gain);
-}
-
 
 void Walking::UpdateParamTime() {
     if (m_debug) {
@@ -635,26 +567,26 @@ void Walking::Process() {
         outValue[11] -= (int) (dir[11] * rlGyroErr * m_balance_ankle_roll_gain * 4); // L_ANKLE_ROLL
     }
 
-    m_Joint.SetValue(JointData::ID_R_HIP_YAW, outValue[0]);
-    m_Joint.SetValue(JointData::ID_R_HIP_ROLL, outValue[1]);
-    m_Joint.SetValue(JointData::ID_R_HIP_PITCH, outValue[2]);
-    m_Joint.SetValue(JointData::ID_R_KNEE, outValue[3]);
-    m_Joint.SetValue(JointData::ID_R_ANKLE_PITCH, outValue[4]);
-    m_Joint.SetValue(JointData::ID_R_ANKLE_ROLL, outValue[5]);
-    m_Joint.SetValue(JointData::ID_L_HIP_YAW, outValue[6]);
-    m_Joint.SetValue(JointData::ID_L_HIP_ROLL, outValue[7]);
-    m_Joint.SetValue(JointData::ID_L_HIP_PITCH, outValue[8]);
-    m_Joint.SetValue(JointData::ID_L_KNEE, outValue[9]);
-    m_Joint.SetValue(JointData::ID_L_ANKLE_PITCH, outValue[10]);
-    m_Joint.SetValue(JointData::ID_L_ANKLE_ROLL, outValue[11]);
-    m_Joint.SetValue(JointData::ID_R_SHOULDER_PITCH, outValue[12]);
-    m_Joint.SetValue(JointData::ID_L_SHOULDER_PITCH, outValue[13]);
-    m_Joint.SetAngle(JointData::ID_HEAD_PAN, m_a_move_amplitude);
+    Joint.SetValue(JointData::ID_R_HIP_YAW, outValue[0]);
+    Joint.SetValue(JointData::ID_R_HIP_ROLL, outValue[1]);
+    Joint.SetValue(JointData::ID_R_HIP_PITCH, outValue[2]);
+    Joint.SetValue(JointData::ID_R_KNEE, outValue[3]);
+    Joint.SetValue(JointData::ID_R_ANKLE_PITCH, outValue[4]);
+    Joint.SetValue(JointData::ID_R_ANKLE_ROLL, outValue[5]);
+    Joint.SetValue(JointData::ID_L_HIP_YAW, outValue[6]);
+    Joint.SetValue(JointData::ID_L_HIP_ROLL, outValue[7]);
+    Joint.SetValue(JointData::ID_L_HIP_PITCH, outValue[8]);
+    Joint.SetValue(JointData::ID_L_KNEE, outValue[9]);
+    Joint.SetValue(JointData::ID_L_ANKLE_PITCH, outValue[10]);
+    Joint.SetValue(JointData::ID_L_ANKLE_ROLL, outValue[11]);
+    Joint.SetValue(JointData::ID_R_SHOULDER_PITCH, outValue[12]);
+    Joint.SetValue(JointData::ID_L_SHOULDER_PITCH, outValue[13]);
+    Joint.SetAngle(JointData::ID_HEAD_PAN, m_a_move_amplitude);
 
     for (int id = JointData::ID_R_HIP_YAW; id <= JointData::ID_L_ANKLE_ROLL; id++) {
-        m_Joint.SetPGain(id, m_p_gain);
-        m_Joint.SetIGain(id, m_i_gain);
-        m_Joint.SetDGain(id, m_d_gain);
+        Joint.SetPGain(id, m_p_gain);
+        Joint.SetIGain(id, m_i_gain);
+        Joint.SetDGain(id, m_d_gain);
     }
 }
 
@@ -724,35 +656,35 @@ void Walking::SetZOffset(float z_offset) {
     Walking::m_z_offset = z_offset;
 }
 
-float Walking::GetAOffset() const {
+float Walking::GetYawOffset() const {
     return m_a_offset;
 }
 
-void Walking::SetAOffset(float a_offset) {
+void Walking::SetYawOffset(float a_offset) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: a_offset" << a_offset;
+        LOG_DEBUG << "WALKING: yaw_offset" << a_offset;
     }
     Walking::m_a_offset = a_offset;
 }
 
-float Walking::GetPOffset() const {
+float Walking::GetPitchOffset() const {
     return m_p_offset;
 }
 
-void Walking::SetPOffset(float p_offset) {
+void Walking::SetPitchOffset(float p_offset) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: p_offset" << p_offset;
+        LOG_DEBUG << "WALKING: pitch_offset" << p_offset;
     }
     Walking::m_p_offset = p_offset;
 }
 
-float Walking::GetROffset() const {
+float Walking::GetRollOffset() const {
     return m_r_offset;
 }
 
-void Walking::SetROffset(float r_offset) {
+void Walking::SetRollOffset(float r_offset) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: r_offset" << r_offset;
+        LOG_DEBUG << "WALKING: roll_offset" << r_offset;
     }
     Walking::m_r_offset = r_offset;
 }
@@ -988,10 +920,43 @@ void Walking::SetDGain(int d_gain) {
     Walking::m_d_gain = d_gain;
 }
 
-bool Walking::GetDebug() const {
+float Walking::GetOdoXFactor() const {
+    return m_odo_x_factor;
+}
+
+void Walking::SetOdoXFactor(float odo_x_factor) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: odo_x_factor = " << odo_x_factor;
+    }
+    m_odo_x_factor = odo_x_factor;
+}
+
+float Walking::GetOdoYFactor() const {
+    return m_odo_y_factor;
+}
+
+void Walking::SetOdoYFactor(float odo_y_factor) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: odo_y_factor = " << odo_y_factor;
+    }
+    m_odo_y_factor = odo_y_factor;
+}
+
+float Walking::GetOdoAFactor() const {
+    return m_odo_a_factor;
+}
+
+void Walking::SetOdoAFactor(float odo_a_factor) {
+    if (m_debug) {
+        LOG_DEBUG << "WALKING: odo_a_factor = " << odo_a_factor;
+    }
+    m_odo_a_factor = odo_a_factor;
+}
+
+bool Walking::IsDebugEnabled() const {
     return m_debug;
 }
 
-void Walking::SetDebug(bool debug) {
+void Walking::EnableDebug(bool debug) {
     m_debug = debug;
 }

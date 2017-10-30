@@ -1,48 +1,14 @@
-/*
- *   Head.h
- *   represents the head of the robot
- *   Author: ROBOTIS
- *
- */
+#pragma once
 
-#ifndef _HEAD_H_
-#define _HEAD_H_
-
-#include <string.h>
+#include <cstring>
 #include <memory>
 
-#include "minIni.h"
 #include "motion/MotionModule.h"
 #include "math/Point.h"
-
-#define HEAD_SECTION    "Head Pan/Tilt"
-#define INVALID_VALUE   -1024.0
 
 namespace Robot {
     class Head
             : public MotionModule {
-    private:
-        float m_LeftLimit;
-        float m_RightLimit;
-        float m_TopLimit;
-        float m_BottomLimit;
-        float m_Pan_Home;
-        float m_Tilt_Home;
-        float m_Pan_err;
-        float m_Pan_err_diff;
-        float m_Pan_p_gain;
-        float m_Pan_d_gain;
-        float m_Tilt_err;
-        float m_Tilt_err_diff;
-        float m_Tilt_p_gain;
-        float m_Tilt_d_gain;
-        float m_PanAngle;
-        float m_TiltAngle;
-
-        Head();
-
-        void CheckLimit();
-
     public:
         static Head* GetInstance() {
             static Head head;
@@ -78,16 +44,72 @@ namespace Robot {
         void MoveTracking(Point2D err); // For image processing
         void MoveTracking();
 
-/*Read/write from a INI file*/
+        float GetLeftLimit() const;
 
-        void LoadINISettings(minIni* ini);
+        void SetLeftLimit(float left_limit);
 
-        void LoadINISettings(minIni* ini, const std::string& section);
+        float GetRightLimit() const;
 
-        void SaveINISettings(minIni* ini);
+        void SetRightLimit(float right_limit);
 
-        void SaveINISettings(minIni* ini, const std::string& section);
+        float GetTopLimit() const;
+
+        void SetTopLimit(float top_limit);
+
+        float GetBottomLimit() const;
+
+        void SetBottomLimit(float bottom_limit);
+
+        float GetPanHome() const;
+
+        void SetPanHome(float pan_home);
+
+        float GetTiltHome() const;
+
+        void SetTiltHome(float tilt_home);
+
+        float GetPanPGain() const;
+
+        void SetPanPGain(float pan_p_gain);
+
+        float GetPanDGain() const;
+
+        void SetPanDGain(float pan_d_gain);
+
+        float GetTiltPGain() const;
+
+        void SetTiltPGain(float tilt_p_gain);
+
+        float GetTiltDGain() const;
+
+        void SetTiltDGain(float tilt_d_gain);
+
+        bool IsDebugEnabled() const;
+
+        void EnableDebug(bool debug);
+
+    private:
+        float m_LeftLimit;
+        float m_RightLimit;
+        float m_TopLimit;
+        float m_BottomLimit;
+        float m_Pan_Home;
+        float m_Tilt_Home;
+        float m_Pan_err;
+        float m_Pan_err_diff;
+        float m_Pan_p_gain;
+        float m_Pan_d_gain;
+        float m_Tilt_err;
+        float m_Tilt_err_diff;
+        float m_Tilt_p_gain;
+        float m_Tilt_d_gain;
+        float m_PanAngle;
+        float m_TiltAngle;
+        bool m_debug{false};
+
+        Head();
+
+        void CheckLimit();
+
     };
 }
-
-#endif

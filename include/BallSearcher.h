@@ -8,8 +8,6 @@
 
 #include <vector>
 #include <math/Point.h>
-#include "minIni.h"
-
 
 #define FINDER_SECTION "Ball Searcher"
 
@@ -30,15 +28,33 @@ namespace Robot {
 
         const Point2D& GetLastPosition() const;
 
-        void LoadINISettings(minIni* ini);
+        float GetTiltPhaseStep() const;
 
-        void LoadINISettings(minIni* ini, const std::string& section);
+        void SetTiltPhaseStep(float tilt_phase_step);
 
-        void SaveINISettings(minIni* ini);
+        float GetPanPhaseStep() const;
 
-        void SaveINISettings(minIni* ini, const std::string& section);
+        void SetPanPhaseStep(float pan_phase_step);
+
+        float GetPhaseSize() const;
+
+        void SetPhaseSize(float phase_size);
+
+        float GetTurnStep() const;
+
+        void SetTurnStep(float turn_step);
+
+        float GetMaxTurn() const;
+
+        void SetMaxTurn(float max_turn);
+
+        void EnableDebug(bool debug);
+
+        bool IsDebugEnabled() const;
+
 
     private:
+        bool m_debug{false};
         bool m_Active;
         Point2D m_LastPosition;
 

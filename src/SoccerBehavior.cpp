@@ -17,11 +17,10 @@
  *  @date 5/5/17
  */
 
-#include <LinuxCamera.h>
 #include <motion/modules/Action.h>
 #include <motion/modules/Head.h>
 #include <motion/modules/Walking.h>
-#include <GameController.h>
+#include <gamecontroller/GameController.h>
 #include <StateMachine.h>
 #include <iostream>
 #include <motion/MotionStatus.h>
@@ -40,10 +39,7 @@ void SoccerBehavior::Process() {
     const Pose2D& Starting = StateMachine::GetInstance()->GetStartingPosition();
     const Pose2D& Odo = Walking::GetInstance()->GetOdo();
 
-    LinuxCamera::GetInstance()->CaptureFrame();
-    Image* img = LinuxCamera::GetInstance()->fbuffer->m_HSVFrame;
-    Point2D& ball = m_BallFinder.GetPosition(img);
-    m_BallTracker.Process(ball);
+//    m_BallTracker.Process(ball);
 
     const RoboCupGameControlData& State = GameController::GetInstance()->GameCtrlData;
 
@@ -58,8 +54,8 @@ void SoccerBehavior::Process() {
 //            m_PreviousState = STATE_INITIAL;
 //            Walking::GetInstance()->SetOdo(Spawn);
 //        }
-//        Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-//        Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+//        Head::GetInstance()->Joint.SetEnableHeadOnly(true, true);
+//        Walking::GetInstance()->Joint.SetEnableBodyWithoutHead(true, true);
 //        Pose2D pos = Starting - Odo;
 //        m_GoTo.Process(pos);
 //        return;
@@ -96,8 +92,8 @@ void SoccerBehavior::Process() {
 
         if (Action::GetInstance()->IsRunning() == 0) {
             // Switch to head and walking after action
-            Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+            Head::GetInstance()->Joint.SetEnableHeadOnly(true, true);
+            Walking::GetInstance()->Joint.SetEnableBodyWithoutHead(true, true);
 
             // Calculate angles to gate
             float free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
@@ -124,8 +120,8 @@ void SoccerBehavior::Process() {
 
             // Kicking the ball
             if (m_BallFollower.GetKickingLeg() != NO_KICKING) {
-                Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-                Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+                Head::GetInstance()->Joint.SetEnableHeadOnly(true, true);
+                Action::GetInstance()->Joint.SetEnableBodyWithoutHead(true, true);
                 // Kick the ball
 
                 if (m_BallFollower.GetKickingLeg() == RIGHT_LEG_KICK) {
@@ -141,31 +137,4 @@ void SoccerBehavior::Process() {
 void SoccerBehavior::normalize(float& m_theta) const {
     while (m_theta < -180.0) m_theta += 2.0 * 180.0;
     while (m_theta > 180.0) m_theta -= 2.0 * 180.0;
-}
-
-void SoccerBehavior::LoadINISettings(minIni* ini) {
-    LoadINISettings(ini, SOCCER_SECTION);
-}
-
-void SoccerBehavior::LoadINISettings(minIni* ini, const std::string& section) {
-    m_BallFinder.LoadINISettings(ini);
-    m_BallTracker.LoadINISettings(ini);
-    m_BallFollower.LoadINISettings(ini);
-    m_BallSearcher.LoadINISettings(ini);
-    m_GoTo.LoadINISettings(ini);
-    m_Field.LoadINISettings(ini);
-}
-
-
-void SoccerBehavior::SaveINISettings(minIni* ini) {
-    SaveINISettings(ini, SOCCER_SECTION);
-}
-
-
-void SoccerBehavior::SaveINISettings(minIni* ini, const std::string& section) {
-    m_BallFinder.SaveINISettings(ini);
-    m_BallTracker.SaveINISettings(ini);
-    m_BallFollower.SaveINISettings(ini);
-    m_GoTo.SaveINISettings(ini);
-    m_Field.SaveINISettings(ini);
 }

@@ -86,7 +86,7 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
 
 
     if (!m_Done) {
-        Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+        Walking::GetInstance()->Joint.SetEnableBodyWithoutHead(true, true);
         Walking::GetInstance()->SetXMoveAmplitude(m_X);
         Walking::GetInstance()->SetYMoveAmplitude(m_Y);
         Walking::GetInstance()->SetAMoveAmplitude(m_A);
@@ -115,43 +115,4 @@ Robot::GoTo::GoTo() {
     m_A = 0.0;
 
     m_Done = false;
-}
-
-void Robot::GoTo::LoadINISettings(minIni *ini) {
-    LoadINISettings(ini, GOTO_SECTION);
-}
-
-
-void Robot::GoTo::LoadINISettings(minIni *ini, const std::string &section) {
-    float value = -2;
-
-    if ((value = ini->getd(section, "max_speed", INVALID_VALUE)) != INVALID_VALUE) m_MaxSpeed = value;
-    if ((value = ini->getd(section, "max_turn", INVALID_VALUE)) != INVALID_VALUE) m_MaxTurn = value;
-    if ((value = ini->getd(section, "fit_speed", INVALID_VALUE)) != INVALID_VALUE) m_FitSpeed = value;
-    if ((value = ini->getd(section, "step_accel", INVALID_VALUE)) != INVALID_VALUE) m_StepAccel = value;
-    if ((value = ini->getd(section, "turn_accel", INVALID_VALUE)) != INVALID_VALUE) m_TurnAccel = value;
-
-    if ((value = ini->getd(section, "distance_variance", INVALID_VALUE)) != INVALID_VALUE) m_DistanceVar = value;
-    if ((value = ini->getd(section, "angle_variance", INVALID_VALUE)) != INVALID_VALUE) m_AngleVar = value;
-    if ((value = ini->getd(section, "fit_distance", INVALID_VALUE)) != INVALID_VALUE) m_FitDistance = value;
-    if ((value = ini->getd(section, "dode_angle", INVALID_VALUE)) != INVALID_VALUE) m_DodeAngle = value;
-}
-
-
-void Robot::GoTo::SaveINISettings(minIni *ini) {
-    SaveINISettings(ini, GOTO_SECTION);
-}
-
-
-void Robot::GoTo::SaveINISettings(minIni *ini, const std::string &section) {
-    ini->put(section, "max_speed", m_MaxSpeed);
-    ini->put(section, "max_turn", m_MaxTurn);
-    ini->put(section, "fit_speed", m_FitSpeed);
-    ini->put(section, "step_accel", m_StepAccel);
-    ini->put(section, "turn_accel", m_TurnAccel);
-
-    ini->put(section, "distance_variance", m_DistanceVar);
-    ini->put(section, "angle_variance", m_AngleVar);
-    ini->put(section, "fit_distance", m_FitDistance);
-    ini->put(section, "dode_angle", m_DodeAngle);
 }

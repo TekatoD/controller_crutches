@@ -20,8 +20,7 @@
 #pragma once
 
 
-#include "CM730.h"
-#include "ColorFinder.h"
+#include "hw/CM730.h"
 #include "BallTracker.h"
 #include "BallFollower.h"
 #include "GoTo.h"
@@ -38,16 +37,7 @@ namespace Robot {
 
         void Process();
 
-        void LoadINISettings(minIni* ini);
-
-        void LoadINISettings(minIni* ini, const std::string& section);
-
-        void SaveINISettings(minIni* ini);
-
-        void SaveINISettings(minIni* ini, const std::string& section);
-
     protected:
-        ColorFinder m_BallFinder;
         BallTracker m_BallTracker;
         BallFollower m_BallFollower;
         BallSearcher m_BallSearcher;

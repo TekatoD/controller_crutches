@@ -90,52 +90,43 @@ void Action::Initialize() {
     m_playing = false;
 
     for (int id = JointData::ID_R_SHOULDER_PITCH; id < JointData::NUMBER_OF_JOINTS; id++)
-        m_Joint.SetValue(id, MotionStatus::m_CurrentJoints.GetValue(id));
+        Joint.SetValue(id, MotionStatus::m_CurrentJoints.GetValue(id));
 }
 
 
-bool Action::LoadFile(char* filename) {
+void Action::LoadFile(const char* filename) {
     FILE* action = fopen(filename, "r+b");
 
-#ifdef WEBOTS
-    // Olivier.Michel@cyberbotics.com added the following line to allow opening a readonly file located in the Webots installation directory.
-  // This is mainly problematic on Windows
-    if( action == 0 ) action = fopen( filename, "rb" );
-#endif
-
-    if (action == 0) {
-        LOG_ERROR << "ACTION: Can not open Action file!";
-        return false;
+    if (action == nullptr) {
+        throw std::runtime_error("Can not open Action file!");
     }
 
     fseek(action, 0, SEEK_END);
     if (ftell(action) != (long) (sizeof(PAGE) * MAXNUM_PAGE)) {
-        LOG_ERROR << "ACTION: It's not an Action file!";
         fclose(action);
-        return false;
+        throw std::runtime_error("It's not an Action file!");
     }
 
-    if (m_action_file != 0)
+    if (m_action_file != nullptr)
         fclose(m_action_file);
 
     m_action_file = action;
-    return true;
 }
 
 
 bool Action::CreateFile(char* filename) {
     FILE* action = fopen(filename, "ab");
-    if (action == 0) {
+    if (action == nullptr) {
         LOG_ERROR << "ACTION: Can not create Action file!";
         return false;
     }
 
-    PAGE page;
+    PAGE page{};
     ResetPage(&page);
     for (int i = 0; i < MAXNUM_PAGE; i++)
         fwrite(&page, 1, sizeof(PAGE), action);
 
-    if (m_action_file != 0)
+    if (m_action_file != nullptr)
         fclose(m_action_file);
 
     m_action_file = action;
@@ -149,7 +140,7 @@ bool Action::Start(int iPage) {
         return false;
     }
 
-    PAGE page;
+    PAGE page{};
     if (!LoadPage(iPage, &page))
         return false;
 
@@ -159,10 +150,10 @@ bool Action::Start(int iPage) {
 
 bool Action::Start(char* namePage) {
     int index;
-    PAGE page;
+    PAGE page{};
 
     for (index = 1; index < MAXNUM_PAGE; index++) {
-        if (LoadPage(index, &page) == false)
+        if (!LoadPage(index, &page))
             return false;
 
         if (strcmp(namePage, (char*) page.header.name) == 0)
@@ -254,10 +245,7 @@ bool Action::SavePage(int index, PAGE* pPage) {
     if (fseek(m_action_file, position, SEEK_SET) != 0)
         return false;
 
-    if (fwrite(pPage, 1, sizeof(PAGE), m_action_file) != sizeof(PAGE))
-        return false;
-
-    return true;
+    return fwrite(pPage, 1, sizeof(PAGE), m_action_file) == sizeof(PAGE);
 }
 
 
@@ -332,7 +320,7 @@ void Action::Process() {
         wNextPlayPage = 0;
 
         for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-            if (m_Joint.GetEnable(bID)) {
+            if (Joint.GetEnable(bID)) {
                 wpTargetAngle1024[bID] = MotionStatus::m_CurrentJoints.GetValue(bID);
                 ipLastOutSpeed1024[bID] = 0;
                 ipMovingAngle1024[bID] = 0;
@@ -348,9 +336,9 @@ void Action::Process() {
         } else {
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
                 // ���� ����ϴ� ������ ���
-                if (m_Joint.GetEnable(bID)) {
+                if (Joint.GetEnable(bID)) {
                     if (ipMovingAngle1024[bID] == 0)
-                        m_Joint.SetValue(bID, wpStartAngle1024[bID]);
+                        Joint.SetValue(bID, wpStartAngle1024[bID]);
                     else {
                         if (bSection == PRE_SECTION) {
                             iSpeedN = (short) (
@@ -361,9 +349,9 @@ void Action::Process() {
                                     (((long) (ipLastOutSpeed1024[bID] + (iSpeedN >> 1)) * wUnitTimeCount * 144) / 15)
                                             >> 9);
 
-                            m_Joint.SetValue(bID, wpStartAngle1024[bID] + ipAccelAngle1024[bID]);
+                            Joint.SetValue(bID, wpStartAngle1024[bID] + ipAccelAngle1024[bID]);
                         } else if (bSection == MAIN_SECTION) {
-                            m_Joint.SetValue(bID, wpStartAngle1024[bID] +
+                            Joint.SetValue(bID, wpStartAngle1024[bID] +
                                                   (short int) (((long) (ipMainAngle1024[bID]) * wUnitTimeCount) /
                                                                wUnitTimeNum));
                             ipGoalSpeed1024[bID] = ipMainSpeed1024[bID];
@@ -371,20 +359,20 @@ void Action::Process() {
                         {
                             if (wUnitTimeCount == (wUnitTimeNum - 1)) {
                                 // ���� ������ ������ ���̱����� �׳� ��ǥ ��ġ ���� ���
-                                m_Joint.SetValue(bID, wpTargetAngle1024[bID]);
+                                Joint.SetValue(bID, wpTargetAngle1024[bID]);
                             } else {
                                 if (bpFinishType[bID] == ZERO_FINISH) {
                                     iSpeedN = (short int) (((long) (0 - ipLastOutSpeed1024[bID]) * wUnitTimeCount) /
                                                            wUnitTimeNum);
                                     ipGoalSpeed1024[bID] = ipLastOutSpeed1024[bID] + iSpeedN;
-                                    m_Joint.SetValue(bID, wpStartAngle1024[bID] + (short) (
+                                    Joint.SetValue(bID, wpStartAngle1024[bID] + (short) (
                                             (((long) (ipLastOutSpeed1024[bID] + (iSpeedN >> 1)) * wUnitTimeCount *
                                               144) / 15) >> 9));
                                 } else // NONE_ZERO_FINISH
                                 {
                                     // MAIN Section�� �����ϰ� �۵�-����
                                     // step���� ������� ���� � ������ �����ϴ� ��Ȳ�� �߻��� �� �����Ƿ� �̷��� �� ���ۿ� ����
-                                    m_Joint.SetValue(bID, wpStartAngle1024[bID] + (short int) (
+                                    Joint.SetValue(bID, wpStartAngle1024[bID] + (short int) (
                                             ((long) (ipMainAngle1024[bID]) * wUnitTimeCount) / wUnitTimeNum));
                                     ipGoalSpeed1024[bID] = ipMainSpeed1024[bID];
                                 }
@@ -393,8 +381,8 @@ void Action::Process() {
                     }
 
                     // lastest MX28 firmwares do not support compliance slopes
-                    //m_Joint.SetSlope(bID, 1 << (m_PlayPage.header.slope[bID]>>4), 1 << (m_PlayPage.header.slope[bID]&0x0f));                    
-                    m_Joint.SetPGain(bID, (256 >> (m_play_page.header.slope[bID] >> 4)) << 2);
+                    //Joint.SetSlope(bID, 1 << (m_PlayPage.header.slope[bID]>>4), 1 << (m_PlayPage.header.slope[bID]&0x0f));
+                    Joint.SetPGain(bID, (256 >> (m_play_page.header.slope[bID] >> 4)) << 2);
                 }
             }
         }
@@ -403,8 +391,8 @@ void Action::Process() {
         wUnitTimeCount = 0;
 
         for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-            if (m_Joint.GetEnable(bID)) {
-                wpStartAngle1024[bID] = m_Joint.GetValue(bID);
+            if (Joint.GetEnable(bID)) {
+                wpStartAngle1024[bID] = Joint.GetValue(bID);
                 ipLastOutSpeed1024[bID] = ipGoalSpeed1024[bID];
             }
         }
@@ -416,7 +404,7 @@ void Action::Process() {
             wUnitTimeNum = wUnitTimeTotalNum - (wAccelStep << 1);
 
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID)) {
+                if (Joint.GetEnable(bID)) {
                     if (bpFinishType[bID] == NONE_ZERO_FINISH) {
                         if ((wUnitTimeTotalNum - wAccelStep) == 0) // ��� ������ ���� ���ٸ�
                             ipMainAngle1024[bID] = 0;
@@ -435,7 +423,7 @@ void Action::Process() {
             wUnitTimeNum = wAccelStep;
 
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID))
+                if (Joint.GetEnable(bID))
                     ipMainAngle1024[bID] = ipMovingAngle1024[bID] - ipMainAngle1024[bID] - ipAccelAngle1024[bID];
             }
         } else if (bSection == POST_SECTION) {
@@ -451,7 +439,7 @@ void Action::Process() {
             bSection = PRE_SECTION;
 
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID))
+                if (Joint.GetEnable(bID))
                     ipLastOutSpeed1024[bID] = 0;
             }
         }
@@ -519,7 +507,7 @@ void Action::Process() {
 
             ////////// Joint�� �Ķ���� ���
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID)) {
+                if (Joint.GetEnable(bID)) {
                     // ����, ����, �̷��� �������� ������ ���
                     ipAccelAngle1024[bID] = 0;
 
@@ -619,7 +607,7 @@ void Action::Process() {
                 lDivider2 = 1;
 
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID)) {
+                if (Joint.GetEnable(bID)) {
                     lStartSpeed1024_PreTime_256T =
                             (long) ipLastOutSpeed1024[bID] * ulPreSectionTime256T; //  *300/1024 * 1024/720 * 256 * 2
                     lMovingAngle_Speed1024Scale_256T_2T = (((long) ipMovingAngle1024[bID]) * 2560L) / 12;
@@ -644,11 +632,11 @@ void Action::Process() {
     }
 }
 
-bool Action::GetDebug() const {
+bool Action::IsDebugEnabled() const noexcept {
     return m_debug;
 }
 
-void Action::SetDebug(bool debug) {
+void Action::EnableDebug(bool debug) noexcept {
     m_debug = debug;
 }
 

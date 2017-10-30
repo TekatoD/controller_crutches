@@ -5,7 +5,8 @@
  *
  */
 
-#include "MX28.h"
+#include <log/Logger.h>
+#include "hw/MX28.h"
 #include "motion/Kinematics.h"
 #include "motion/MotionStatus.h"
 #include "motion/modules/Head.h"
@@ -30,7 +31,7 @@ Head::Head() {
     m_Pan_Home = 0.0;
     m_Tilt_Home = Kinematics::EYE_TILT_OFFSET_ANGLE - 30.0;
 
-    m_Joint.SetEnableHeadOnly(true);
+    Joint.SetEnableHeadOnly(true);
 }
 
 
@@ -61,43 +62,114 @@ void Head::Initialize() {
 }
 
 
-void Head::LoadINISettings(minIni* ini) {
-    LoadINISettings(ini, HEAD_SECTION);
+float Head::GetLeftLimit() const {
+    return m_LeftLimit;
 }
 
-
-void Head::LoadINISettings(minIni* ini, const std::string& section) {
-    float value = INVALID_VALUE;
-
-    if ((value = ini->getd(section, "pan_p_gain", INVALID_VALUE)) != INVALID_VALUE) m_Pan_p_gain = value;
-    if ((value = ini->getd(section, "pan_d_gain", INVALID_VALUE)) != INVALID_VALUE) m_Pan_d_gain = value;
-    if ((value = ini->getd(section, "tilt_p_gain", INVALID_VALUE)) != INVALID_VALUE) m_Tilt_p_gain = value;
-    if ((value = ini->getd(section, "tilt_d_gain", INVALID_VALUE)) != INVALID_VALUE) m_Tilt_d_gain = value;
-    if ((value = ini->getd(section, "left_limit", INVALID_VALUE)) != INVALID_VALUE) m_LeftLimit = value;
-    if ((value = ini->getd(section, "right_limit", INVALID_VALUE)) != INVALID_VALUE) m_RightLimit = value;
-    if ((value = ini->getd(section, "top_limit", INVALID_VALUE)) != INVALID_VALUE) m_TopLimit = value;
-    if ((value = ini->getd(section, "bottom_limit", INVALID_VALUE)) != INVALID_VALUE)m_BottomLimit = value;
-    if ((value = ini->getd(section, "pan_home", INVALID_VALUE)) != INVALID_VALUE) m_Pan_Home = value;
-    if ((value = ini->getd(section, "tilt_home", INVALID_VALUE)) != INVALID_VALUE) m_Tilt_Home = value;
+void Head::SetLeftLimit(float left_limit) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: left_limit = " << left_limit;
+    }
+    m_LeftLimit = left_limit;
 }
 
-
-void Head::SaveINISettings(minIni* ini) {
-    SaveINISettings(ini, HEAD_SECTION);
+float Head::GetRightLimit() const {
+    return m_RightLimit;
 }
 
+void Head::SetRightLimit(float right_limit) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: right_limit = " << right_limit;
+    }
+    m_RightLimit = right_limit;
+}
 
-void Head::SaveINISettings(minIni* ini, const std::string& section) {
-    ini->put(section, "pan_p_gain", m_Pan_p_gain);
-    ini->put(section, "pan_d_gain", m_Pan_d_gain);
-    ini->put(section, "tilt_p_gain", m_Tilt_p_gain);
-    ini->put(section, "tilt_d_gain", m_Tilt_d_gain);
-    ini->put(section, "left_limit", m_LeftLimit);
-    ini->put(section, "right_limit", m_RightLimit);
-    ini->put(section, "top_limit", m_TopLimit);
-    ini->put(section, "bottom_limit", m_BottomLimit);
-    ini->put(section, "pan_home", m_Pan_Home);
-    ini->put(section, "tilt_home", m_Tilt_Home);
+float Head::GetTopLimit() const {
+    return m_TopLimit;
+}
+
+void Head::SetTopLimit(float top_limit) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: top_limit = " << top_limit;
+    }
+    Head::m_TopLimit = top_limit;
+}
+
+float Head::GetBottomLimit() const {
+    return m_BottomLimit;
+}
+
+void Head::SetBottomLimit(float bottom_limit) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: bottom_limit = " << bottom_limit;
+    }
+    m_BottomLimit = bottom_limit;
+}
+
+float Head::GetPanHome() const {
+    return m_Pan_Home;
+}
+
+void Head::SetPanHome(float pan_home) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: pan_home = " << pan_home;
+    }
+    m_Pan_Home = pan_home;
+}
+
+float Head::GetTiltHome() const {
+    return m_Tilt_Home;
+}
+
+void Head::SetTiltHome(float tilt_home) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: tilt_home = " << tilt_home;
+    }
+    m_Tilt_Home = tilt_home;
+}
+
+float Head::GetPanPGain() const {
+    return m_Pan_p_gain;
+}
+
+void Head::SetPanPGain(float pan_p_gain) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: pan_p_gain = " << pan_p_gain;
+    }
+    m_Pan_p_gain = pan_p_gain;
+}
+
+float Head::GetPanDGain() const {
+    return m_Pan_d_gain;
+}
+
+void Head::SetPanDGain(float pan_d_gain) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: pan_d_gain = " << pan_d_gain;
+    }
+    m_Pan_d_gain = pan_d_gain;
+}
+
+float Head::GetTiltPGain() const {
+    return m_Tilt_p_gain;
+}
+
+void Head::SetTiltPGain(float tilt_p_gain) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: tilt_p_gain = " << tilt_p_gain;
+    }
+    m_Tilt_p_gain = tilt_p_gain;
+}
+
+float Head::GetTiltDGain() const {
+    return m_Tilt_d_gain;
+}
+
+void Head::SetTiltDGain(float tilt_d_gain) {
+    if(m_debug) {
+        LOG_DEBUG << "HEAD: tilt_d_gain = " << tilt_d_gain;
+    }
+    m_Tilt_d_gain = tilt_d_gain;
 }
 
 
@@ -166,9 +238,17 @@ void Head::MoveTracking() {
 
 
 void Head::Process() {
-    if (m_Joint.GetEnable(JointData::ID_HEAD_PAN) == true)
-        m_Joint.SetAngle(JointData::ID_HEAD_PAN, m_PanAngle);
+    if (Joint.GetEnable(JointData::ID_HEAD_PAN) == true)
+        Joint.SetAngle(JointData::ID_HEAD_PAN, m_PanAngle);
 
-    if (m_Joint.GetEnable(JointData::ID_HEAD_TILT) == true)
-        m_Joint.SetAngle(JointData::ID_HEAD_TILT, m_TiltAngle);
+    if (Joint.GetEnable(JointData::ID_HEAD_TILT) == true)
+        Joint.SetAngle(JointData::ID_HEAD_TILT, m_TiltAngle);
+}
+
+bool Head::IsDebugEnabled() const {
+    return m_debug;
+}
+
+void Head::EnableDebug(bool debug) {
+    m_debug = debug;
 }

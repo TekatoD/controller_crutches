@@ -1,53 +1,19 @@
-/*
- *   MotionManager.h
- *
- *   Author: ROBOTIS
- *
- */
-
-#ifndef _MOTION_MANGER_H_
-#define _MOTION_MANGER_H_
+#pragma once
 
 #include <list>
-#include <fstream>
-#include <iostream>
 #include "MotionStatus.h"
 #include "MotionModule.h"
-#include "CM730.h"
-#include "minIni.h"
-
-#define OFFSET_SECTION "Offset"
-#define INVALID_VALUE   -1024.0
+#include "hw/CM730.h"
 
 namespace Robot {
     class MotionManager {
-    private:
-        static MotionManager* m_UniqueInstance;
-        std::list<MotionModule*> m_Modules;
-        CM730* m_CM730;
-        bool m_ProcessEnable;
-        bool m_Enabled;
-        int m_FBGyroCenter;
-        int m_RLGyroCenter;
-        int m_CalibrationStatus;
-
-        bool m_IsRunning;
-        bool m_IsThreadRunning;
-        bool m_IsLogging;
-
-        std::ofstream m_LogFileStream;
-
-        MotionManager();
-
-    protected:
-
     public:
-        bool DEBUG_PRINT;
-        int m_Offset[JointData::NUMBER_OF_JOINTS];
+        int Offset[JointData::NUMBER_OF_JOINTS];
 
-        ~MotionManager();
-
-        static MotionManager* GetInstance() { return m_UniqueInstance; }
+        static MotionManager* GetInstance() {
+            static MotionManager instance;
+            return &instance;
+        }
 
         bool Initialize(CM730* cm730);
 
@@ -57,7 +23,7 @@ namespace Robot {
 
         void SetEnable(bool enable);
 
-        bool GetEnable() { return m_Enabled; }
+        bool GetEnable() const { return m_Enabled; }
 
         void AddModule(MotionModule* module);
 
@@ -69,22 +35,32 @@ namespace Robot {
             m_RLGyroCenter = 512;
         }
 
-        int GetCalibrationStatus() { return m_CalibrationStatus; }
+        int GetCalibrationStatus() const { return m_CalibrationStatus; }
 
         void SetJointDisable(int index);
 
-        void StartLogging();
+        bool IsDebugEnabled() const;
 
-        void StopLogging();
+        void EnabledDebug(bool debug);
 
-        void LoadINISettings(minIni* ini);
+        void SetJointOffset(int id, int offset);
 
-        void LoadINISettings(minIni* ini, const std::string& section);
+        int GetJointOffset(int id) const;
 
-        void SaveINISettings(minIni* ini);
+    private:
+        bool m_debug{false};
 
-        void SaveINISettings(minIni* ini, const std::string& section);
+        std::list<MotionModule*> m_Modules;
+        CM730* m_CM730{nullptr};
+        bool m_ProcessEnable{false};
+        bool m_Enabled{false};
+        int m_FBGyroCenter{512};
+        int m_RLGyroCenter{512};
+        int m_CalibrationStatus{0};
+
+        bool m_IsRunning{false};
+        bool m_IsThreadRunning{false};
+
+        MotionManager();
     };
 }
-
-#endif

@@ -7,6 +7,7 @@
 #include <motion/modules/Head.h>
 #include <cmath>
 #include <motion/modules/Walking.h>
+#include <log/Logger.h>
 #include "BallSearcher.h"
 
 using namespace Robot;
@@ -66,7 +67,7 @@ void BallSearcher::Process() {
     if (m_WalkingEnabled) {
         m_TurnSpeed = Walking::GetInstance()->GetAMoveAmplitude();
         m_TurnSpeed += m_TurnStep * m_TurnDirection;
-        if (fabs(m_TurnSpeed) > m_MaxTurn) {
+        if (fabsf(m_TurnSpeed) > m_MaxTurn) {
             m_TurnSpeed = m_MaxTurn * m_TurnDirection;
         }
 
@@ -78,31 +79,6 @@ void BallSearcher::Process() {
     } else {
         Walking::GetInstance()->Stop();
     }
-}
-
-void BallSearcher::LoadINISettings(minIni* ini) {
-    LoadINISettings(ini, FINDER_SECTION);
-}
-
-void BallSearcher::LoadINISettings(minIni* ini, const std::string& section) {
-    float value;
-    if ((value = ini->getd(section, "tilt_phase_step", INVALID_VALUE)) != INVALID_VALUE) m_TiltPhaseStep = value;
-    if ((value = ini->getd(section, "pan_phase_step", INVALID_VALUE)) != INVALID_VALUE) m_PanPhaseStep = value;
-    if ((value = ini->getd(section, "phase_size", INVALID_VALUE)) != INVALID_VALUE) m_PhaseSize = value;
-    if ((value = ini->getd(section, "turn_step", INVALID_VALUE)) != INVALID_VALUE) m_TurnStep = value;
-    if ((value = ini->getd(section, "max_turn", INVALID_VALUE)) != INVALID_VALUE) m_MaxTurn = value;
-}
-
-void BallSearcher::SaveINISettings(minIni* ini) {
-    SaveINISettings(ini, FINDER_SECTION);
-}
-
-void BallSearcher::SaveINISettings(minIni* ini, const std::string& section) {
-    ini->put(section, "tilt_phase_step", m_TiltPhaseStep);
-    ini->put(section, "pan_phase_step", m_PanPhaseStep);
-    ini->put(section, "phase_size", m_PhaseSize);
-    ini->put(section, "turn_step", m_TurnStep);
-    ini->put(section, "max_turn", m_MaxTurn);
 }
 
 void BallSearcher::EnableWalking() {
@@ -122,8 +98,70 @@ const Point2D& BallSearcher::GetLastPosition() const {
 }
 
 void BallSearcher::SetLastPosition(const Point2D& pos) {
+    if(m_debug) {
+        LOG_DEBUG << "BALL SEARCHER: last_position_x = " << pos.X << " last_position_y = " << pos.Y;
+    }
     if (pos.X != -1 && pos.Y != -1) {
         m_LastPosition = pos;
         m_Active = false;
     }
 }
+
+float BallSearcher::GetTiltPhaseStep() const {
+    return m_TiltPhaseStep;
+}
+
+void BallSearcher::SetTiltPhaseStep(float tilt_phase_step) {
+    if(m_debug) {
+        LOG_DEBUG << "BALL SEARCHER: tilt_phase_step = " << tilt_phase_step;
+    }
+    m_TiltPhaseStep = tilt_phase_step;
+}
+
+float BallSearcher::GetPanPhaseStep() const {
+    return m_PanPhaseStep;
+}
+
+void BallSearcher::SetPanPhaseStep(float pan_phase_step) {
+    if(m_debug) {
+        LOG_DEBUG << "BALL SEARCHER: pan_phase_step = " << pan_phase_step;
+    }
+    m_PanPhaseStep = pan_phase_step;
+}
+
+float BallSearcher::GetPhaseSize() const {
+    return m_PhaseSize;
+}
+
+void BallSearcher::SetPhaseSize(float phase_size) {
+    if(m_debug) {
+        LOG_DEBUG << "BALL SEARCHER: phase_size = " << phase_size;
+    }
+    m_PhaseSize = phase_size;
+}
+
+float BallSearcher::GetTurnStep() const {
+    return m_TurnStep;
+}
+
+void BallSearcher::SetTurnStep(float turn_step) {
+    if(m_debug) {
+        LOG_DEBUG << "BALL SEARCHER: turn_step = " << turn_step;
+    }
+    m_TurnStep = turn_step;
+}
+
+float BallSearcher::GetMaxTurn() const {
+    return m_MaxTurn;
+}
+
+void BallSearcher::SetMaxTurn(float max_turn) {
+    if(m_debug) {
+        LOG_DEBUG << "BALL SEARCHER: max_turn = " << max_turn;
+    }
+    m_MaxTurn = max_turn;
+}
+
+void BallSearcher::EnableDebug(bool debug) { m_debug = debug; }
+
+bool BallSearcher::IsDebugEnabled() const { return m_debug; }

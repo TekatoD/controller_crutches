@@ -68,14 +68,6 @@ namespace Robot {
 
         void Process(Point2D ball_pos, float angle_top, float angle_bot);
 
-        void LoadINISettings(minIni* ini);
-
-        void LoadINISettings(minIni* ini, const std::string& section);
-
-        void SaveINISettings(minIni* ini);
-
-        void SaveINISettings(minIni* ini, const std::string& section);
-
         bool IsNoBall() const;
 
         KickingAction GetKickingLeg() const;

@@ -10,7 +10,7 @@
 #include <motion/MotionModule.h>
 #include <math/AngleTools.h>
 #include <motion/Kinematics.h>
-#include <MX28.h>
+#include <hw/MX28.h>
 
 namespace Robot {
     class Kicking
@@ -129,21 +129,21 @@ namespace Robot {
 
         void SetBalanceEnabled(bool balance_enabled) noexcept;
 
-        float GetLegsYOffset() const;
+        float GetLegsYOffset() const noexcept ;
 
         void SetLegsYOffset(float legs_y_offset);
 
-        float GetArmSpreadOffset() const;
+        float GetArmSpreadOffset() const noexcept ;
 
         void SetArmSpreadOffset(float arm_spread_amplitude);
 
-        float GetElbowOffset() const;
+        float GetElbowOffset() const noexcept;
 
         void SetElbowOffset(float arm_elbow_offset);
 
-        bool GetDebug() const;
+        bool IsDebugEnabled() const noexcept;
 
-        void SetDebug(bool debug);
+        void EnableDebug(bool debug) noexcept;
 
     private:
         Kicking() = default;
@@ -153,7 +153,7 @@ namespace Robot {
         void UpdateActiveParams() noexcept;
 
     private:
-        bool m_debug{true};
+        bool m_debug{false};
 
         int m_kicking_leg{RIGHT_LEG};
         float m_kick_target_x_offset{0.0f};
@@ -219,5 +219,4 @@ namespace Robot {
         bool m_done{true};
     };
 }
-
 

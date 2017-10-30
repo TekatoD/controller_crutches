@@ -1,28 +1,10 @@
-/*
- *   BallTracker.h
- *
- *   Author: ROBOTIS
- *
- */
+#pragma once
 
-#ifndef _BALL_TRACKER_H_
-#define _BALL_TRACKER_H_
-
-#include <string.h>
-
+#include <cstring>
 #include "math/Point.h"
-#include "minIni.h"
-
-#define TRACKER_SECTION "Ball Tracker"
 
 namespace Robot {
     class BallTracker {
-    private:
-        int m_NoBallCount;
-        int m_NoBallMaxCount;
-
-        Point2D BallPosition;
-
     public:
 
         BallTracker();
@@ -35,14 +17,20 @@ namespace Robot {
 
         void Process(Point2D pos);
 
-        void LoadINISettings(minIni* ini);
+        int GetNoBallMaxCount() const;
 
-        void LoadINISettings(minIni* ini, const std::string& section);
+        void SetNoBallMaxCount(int no_ball_max_count);
 
-        void SaveINISettings(minIni* ini);
+        bool IsDebugEnabled() const;
 
-        void SaveINISettings(minIni* ini, const std::string& section);
+        void EnableDebug(bool debug);
+
+    private:
+
+        int m_NoBallCount;
+        int m_NoBallMaxCount;
+        Point2D BallPosition;
+        bool m_debug{false};
+
     };
 }
-
-#endif

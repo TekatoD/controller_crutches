@@ -1,39 +1,57 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 project(darwin-soccer)
 
 #### Project options ####
 option(CROSSCOMPILE "Compile for real Darwin-OP (V-REP build by default)" OFF)
 
 #### Compile properties ####
-set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 add_definitions(-DBOOST_ALL_DYN_LINK)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release FORCE)
-endif()
-
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_definitions(-DDEBUG)
-endif()
+endif ()
 
 if (CROSSCOMPILE)
     add_definitions(-DCROSSCOMPILE) # This definition is used during the initialization in the main
-    set(CROSSCOMPILE_FLAGS "-m32 -march=atom -mtune=atom -mfpmath=sse -flto -ffast-math")
+    set(CROSSCOMPILE_FLAGS "-m32 -march=atom -mtune=atom -mfpmath=sse -ffast-math") #-flto was disabled
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++ -std=c++17")
+
+    add_library(hw STATIC
+            include/hw/RobotCM730.h
+            src/hw/RobotCM730.cpp
+            include/hw/LinuxCM730.h
+            src/hw/LinuxCM730.cpp)
+else (CROSSCOMPILE)
+    set(CMAKE_CXX_STANDARD 17)
+    find_package(VREP REQUIRED)
+    add_library(hw STATIC
+            include/hw/VrepCM730.h
+            include/hw/VrepConnector.h
+            src/hw/VrepConnector.cpp
+            src/hw/VrepCM730.cpp)
+    target_link_libraries(hw ${VREP_LIBRARIES})
+    target_include_directories(hw PUBLIC ${VREP_REMOTE} ${VREP_INCLUDE})
 endif (CROSSCOMPILE)
+
+# Disable some warnings
+if (CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated-declarations -Wno-register -Wno-unused-local-typedefs")
+endif(CMAKE_COMPILER_IS_GNUCXX)
 
 include_directories(include/)
 
 #### External libraries and packages ####
 find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED) # This lib is used by the linux camera
-find_package(VREP REQUIRED)
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(Eigen3 REQUIRED)
 # Path to Boost and OpenCV needs to be set manually when crosscompiling
-find_package(Boost 1.54 COMPONENTS system log date_time filesystem thread REQUIRED)
+find_package(Boost 1.54 COMPONENTS system log_setup log date_time filesystem thread program_options REQUIRED)
 find_package(OpenCV 3.3 REQUIRED)
+find_package(LibXml2)
+
+include_directories( ${EIGEN3_INCLUDE_DIR}) #Eigen doesn't work either way
 
 #### Sources ####
 # All sources of the project. Insert one file per line.
@@ -41,25 +59,18 @@ find_package(OpenCV 3.3 REQUIRED)
 set(SRC
         include/motion/modules/Action.h
         include/BallFollower.h
-        include/BallTracker.h
+        #        include/BallTracker.h
         include/Camera.h
-        include/VrepCM730.h
-        include/ColorFinder.h
-        include/FSR.h
+        include/hw/FSR.h
         include/motion/modules/Head.h
-        include/Image.h
-        include/ImgProcess.h
         include/motion/JointData.h
         include/motion/Kinematics.h
-        include/LinuxCamera.h
-        include/LinuxCM730.h
-        include/LinuxMotionTimer.h
+        include/hw/LinuxMotionTimer.h
         include/math/Matrix.h
-        include/minIni.h
         include/motion/MotionManager.h
         include/motion/MotionModule.h
         include/motion/MotionStatus.h
-        include/MX28.h
+        include/hw/MX28.h
         include/math/Point.h
         include/StateMachine.h
         include/math/Vector.h
@@ -67,10 +78,6 @@ set(SRC
         src/math/Matrix.cpp
         src/math/Point.cpp
         src/math/Vector.cpp
-        include/minIni/minGlue.h
-        src/minIni/minIni.c
-        include/minIni/minIni.h
-        include/minIni/wxMinIni.h
         src/motion/modules/Walking.cpp
         src/motion/modules/Head.cpp
         src/motion/modules/Action.cpp
@@ -80,20 +87,14 @@ set(SRC
         src/motion/MotionStatus.cpp
         src/BallFollower.cpp
         src/BallTracker.cpp
-        src/vision/Camera.cpp
-        src/vision/ColorFinder.cpp
-        src/vision/Image.cpp
-        src/vision/ImgProcess.cpp
-        src/VrepCM730.cpp
-        src/LinuxCamera.cpp
-        src/LinuxCM730.cpp
-        src/LinuxMotionTimer.cpp
+        src/hw/LinuxMotionTimer.cpp
         src/main.cpp
         src/StateMachine.cpp
         include/gamecontroller/RoboCupGameControlData.h
         include/gamecontroller/SPLCoachMessage.h
         include/gamecontroller/SPLStandardMessage.h
-        src/GameController.cpp include/GameController.h
+        src/gamecontroller/GameController.cpp
+        include/gamecontroller/GameController.h
         include/UdpComm.h
         src/UdpComm.cpp
         src/Pose2D.cpp
@@ -104,26 +105,15 @@ set(SRC
         include/GoTo.h
         include/SoccerBehavior.h
         src/SoccerBehavior.cpp
-        include/GoalieBehavior.h
-        src/GoalieBehavior.cpp
         src/Field.cpp
         include/Field.h
         src/BallSearcher.cpp
         include/BallSearcher.h
-        include/RobotCM730.h
-        src/RobotCM730.cpp
-        include/CM730.h
-        src/CM730.cpp
-        include/VrepConnector.h
-        src/VrepConnector.cpp
+        include/hw/CM730.h
+        src/hw/CM730.cpp
         include/math/AngleTools.h
         include/math/Eigen.h
         src/math/AngleTools.cpp
-        src/ServiceLocator.cpp
-        include/ServiceLocator.h
-        src/ServiceInterface.cpp
-        include/ServiceInterface.h
-        include/Singleton.h
         src/PropertyReader.cpp
         include/PropertyReader.h
         src/motion/modules/Kicking.cpp
@@ -132,23 +122,73 @@ set(SRC
         src/log/ColouredSink.cpp
         include/log/ColouredSink.h
         src/log/Logger.cpp
-        include/log/Logger.h)
+        include/log/Logger.h
+        src/RobotApplication.cpp
+        include/RobotApplication.h
+        include/behavior/Behavior.h
+        src/behavior/BaseBehavior.cpp
+        include/behavior/BaseBehavior.h
+        src/hw/LEDs.cpp
+        include/hw/LEDs.h
+        src/Color.cpp
+        include/Color.h
+        src/hw/Buttons.cpp
+        include/hw/Buttons.h
+        src/tool/Accumulator.cpp
+        include/tool/Accumulator.h
+        include/tool/Rate.h
+        include/config/ConfigurationStrategy.h
+        src/config/strategies/WalkingConfigurationStrategy.cpp
+        include/config/strategies/WalkingConfigurationStrategy.h
+        src/config/ConfigurationFileLoader.cpp
+        include/config/ConfigurationFileLoader.h
+        src/config/ConfigurationParser.cpp
+        include/config/ConfigurationParser.h
+        include/config/strategies/MotionManagerConfigurationStrategy.h
+        src/config/strategies/MotionManagerConfigurationStrategy.cpp
+        include/config/ConfigurationParser.h
+        src/config/CommandArguments.cpp
+        include/config/CommandArguments.h
+        src/config/ActionConfigurationFileLoader.cpp
+        include/config/ActionConfigurationFileLoader.h
+        include/config/CommandArguments.h
+        include/BallTracker.h
+        include/config/strategies/BallSearcherConfigurationStrategy.h
+        include/config/strategies/BallTrackerConfigurationStrategy.h
+        include/config/strategies/HeadConfigurationStrategy.h
+        include/config/strategies/GameControllerConfigurationStrategy.h
+        src/config/strategies/BallSearcherConfigurationStrategy.cpp
+        src/config/strategies/BallTrackerConfigurationStrategy.cpp
+        src/config/strategies/HeadConfigurationStrategy.cpp
+        src/config/strategies/GameControllerConfigurationStrategy.cpp
+        src/config/strategies/ConfigurationStrategy.cpp
+        src/config/ArgumentsParser.cpp
+        include/config/ArgumentsParser.h
+        include/config/SingleOptionArgumentsParsingStrategy.h
+        include/config/strategies/DebugModeArgumentsParsingStrategy.h
+        src/config/strategies/DebugModeArgumentsParsingStrategy.cpp
+        src/config/strategies/ConfigPathArgumentsParsingStrategy.cpp
+        include/config/strategies/ConfigPathArgumentsParsingStrategy.h
+        src/config/SingleOptionArgumentsParsingStrategy.cpp
+        include/config/ArgumentsParsingStrategy.h
+        src/config/strategies/HelpArgumentsParsingStrategy.cpp
+        include/config/strategies/HelpArgumentsParsingStrategy.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})
 
 target_link_libraries(controller
+        hw
         ${CMAKE_THREAD_LIBS_INIT}
         ${JPEG_LIBRARIES}
         ${Boost_LIBRARIES}
-#        ${OpenCV_LIBRARIES}
-        Eigen3::Eigen
-        ${VREP_LIBRARIES})
+        ${OpenCV_LIBRARIES}
+        ${LIBXML2_LIBRARIES})
 
 target_include_directories(controller PUBLIC
         ${JPEG_INCLUDE_DIR}
-        ${VREP_REMOTE}
-        ${VREP_INCLUDE}
         ${Boost_INCLUDE_DIR}
         ${JPEG_INCLUDE_DIR}
-        ${OpenCV_INCLUDE_DIR})
+        ${OpenCV_INCLUDE_DIR}
+        ${EIGEN3_INCLUDE_DIR}
+        ${LIBXML2_INCLUDE_DIR})

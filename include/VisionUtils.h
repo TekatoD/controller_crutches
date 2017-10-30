@@ -219,18 +219,23 @@ namespace ant {
                 // Same functionality as in CamGeom in naomech behaviour
                 
                 float f = m_cameraParams.f;
+                float ratio = m_cameraParams.a;
                 float ix, iy;
                 ix = ImagePoint.at<float>(0, 0);
                 iy = ImagePoint.at<float>(1, 0);
                 // Magic number: height in pixels
                 // From top left origin (y downwards) to bottom left origin (y upwards)
-                iy = -iy + 240;
+                iy = -iy + 240.0;
+                
+                //ix /= 320.0f;
+                //iy /= 240.0f;
+                
                 
                 // Something like image to camera conversion?
                 // x axis in camera coordinates: points forward (focal length)
                 // y axis in camera coordinates: opposite to x axis in image coordinates (+offsets which are equal to 0)
                 // z axis in camera coordinates: z axis in image coordinates (+offsets which are equal to 0)
-                cv::Mat Pixel = (cv::Mat_<float>(3, 1) << f, -ix, iy);
+                cv::Mat Pixel = (cv::Mat_<float>(3, 1) << f, -ix * f, iy * f * ratio);
                 
                 std::cout << "Pixel: " << std::endl << Pixel << std::endl;
                 

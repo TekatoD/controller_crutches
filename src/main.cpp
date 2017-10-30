@@ -246,7 +246,7 @@ int main(int argc, char** argv) {
         Robot::Kinematics::ComputeHeadForwardKinematics(HeadTransformE, HeadPan, HeadTilt);
         cv::eigen2cv(HeadTransformE, HeadTransform);
         
-        HeadTransform = HeadTransform.inv();
+        //HeadTransform = HeadTransform.inv();
         
         /*
         cv::Mat Rx = cv::Mat::eye(3, 3, CV_32F);
@@ -265,9 +265,11 @@ int main(int argc, char** argv) {
         t.at<float>(2, 0) += HeightFromGround;
         */
         
-        cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, -HeightFromGround);
+        cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, HeightFromGround);
         
-        ant::vision_utils::CameraParameters params(R, t, 0.002);
+        // works with y / x
+        float aspectRatio = 240.f/320.f;
+        ant::vision_utils::CameraParameters params(R, t, 0.02, aspectRatio);
         ant::vision_utils::CameraProjection cameraToGround(params);
         
         camera.CaptureFrame();

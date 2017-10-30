@@ -2,28 +2,24 @@
 // Created by nikitas on 26.03.16.
 //
 
-#ifndef NAOMECH_LINEDETECTOR_H
-#define NAOMECH_LINEDETECTOR_H
+#pragma once
 
 #include "BaseDetector.h"
 
-namespace ant {
-
+namespace Robot {
     class LineDetector : public BaseDetector {
     public:
-
         LineDetector();
 
-        cv::Mat preproccess(const cv::Mat &image);
+        cv::Mat Preproccess(const cv::Mat& image);
 
-        cv::Mat preproccess_old(const cv::Mat &image);
+        cv::Mat PreproccessOld(const cv::Mat& image);
 
-        std::vector<cv::Vec4i> detect(const cv::Mat &preprocImage);
+        std::vector<cv::Vec4i> Detect(const cv::Mat& preproc_image);
 
-        std::vector<cv::Vec4i> detect_old(const cv::Mat &preprocImage);
+        std::vector<cv::Vec4i> DetectOld(const cv::Mat& preproc_image);
 
         struct configuration {
-
             struct HoughLines {
                 double rho;
                 double theta;
@@ -54,18 +50,17 @@ namespace ant {
         void load(const boost::property_tree::ptree &line_config);
 
         boost::property_tree::ptree get_params();
+
+    private:
+        void GetSkeleton(const cv::Mat& img, cv::Mat& result);
+        void GetSimpleSkeleton(const cv::Mat& img, cv::Mat& result);
+        void ZhangSuen(const cv::Mat& img, cv::Mat& result);
+
+        void JoinLines(std::vector<cv::Vec4i>& lines);
+
     private:
         configuration m_conf;
-
-        void __get_skeleton(const cv::Mat &img, cv::Mat &result);
-        void __simple_skeleton(const cv::Mat &img, cv::Mat &result);
-        void __zhang_suen(const cv::Mat &img, cv::Mat &result);
-
-        void __join_lines(std::vector<cv::Vec4i> &lines);
     };
 
 
 }
-
-
-#endif //NAOMECH_LINEDETECTOR_H

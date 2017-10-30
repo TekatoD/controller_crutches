@@ -3,15 +3,15 @@
 //
 
 
-#include <detectors/BallDetector.h>
+#include <vision/detectors/BallDetector.h>
 #include <array>
 
 
-namespace ant {
+namespace Robot {
 
   BallDetector::BallDetector() : BaseDetector("BallDetector") {}
 
-  cv::Rect BallDetector::detect_old(const cv::Mat &preprocImage) {
+  cv::Rect BallDetector::DetectOld(const cv::Mat& preprocImage) {
     cv::Rect ans;
     std::vector<std::vector<cv::Point> > contours;
     cv::findContours(preprocImage, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
@@ -29,9 +29,9 @@ namespace ant {
     return ans;
   }
 
-  cv::Rect BallDetector::detect(const cv::Mat &preprocImage, const std::vector<cv::Vec4i> &lines) {
+  cv::Rect BallDetector::Detect(const cv::Mat& preprocImage, const std::vector<cv::Vec4i>& lines) {
     if(!m_conf.white_ball){
-      return detect_old(preprocImage);
+      return DetectOld(preprocImage);
     }
     cv::Mat preproc = preprocImage;
     for (auto &&line : lines) {
@@ -184,7 +184,7 @@ namespace ant {
     return ans;
   }
 
-  cv::Mat BallDetector::preproccess(const cv::Mat &image) {
+  cv::Mat BallDetector::Preproccess(const cv::Mat& image) {
     cv::Mat preprocImage, prepImage;
     cv::cvtColor(image, preprocImage, CV_YUV2BGR);
     cv::Mat medianBlurFrame;
@@ -229,7 +229,7 @@ namespace ant {
   }
 
   void BallDetector::load(const boost::property_tree::ptree &config) {
-    const boost::property_tree::ptree ball_config = config.get_child(detectorName());
+    const boost::property_tree::ptree ball_config = config.get_child(DetectorName());
     m_conf.median_blur_size = ball_config.get<int>("median_blur_size");
     m_conf.white_ball = ball_config.get<bool>("white_ball");
     m_conf.ColorThresh.min_1 = ball_config.get<uchar>("ColorThresh.min_1");
@@ -264,11 +264,11 @@ namespace ant {
     ball_config.put("GaborThresh.max_2", m_conf.GaborThresh.max_2);
     ball_config.put("GaborThresh.max_3", m_conf.GaborThresh.max_3);
 
-    ptree.put_child(detectorName(), ball_config);
+    ptree.put_child(DetectorName(), ball_config);
     return ptree;
   }
 
-  bool BallDetector::is_white() {
+  bool BallDetector::IsWhite() const noexcept {
     return m_conf.white_ball;
   }
 

@@ -172,7 +172,21 @@ set(SRC
         src/config/SingleOptionArgumentsParsingStrategy.cpp
         include/config/ArgumentsParsingStrategy.h
         src/config/strategies/HelpArgumentsParsingStrategy.cpp
-        include/config/strategies/HelpArgumentsParsingStrategy.h)
+        include/config/strategies/HelpArgumentsParsingStrategy.h
+        include/vision/detectors/AngleDetector.h
+        include/vision/detectors/BallDetector.h
+        include/vision/detectors/BaseDetector.h
+        include/vision/detectors/FieldDetector.h
+        include/vision/detectors/LineDetector.h
+        include/vision/Vision.h
+        include/vision/VisionUtils.h
+        src/vision/detectors/AngleDetector.cpp
+        src/vision/detectors/BallDetector.cpp
+        src/vision/detectors/BaseDetector.cpp
+        src/vision/detectors/FieldDetector.cpp
+        src/vision/detectors/LineDetector.cpp
+        src/vision/Vision.cpp
+        )
 
 #### Build targets #####
 add_executable(controller ${SRC})

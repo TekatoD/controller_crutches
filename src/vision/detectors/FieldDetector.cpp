@@ -2,13 +2,13 @@
 // Created by pav on 25/01/2017.
 //
 
-#include "detectors/FieldDetector.h"
+#include "vision/detectors/FieldDetector.h"
 
-ant::FieldDetector::FieldDetector() : BaseDetector("FieldDetector"){
+Robot::FieldDetector::FieldDetector() : BaseDetector("FieldDetector"){
 
 }
 
-cv::Mat ant::FieldDetector::preproccess(const cv::Mat &image) {
+cv::Mat Robot::FieldDetector::Preproccess(const cv::Mat& image) {
   cv::Mat preprocImage, prepImage, hsvImg;
   image.copyTo(preprocImage);
   cv::cvtColor(preprocImage,hsvImg,cv::COLOR_BGR2HSV);
@@ -49,7 +49,7 @@ cv::Mat ant::FieldDetector::preproccess(const cv::Mat &image) {
   return preprocImage + field;
 }
 
-cv::Mat ant::FieldDetector::detect(const cv::Mat &preprocImage) {
+cv::Mat Robot::FieldDetector::Detect(const cv::Mat& preprocImage) {
   cv::Rect ans;
   cv::Mat temp_image=cv::Mat::zeros(preprocImage.rows,preprocImage.cols,CV_8UC3);
   std::vector<std::vector<cv::Point> > contours;
@@ -76,8 +76,8 @@ cv::Mat ant::FieldDetector::detect(const cv::Mat &preprocImage) {
 }
 
 
-void ant::FieldDetector::load(const boost::property_tree::ptree &config) {
-  const boost::property_tree::ptree line_config = config.get_child(detectorName());
+void Robot::FieldDetector::load(const boost::property_tree::ptree &config) {
+  const boost::property_tree::ptree line_config = config.get_child(DetectorName());
   ColorThresh.min_1 = line_config.get<uchar>("ColorThresh1.min_1");
   ColorThresh.min_2 = line_config.get<uchar>("ColorThresh1.min_2");
   ColorThresh.min_3 = line_config.get<uchar>("ColorThresh1.min_3");
@@ -92,7 +92,7 @@ void ant::FieldDetector::load(const boost::property_tree::ptree &config) {
   ColorThresh2.max_3 = line_config.get<uchar>("ColorThresh2.max_3");
 }
 
-boost::property_tree::ptree ant::FieldDetector::get_params() {
+boost::property_tree::ptree Robot::FieldDetector::get_params() {
   boost::property_tree::ptree line_config, ptree;
   line_config.put("ColorThresh1.min_2", ColorThresh.min_2);
   line_config.put("ColorThresh1.min_1", ColorThresh.min_1);
@@ -107,6 +107,6 @@ boost::property_tree::ptree ant::FieldDetector::get_params() {
   line_config.put("ColorThresh2.max_1", ColorThresh2.max_1);
   line_config.put("ColorThresh2.max_2", ColorThresh2.max_2);
   line_config.put("ColorThresh2.max_3", ColorThresh2.max_3);
-  ptree.put_child(detectorName(), line_config);
+  ptree.put_child(DetectorName(), line_config);
   return ptree;
 }

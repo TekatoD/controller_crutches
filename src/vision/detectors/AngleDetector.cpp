@@ -1,29 +1,29 @@
 // Created by Andrey Potemkin
 
-#include <detectors/AngleDetector.h>
+#include <vision/detectors/AngleDetector.h>
 //#include <rrc/core.h>
 
 
-namespace ant {
+namespace Robot {
   AngleDetector::AngleDetector() : BaseDetector("AngleDetector") {};
 
-  std::vector<cv::Vec3d> AngleDetector::detect(cv::Mat &img, const std::vector<cv::Vec4i> &lines) {
+  std::vector<cv::Vec3d> AngleDetector::Detect(cv::Mat& img, const std::vector<cv::Vec4i>& lines) {
 //    std::vector<std::vector<cv::Vec3d>> angles(lines.size(), std::vector<cv::Vec3d>(lines.size(), cv::Vec3d(0, 0, 0)));
     std::vector<cv::Vec3d> angles(0);
     for (size_t i = 0; i < lines.size(); i++) {
       for (size_t j = i + 1; j < lines.size(); j++) {
         double ki, mi, kj, mj;
-        std::tie(ki, mi) = getLineParams(lines[i]);
-        std::tie(kj, mj) = getLineParams(lines[j]);
+        std::tie(ki, mi) = GetLineParams(lines[i]);
+        std::tie(kj, mj) = GetLineParams(lines[j]);
         double x = (mj - mi) / (ki - kj);
         double y = ki * x + mi;
         //
-        if (isOnLine(lines[i], x, y) && ( sqrt(pow(x-lines[j](0),2.)+pow(y-lines[j](1),2.))< 40  ||
+        if (IsOnLine(lines[i], x, y) && ( sqrt(pow(x-lines[j](0),2.)+pow(y-lines[j](1),2.))< 40  ||
                                           sqrt(pow(x-lines[j](2),2.)+pow(y-lines[j](3),2.)) < 40 ||
-                                          isOnLine(lines[j], x, y))
-            || isOnLine(lines[j], x, y) && ( sqrt(pow(x-lines[i](0),2.)+pow(y-lines[i](1),2.))< 40  ||
+                IsOnLine(lines[j], x, y))
+            || IsOnLine(lines[j], x, y) && ( sqrt(pow(x-lines[i](0),2.)+pow(y-lines[i](1),2.))< 40  ||
                                              sqrt(pow(x-lines[i](2),2.)+pow(y-lines[i](3),2.)) < 40 ||
-                                             isOnLine(lines[i], x, y))) {
+                IsOnLine(lines[i], x, y))) {
           double xi = (lines[i](2) - lines[i](0));
           double xj = (lines[j](2) - lines[j](0));
           double yi = (lines[i](3) - lines[i](1));
@@ -51,7 +51,7 @@ namespace ant {
   }
 
 
-  std::pair<double, double> AngleDetector::getLineParams(const cv::Vec4i &line) {
+  std::pair<double, double> AngleDetector::GetLineParams(const cv::Vec4i& line) {
     double x0 = line(0);
     double y0 = line(1);
     double x1 = line(2);
@@ -61,7 +61,7 @@ namespace ant {
     return std::make_pair(k, m);
   }
 
-  bool AngleDetector::isOnLine(const cv::Vec4i &line, double x, double y) {
+  bool AngleDetector::IsOnLine(const cv::Vec4i& line, double x, double y) {
     double x0 = line(0);
     double y0 = line(1);
     double x1 = line(2);

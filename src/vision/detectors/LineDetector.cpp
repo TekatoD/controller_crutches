@@ -2,83 +2,83 @@
 // Created by nikitas on 26.03.16.
 //
 
-#include "detectors/LineDetector.h"
-#include "VisionUtils.h"
+#include "vision/detectors/LineDetector.h"
+#include "vision/VisionUtils.h"
+
+using namespace Robot;
 
 const char table[]{
-  0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0,
-  0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0
+        0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0,
+        0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0
 };
 
-int fillNeighbours(const cv::Mat &window, bool *neighbours) {
-  const int indexes[][2]{
-    {0, 1},
-    {0, 2},
-    {1, 2},
-    {2, 2},
-    {2, 1},
-    {2, 0},
-    {1, 0},
-    {0, 0}
-  };
+int fillNeighbours(const cv::Mat& window, bool* neighbours) {
+    const int indexes[][2]{
+            {0, 1},
+            {0, 2},
+            {1, 2},
+            {2, 2},
+            {2, 1},
+            {2, 0},
+            {1, 0},
+            {0, 0}
+    };
 
-  int table_idx = 0;
+    int table_idx = 0;
 
 //  const uchar *data = window.ptr(0);
-  for (int i = 0; i < sizeof(indexes) / sizeof(*indexes); ++i) {
-    const int *idx = indexes[i];
-    neighbours[i] = window.at<uchar>(idx[0], idx[1]);
-    table_idx = table_idx << 1 | neighbours[i];
-  }
-  return table_idx;
+    for (int i = 0; i < sizeof(indexes) / sizeof(*indexes); ++i) {
+        const int* idx = indexes[i];
+        neighbours[i] = window.at<uchar>(idx[0], idx[1]);
+        table_idx = table_idx << 1 | neighbours[i];
+    }
+    return table_idx;
+}
+
+LineDetector::LineDetector()
+        : BaseDetector("LineDetector") {}
+
+std::vector<cv::Vec4i> LineDetector::Detect(const cv::Mat& preproc_image) {
+    cv::Mat skeleton;
+//
+    GetSkeleton(preproc_image, skeleton); // O(n) n = h*w of img
+//
+    std::vector<cv::Vec4i> lines;
+    cv::HoughLinesP(skeleton, lines,
+                    m_conf.HoughLines.rho, m_conf.HoughLines.theta, m_conf.HoughLines.threshold,
+                    m_conf.HoughLines.min_line_length, m_conf.HoughLines.max_line_gap);
+
+    JoinLines(lines); // O(m^2) - m = countLines
+
+    return lines;
+}
+
+std::vector<cv::Vec4i> LineDetector::DetectOld(const cv::Mat& preproc_image) {
+    cv::Mat skeleton;
+
+    GetSkeleton(preproc_image, skeleton); // O(n) n = h*w of img
+    std::vector<cv::Vec4i> lines;
+    cv::HoughLinesP(skeleton, lines,
+                    m_conf.HoughLines.rho, m_conf.HoughLines.theta, m_conf.HoughLines.threshold,
+                    m_conf.HoughLines.min_line_length, m_conf.HoughLines.max_line_gap);
+
+    JoinLines(lines); // O(m^2) - m = countLines
+
+    return lines;
 }
 
 
-namespace ant {
-
-  LineDetector::LineDetector() : BaseDetector("LineDetector") {}
-
-  std::vector<cv::Vec4i> LineDetector::detect(const cv::Mat &preprocImage) {
-    cv::Mat skeleton;
-//
-    __get_skeleton(preprocImage, skeleton); // O(n) n = h*w of img
-//
-    std::vector<cv::Vec4i> lines;
-    cv::HoughLinesP(skeleton, lines,
-                    m_conf.HoughLines.rho, m_conf.HoughLines.theta, m_conf.HoughLines.threshold,
-                    m_conf.HoughLines.min_line_length, m_conf.HoughLines.max_line_gap);
-
-    __join_lines(lines); // O(m^2) - m = countLines
-
-    return lines;
-  }
-
-  std::vector<cv::Vec4i> LineDetector::detect_old(const cv::Mat &preprocImage) {
-    cv::Mat skeleton;
-
-    __get_skeleton(preprocImage, skeleton); // O(n) n = h*w of img
-    std::vector<cv::Vec4i> lines;
-    cv::HoughLinesP(skeleton, lines,
-                    m_conf.HoughLines.rho, m_conf.HoughLines.theta, m_conf.HoughLines.threshold,
-                    m_conf.HoughLines.min_line_length, m_conf.HoughLines.max_line_gap);
-
-    __join_lines(lines); // O(m^2) - m = countLines
-
-    return lines;
-  }
-
-
-  cv::Mat LineDetector::preproccess(const cv::Mat &image) {
+cv::Mat LineDetector::Preproccess(const cv::Mat& image) {
     cv::Mat hsv_img, gray_img, bgr_img, buffer;
 
     cv::cvtColor(image, bgr_img, CV_YUV2BGR);
-    cv::GaussianBlur(bgr_img,bgr_img,cv::Size(5,5),1.5,1.5);
+    cv::GaussianBlur(bgr_img, bgr_img, cv::Size(5, 5), 1.5, 1.5);
     cv::cvtColor(bgr_img, gray_img, CV_BGR2GRAY);
     cv::cvtColor(bgr_img, hsv_img, CV_BGR2HSV);
 
@@ -111,20 +111,20 @@ namespace ant {
     cv::Mat colorImg = gray_img.clone();
 
     for (int r = 0; r < colorImg.rows; r++) {
-      for (int c = 0; c < colorImg.cols; c++) {
-        if (thresh_filt_image.at<uchar>(r, c) != 0) {
-          cv::floodFill(colorImg, cv::Point(c, r), 0);
-          cv::floodFill(thresh_filt_image, cv::Point(c, r), 0);
+        for (int c = 0; c < colorImg.cols; c++) {
+            if (thresh_filt_image.at<uchar>(r, c) != 0) {
+                cv::floodFill(colorImg, cv::Point(c, r), 0);
+                cv::floodFill(thresh_filt_image, cv::Point(c, r), 0);
+            }
         }
-      }
     }
 
     const cv::Mat result_matrix = gray_img - colorImg;
 
     return result_matrix;
-  }
+}
 
-  cv::Mat LineDetector::preproccess_old(const cv::Mat &image) {
+cv::Mat LineDetector::PreproccessOld(const cv::Mat& image) {
     cv::Mat hsv_img, gray_img, bgr_img, buffer;
 
     cv::cvtColor(image, bgr_img, CV_YUV2BGR);
@@ -149,21 +149,21 @@ namespace ant {
     cv::Mat colorImg = gray_img.clone();
 
     for (int r = 0; r < colorImg.rows; r++) {
-      for (int c = 0; c < colorImg.cols; c++) {
-        if (thresh_filt_image.at<uchar>(r, c) != 0) {
-          cv::floodFill(colorImg, cv::Point(c, r), 0);
-          cv::floodFill(thresh_filt_image, cv::Point(c, r), 0);
+        for (int c = 0; c < colorImg.cols; c++) {
+            if (thresh_filt_image.at<uchar>(r, c) != 0) {
+                cv::floodFill(colorImg, cv::Point(c, r), 0);
+                cv::floodFill(thresh_filt_image, cv::Point(c, r), 0);
+            }
         }
-      }
     }
 
     const cv::Mat result_matrix = gray_img - colorImg;
 
     return result_matrix;
-  }
+}
 
 
-  void LineDetector::__join_lines(std::vector<cv::Vec4i> &lines) {
+void LineDetector::JoinLines(std::vector<cv::Vec4i>& lines) {
     std::vector<int> clusters;
 
     const int num_clusters = cv::partition(lines, clusters, m_conf.LineEqualPredicate);
@@ -171,53 +171,51 @@ namespace ant {
     std::vector<cv::Vec4i> joinLines((std::size_t) num_clusters);
 
     for (std::size_t i = 0; i < lines.size(); ++i)
-      joinLines[clusters[i]] += lines[i];
+        joinLines[clusters[i]] += lines[i];
 
     lines = joinLines;
-  }
+}
 
-  void LineDetector::__get_skeleton(const cv::Mat &img, cv::Mat &result) {
-    __zhang_suen(img, result);
+void LineDetector::GetSkeleton(const cv::Mat& img, cv::Mat& result) {
+    ZhangSuen(img, result);
+}
 
-
-  }
-
-  void LineDetector::__simple_skeleton(const cv::Mat &img, cv::Mat &result) {
+void LineDetector::GetSimpleSkeleton(const cv::Mat& img, cv::Mat& result) {
     result = cv::Mat::zeros(img.rows, img.cols, CV_8UC1);
 
     //scan x
     const uchar white = 255;
     for (int r = 0; r < img.rows; r++) {
-      for (int c = 0, e; c < img.cols; c++) {
-        uchar px = img.at<uchar>(r, c);
-        if (px != white) continue;
-        e = c;
-        while (px == white && e < img.cols)
-          px = img.at<uchar>(r, e++);
-        int dx = e - c;
-        if (dx > 1 && dx < 30)
-          result.at<uchar>(r, c + dx / 2) = 255;
-        c = e;
-      }
+        for (int c = 0, e; c < img.cols; c++) {
+            uchar px = img.at<uchar>(r, c);
+            if (px != white) continue;
+            e = c;
+            while (px == white && e < img.cols)
+                px = img.at<uchar>(r, e++);
+            int dx = e - c;
+            if (dx > 1 && dx < 30)
+                result.at<uchar>(r, c + dx / 2) = 255;
+            c = e;
+        }
     }
 
     //scan y
     for (int c = 0; c < img.cols; c++) {
-      for (int r = 0, e; r < img.rows; r++) {
-        uchar px = img.at<uchar>(r, c);
-        if (px != white) continue;
-        e = r;
-        while (px == white && e < img.rows)
-          px = img.at<uchar>(e++, c);
-        int dx = e - r;
-        if (dx > 1 && dx < 30)
-          result.at<uchar>(r + dx / 2, c) = 255;
-        r = e;
-      }
+        for (int r = 0, e; r < img.rows; r++) {
+            uchar px = img.at<uchar>(r, c);
+            if (px != white) continue;
+            e = r;
+            while (px == white && e < img.rows)
+                px = img.at<uchar>(e++, c);
+            int dx = e - r;
+            if (dx > 1 && dx < 30)
+                result.at<uchar>(r + dx / 2, c) = 255;
+            r = e;
+        }
     }
-  }
+}
 
-  void LineDetector::__zhang_suen(const cv::Mat &img, cv::Mat &result) {
+void LineDetector::ZhangSuen(const cv::Mat& img, cv::Mat& result) {
     result = img.clone();
 
     assert(result.depth() == CV_8U);
@@ -232,32 +230,32 @@ namespace ant {
 
     int inter = 0, count;
     do {
-      count = 0;
+        count = 0;
 
-      for (int r = 1; r < rows - 1; ++r) {
-        for (int c = 1; c < cols - 1; ++c) {
+        for (int r = 1; r < rows - 1; ++r) {
+            for (int c = 1; c < cols - 1; ++c) {
 
-          if (!result.at<uchar>(r, c))
-            continue;
+                if (!result.at<uchar>(r, c))
+                    continue;
 
-          const cv::Rect window(c - 1, r - 1, 3, 3);
+                const cv::Rect window(c - 1, r - 1, 3, 3);
 
-          int idx = fillNeighbours(result(window), neighbours);
+                int idx = fillNeighbours(result(window), neighbours);
 
-          if (table[idx]) points[count++] = cv::Point(c, r);
+                if (table[idx]) points[count++] = cv::Point(c, r);
+            }
         }
-      }
 
-      for (int i = 0; i < count; ++i)
-        result.at<uchar>(points[i]) = 0;
-      inter++;
+        for (int i = 0; i < count; ++i)
+            result.at<uchar>(points[i]) = 0;
+        inter++;
     } while (count != 0);
 
 //    std::cout << inter << std::endl;
-  }
+}
 
-  bool LineDetector::configuration::LineEqualPredicate::operator()
-    (const cv::Vec4i &line1, const cv::Vec4i &line2) {
+bool LineDetector::configuration::LineEqualPredicate::operator()
+        (const cv::Vec4i& line1, const cv::Vec4i& line2) {
     using namespace vision_utils;
 
     const cv::Point a(line1(0), line1(1));
@@ -269,10 +267,10 @@ namespace ant {
     const bool pointInLineC = std::abs(getAltitude(c, a, b)) < error_px;
 
     return parallel && pointInLineC;
-  }
+}
 
-  void LineDetector::load(const boost::property_tree::ptree &config) {
-    const boost::property_tree::ptree line_config = config.get_child(detectorName());
+void LineDetector::load(const boost::property_tree::ptree& config) {
+    const boost::property_tree::ptree line_config = config.get_child(DetectorName());
 
     m_conf.HoughLines.max_line_gap = line_config.get<double>("HoughLines.max_line_gap");
     m_conf.HoughLines.min_line_length = line_config.get<double>("HoughLines.min_line_length");
@@ -304,10 +302,10 @@ namespace ant {
     m_conf.Preproc_new.ColorThresh2.max_1 = line_config.get<uchar>("Preproc_new.ColorThresh2.max_1");
     m_conf.Preproc_new.ColorThresh2.max_2 = line_config.get<uchar>("Preproc_new.ColorThresh2.max_2");
     m_conf.Preproc_new.ColorThresh2.max_3 = line_config.get<uchar>("Preproc_new.ColorThresh2.max_3");
-  }
+}
 
 
-  boost::property_tree::ptree LineDetector::get_params() {
+boost::property_tree::ptree LineDetector::get_params() {
     boost::property_tree::ptree line_config, ptree;
 
     line_config.put("HoughLines.max_line_gap", m_conf.HoughLines.max_line_gap);
@@ -339,9 +337,6 @@ namespace ant {
     line_config.put("Preproc_new.ColorThresh2.max_1", m_conf.Preproc_new.ColorThresh2.max_1);
     line_config.put("Preproc_new.ColorThresh2.max_2", m_conf.Preproc_new.ColorThresh2.max_2);
     line_config.put("Preproc_new.ColorThresh2.max_3", m_conf.Preproc_new.ColorThresh2.max_3);
-    ptree.put_child(detectorName(), line_config);
+    ptree.put_child(DetectorName(), line_config);
     return ptree;
-  }
-
-
 }

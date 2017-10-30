@@ -2,18 +2,14 @@
 // Created by nikitas on 27.03.16.
 //
 
-#ifndef NAOMECH_COREFUNTIONS_H
-#define NAOMECH_COREFUNTIONS_H
+#pragma once
 
 #include "opencv2/core/core.hpp"
-//#include <flatbuffers/flatbuffers.h>
 
-namespace ant {
+namespace Robot {
     namespace vision_utils {
-
         template<class _Tp, int m, int n>
-        inline
-        float norm(const cv::Matx<_Tp, m, n> &M) {
+        inline float norm(const cv::Matx<_Tp, m, n> &M) {
             float sum = 0.0f;
             for (int i = 0; i < m; i++) {
                 for (int j = 0; j < n; j++) {
@@ -45,14 +41,12 @@ namespace ant {
             return dividend / divider;
         }
 
-        inline
-        bool cmp(const cv::Point &p1, const cv::Point &p2) {
+        inline bool cmp(const cv::Point &p1, const cv::Point &p2) {
             return cv::norm(p1) < cv::norm(p2);
         }
 
 
-        inline
-        void operator+=(cv::Vec4i &line1, const cv::Vec4i &line2) {
+        inline void operator+=(cv::Vec4i &line1, const cv::Vec4i &line2) {
             using vision_utils::cmp;
 
             const cv::Point a(line1(0), line1(1)), b(line1(2), line1(3));
@@ -70,15 +64,7 @@ namespace ant {
             const cv::Point max = std::max(a, std::max(b, std::max(c, d, cmp), cmp), cmp);
 
             line1 = cv::Vec4i(min.x, min.y, max.x, max.y);
-            return;
         }
-
-//        inline cv::Mat reconstructCvMat(const flatbuffers::Vector<uint8_t> *frame,
-//                                        int cols,
-//                                        int rows,
-//                                        int type){
-//            return cv::Mat(rows,cols,type,(void*)frame->Data());
-//        }
 
         inline void rot90(cv::Mat img, int degrees)
         {
@@ -86,16 +72,14 @@ namespace ant {
             if (degrees == 90) {
                 transpose(img, img);
                 flip(img, img, 1); //transpose+flip(1)=CW
-            }
-            else if (degrees == 270) {
+            } else if (degrees == 270) {
                 transpose(img, img);
                 flip(img, img, 0); //transpose+flip(0)=CCW
-            }
-            else if (degrees == 180) {
+            } else if (degrees == 180) {
                 flip(img, img, -1); //flip(-1)=180
+            } else {
+                throw std::runtime_error("Can't rotate image to 90 degrees");
             }
         }
     }
 }
-
-#endif //NAOMECH_COREFUNTIONS_H

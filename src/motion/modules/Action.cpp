@@ -94,26 +94,23 @@ void Action::Initialize() {
 }
 
 
-bool Action::LoadFile(const char* filename) {
+void Action::LoadFile(const char* filename) {
     FILE* action = fopen(filename, "r+b");
 
     if (action == nullptr) {
-        LOG_ERROR << "ACTION: Can not open Action file!";
-        return false;
+        throw std::runtime_error("Can not open Action file!");
     }
 
     fseek(action, 0, SEEK_END);
     if (ftell(action) != (long) (sizeof(PAGE) * MAXNUM_PAGE)) {
-        LOG_ERROR << "ACTION: It's not an Action file!";
         fclose(action);
-        return false;
+        throw std::runtime_error("It's not an Action file!");
     }
 
     if (m_action_file != nullptr)
         fclose(m_action_file);
 
     m_action_file = action;
-    return true;
 }
 
 

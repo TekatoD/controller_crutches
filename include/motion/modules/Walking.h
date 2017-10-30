@@ -27,7 +27,7 @@ namespace Robot {
         };
 
     private:
-        bool m_debug{true};
+        bool m_debug{false};
 
         float m_cur_period_time;
         float m_cur_dsp_ratio;

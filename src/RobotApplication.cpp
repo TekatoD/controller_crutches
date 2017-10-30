@@ -1,3 +1,6 @@
+#include <config/ArgumentsParser.h>
+#include <hw/Buttons.h>
+#include <hw/LEDs.h>
 #include "log/Logger.h"
 #include "motion/MotionManager.h"
 #include "gamecontroller/GameController.h"
@@ -5,12 +8,14 @@
 #include "motion/modules/Kicking.h"
 #include "motion/modules/Walking.h"
 #include "motion/modules/Head.h"
-#include "config/CommandArguments.h"
 #include "RobotApplication.h"
+
 #ifdef CROSSCOMPILE
-	#include "hw/RobotCM730.h"
+#include "hw/RobotCM730.h"
 #else
-	#include "hw/VrepCM730.h"
+
+#include "hw/VrepCM730.h"
+
 #endif
 
 using namespace Robot;
@@ -32,14 +37,14 @@ int RobotApplication::Exec() {
         Initialize();
         StartMainLoop();
         return EXEC_SUCCESS;
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         LOG_FATAL << "Application terminated: " << e.what();
         return EXEC_FAILED;
     }
 }
 
 bool RobotApplication::HelpMessageRequested() const noexcept {
-    return m_show_help_message;
+    return m_arg_help_requested.IsHelpRequested();
 }
 
 bool RobotApplication::TryStart() {
@@ -63,6 +68,7 @@ bool RobotApplication::IsRunning() const {
 }
 
 void RobotApplication::Initialize() {
+    ApplyDebugArguments();
     if (m_debug) LOG_INFO << "=== Initialization was started ===";
     CheckHWStatus();
     InitCM730();
@@ -103,15 +109,15 @@ void RobotApplication::InitCM730() {
 void RobotApplication::CheckFirmware() {
     int firm_ver = 0;
     auto read_result = m_cm730->ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, nullptr);
-	LOG_DEBUG << "Firmware version: " << firm_ver;
+    if (m_debug) LOG_DEBUG << "Firmware version: " << firm_ver;
     if (read_result != CM730::SUCCESS) {
         throw std::runtime_error("Can't read firmware version from Dynamixel ID " +
-                                         std::to_string(JointData::ID_HEAD_PAN));
+                                 std::to_string(JointData::ID_HEAD_PAN));
     }
 
     if (0 < firm_ver && firm_ver < 27) {
         throw std::runtime_error("MX-28's firmware is not support 4096 resolution! "
-                                 "Upgrade MX-28's firmware to version 27(0x1B) or higher.");
+                                         "Upgrade MX-28's firmware to version 27(0x1B) or higher.");
     } else if (27 <= firm_ver) {
         // Do nothing
     } else {
@@ -156,107 +162,103 @@ void RobotApplication::InitGameController() {
 void RobotApplication::InitConfiguraionLoader() {
     if (m_debug) LOG_DEBUG << "Initializing configuration loader...";
     //TODO Don't forget uncomment this lines
-    m_configuration_loader.SetDefaultPath(m_config_default);
+    m_configuration_loader.SetDefaultPath(m_arg_config_default);
 
-//    m_configuration_loader.AddStrategy(m_ball_searcher_configuration_strategy, m_config_ball_searcher);
-//    m_configuration_loader.AddStrategy(m_ball_tracker_configuration_strategy, m_config_ball_searcher);
-    m_configuration_loader.AddStrategy(m_game_controller_configuration_strategy, m_config_game_controller);
-    m_configuration_loader.AddStrategy(m_head_configuration_strategy, m_config_head);
-    m_configuration_loader.AddStrategy(m_walking_configuration_strategy, m_config_walking);
-    m_configuration_loader.AddStrategy(m_motion_manager_configuration_strategy, m_config_motion_manager);
-
-    m_action_configuration_loader.SetPath(m_config_action);
+//    m_configuration_loader.AddStrategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
+//    m_configuration_loader.AddStrategy(m_ball_tracker_configuration_strategy, m_arg_config_ball_searcher);
+    m_configuration_loader.AddStrategy(m_game_controller_configuration_strategy, m_arg_config_game_controller);
+    m_configuration_loader.AddStrategy(m_head_configuration_strategy, m_arg_config_head);
+    m_configuration_loader.AddStrategy(m_walking_configuration_strategy, m_arg_config_walking);
+    m_configuration_loader.AddStrategy(m_motion_manager_configuration_strategy, m_arg_config_motion_manager);
+    // Action configuration loader uses self loader
+    m_action_configuration_loader.SetPath(m_arg_config_action);
     if (m_debug) LOG_INFO << "Configuration loader is ready";
 }
 
 void RobotApplication::ParseCommandLineArguments() {
     namespace po = boost::program_options;
 
-    po::options_description desk("Allowed options");
+    ArgumentsParser parser("Allowed options");
+    parser.SetArguments(m_arguments);
 
-    bool help_requested = false;
+    parser.AddStrategy(m_arg_help_requested);
 
-    bool debug_all = false;
-    bool debug_application = false;
-    bool debug_ball_searcher = false;
-    bool debug_ball_tracker = false;
-    bool debug_game_controller = false;
-    bool debug_motion_manager = false;
-    bool debug_head = false;
-    bool debug_walking = false;
-    bool debug_action = false;
-    bool debug_kicking = false;
+    parser.AddStrategy(m_arg_debug_all);
+    parser.AddStrategy(m_arg_debug_application);
+    parser.AddStrategy(m_arg_debug_ball_searcher);
+    parser.AddStrategy(m_arg_debug_ball_tracker);
+    parser.AddStrategy(m_arg_debug_game_controller);
+    parser.AddStrategy(m_arg_debug_motion_manager);
+    parser.AddStrategy(m_arg_debug_head);
+    parser.AddStrategy(m_arg_debug_walking);
+    parser.AddStrategy(m_arg_debug_action);
+    parser.AddStrategy(m_arg_debug_kicking);
+    parser.AddStrategy(m_arg_debug_buttons);
+    parser.AddStrategy(m_arg_debug_leds);
 
-    std::string config_default;
-    std::string config_ball_searcher;
-    std::string config_ball_tracker;
-    std::string config_game_controller;
-    std::string config_motion_manager;
-    std::string config_head;
-    std::string config_walking;
-    std::string config_action;
-    std::string config_kicking;
+    parser.AddStrategy(m_arg_config_default);
+    parser.AddStrategy(m_arg_config_ball_searcher);
+    parser.AddStrategy(m_arg_config_ball_tracker);
+    parser.AddStrategy(m_arg_config_game_controller);
+    parser.AddStrategy(m_arg_config_motion_manager);
+    parser.AddStrategy(m_arg_config_head);
+    parser.AddStrategy(m_arg_config_walking);
+    parser.AddStrategy(m_arg_config_action);
+    parser.AddStrategy(m_arg_config_kicking);
 
-    desk.add_options()
-            ("help,h", po::value(&help_requested)->zero_tokens(), "produce help message")
-            // Debug output
-            ("dbg-all,d", po::value(&debug_all)->zero_tokens(), "enable debug output for all components")
-            ("dbg-app", po::value(&debug_application)->zero_tokens(), "enable debug output for main application")
-            ("dbg-ball-searcher", po::value(&debug_ball_searcher)->zero_tokens(), "enable debug output for ball searcher")
-            ("dbg-ball-tracker", po::value(&debug_ball_tracker)->zero_tokens(), "enable debug output for ball tracker")
-            ("dbg-game-contoller", po::value(&debug_game_controller)->zero_tokens(), "enable debug output for game controller")
-            ("dbg-motion-manager", po::value(&debug_motion_manager)->zero_tokens(), "enable debug output for motion manager")
-            ("dbg-head", po::value(&debug_head)->zero_tokens(), "enable debug output for head motion module")
-            ("dbg-walking", po::value(&debug_walking)->zero_tokens(), "enable debug output for walking motion module")
-            ("dbg-action", po::value(&debug_action)->zero_tokens(), "enable debug output for action motion module")
-            ("dbg-kicking", po::value(&debug_kicking)->zero_tokens(), "enable debug output for kicking motion module")
-            // Config files
-            ("cfg,c", po::value(&config_default)->value_name("path"), "default config file (res/config.ini by default)")
-            ("cfg-ball-tracker", po::value(&config_ball_searcher)->value_name("path"), "config file for ball tracker")
-            ("cfg-ball-searcher", po::value(&config_ball_tracker)->value_name("path"), "config file for ball searcher")
-            ("cfg-game-controller", po::value(&config_game_controller)->value_name("path"), "config file for game controller")
-            ("cfg-motion-manager", po::value(&config_motion_manager)->value_name("path"), "config file for motion manager")
-            ("cfg-head", po::value(&config_head)->value_name("path"), "config file for head motion module")
-            ("cfg-walking", po::value(&config_walking)->value_name("path"), "config file for walking motion module")
-            ("cfg-kicking", po::value(&config_kicking)->value_name("path"), "config file for kicking motion module")
-            ("cfg-action", po::value(&config_action)->value_name("path"), "path to motion_4096.bin");
+    m_arg_help_requested.SetOption("help,h", "produce help message");
 
-    po::variables_map vm;
-    try {
-        po::store(po::command_line_parser(m_arguments.GetArgc(), m_arguments.GetArgv())
-                          .options(desk)
-                          .allow_unregistered()
-                          .run(), vm);
-        po::notify(vm);
-    } catch (const boost::program_options::error& e) {
-        std::cout << e.what() << std::endl;
-        help_requested = true;
+    m_arg_debug_all.SetOption("dbg-all,d", "enable debug output for all components");
+    m_arg_debug_application.SetOption("dbg-app", "enable debug output for main application");
+    m_arg_debug_ball_searcher.SetOption("dbg-ball-searcher", "enable debug output for ball searcher");
+    m_arg_debug_ball_tracker.SetOption("dbg-ball-tracker", "enable debug output for ball tracker");
+    m_arg_debug_game_controller.SetOption("dbg-game-contoller", "enable debug output for game controller");
+    m_arg_debug_motion_manager.SetOption("dbg-motion-manager", "enable debug output for motion manager");
+    m_arg_debug_head.SetOption("dbg-head", "enable debug output for head motion module");
+    m_arg_debug_walking.SetOption("dbg-walking", "enable debug output for walking motion module");
+    m_arg_debug_action.SetOption("dbg-action", "enable debug output for action motion module");
+    m_arg_debug_kicking.SetOption("dbg-kicking", "enable debug output for kicking motion module");
+    m_arg_debug_buttons.SetOption("dbg-kicking", "enable debug output for buttons");
+    m_arg_debug_leds.SetOption("dbg-kicking", "enable debug output for LEDs");
+
+    m_arg_config_default.SetOption("cfg,c", "default config file (res/config.ini by default)");
+    m_arg_config_ball_tracker.SetOption("cfg-ball-tracker", "config file for ball tracker");
+    m_arg_config_ball_searcher.SetOption("cfg-ball-searcher", "config file for ball searcher");
+    m_arg_config_game_controller.SetOption("cfg-game-controller", "config file for game controller");
+    m_arg_config_motion_manager.SetOption("cfg-motion-manager", "config file for motion manager");
+    m_arg_config_head.SetOption("cfg-head", "config file for head motion module");
+    m_arg_config_walking.SetOption("cfg-walking", "config file for walking motion module");
+    m_arg_config_kicking.SetOption("cfg-kicking", "config file for kicking motion module");
+    m_arg_config_action.SetOption("cfg-action", "path to motion_4096.bin");
+
+    if (!parser.Parse() || m_arg_help_requested.IsHelpRequested()) {
+        parser.ShowDescriptionToStream(std::cout);
     }
+}
 
-    if (help_requested) {
-        m_show_help_message = help_requested;
-        std::cout << desk << std::endl;
-    } else {
-        if (debug_all || debug_application) EnableDebug(true);
-        if (debug_all || debug_ball_searcher) ;// TODO Enable debug for ball searcher
-        if (debug_all || debug_ball_tracker) ;// TODO Enable debug for ball tracker
-        if (debug_all || debug_game_controller) ;// TODO Enable debug for ball tracker
-        if (debug_all || debug_motion_manager) MotionManager::GetInstance()->EnabledDebug(true);
-        if (debug_all || debug_head) ; // TODO Enable debug for head
-        if (debug_all || debug_walking) ; // TODO Enable debug for walking
-        if (debug_all || debug_action) Action::GetInstance()->EnableDebug(true);
-        if (debug_all || debug_kicking) Kicking::GetInstance()->EnableDebug(true);
-
-        if (!config_default.empty()) m_config_default = config_default;
-        if (!config_ball_searcher.empty()) m_config_ball_searcher = config_ball_searcher;
-        if (!config_ball_tracker.empty()) m_config_ball_tracker = config_ball_tracker;
-        if (!config_game_controller.empty()) m_config_game_controller = config_game_controller;
-        if (!config_motion_manager.empty()) m_config_motion_manager = config_motion_manager;
-        if (!config_head.empty()) m_config_head = config_head;
-        if (!config_walking.empty()) m_config_walking = config_walking;
-        if (!config_action.empty()) m_config_action = config_action;
-        if (!config_kicking.empty()) m_config_kicking = config_kicking;
-    }
+void RobotApplication::ApplyDebugArguments() {
+    if (m_arg_debug_all || m_arg_debug_application)
+        EnableDebug(true);
+    if (m_arg_debug_all || m_arg_debug_ball_searcher)
+        ; // TODO Enable debug for ball searcher
+    if (m_arg_debug_all || m_arg_debug_ball_tracker)
+        ; // TODO Setting debug for ball tracker
+    if (m_arg_debug_all || m_arg_debug_game_controller)
+        GameController::GetInstance()->EnableDebug(true);
+    if (m_arg_debug_all || m_arg_debug_motion_manager)
+        MotionManager::GetInstance()->EnabledDebug(true);
+    if (m_arg_debug_all || m_arg_debug_head)
+        Head::GetInstance()->EnableDebug(true);
+    if (m_arg_debug_all || m_arg_debug_walking)
+        Walking::GetInstance()->EnableDebug(true);
+    if (m_arg_debug_all || m_arg_debug_action)
+        Action::GetInstance()->EnableDebug(true);
+    if (m_arg_debug_all || m_arg_debug_kicking)
+        Kicking::GetInstance()->EnableDebug(true);
+    if (m_arg_debug_all || m_arg_debug_buttons)
+        Buttons::GetInstance()->EnableDebug(true);
+    if (m_arg_debug_all || m_arg_debug_leds)
+        LEDs::GetInstance()->EnableDebug(true);
 }
 
 void RobotApplication::ReadConfiguration() {

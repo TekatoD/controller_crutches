@@ -30,7 +30,7 @@ namespace Robot {
         int m_NoBallCount;
         int m_NoBallMaxCount;
         Point2D BallPosition;
-        bool m_debug{true};
+        bool m_debug{false};
 
     };
 }

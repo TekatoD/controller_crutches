@@ -10,7 +10,7 @@ namespace Robot {
             SECOND_BUTTON
         };
 
-        Buttons* GetInstance();
+        static Buttons* GetInstance();
 
         void Update();
 
@@ -24,7 +24,7 @@ namespace Robot {
         Buttons() = default;
 
     private:
-        bool m_debug{true};
+        bool m_debug{false};
 
         bool m_button_status[2];
     };

@@ -105,7 +105,7 @@ namespace Robot {
         float m_Tilt_d_gain;
         float m_PanAngle;
         float m_TiltAngle;
-        bool m_debug{true};
+        bool m_debug{false};
 
         Head();
 

@@ -54,7 +54,7 @@ namespace Robot {
 
 
     private:
-        bool m_debug{true};
+        bool m_debug{false};
         bool m_Active;
         Point2D m_LastPosition;
 

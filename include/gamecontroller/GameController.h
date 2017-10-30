@@ -78,7 +78,7 @@ namespace Robot {
         in_addr m_GameControllerAddress;
         clock_t m_WhenPacketWasReceived;
         clock_t m_WhenPacketWasSent;
-        bool m_debug{true};
+        bool m_debug{false};
 
     };
 }

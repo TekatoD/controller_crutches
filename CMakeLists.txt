@@ -39,9 +39,9 @@ else (CROSSCOMPILE)
     target_include_directories(hw PUBLIC ${VREP_REMOTE} ${VREP_INCLUDE})
 endif (CROSSCOMPILE)
 
-# Disable deprecated declarations warning
+# Disable some warnings
 if (CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated-declarations -Wno-register -Wno-unused-local-typedefs")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 include_directories(include/)
@@ -167,7 +167,14 @@ set(SRC
         src/config/strategies/GameControllerConfigurationStrategy.cpp
         src/config/strategies/ConfigurationStrategy.cpp
         src/config/ArgumentsParser.cpp
-        include/config/ArgumentsParser.h)
+        include/config/ArgumentsParser.h
+        include/config/SingleOptionArgumentsParsingStrategy.h
+        include/config/strategies/DebugModeArgumentsParsingStrategy.h
+        src/config/strategies/DebugModeArgumentsParsingStrategy.cpp
+        src/config/strategies/ConfigPathArgumentsParsingStrategy.cpp
+        include/config/strategies/ConfigPathArgumentsParsingStrategy.h
+        src/config/SingleOptionArgumentsParsingStrategy.cpp
+        include/config/ArgumentsParsingStrategy.h src/config/strategies/HelpArgumentsParsingStrategy.cpp include/config/strategies/HelpArgumentsParsingStrategy.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

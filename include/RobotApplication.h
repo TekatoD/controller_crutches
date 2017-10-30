@@ -10,6 +10,9 @@
 #include <config/strategies/BallTrackerConfigurationStrategy.h>
 #include <config/strategies/GameControllerConfigurationStrategy.h>
 #include <config/strategies/HeadConfigurationStrategy.h>
+#include <config/strategies/DebugModeArgumentsParsingStrategy.h>
+#include <config/strategies/ConfigPathArgumentsParsingStrategy.h>
+#include <config/strategies/HelpArgumentsParsingStrategy.h>
 #include "config/ConfigurationFileLoader.h"
 #include "config/strategies/WalkingConfigurationStrategy.h"
 #include "config/strategies/MotionManagerConfigurationStrategy.h"
@@ -81,7 +84,7 @@ namespace Robot {
         void ReadConfiguration();
 
     private:
-        bool m_debug{true}; // Debug output to console
+        bool m_debug{false}; // Debug output to console
         bool m_show_help_message{false};
 
         CommandArguments m_arguments;
@@ -100,15 +103,31 @@ namespace Robot {
         WalkingConfigurationStrategy m_walking_configuration_strategy;
         MotionManagerConfigurationStrategy m_motion_manager_configuration_strategy;
 
-        std::string m_config_default;
-        std::string m_config_ball_searcher;
-        std::string m_config_ball_tracker;
-        std::string m_config_game_controller;
-        std::string m_config_motion_manager;
-        std::string m_config_head;
-        std::string m_config_walking;
-        std::string m_config_action;
-        std::string m_config_kicking;
+        //*** Command line parsing strategies ***//
+        HelpArgumentsParsingStrategy m_arg_help_requested;
+
+        DebugModeArgumentsParsingStrategy m_arg_debug_all;
+        DebugModeArgumentsParsingStrategy m_arg_debug_application;
+        DebugModeArgumentsParsingStrategy m_arg_debug_ball_searcher;
+        DebugModeArgumentsParsingStrategy m_arg_debug_ball_tracker;
+        DebugModeArgumentsParsingStrategy m_arg_debug_game_controller;
+        DebugModeArgumentsParsingStrategy m_arg_debug_motion_manager;
+        DebugModeArgumentsParsingStrategy m_arg_debug_head;
+        DebugModeArgumentsParsingStrategy m_arg_debug_walking;
+        DebugModeArgumentsParsingStrategy m_arg_debug_action;
+        DebugModeArgumentsParsingStrategy m_arg_debug_kicking;
+        DebugModeArgumentsParsingStrategy m_arg_debug_buttons;
+        DebugModeArgumentsParsingStrategy m_arg_debug_leds;
+
+        ConfigPathArgumentsParsingStrategy m_arg_config_default;
+        ConfigPathArgumentsParsingStrategy m_arg_config_ball_searcher;
+        ConfigPathArgumentsParsingStrategy m_arg_config_ball_tracker;
+        ConfigPathArgumentsParsingStrategy m_arg_config_game_controller;
+        ConfigPathArgumentsParsingStrategy m_arg_config_motion_manager;
+        ConfigPathArgumentsParsingStrategy m_arg_config_head;
+        ConfigPathArgumentsParsingStrategy m_arg_config_walking;
+        ConfigPathArgumentsParsingStrategy m_arg_config_action;
+        ConfigPathArgumentsParsingStrategy m_arg_config_kicking;
 
         ActionConfigurationFileLoader m_action_configuration_loader;
 
@@ -119,6 +138,10 @@ namespace Robot {
 #else
         std::unique_ptr<VrepConnector> m_vrep_connector{nullptr};
 #endif
+
+        void ApplyDebugArguments();
+
+        void ApplyConfigArguments();
     };
 }
 

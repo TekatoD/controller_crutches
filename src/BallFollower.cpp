@@ -190,7 +190,7 @@ void BallFollower::Process(Point2D ball_pos,
 }
 
 bool BallFollower::IsNoBall() const {
-    return m_NoBallCount >= m_NoBallCount;
+    return m_NoBallCount >= m_NoBallMaxCount;
 }
 
 KickingAction BallFollower::GetKickingLeg() const {

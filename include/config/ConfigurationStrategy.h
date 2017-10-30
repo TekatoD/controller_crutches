@@ -25,7 +25,7 @@ namespace Robot {
 
     private:
         std::string m_section{};
-        bool m_debug{true};
+        bool m_debug{false};
     };
 }
 

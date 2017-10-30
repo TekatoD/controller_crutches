@@ -153,7 +153,7 @@ namespace Robot {
         void UpdateActiveParams() noexcept;
 
     private:
-        bool m_debug{true};
+        bool m_debug{false};
 
         int m_kicking_leg{RIGHT_LEG};
         float m_kick_target_x_offset{0.0f};

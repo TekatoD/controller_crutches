@@ -32,7 +32,7 @@ namespace Robot {
         std::map<std::string, std::list<ConfigurationStrategy*>> GetFileAssotiatedStrategies() const;;
 
     private:
-        bool m_debug{true};
+        bool m_debug{false};
 
         std::string m_default_path{DEFAULT_PATH};
         std::map<ConfigurationStrategy*, std::string> m_strategies{};

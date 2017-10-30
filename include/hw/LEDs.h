@@ -27,7 +27,7 @@ namespace Robot {
         void CheckCM730();
 
     private:
-        bool m_debug{true};
+        bool m_debug{false};
 
         CM730* m_cm730{nullptr};
     };

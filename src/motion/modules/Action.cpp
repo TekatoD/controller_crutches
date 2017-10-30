@@ -90,7 +90,7 @@ void Action::Initialize() {
     m_playing = false;
 
     for (int id = JointData::ID_R_SHOULDER_PITCH; id < JointData::NUMBER_OF_JOINTS; id++)
-        m_Joint.SetValue(id, MotionStatus::m_CurrentJoints.GetValue(id));
+        Joint.SetValue(id, MotionStatus::m_CurrentJoints.GetValue(id));
 }
 
 
@@ -320,7 +320,7 @@ void Action::Process() {
         wNextPlayPage = 0;
 
         for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-            if (m_Joint.GetEnable(bID)) {
+            if (Joint.GetEnable(bID)) {
                 wpTargetAngle1024[bID] = MotionStatus::m_CurrentJoints.GetValue(bID);
                 ipLastOutSpeed1024[bID] = 0;
                 ipMovingAngle1024[bID] = 0;
@@ -336,9 +336,9 @@ void Action::Process() {
         } else {
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
                 // ���� ����ϴ� ������ ���
-                if (m_Joint.GetEnable(bID)) {
+                if (Joint.GetEnable(bID)) {
                     if (ipMovingAngle1024[bID] == 0)
-                        m_Joint.SetValue(bID, wpStartAngle1024[bID]);
+                        Joint.SetValue(bID, wpStartAngle1024[bID]);
                     else {
                         if (bSection == PRE_SECTION) {
                             iSpeedN = (short) (
@@ -349,9 +349,9 @@ void Action::Process() {
                                     (((long) (ipLastOutSpeed1024[bID] + (iSpeedN >> 1)) * wUnitTimeCount * 144) / 15)
                                             >> 9);
 
-                            m_Joint.SetValue(bID, wpStartAngle1024[bID] + ipAccelAngle1024[bID]);
+                            Joint.SetValue(bID, wpStartAngle1024[bID] + ipAccelAngle1024[bID]);
                         } else if (bSection == MAIN_SECTION) {
-                            m_Joint.SetValue(bID, wpStartAngle1024[bID] +
+                            Joint.SetValue(bID, wpStartAngle1024[bID] +
                                                   (short int) (((long) (ipMainAngle1024[bID]) * wUnitTimeCount) /
                                                                wUnitTimeNum));
                             ipGoalSpeed1024[bID] = ipMainSpeed1024[bID];
@@ -359,20 +359,20 @@ void Action::Process() {
                         {
                             if (wUnitTimeCount == (wUnitTimeNum - 1)) {
                                 // ���� ������ ������ ���̱����� �׳� ��ǥ ��ġ ���� ���
-                                m_Joint.SetValue(bID, wpTargetAngle1024[bID]);
+                                Joint.SetValue(bID, wpTargetAngle1024[bID]);
                             } else {
                                 if (bpFinishType[bID] == ZERO_FINISH) {
                                     iSpeedN = (short int) (((long) (0 - ipLastOutSpeed1024[bID]) * wUnitTimeCount) /
                                                            wUnitTimeNum);
                                     ipGoalSpeed1024[bID] = ipLastOutSpeed1024[bID] + iSpeedN;
-                                    m_Joint.SetValue(bID, wpStartAngle1024[bID] + (short) (
+                                    Joint.SetValue(bID, wpStartAngle1024[bID] + (short) (
                                             (((long) (ipLastOutSpeed1024[bID] + (iSpeedN >> 1)) * wUnitTimeCount *
                                               144) / 15) >> 9));
                                 } else // NONE_ZERO_FINISH
                                 {
                                     // MAIN Section�� �����ϰ� �۵�-����
                                     // step���� ������� ���� � ������ �����ϴ� ��Ȳ�� �߻��� �� �����Ƿ� �̷��� �� ���ۿ� ����
-                                    m_Joint.SetValue(bID, wpStartAngle1024[bID] + (short int) (
+                                    Joint.SetValue(bID, wpStartAngle1024[bID] + (short int) (
                                             ((long) (ipMainAngle1024[bID]) * wUnitTimeCount) / wUnitTimeNum));
                                     ipGoalSpeed1024[bID] = ipMainSpeed1024[bID];
                                 }
@@ -381,8 +381,8 @@ void Action::Process() {
                     }
 
                     // lastest MX28 firmwares do not support compliance slopes
-                    //m_Joint.SetSlope(bID, 1 << (m_PlayPage.header.slope[bID]>>4), 1 << (m_PlayPage.header.slope[bID]&0x0f));                    
-                    m_Joint.SetPGain(bID, (256 >> (m_play_page.header.slope[bID] >> 4)) << 2);
+                    //Joint.SetSlope(bID, 1 << (m_PlayPage.header.slope[bID]>>4), 1 << (m_PlayPage.header.slope[bID]&0x0f));
+                    Joint.SetPGain(bID, (256 >> (m_play_page.header.slope[bID] >> 4)) << 2);
                 }
             }
         }
@@ -391,8 +391,8 @@ void Action::Process() {
         wUnitTimeCount = 0;
 
         for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-            if (m_Joint.GetEnable(bID)) {
-                wpStartAngle1024[bID] = m_Joint.GetValue(bID);
+            if (Joint.GetEnable(bID)) {
+                wpStartAngle1024[bID] = Joint.GetValue(bID);
                 ipLastOutSpeed1024[bID] = ipGoalSpeed1024[bID];
             }
         }
@@ -404,7 +404,7 @@ void Action::Process() {
             wUnitTimeNum = wUnitTimeTotalNum - (wAccelStep << 1);
 
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID)) {
+                if (Joint.GetEnable(bID)) {
                     if (bpFinishType[bID] == NONE_ZERO_FINISH) {
                         if ((wUnitTimeTotalNum - wAccelStep) == 0) // ��� ������ ���� ���ٸ�
                             ipMainAngle1024[bID] = 0;
@@ -423,7 +423,7 @@ void Action::Process() {
             wUnitTimeNum = wAccelStep;
 
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID))
+                if (Joint.GetEnable(bID))
                     ipMainAngle1024[bID] = ipMovingAngle1024[bID] - ipMainAngle1024[bID] - ipAccelAngle1024[bID];
             }
         } else if (bSection == POST_SECTION) {
@@ -439,7 +439,7 @@ void Action::Process() {
             bSection = PRE_SECTION;
 
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID))
+                if (Joint.GetEnable(bID))
                     ipLastOutSpeed1024[bID] = 0;
             }
         }
@@ -507,7 +507,7 @@ void Action::Process() {
 
             ////////// Joint�� �Ķ���� ���
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID)) {
+                if (Joint.GetEnable(bID)) {
                     // ����, ����, �̷��� �������� ������ ���
                     ipAccelAngle1024[bID] = 0;
 
@@ -607,7 +607,7 @@ void Action::Process() {
                 lDivider2 = 1;
 
             for (bID = JointData::ID_R_SHOULDER_PITCH; bID < JointData::NUMBER_OF_JOINTS; bID++) {
-                if (m_Joint.GetEnable(bID)) {
+                if (Joint.GetEnable(bID)) {
                     lStartSpeed1024_PreTime_256T =
                             (long) ipLastOutSpeed1024[bID] * ulPreSectionTime256T; //  *300/1024 * 1024/720 * 256 * 2
                     lMovingAngle_Speed1024Scale_256T_2T = (((long) ipMovingAngle1024[bID]) * 2560L) / 12;

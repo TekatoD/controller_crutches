@@ -8,10 +8,6 @@ option(CROSSCOMPILE "Compile for real Darwin-OP (V-REP build by default)" OFF)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 add_definitions(-DBOOST_ALL_DYN_LINK)
 
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release FORCE)
-endif ()
-
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_definitions(-DDEBUG)
 endif ()
@@ -174,7 +170,9 @@ set(SRC
         src/config/strategies/ConfigPathArgumentsParsingStrategy.cpp
         include/config/strategies/ConfigPathArgumentsParsingStrategy.h
         src/config/SingleOptionArgumentsParsingStrategy.cpp
-        include/config/ArgumentsParsingStrategy.h src/config/strategies/HelpArgumentsParsingStrategy.cpp include/config/strategies/HelpArgumentsParsingStrategy.h)
+        include/config/ArgumentsParsingStrategy.h
+        src/config/strategies/HelpArgumentsParsingStrategy.cpp
+        include/config/strategies/HelpArgumentsParsingStrategy.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

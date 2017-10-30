@@ -48,9 +48,9 @@ namespace Robot {
 
         void SetMaxTurn(float max_turn);
 
-        void IsDebugEnabled(bool debug);
+        void EnableDebug(bool debug);
 
-        bool EnableDebug() const;
+        bool IsDebugEnabled() const;
 
 
     private:

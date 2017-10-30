@@ -54,8 +54,8 @@ void SoccerBehavior::Process() {
 //            m_PreviousState = STATE_INITIAL;
 //            Walking::GetInstance()->SetOdo(Spawn);
 //        }
-//        Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-//        Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+//        Head::GetInstance()->Joint.SetEnableHeadOnly(true, true);
+//        Walking::GetInstance()->Joint.SetEnableBodyWithoutHead(true, true);
 //        Pose2D pos = Starting - Odo;
 //        m_GoTo.Process(pos);
 //        return;
@@ -92,8 +92,8 @@ void SoccerBehavior::Process() {
 
         if (Action::GetInstance()->IsRunning() == 0) {
             // Switch to head and walking after action
-            Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+            Head::GetInstance()->Joint.SetEnableHeadOnly(true, true);
+            Walking::GetInstance()->Joint.SetEnableBodyWithoutHead(true, true);
 
             // Calculate angles to gate
             float free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
@@ -120,8 +120,8 @@ void SoccerBehavior::Process() {
 
             // Kicking the ball
             if (m_BallFollower.GetKickingLeg() != NO_KICKING) {
-                Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-                Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+                Head::GetInstance()->Joint.SetEnableHeadOnly(true, true);
+                Action::GetInstance()->Joint.SetEnableBodyWithoutHead(true, true);
                 // Kick the ball
 
                 if (m_BallFollower.GetKickingLeg() == RIGHT_LEG_KICK) {

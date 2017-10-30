@@ -30,7 +30,7 @@ void StateMachine::Check(CM730* cm730) {
         Walking::GetInstance()->Stop();
         while (Walking::GetInstance()->IsRunning()) usleep(8000);
 
-        Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+        Action::GetInstance()->Joint.SetEnableBody(true, true);
 
         if (MotionStatus::FALLEN == FORWARD)
             Action::GetInstance()->Start(10);   // FORWARD GETUP
@@ -39,8 +39,8 @@ void StateMachine::Check(CM730* cm730) {
 
         while (Action::GetInstance()->IsRunning()) usleep(8000);
 
-        Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-        Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+        Head::GetInstance()->Joint.SetEnableHeadOnly(true, true);
+        Walking::GetInstance()->Joint.SetEnableBodyWithoutHead(true, true);
     }
 
     if (m_old_btn == MotionStatus::BUTTON)
@@ -118,13 +118,13 @@ void StateMachine::Enable() {
     MotionManager::GetInstance()->Reinitialize();
     MotionManager::GetInstance()->SetEnable(true);
 
-    Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+    Action::GetInstance()->Joint.SetEnableBody(true, true);
 
     Action::GetInstance()->Start(9);
     while (Action::GetInstance()->IsRunning()) usleep(8000);
 
-    Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
-    Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+    Head::GetInstance()->Joint.SetEnableHeadOnly(true, true);
+    Walking::GetInstance()->Joint.SetEnableBodyWithoutHead(true, true);
 
     MotionManager::GetInstance()->ResetGyroCalibration();
     while (true) {
@@ -140,7 +140,7 @@ void StateMachine::Enable() {
 void StateMachine::Disable() {
     m_is_started = false;
     Walking::GetInstance()->Stop();
-    Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+    Action::GetInstance()->Joint.SetEnableBody(true, true);
 
     while (!Action::GetInstance()->Start(15)) usleep(8000);
     while (Action::GetInstance()->IsRunning()) usleep(8000);

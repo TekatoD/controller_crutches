@@ -162,6 +162,6 @@ void BallSearcher::SetMaxTurn(float max_turn) {
     m_MaxTurn = max_turn;
 }
 
-void BallSearcher::IsDebugEnabled(bool debug) { m_debug = debug; }
+void BallSearcher::EnableDebug(bool debug) { m_debug = debug; }
 
-bool BallSearcher::EnableDebug() const { return m_debug; }
+bool BallSearcher::IsDebugEnabled() const { return m_debug; }

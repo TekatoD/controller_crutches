@@ -8,7 +8,7 @@
 namespace Robot {
     class MotionManager {
     public:
-        int m_Offset[JointData::NUMBER_OF_JOINTS];
+        int Offset[JointData::NUMBER_OF_JOINTS];
 
         static MotionManager* GetInstance() {
             static MotionManager instance;

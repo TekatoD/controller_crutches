@@ -31,7 +31,7 @@ Head::Head() {
     m_Pan_Home = 0.0;
     m_Tilt_Home = Kinematics::EYE_TILT_OFFSET_ANGLE - 30.0;
 
-    m_Joint.SetEnableHeadOnly(true);
+    Joint.SetEnableHeadOnly(true);
 }
 
 
@@ -238,11 +238,11 @@ void Head::MoveTracking() {
 
 
 void Head::Process() {
-    if (m_Joint.GetEnable(JointData::ID_HEAD_PAN) == true)
-        m_Joint.SetAngle(JointData::ID_HEAD_PAN, m_PanAngle);
+    if (Joint.GetEnable(JointData::ID_HEAD_PAN) == true)
+        Joint.SetAngle(JointData::ID_HEAD_PAN, m_PanAngle);
 
-    if (m_Joint.GetEnable(JointData::ID_HEAD_TILT) == true)
-        m_Joint.SetAngle(JointData::ID_HEAD_TILT, m_TiltAngle);
+    if (Joint.GetEnable(JointData::ID_HEAD_TILT) == true)
+        Joint.SetAngle(JointData::ID_HEAD_TILT, m_TiltAngle);
 }
 
 bool Head::IsDebugEnabled() const {

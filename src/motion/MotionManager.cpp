@@ -16,7 +16,7 @@ using namespace Robot;
 
 MotionManager::MotionManager() {
     for (int i = 0; i < JointData::NUMBER_OF_JOINTS; i++)
-        m_Offset[i] = 0;
+        Offset[i] = 0;
 }
 
 bool MotionManager::Initialize(CM730* cm730) {
@@ -171,12 +171,12 @@ void MotionManager::Process() {
             for (auto& module : m_Modules) {
                 module->Process();
                 for (int id = JointData::ID_R_SHOULDER_PITCH; id < JointData::NUMBER_OF_JOINTS; id++) {
-                    if (module->m_Joint.GetEnable(id)) {
-                        MotionStatus::m_CurrentJoints.SetValue(id, module->m_Joint.GetValue(id));
+                    if (module->Joint.GetEnable(id)) {
+                        MotionStatus::m_CurrentJoints.SetValue(id, module->Joint.GetValue(id));
 
-                        MotionStatus::m_CurrentJoints.SetPGain(id, module->m_Joint.GetPGain(id));
-                        MotionStatus::m_CurrentJoints.SetIGain(id, module->m_Joint.GetIGain(id));
-                        MotionStatus::m_CurrentJoints.SetDGain(id, module->m_Joint.GetDGain(id));
+                        MotionStatus::m_CurrentJoints.SetPGain(id, module->Joint.GetPGain(id));
+                        MotionStatus::m_CurrentJoints.SetIGain(id, module->Joint.GetIGain(id));
+                        MotionStatus::m_CurrentJoints.SetDGain(id, module->Joint.GetDGain(id));
                     }
                 }
             }
@@ -192,8 +192,8 @@ void MotionManager::Process() {
                 param[n++] = MotionStatus::m_CurrentJoints.GetIGain(id);
                 param[n++] = MotionStatus::m_CurrentJoints.GetPGain(id);
                 param[n++] = 0;
-                param[n++] = CM730::GetLowByte(MotionStatus::m_CurrentJoints.GetValue(id) + m_Offset[id]);
-                param[n++] = CM730::GetHighByte(MotionStatus::m_CurrentJoints.GetValue(id) + m_Offset[id]);
+                param[n++] = CM730::GetLowByte(MotionStatus::m_CurrentJoints.GetValue(id) + Offset[id]);
+                param[n++] = CM730::GetHighByte(MotionStatus::m_CurrentJoints.GetValue(id) + Offset[id]);
                 joint_num++;
             }
 
@@ -235,7 +235,7 @@ void MotionManager::RemoveModule(MotionModule* module) {
 void MotionManager::SetJointDisable(int index) {
     if (!m_Modules.empty()) {
         for (auto& module : m_Modules)
-            module->m_Joint.SetEnable(index, false);
+            module->Joint.SetEnable(index, false);
     }
 }
 
@@ -250,7 +250,7 @@ void MotionManager::EnabledDebug(bool debug) {
 void MotionManager::SetJointOffset(int id, int offset) {
     LOG_DEBUG << "MOTION MANAGER ID: " << id << " offset = " << offset;
     if(id >= 1 && id < JointData::NUMBER_OF_JOINTS) {
-        m_Offset[id] = offset;
+        Offset[id] = offset;
     } else {
         throw std::runtime_error("Can't set joint offset. Wrong joint ID: " + std::to_string(id));
     }
@@ -258,7 +258,7 @@ void MotionManager::SetJointOffset(int id, int offset) {
 
 int MotionManager::GetJointOffset(int id) const {
     if(id >= 1 && id < JointData::NUMBER_OF_JOINTS) {
-        return m_Offset[id];
+        return Offset[id];
     } else {
         throw std::runtime_error("Can't get joint offset. Wrong joint ID: " + std::to_string(id));
     }

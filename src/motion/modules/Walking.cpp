@@ -67,21 +67,21 @@ Walking::Walking() {
     m_odo_y_factor = 2.0;
     m_odo_a_factor = 0.8;
 
-    m_Joint.SetAngle(JointData::ID_R_SHOULDER_PITCH, -48.345f);
-    m_Joint.SetAngle(JointData::ID_L_SHOULDER_PITCH, 41.313f);
-    m_Joint.SetAngle(JointData::ID_R_SHOULDER_ROLL, -17.873f);
-    m_Joint.SetAngle(JointData::ID_L_SHOULDER_ROLL, 17.580f);
-    m_Joint.SetAngle(JointData::ID_R_ELBOW, 29.300f);
-    m_Joint.SetAngle(JointData::ID_L_ELBOW, -29.593f);
+    Joint.SetAngle(JointData::ID_R_SHOULDER_PITCH, -48.345f);
+    Joint.SetAngle(JointData::ID_L_SHOULDER_PITCH, 41.313f);
+    Joint.SetAngle(JointData::ID_R_SHOULDER_ROLL, -17.873f);
+    Joint.SetAngle(JointData::ID_L_SHOULDER_ROLL, 17.580f);
+    Joint.SetAngle(JointData::ID_R_ELBOW, 29.300f);
+    Joint.SetAngle(JointData::ID_L_ELBOW, -29.593f);
 
-    m_Joint.SetAngle(JointData::ID_HEAD_TILT, Kinematics::EYE_TILT_OFFSET_ANGLE);
+    Joint.SetAngle(JointData::ID_HEAD_TILT, Kinematics::EYE_TILT_OFFSET_ANGLE);
 
-    m_Joint.SetPGain(JointData::ID_R_SHOULDER_PITCH, 8);
-    m_Joint.SetPGain(JointData::ID_L_SHOULDER_PITCH, 8);
-    m_Joint.SetPGain(JointData::ID_R_SHOULDER_ROLL, 8);
-    m_Joint.SetPGain(JointData::ID_L_SHOULDER_ROLL, 8);
-    m_Joint.SetPGain(JointData::ID_R_ELBOW, 8);
-    m_Joint.SetPGain(JointData::ID_L_ELBOW, 8);
+    Joint.SetPGain(JointData::ID_R_SHOULDER_PITCH, 8);
+    Joint.SetPGain(JointData::ID_L_SHOULDER_PITCH, 8);
+    Joint.SetPGain(JointData::ID_R_SHOULDER_ROLL, 8);
+    Joint.SetPGain(JointData::ID_L_SHOULDER_ROLL, 8);
+    Joint.SetPGain(JointData::ID_R_ELBOW, 8);
+    Joint.SetPGain(JointData::ID_L_ELBOW, 8);
 }
 
 void Walking::UpdateParamTime() {
@@ -567,26 +567,26 @@ void Walking::Process() {
         outValue[11] -= (int) (dir[11] * rlGyroErr * m_balance_ankle_roll_gain * 4); // L_ANKLE_ROLL
     }
 
-    m_Joint.SetValue(JointData::ID_R_HIP_YAW, outValue[0]);
-    m_Joint.SetValue(JointData::ID_R_HIP_ROLL, outValue[1]);
-    m_Joint.SetValue(JointData::ID_R_HIP_PITCH, outValue[2]);
-    m_Joint.SetValue(JointData::ID_R_KNEE, outValue[3]);
-    m_Joint.SetValue(JointData::ID_R_ANKLE_PITCH, outValue[4]);
-    m_Joint.SetValue(JointData::ID_R_ANKLE_ROLL, outValue[5]);
-    m_Joint.SetValue(JointData::ID_L_HIP_YAW, outValue[6]);
-    m_Joint.SetValue(JointData::ID_L_HIP_ROLL, outValue[7]);
-    m_Joint.SetValue(JointData::ID_L_HIP_PITCH, outValue[8]);
-    m_Joint.SetValue(JointData::ID_L_KNEE, outValue[9]);
-    m_Joint.SetValue(JointData::ID_L_ANKLE_PITCH, outValue[10]);
-    m_Joint.SetValue(JointData::ID_L_ANKLE_ROLL, outValue[11]);
-    m_Joint.SetValue(JointData::ID_R_SHOULDER_PITCH, outValue[12]);
-    m_Joint.SetValue(JointData::ID_L_SHOULDER_PITCH, outValue[13]);
-    m_Joint.SetAngle(JointData::ID_HEAD_PAN, m_a_move_amplitude);
+    Joint.SetValue(JointData::ID_R_HIP_YAW, outValue[0]);
+    Joint.SetValue(JointData::ID_R_HIP_ROLL, outValue[1]);
+    Joint.SetValue(JointData::ID_R_HIP_PITCH, outValue[2]);
+    Joint.SetValue(JointData::ID_R_KNEE, outValue[3]);
+    Joint.SetValue(JointData::ID_R_ANKLE_PITCH, outValue[4]);
+    Joint.SetValue(JointData::ID_R_ANKLE_ROLL, outValue[5]);
+    Joint.SetValue(JointData::ID_L_HIP_YAW, outValue[6]);
+    Joint.SetValue(JointData::ID_L_HIP_ROLL, outValue[7]);
+    Joint.SetValue(JointData::ID_L_HIP_PITCH, outValue[8]);
+    Joint.SetValue(JointData::ID_L_KNEE, outValue[9]);
+    Joint.SetValue(JointData::ID_L_ANKLE_PITCH, outValue[10]);
+    Joint.SetValue(JointData::ID_L_ANKLE_ROLL, outValue[11]);
+    Joint.SetValue(JointData::ID_R_SHOULDER_PITCH, outValue[12]);
+    Joint.SetValue(JointData::ID_L_SHOULDER_PITCH, outValue[13]);
+    Joint.SetAngle(JointData::ID_HEAD_PAN, m_a_move_amplitude);
 
     for (int id = JointData::ID_R_HIP_YAW; id <= JointData::ID_L_ANKLE_ROLL; id++) {
-        m_Joint.SetPGain(id, m_p_gain);
-        m_Joint.SetIGain(id, m_i_gain);
-        m_Joint.SetDGain(id, m_d_gain);
+        Joint.SetPGain(id, m_p_gain);
+        Joint.SetIGain(id, m_i_gain);
+        Joint.SetDGain(id, m_d_gain);
     }
 }
 

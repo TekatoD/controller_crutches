@@ -55,8 +55,8 @@ void Robot::LEDs::Initialize(Robot::CM730* cm730) noexcept {
 void Robot::LEDs::CheckCM730() {
     if (m_cm730 == nullptr) {
         if (m_debug) {
-            LOG_ERROR << "LEDS: CM730 don't initialized";
+            LOG_ERROR << "LEDS: CM730 isn't initialized";
         }
-        throw std::runtime_error{"LEDs: CM730 don't initialized"};
+        throw std::runtime_error{"LEDs: CM730 isn't initialized"};
     }
 }

@@ -22,7 +22,7 @@ namespace Robot {
 
     public:
         /*state of all the articulations (the motors MX-28)*/
-        JointData m_Joint;
+        JointData Joint;
 
         static const int TIME_UNIT = 8; //msec
 

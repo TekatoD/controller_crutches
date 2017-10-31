@@ -134,7 +134,11 @@ set(SRC
         src/detectors/FieldDetector.cpp
         include/detectors/FieldDetector.h
         src/detectors/LineDetector.cpp
-        include/detectors/LineDetector.h)
+        include/detectors/LineDetector.h
+        src/localization/ParticleFilter.cpp
+        include/localization/ParticleFilter.h
+        src/localization/LocalizationUtil.cpp
+        include/localization/LocalizationUtil.h)
         
 set(VISION_SRC
     include/minIni.h
@@ -246,6 +250,8 @@ add_executable(localization
     src/Pose2D.cpp
     src/localization/DataReader.cpp
     src/localization/ParticleFilter.cpp
+    src/localization/LocalizationUtil.cpp
+    src/minIni/minIni.c
 )
 
 target_link_libraries(localization

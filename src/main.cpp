@@ -237,9 +237,9 @@ int main(int argc, char** argv) {
         float HeightFromGround = Robot::Kinematics::LEG_LENGTH + 122.2f + 50.5f + Robot::Kinematics::CAMERA_OFFSET_Z;
         HeightFromGround /= 1000.0f;
         // Z
-        float HeadPan = DarwinHead->GetPanAngle() * M_PI / 180.0f;
+        float HeadPan = DarwinHead->GetPanAngle() * (M_PI / 180.0f);
         // Y
-        float HeadTilt = (90.0f + DarwinHead->GetTiltAngle()) * M_PI / 180.0f;
+        float HeadTilt = (90.0f + DarwinHead->GetTiltAngle()) * (M_PI / 180.0f);
         
         Matrix4x4f HeadTransformE;
         cv::Mat HeadTransform;

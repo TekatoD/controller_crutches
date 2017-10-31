@@ -3,14 +3,25 @@
 #include <string>
 #include <eigen3/Eigen/Dense>
 
+#include <minIni.h>
 #include <Pose2D.h>
 #include <localization/DataReader.h>
 #include <localization/ParticleFilter.h>
+#include <localization/LocalizationUtil.h>
 
 using namespace Eigen;
 
+#define INI_FILE_PATH "res/config.ini"
+
 int main(int argc, char** argv)
 {
+    
+    minIni ini(INI_FILE_PATH);
+    Localization::FieldMap field;
+    field.LoadIniSettings(&ini);
+    field.PrintFieldLines();
+    
+    /*
     if (argc != 3) {
         std::cout << "Need data" << std::endl;
         return -1;
@@ -45,6 +56,7 @@ int main(int argc, char** argv)
     } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;
     }
+    */
     
     return 0;
 }

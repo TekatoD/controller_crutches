@@ -6,7 +6,7 @@
 
 #include "BaseDetector.h"
 
-namespace Robot {
+namespace drwn {
     class LineDetector : public BaseDetector {
     public:
         LineDetector();

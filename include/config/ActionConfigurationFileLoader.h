@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace Robot {
+namespace drwn {
     class ActionConfigurationFileLoader {
     public:
         static constexpr char DEFAULT_PATH[] = "res/motion_4096.bin";

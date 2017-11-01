@@ -4,7 +4,7 @@
 
 #include "vision/detectors/BaseDetector.h"
 
-namespace Robot {
+namespace drwn {
 
     BaseDetector::BaseDetector(const std::string &detector_name) :
             m_detector_name(detector_name) { }

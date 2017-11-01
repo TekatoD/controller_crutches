@@ -5,7 +5,7 @@
 #include <map>
 #include "ConfigurationStrategy.h"
 
-namespace Robot {
+namespace drwn {
     class ConfigurationFileLoader {
     public:
         static constexpr char DEFAULT_PATH[]{"res/config.ini"};

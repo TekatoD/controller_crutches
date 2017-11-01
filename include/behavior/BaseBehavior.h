@@ -1,10 +1,10 @@
 #pragma once
 
 
-#include <motion/MotionStatus.h>
+#include <motion/motion_status_t.h>
 #include "Behavior.h"
 
-namespace Robot {
+namespace drwn {
     class BaseBehavior : public Behavior {
     public:
 

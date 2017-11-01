@@ -8,7 +8,7 @@
 
 #include "config/SingleOptionArgumentsParsingStrategy.h"
 
-namespace Robot {
+namespace drwn {
     class HelpArgumentsParsingStrategy
             : public SingleOptionArgumentsParsingStrategy {
     public:

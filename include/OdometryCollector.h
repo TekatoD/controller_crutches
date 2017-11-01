@@ -6,7 +6,7 @@
 
 #include "Pose2D.h"
 
-namespace Robot {
+namespace drwn {
     class OdometryCollector {
     public:
 

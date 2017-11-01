@@ -6,7 +6,7 @@
 
 #include "config/ConfigurationStrategy.h"
 
-namespace Robot {
+namespace drwn {
     class MotionManagerConfigurationStrategy
              : public ConfigurationStrategy {
     public:

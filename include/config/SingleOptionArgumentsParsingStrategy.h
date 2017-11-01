@@ -8,7 +8,7 @@
 #include <boost/program_options.hpp>
 #include "config/ArgumentsParsingStrategy.h"
 
-namespace Robot {
+namespace drwn {
     class SingleOptionArgumentsParsingStrategy
             : public ArgumentsParsingStrategy {
     public:

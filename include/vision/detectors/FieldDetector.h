@@ -6,7 +6,7 @@
 
 #include "BaseDetector.h"
 
-namespace Robot {
+namespace drwn {
     class FieldDetector : BaseDetector {
         struct {
             uchar min_1, max_1;

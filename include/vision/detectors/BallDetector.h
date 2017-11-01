@@ -6,7 +6,7 @@
 
 #include "BaseDetector.h"
 
-namespace Robot {
+namespace drwn {
     class BallDetector : public BaseDetector {
     public:
         struct configuration {
@@ -40,9 +40,40 @@ namespace Robot {
 
         boost::property_tree::ptree get_params();
 
+        int GetMedianBlurSize() const noexcept;
+
+        int SetMedianBlurSize(int median_blur_sie);
+
+        bool IsDebugEnabled();
+
+        void EnableDebug(bool debug);
+
+        const cv::Scalar& GetMinGaborColor() const;
+
+        void SetMinGaborColor(const cv::Scalar& min_gabor_color);
+
+        const cv::Scalar& GetMaxGaborColor() const;
+
+        void SetMaxGaborColor(const cv::Scalar& max_gabor_color);
+
+        const cv::Scalar& GetM_min_color() const;
+
+        void SetMinColor(const cv::Scalar& min_color);
+
+        const cv::Scalar& GetMaxColor() const;
+
+        void SetMaxColor(const cv::Scalar& max_color);
+
     private:
         configuration m_conf;
+        cv::Scalar m_min_gabor_color;
+        cv::Scalar m_max_gabor_color;
 
+        cv::Scalar m_min_color;
+        cv::Scalar m_max_color;
+
+        int m_median_blur_size;
+        bool m_debug{false};
     };
 
 }

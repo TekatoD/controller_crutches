@@ -3,17 +3,17 @@
  *  \date 10/26/17
  */
 
-#include "motion/modules/Action.h"
+#include "motion/modules/action_t.h"
 #include "config/ActionConfigurationFileLoader.h"
 
-void Robot::ActionConfigurationFileLoader::ReadMotionFile() {
-    Action::GetInstance()->LoadFile(m_path.c_str());
+void drwn::ActionConfigurationFileLoader::ReadMotionFile() {
+    action_t::GetInstance()->load_file(m_path.c_str());
 }
 
-const std::string& Robot::ActionConfigurationFileLoader::GetPath() const {
+const std::string& drwn::ActionConfigurationFileLoader::GetPath() const {
     return m_path;
 }
 
-void Robot::ActionConfigurationFileLoader::SetPath(const std::string& path) {
+void drwn::ActionConfigurationFileLoader::SetPath(const std::string& path) {
     m_path = path;
 }

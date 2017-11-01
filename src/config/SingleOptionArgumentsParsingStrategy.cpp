@@ -5,7 +5,7 @@
 
 #include "config/SingleOptionArgumentsParsingStrategy.h"
 
-using namespace Robot;
+using namespace drwn;
 
 SingleOptionArgumentsParsingStrategy::SingleOptionArgumentsParsingStrategy(std::string option_name,
                                                                            std::string option_description)

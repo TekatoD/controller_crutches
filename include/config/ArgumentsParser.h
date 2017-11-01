@@ -10,7 +10,7 @@
 #include "ArgumentsParsingStrategy.h"
 #include "CommandArguments.h"
 
-namespace Robot {
+namespace drwn {
     class ArgumentsParser {
     public:
         ArgumentsParser(std::string caption = "");

@@ -3,11 +3,11 @@
  *  @date 4/21/17
  */
 
-#include <log/Logger.h>
+#include <log/trivial_logger_t.h>
 #include "gamecontroller/GameController.h"
 
 
-using namespace Robot;
+using namespace drwn;
 
 GameController* GameController::GetInstance() {
     static GameController gameController;

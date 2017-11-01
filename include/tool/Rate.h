@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace Robot {
+namespace drwn {
     template<class Clock>
     class Rate {
     public:

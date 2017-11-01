@@ -6,7 +6,7 @@
 
 #include "BaseDetector.h"
 
-namespace Robot {
+namespace drwn {
     class AngleDetector : public BaseDetector {
     public:
         AngleDetector();

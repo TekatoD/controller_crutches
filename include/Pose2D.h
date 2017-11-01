@@ -7,7 +7,7 @@
 
 #include <ostream>
 
-namespace Robot {
+namespace drwn {
     class Pose2D {
     public:
 

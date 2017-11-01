@@ -22,7 +22,7 @@
 static const int GAMECONTROLLER_TIMEOUT = 2000000;
 static const int ALIVE_DELAY = 1000000;
 
-namespace Robot {
+namespace drwn {
     class GameController {
     public:
         static GameController* GetInstance();

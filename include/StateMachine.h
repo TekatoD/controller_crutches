@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include "hw/CM730.h"
+#include "hw/CM730_t.h"
 #include "Pose2D.h"
 
 #define CNTRL_SECTION "State Machine"
 
-namespace Robot {
+namespace drwn {
     enum {
         BTN_STATE = 1,
         BTN_START = 2
@@ -58,13 +58,13 @@ namespace Robot {
 
         void SetRole(Role role);
 
-        void Check(CM730* cm730);
+        void Check(CM730_t* cm730);
 
         void Disable();
 
         void Enable();
 
-        void UpdateLeds(CM730* cm730) const;
+        void UpdateLeds(CM730_t* cm730) const;
     };
 }
 

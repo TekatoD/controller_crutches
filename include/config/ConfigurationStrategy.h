@@ -3,7 +3,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-namespace Robot {
+namespace drwn {
     class ConfigurationStrategy {
     public:
 

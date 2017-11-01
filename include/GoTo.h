@@ -21,12 +21,12 @@
 
 
 #include <cmath>
-#include "math/Point.h"
+#include "math/point_t.h"
 #include "Pose2D.h"
 
 #define GOTO_SECTION ("Goto")
 
-namespace Robot {
+namespace drwn {
     class GoTo {
     private:
         float m_MaxSpeed;

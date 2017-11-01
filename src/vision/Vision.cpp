@@ -8,7 +8,7 @@
 //#include <vec3_generated.h>
 //#include <rect_generated.h>
 
-using namespace Robot;
+using namespace drwn;
 
 
 Vision::Vision(std::string prop_file) {

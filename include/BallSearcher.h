@@ -7,16 +7,16 @@
 
 
 #include <vector>
-#include <math/Point.h>
+#include <math/point_t.h>
 
 #define FINDER_SECTION "Ball Searcher"
 
-namespace Robot {
+namespace drwn {
     class BallSearcher {
     public:
         BallSearcher();
 
-        void SetLastPosition(const Point2D& pos);
+        void SetLastPosition(const point_2D_t& pos);
 
         void Process();
 
@@ -26,7 +26,7 @@ namespace Robot {
 
         bool IsWalkingEnabled() const;
 
-        const Point2D& GetLastPosition() const;
+        const point_2D_t& GetLastPosition() const;
 
         float GetTiltPhaseStep() const;
 
@@ -56,7 +56,7 @@ namespace Robot {
     private:
         bool m_debug{false};
         bool m_Active;
-        Point2D m_LastPosition;
+        point_2D_t m_LastPosition;
 
         float m_TiltPhase;
         float m_PanPhase;

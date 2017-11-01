@@ -5,7 +5,7 @@
 #include "vision/detectors/LineDetector.h"
 #include "vision/VisionUtils.h"
 
-using namespace Robot;
+using namespace drwn;
 
 const char table[]{
         0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1,

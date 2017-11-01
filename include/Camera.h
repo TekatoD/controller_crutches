@@ -9,7 +9,7 @@
 #define _CAMERA_H_
 
 
-namespace Robot {
+namespace drwn {
     class Camera {
     public:
         static constexpr float VIEW_V_ANGLE = 46.0; //degree

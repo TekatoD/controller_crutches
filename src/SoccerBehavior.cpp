@@ -17,16 +17,16 @@
  *  @date 5/5/17
  */
 
-#include <motion/modules/Action.h>
-#include <motion/modules/Head.h>
-#include <motion/modules/Walking.h>
+#include <motion/modules/action_t.h>
+#include <motion/modules/head_t.h>
+#include <motion/modules/walking_t.h>
 #include <gamecontroller/GameController.h>
 #include <StateMachine.h>
 #include <iostream>
-#include <motion/MotionStatus.h>
+#include <motion/motion_status_t.h>
 #include "SoccerBehavior.h"
 
-using namespace Robot;
+using namespace drwn;
 
 SoccerBehavior::SoccerBehavior() {
     m_PreviousState = STATE_INITIAL;
@@ -34,28 +34,28 @@ SoccerBehavior::SoccerBehavior() {
 
 void SoccerBehavior::Process() {
     // Update CV
-    Walking::GetInstance()->SetMoveAimOn(false);
+    walking_t::GetInstance()->set_move_aim_on(false);
     const Pose2D& Spawn = StateMachine::GetInstance()->GetSpawnPosition();
     const Pose2D& Starting = StateMachine::GetInstance()->GetStartingPosition();
-    const Pose2D& Odo = Walking::GetInstance()->GetOdo();
+    const Pose2D& Odo = walking_t::GetInstance()->get_odo();
 
 //    m_BallTracker.Process(ball);
 
     const RoboCupGameControlData& State = GameController::GetInstance()->GameCtrlData;
 
 //    if (State.state == STATE_INITIAL || State.state == STATE_FINISHED) {
-//        Walking::GetInstance()->SetOdo(Spawn);
-//        Walking::GetInstance()->Stop();
+//        walking_t::GetInstance()->set_odo(Spawn);
+//        walking_t::GetInstance()->stop();
 //        return;
 //    }
 //
 //    if (State.state == STATE_READY) {
 //        if (m_PreviousState != STATE_INITIAL) {
 //            m_PreviousState = STATE_INITIAL;
-//            Walking::GetInstance()->SetOdo(Spawn);
+//            walking_t::GetInstance()->set_odo(Spawn);
 //        }
-//        Head::GetInstance()->Joint.SetEnableHeadOnly(true, true);
-//        Walking::GetInstance()->Joint.SetEnableBodyWithoutHead(true, true);
+//        head_t::GetInstance()->joint.set_enable_head_only(true, true);
+//        walking_t::GetInstance()->joint.set_enable_body_without_head(true, true);
 //        Pose2D pos = Starting - Odo;
 //        m_GoTo.Process(pos);
 //        return;
@@ -66,17 +66,17 @@ void SoccerBehavior::Process() {
 //    int team = State.teams[0].teamNumber == GameController::GetInstance()->TeamNumber ? 0 : 1;
 //    int player = GameController::GetInstance()->PlayerNumber;
 //    if (State.teams[team].players[player].secsTillUnpenalised > 0) {
-//        Walking::GetInstance()->Stop();
+//        walking_t::GetInstance()->stop();
 //        return;
 //    }
 
     if (State.state == STATE_SET || State.state == STATE_READY || State.state == STATE_INITIAL) {
         const Pose2D& Spawn = StateMachine::GetInstance()->GetSpawnPosition();
         if (m_BallTracker.IsNoBall()) {
-            Head::GetInstance()->MoveToHome();
+            head_t::GetInstance()->move_to_home();
         }
-        Walking::GetInstance()->SetOdo(Starting);
-        Walking::GetInstance()->Stop();
+        walking_t::GetInstance()->set_odo(Starting);
+        walking_t::GetInstance()->stop();
         return;
     }
 
@@ -87,20 +87,20 @@ void SoccerBehavior::Process() {
 
         if (m_PreviousState != STATE_SET) {
             m_PreviousState = STATE_SET;
-            Walking::GetInstance()->SetOdo(Starting);
+            walking_t::GetInstance()->set_odo(Starting);
         }
 
-        if (Action::GetInstance()->IsRunning() == 0) {
+        if (action_t::GetInstance()->is_running() == 0) {
             // Switch to head and walking after action
-            Head::GetInstance()->Joint.SetEnableHeadOnly(true, true);
-            Walking::GetInstance()->Joint.SetEnableBodyWithoutHead(true, true);
+            head_t::GetInstance()->joint.set_enable_head_only(true, true);
+            walking_t::GetInstance()->joint.set_enable_body_without_head(true, true);
 
             // Calculate angles to gate
             float free_space = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0;
             float x_top = m_Field.GetWidth() - free_space;
             float x_bot = x_top - m_Field.GetGateWidth();
 
-            float pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
+            float pan = motion_status_t::m_current_joints.set_angle(joint_data_t::ID_HEAD_PAN);
             float angle_top = (atan2(m_Field.GetLength() - Odo.Y(), x_top - Odo.X()) - Odo.Theta()) / M_PI * 180.0;
             float angle_bot = (atan2(m_Field.GetLength() - Odo.Y(), x_bot - Odo.X()) - Odo.Theta()) / M_PI * 180.0;
             angle_bot -= pan;
@@ -120,14 +120,14 @@ void SoccerBehavior::Process() {
 
             // Kicking the ball
             if (m_BallFollower.GetKickingLeg() != NO_KICKING) {
-                Head::GetInstance()->Joint.SetEnableHeadOnly(true, true);
-                Action::GetInstance()->Joint.SetEnableBodyWithoutHead(true, true);
+                head_t::GetInstance()->joint.set_enable_head_only(true, true);
+                action_t::GetInstance()->joint.set_enable_body_without_head(true, true);
                 // Kick the ball
 
                 if (m_BallFollower.GetKickingLeg() == RIGHT_LEG_KICK) {
-                    Action::GetInstance()->Start(12);   // RIGHT KICK
+                    action_t::GetInstance()->start(12);   // RIGHT KICK
                 } else if (m_BallFollower.GetKickingLeg() == LEFT_LEG_KICK) {
-                    Action::GetInstance()->Start(13);   // LEFT KICK
+                    action_t::GetInstance()->start(13);   // LEFT KICK
                 }
             }
         }

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstring>
-#include "math/Point.h"
+#include "math/point_t.h"
 
-namespace Robot {
+namespace drwn {
     class BallTracker {
     public:
 
@@ -11,11 +11,11 @@ namespace Robot {
 
         ~BallTracker();
 
-        const Point2D& GetBallPosition() const;
+        const point_2D_t& GetBallPosition() const;
 
         bool IsNoBall() const;
 
-        void Process(Point2D pos);
+        void Process(point_2D_t pos);
 
         int GetNoBallMaxCount() const;
 
@@ -29,7 +29,7 @@ namespace Robot {
 
         int m_NoBallCount;
         int m_NoBallMaxCount;
-        Point2D BallPosition;
+        point_2D_t BallPosition;
         bool m_debug{false};
 
     };

@@ -9,7 +9,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-namespace Robot {
+namespace drwn {
     class BaseDetector {
     public:
         explicit BaseDetector(const std::string &detector_name = "");

@@ -5,7 +5,7 @@
 
 #include "config/ArgumentsParser.h"
 
-using namespace Robot;
+using namespace drwn;
 
 ArgumentsParser::ArgumentsParser(std::string caption)
         : m_caption(std::move(caption)) {}

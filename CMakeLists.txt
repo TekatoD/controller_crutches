@@ -19,18 +19,18 @@ if (CROSSCOMPILE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CROSSCOMPILE_FLAGS} -static-libstdc++ -std=c++17")
 
     add_library(hw STATIC
-            include/hw/RobotCM730.h
-            src/hw/RobotCM730.cpp
-            include/hw/LinuxCM730.h
-            src/hw/LinuxCM730.cpp)
+            include/hw/robot_CM730_t.h
+            src/hw/robot_CM730_t.cpp
+            include/hw/linux_CM730_t.h
+            src/hw/linux_CM730_t.cpp)
 else (CROSSCOMPILE)
     set(CMAKE_CXX_STANDARD 17)
     find_package(VREP REQUIRED)
     add_library(hw STATIC
-            include/hw/VrepCM730.h
-            include/hw/VrepConnector.h
-            src/hw/VrepConnector.cpp
-            src/hw/VrepCM730.cpp)
+            include/hw/vrep_CM730_t.h
+            include/hw/vrep_connector_t.h
+            src/hw/vrep_connector_t.cpp
+            src/hw/vrep_CM730_t.cpp)
     target_link_libraries(hw ${VREP_LIBRARIES})
     target_include_directories(hw PUBLIC ${VREP_REMOTE} ${VREP_INCLUDE})
 endif (CROSSCOMPILE)
@@ -57,37 +57,37 @@ include_directories( ${EIGEN3_INCLUDE_DIR}) #Eigen doesn't work either way
 # All sources of the project. Insert one file per line.
 # Don't forget include header files
 set(SRC
-        include/motion/modules/Action.h
+        include/motion/modules/action_t.h
         include/BallFollower.h
         #        include/BallTracker.h
         include/Camera.h
-        include/hw/FSR.h
-        include/motion/modules/Head.h
-        include/motion/JointData.h
-        include/motion/Kinematics.h
-        include/hw/LinuxMotionTimer.h
-        include/math/Matrix.h
-        include/motion/MotionManager.h
-        include/motion/MotionModule.h
-        include/motion/MotionStatus.h
-        include/hw/MX28.h
-        include/math/Point.h
+        include/hw/FSR_t.h
+        include/motion/modules/head_t.h
+        include/motion/joint_data_t.h
+        include/motion/kinematics_t.h
+        include/hw/linux_motion_timer_t.h
+        include/math/matrix_t.h
+        include/motion/motion_manager_t.h
+        include/motion/motion_module_t.h
+        include/motion/motion_status_t.h
+        include/hw/MX28_t.h
+        include/math/point_t.h
         include/StateMachine.h
-        include/math/Vector.h
-        include/motion/modules/Walking.h
-        src/math/Matrix.cpp
-        src/math/Point.cpp
-        src/math/Vector.cpp
-        src/motion/modules/Walking.cpp
-        src/motion/modules/Head.cpp
-        src/motion/modules/Action.cpp
-        src/motion/JointData.cpp
-        src/motion/Kinematics.cpp
-        src/motion/MotionManager.cpp
-        src/motion/MotionStatus.cpp
+        include/math/vector_3D_t.h
+        include/motion/modules/walking_t.h
+        src/math/matrix_t.cpp
+        src/math/point_t.cpp
+        src/math/vector_3D_t.cpp
+        src/motion/modules/walking_t.cpp
+        src/motion/modules/head_t.cpp
+        src/motion/modules/action_t.cpp
+        src/motion/joint_data_t.cpp
+        src/motion/kinematics_t.cpp
+        src/motion/motion_manager_t.cpp
+        src/motion/motion_status_t.cpp
         src/BallFollower.cpp
         src/BallTracker.cpp
-        src/hw/LinuxMotionTimer.cpp
+        src/hw/linux_motion_timer_t.cpp
         src/main.cpp
         src/StateMachine.cpp
         include/gamecontroller/RoboCupGameControlData.h
@@ -109,31 +109,31 @@ set(SRC
         include/Field.h
         src/BallSearcher.cpp
         include/BallSearcher.h
-        include/hw/CM730.h
-        src/hw/CM730.cpp
-        include/math/AngleTools.h
-        include/math/Eigen.h
-        src/math/AngleTools.cpp
+        include/hw/CM730_t.h
+        src/hw/CM730_t.cpp
+        include/math/angle_tools.h
+        include/math/eigen.h
+        src/math/angle_tools.cpp
         src/PropertyReader.cpp
         include/PropertyReader.h
-        src/motion/modules/Kicking.cpp
-        include/motion/modules/Kicking.h
-        include/log/Console.h
-        src/log/ColouredSink.cpp
-        include/log/ColouredSink.h
-        src/log/Logger.cpp
-        include/log/Logger.h
-        src/RobotApplication.cpp
-        include/RobotApplication.h
+        src/motion/modules/kicking_t.cpp
+        include/motion/modules/kicking_t.h
+        include/log/console.h
+        src/log/сoloured_sink_t.cpp
+        include/log/сoloured_sink_t.h
+        src/log/trivial_logger_t.cpp
+        include/log/trivial_logger_t.h
+        src/robot_application_t.cpp
+        include/robot_application_t.h
         include/behavior/Behavior.h
         src/behavior/BaseBehavior.cpp
         include/behavior/BaseBehavior.h
-        src/hw/LEDs.cpp
-        include/hw/LEDs.h
+        src/hw/LEDs_t.cpp
+        include/hw/LEDs_t.h
         src/Color.cpp
         include/Color.h
-        src/hw/Buttons.cpp
-        include/hw/Buttons.h
+        src/hw/buttons_t.cpp
+        include/hw/buttons_t.h
         src/tool/Accumulator.cpp
         include/tool/Accumulator.h
         include/tool/Rate.h
@@ -186,7 +186,7 @@ set(SRC
         src/vision/detectors/FieldDetector.cpp
         src/vision/detectors/LineDetector.cpp
         src/vision/Vision.cpp
-        )
+        include/config/strategies/BallDetectorConfigurationStrategy.h src/config/strategies/BallDetectorConfigurationStrategy.cpp)
 
 #### Build targets #####
 add_executable(controller ${SRC})

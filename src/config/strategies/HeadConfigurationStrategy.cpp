@@ -3,9 +3,9 @@
  *  @date 10/25/17
  */
 #include "config/strategies/HeadConfigurationStrategy.h"
-#include "motion/modules/Head.h"
+#include "motion/modules/head_t.h"
 
-using namespace Robot;
+using namespace drwn;
 
 HeadConfigurationStrategy::HeadConfigurationStrategy(std::string section)
         : ConfigurationStrategy(std::move(section)) { }
@@ -13,7 +13,7 @@ HeadConfigurationStrategy::HeadConfigurationStrategy(std::string section)
 void HeadConfigurationStrategy::ReadConfig(const boost::property_tree::ptree& prop) {
     if (prop.count(GetSection()) == 0) return; // Section doesn't exist
 
-    Head* head = Head::GetInstance();
+    head_t* head = head_t::GetInstance();
     auto& head_section = prop.get_child(this->GetSection());
 
     auto pan_p_gain = head_section.get_optional<float>("pan_p_gain");
@@ -27,32 +27,32 @@ void HeadConfigurationStrategy::ReadConfig(const boost::property_tree::ptree& pr
     auto pan_home = head_section.get_optional<float>("pan_home");
     auto tilt_home = head_section.get_optional<float>("tilt_home");
 
-    if (pan_p_gain) head->SetPanPGain(pan_p_gain.get());
-    if (pan_d_gain) head->SetPanDGain(pan_d_gain.get());
-    if (tilt_p_gain) head->SetTiltPGain(tilt_p_gain.get());
-    if (tilt_d_gain) head->SetTiltDGain(tilt_d_gain.get());
-    if (left_limit) head->SetLeftLimit(left_limit.get());
-    if (right_limit) head->SetRightLimit(right_limit.get());
-    if (top_limit) head->SetTopLimit(top_limit.get());
-    if (bottom_limit) head->SetBottomLimit(bottom_limit.get());
-    if (pan_home ) head->SetPanHome(pan_home.get());
-    if (tilt_home) head->SetTiltHome(tilt_home.get());
+    if (pan_p_gain) head->set_pan_p_gain(pan_p_gain.get());
+    if (pan_d_gain) head->set_pan_d_gain(pan_d_gain.get());
+    if (tilt_p_gain) head->set_tilt_p_gain(tilt_p_gain.get());
+    if (tilt_d_gain) head->set_tilt_d_gain(tilt_d_gain.get());
+    if (left_limit) head->set_left_limit(left_limit.get());
+    if (right_limit) head->set_right_limit(right_limit.get());
+    if (top_limit) head->set_top_limit(top_limit.get());
+    if (bottom_limit) head->set_bottom_limit(bottom_limit.get());
+    if (pan_home ) head->set_pan_home(pan_home.get());
+    if (tilt_home) head->set_tilt_home(tilt_home.get());
 }
 
 void HeadConfigurationStrategy::WriteConfig(boost::property_tree::ptree& prop) const {
     if (prop.count(GetSection()) == 0) prop.add_child(GetSection(), {});
 
-    Head* head = Head::GetInstance();
+    head_t* head = head_t::GetInstance();
     auto& head_section = prop.get_child(this->GetSection());
 
-    head_section.put("pan_p_gain", head->GetPanPGain());
-    head_section.put("pan_d_gain", head->GetPanDGain());
-    head_section.put("tilt_p_gain", head->GetTiltPGain());
-    head_section.put("tilt_d_gain", head->GetTiltDGain());
-    head_section.put("left_limit", head->GetLeftLimit());
-    head_section.put("right_limit", head->GetRightLimit());
-    head_section.put("top_limit", head->GetTopLimit());
-    head_section.put("bottom_limit", head->GetBottomLimit());
-    head_section.put("pan_home", head->GetPanHome());
-    head_section.put("tilt_home", head->GetTiltHome());
+    head_section.put("pan_p_gain", head->get_pan_p_gain());
+    head_section.put("pan_d_gain", head->get_pan_d_gain());
+    head_section.put("tilt_p_gain", head->get_tilt_p_gain());
+    head_section.put("tilt_d_gain", head->get_tilt_d_gain());
+    head_section.put("left_limit", head->get_left_limit());
+    head_section.put("right_limit", head->get_right_limit());
+    head_section.put("top_limit", head->get_top_limit());
+    head_section.put("bottom_limit", head->get_bottom_limit());
+    head_section.put("pan_home", head->get_pan_home());
+    head_section.put("tilt_home", head->get_tilt_home());
 }

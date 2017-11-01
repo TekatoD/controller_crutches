@@ -8,7 +8,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <string>
 
-namespace Robot {
+namespace drwn {
     enum class ConfigFormat {
         INI,
         XML,

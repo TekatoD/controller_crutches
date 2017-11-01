@@ -6,7 +6,7 @@
 
 #include "opencv2/core/core.hpp"
 
-namespace Robot {
+namespace drwn {
     namespace vision_utils {
         template<class _Tp, int m, int n>
         inline float norm(const cv::Matx<_Tp, m, n> &M) {

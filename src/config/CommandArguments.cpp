@@ -4,21 +4,21 @@
  */
 #include "config/CommandArguments.h"
 
-Robot::CommandArguments::CommandArguments(int argc, char** argv)
+drwn::CommandArguments::CommandArguments(int argc, char** argv)
         : m_argc(argc), m_argv(argv) {}
 
-int Robot::CommandArguments::GetArgc() const {
+int drwn::CommandArguments::GetArgc() const {
     return m_argc;
 }
 
-void Robot::CommandArguments::SetArgc(int argc) {
+void drwn::CommandArguments::SetArgc(int argc) {
     m_argc = argc;
 }
 
-char** Robot::CommandArguments::GetArgv() const {
+char** drwn::CommandArguments::GetArgv() const {
     return m_argv;
 }
 
-void Robot::CommandArguments::SetArgv(char** argv) {
+void drwn::CommandArguments::SetArgv(char** argv) {
     m_argv = argv;
 }

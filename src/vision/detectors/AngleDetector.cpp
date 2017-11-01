@@ -4,7 +4,7 @@
 //#include <rrc/core.h>
 
 
-namespace Robot {
+namespace drwn {
   AngleDetector::AngleDetector() : BaseDetector("AngleDetector") {};
 
   std::vector<cv::Vec3d> AngleDetector::Detect(cv::Mat& img, const std::vector<cv::Vec4i>& lines) {

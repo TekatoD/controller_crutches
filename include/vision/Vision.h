@@ -9,7 +9,7 @@
 #include <vision/detectors/AngleDetector.h>
 #include <vision/detectors/FieldDetector.h>
 
-namespace Robot {
+namespace drwn {
     class Vision {
     public:
         explicit Vision(std::string prop_file = std::string());

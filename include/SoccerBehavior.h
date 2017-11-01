@@ -20,7 +20,7 @@
 #pragma once
 
 
-#include "hw/CM730.h"
+#include "hw/CM730_t.h"
 #include "BallTracker.h"
 #include "BallFollower.h"
 #include "GoTo.h"
@@ -30,7 +30,7 @@
 
 #define SOCCER_SECTION "Soccer"
 
-namespace Robot {
+namespace drwn {
     class SoccerBehavior {
     public:
         SoccerBehavior();

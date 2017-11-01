@@ -4,11 +4,11 @@
 
 #include "vision/detectors/FieldDetector.h"
 
-Robot::FieldDetector::FieldDetector() : BaseDetector("FieldDetector"){
+drwn::FieldDetector::FieldDetector() : BaseDetector("FieldDetector"){
 
 }
 
-cv::Mat Robot::FieldDetector::Preproccess(const cv::Mat& image) {
+cv::Mat drwn::FieldDetector::Preproccess(const cv::Mat& image) {
   cv::Mat preprocImage, prepImage, hsvImg;
   image.copyTo(preprocImage);
   cv::cvtColor(preprocImage,hsvImg,cv::COLOR_BGR2HSV);
@@ -49,7 +49,7 @@ cv::Mat Robot::FieldDetector::Preproccess(const cv::Mat& image) {
   return preprocImage + field;
 }
 
-cv::Mat Robot::FieldDetector::Detect(const cv::Mat& preprocImage) {
+cv::Mat drwn::FieldDetector::Detect(const cv::Mat& preprocImage) {
   cv::Rect ans;
   cv::Mat temp_image=cv::Mat::zeros(preprocImage.rows,preprocImage.cols,CV_8UC3);
   std::vector<std::vector<cv::Point> > contours;
@@ -76,7 +76,7 @@ cv::Mat Robot::FieldDetector::Detect(const cv::Mat& preprocImage) {
 }
 
 
-void Robot::FieldDetector::load(const boost::property_tree::ptree &config) {
+void drwn::FieldDetector::load(const boost::property_tree::ptree &config) {
   const boost::property_tree::ptree line_config = config.get_child(DetectorName());
   ColorThresh.min_1 = line_config.get<uchar>("ColorThresh1.min_1");
   ColorThresh.min_2 = line_config.get<uchar>("ColorThresh1.min_2");
@@ -92,7 +92,7 @@ void Robot::FieldDetector::load(const boost::property_tree::ptree &config) {
   ColorThresh2.max_3 = line_config.get<uchar>("ColorThresh2.max_3");
 }
 
-boost::property_tree::ptree Robot::FieldDetector::get_params() {
+boost::property_tree::ptree drwn::FieldDetector::get_params() {
   boost::property_tree::ptree line_config, ptree;
   line_config.put("ColorThresh1.min_2", ColorThresh.min_2);
   line_config.put("ColorThresh1.min_1", ColorThresh.min_1);

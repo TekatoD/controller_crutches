@@ -6,7 +6,7 @@
 
 #include "config/ConfigurationStrategy.h"
 
-namespace Robot {
+namespace drwn {
     class GameControllerConfigurationStrategy
             : public ConfigurationStrategy {
     public:

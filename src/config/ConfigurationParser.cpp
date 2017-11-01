@@ -9,7 +9,7 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/algorithm/string.hpp>
 
-using namespace Robot;
+using namespace drwn;
 
 boost::property_tree::ptree ConfigurationParser::ReadFromFile(const std::string& path) {
     auto format = GetFileFormat(path);

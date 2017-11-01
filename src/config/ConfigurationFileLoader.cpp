@@ -1,9 +1,9 @@
-#include <log/Logger.h>
+#include <log/trivial_logger_t.h>
 #include <boost/filesystem.hpp>
 #include "config/ConfigurationParser.h"
 #include "config/ConfigurationFileLoader.h"
 
-using namespace Robot;
+using namespace drwn;
 
 void ConfigurationFileLoader::AddStrategy(ConfigurationStrategy& strategy, std::string path) {
     if (path.empty()) {

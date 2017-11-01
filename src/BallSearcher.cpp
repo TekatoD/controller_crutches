@@ -4,13 +4,13 @@
  */
 
 #include <Camera.h>
-#include <motion/modules/Head.h>
+#include <motion/modules/head_t.h>
 #include <cmath>
-#include <motion/modules/Walking.h>
-#include <log/Logger.h>
+#include <motion/modules/walking_t.h>
+#include <log/trivial_logger_t.h>
 #include "BallSearcher.h"
 
-using namespace Robot;
+using namespace drwn;
 
 BallSearcher::BallSearcher() {
     m_Active = false;
@@ -29,14 +29,14 @@ BallSearcher::BallSearcher() {
     m_PanDirection = 0;
 
     m_WalkingEnabled = true;
-    m_LastPosition = Point2D(Camera::WIDTH / 2, Camera::HEIGHT / 2);
+    m_LastPosition = point_2D_t(Camera::WIDTH / 2, Camera::HEIGHT / 2);
 }
 
 void BallSearcher::Process() {
    if (!m_Active) {
        // TODO Pan checking
-        Point2D center = Point2D(Camera::WIDTH / 2, Camera::HEIGHT / 2);
-        Point2D offset = m_LastPosition - center;
+        point_2D_t center = point_2D_t(Camera::WIDTH / 2, Camera::HEIGHT / 2);
+        point_2D_t offset = m_LastPosition - center;
 
         m_PanPhase = 0.0;
         m_TiltPhase = 0.0;
@@ -51,33 +51,33 @@ void BallSearcher::Process() {
     m_PanPhase += m_PanPhaseStep * m_PanDirection;
     m_TiltPhase += m_TiltPhaseStep * m_TurnDirection;
 
-    const float tilt_max = Head::GetInstance()->GetTopLimitAngle();
-    const float tilt_min = Head::GetInstance()->GetBottomLimitAngle();
+    const float tilt_max = head_t::GetInstance()->get_top_limit_angle();
+    const float tilt_min = head_t::GetInstance()->get_bottom_limit_angle();
     const float tilt_diff = tilt_max - tilt_min;
-    const float pan_max = Head::GetInstance()->GetLeftLimitAngle();
-    const float pan_min = Head::GetInstance()->GetRightLimitAngle();
+    const float pan_max = head_t::GetInstance()->get_left_limit_angle();
+    const float pan_min = head_t::GetInstance()->get_right_limit_angle();
     const float pan_diff = pan_max - pan_min;
 
 
 
     float pan = sinf(m_PanPhase / m_PhaseSize * M_2_PI) * pan_diff - pan_min;
     float tilt = sinf(m_TiltPhase / m_PhaseSize * M_2_PI) * tilt_diff - tilt_min;
-    Head::GetInstance()->MoveByAngle(pan, tilt);
+    head_t::GetInstance()->move_by_angle(pan, tilt);
 
     if (m_WalkingEnabled) {
-        m_TurnSpeed = Walking::GetInstance()->GetAMoveAmplitude();
+        m_TurnSpeed = walking_t::GetInstance()->get_a_move_amplitude();
         m_TurnSpeed += m_TurnStep * m_TurnDirection;
         if (fabsf(m_TurnSpeed) > m_MaxTurn) {
             m_TurnSpeed = m_MaxTurn * m_TurnDirection;
         }
 
-        Walking::GetInstance()->SetXMoveAmplitude(0);
-        Walking::GetInstance()->SetXMoveAmplitude(0);
-        Walking::GetInstance()->SetXMoveAmplitude(m_TurnSpeed);
-        Walking::GetInstance()->SetMoveAimOn(false);
-        Walking::GetInstance()->Start();
+        walking_t::GetInstance()->set_x_move_amplitude(0);
+        walking_t::GetInstance()->set_x_move_amplitude(0);
+        walking_t::GetInstance()->set_x_move_amplitude(m_TurnSpeed);
+        walking_t::GetInstance()->set_move_aim_on(false);
+        walking_t::GetInstance()->start();
     } else {
-        Walking::GetInstance()->Stop();
+        walking_t::GetInstance()->stop();
     }
 }
 
@@ -93,11 +93,11 @@ bool BallSearcher::IsWalkingEnabled() const {
     return m_WalkingEnabled;
 }
 
-const Point2D& BallSearcher::GetLastPosition() const {
+const point_2D_t& BallSearcher::GetLastPosition() const {
     return m_LastPosition;
 }
 
-void BallSearcher::SetLastPosition(const Point2D& pos) {
+void BallSearcher::SetLastPosition(const point_2D_t& pos) {
     if(m_debug) {
         LOG_DEBUG << "BALL SEARCHER: last_position_x = " << pos.X << " last_position_y = " << pos.Y;
     }

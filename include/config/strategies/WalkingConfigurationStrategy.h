@@ -3,7 +3,7 @@
 
 #include "config/ConfigurationStrategy.h"
 
-namespace Robot {
+namespace drwn {
     class WalkingConfigurationStrategy
             : public ConfigurationStrategy {
     public:

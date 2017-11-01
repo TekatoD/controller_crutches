@@ -7,7 +7,7 @@
 
 #include <boost/program_options.hpp>
 
-namespace Robot {
+namespace drwn {
     class ArgumentsParsingStrategy {
     public:
         virtual void DefineDescription(boost::program_options::options_description& desc) = 0;

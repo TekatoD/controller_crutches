@@ -5,16 +5,16 @@
 #include "OdometryCollector.h"
 #include <math.h>
 
-Robot::OdometryCollector::OdometryCollector()
+drwn::OdometryCollector::OdometryCollector()
         : m_initial(0, 0, 0), m_pose(0, 0, 0) { }
 
-Robot::OdometryCollector::OdometryCollector(Pose2D initial)
+drwn::OdometryCollector::OdometryCollector(Pose2D initial)
         : m_initial(initial), m_pose(initial) { }
 
-Robot::OdometryCollector::OdometryCollector(float x, float y, float theta)
+drwn::OdometryCollector::OdometryCollector(float x, float y, float theta)
         : m_initial(x, y, theta), m_pose(x, y, theta) { }
 
-void Robot::OdometryCollector::odoTranslate(Pose2D offset) {
+void drwn::OdometryCollector::odoTranslate(Pose2D offset) {
     float dst = hypot(offset.X(), offset.Y());
     float angle = atan2(offset.Y(), offset.X());
     m_pose.setX(m_pose.X() + (cos(m_pose.Theta() + angle) * dst));
@@ -23,18 +23,18 @@ void Robot::OdometryCollector::odoTranslate(Pose2D offset) {
     m_pose.normalizeTheta();
 }
 
-Robot::Pose2D Robot::OdometryCollector::GetPose() const {
+drwn::Pose2D drwn::OdometryCollector::GetPose() const {
     return m_pose;
 }
 
-void Robot::OdometryCollector::SetPose(Robot::Pose2D offset) {
+void drwn::OdometryCollector::SetPose(drwn::Pose2D offset) {
     m_pose = offset;
 }
 
-void Robot::OdometryCollector::SetInitial(Robot::Pose2D offset) {
+void drwn::OdometryCollector::SetInitial(drwn::Pose2D offset) {
     m_initial = offset;
 }
 
-void Robot::OdometryCollector::Reset() {
+void drwn::OdometryCollector::Reset() {
     m_pose = m_initial;
 }

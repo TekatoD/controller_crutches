@@ -1,49 +1,49 @@
 #include "tool/Accumulator.h"
 
-Robot::Accumulator::Accumulator(unsigned int threshold)
+drwn::Accumulator::Accumulator(unsigned int threshold)
         : m_threshold(threshold) {}
 
-unsigned int Robot::Accumulator::GetThreshold() const {
+unsigned int drwn::Accumulator::GetThreshold() const {
     return m_threshold;
 }
 
-void Robot::Accumulator::SetThreshold(unsigned int threshold) {
+void drwn::Accumulator::SetThreshold(unsigned int threshold) {
     m_threshold = threshold;
 }
 
-void Robot::Accumulator::Reset() {
+void drwn::Accumulator::Reset() {
     m_counter = 0;
 }
 
-void Robot::Accumulator::Increment() {
+void drwn::Accumulator::Increment() {
     if (!IsOverflow()) {
         m_counter += m_step;
     }
 }
 
-Robot::Accumulator Robot::Accumulator::operator++(int) {
+drwn::Accumulator drwn::Accumulator::operator++(int) {
     Accumulator tmp(*this);
     Increment();
     return tmp;
 }
 
-Robot::Accumulator& Robot::Accumulator::operator++() {
+drwn::Accumulator& drwn::Accumulator::operator++() {
     Increment();
     return *this;
 }
 
-bool Robot::Accumulator::IsOverflow() const noexcept {
+bool drwn::Accumulator::IsOverflow() const noexcept {
     return m_counter >= m_threshold;
 }
 
-Robot::Accumulator::operator bool() const {
+drwn::Accumulator::operator bool() const {
     return IsOverflow();
 }
 
-unsigned int Robot::Accumulator::GetStep() const {
+unsigned int drwn::Accumulator::GetStep() const {
     return m_step;
 }
 
-void Robot::Accumulator::SetStep(unsigned int step) {
+void drwn::Accumulator::SetStep(unsigned int step) {
     m_step = step;
 }

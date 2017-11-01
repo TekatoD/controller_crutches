@@ -8,13 +8,13 @@
 #ifndef _BALL_FOLLOWER_H_
 #define _BALL_FOLLOWER_H_
 
-#include "math/Point.h"
+#include "math/point_t.h"
 #include "BallTracker.h"
 
 #define FOLLOWER_SECTION ("Ball Follower")
 
 
-namespace Robot {
+namespace drwn {
     enum KickingAction {
         NO_KICKING,
         LEFT_LEG_KICK,
@@ -66,7 +66,7 @@ namespace Robot {
 
         ~BallFollower();
 
-        void Process(Point2D ball_pos, float angle_top, float angle_bot);
+        void Process(point_2D_t ball_pos, float angle_top, float angle_bot);
 
         bool IsNoBall() const;
 

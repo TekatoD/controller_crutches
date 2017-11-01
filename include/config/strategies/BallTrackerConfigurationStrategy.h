@@ -7,7 +7,7 @@
 #include <BallTracker.h>
 #include "config/ConfigurationStrategy.h"
 
-namespace Robot {
+namespace drwn {
     class BallTrackerConfigurationStrategy
             : public ConfigurationStrategy {
     public:

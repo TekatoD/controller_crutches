@@ -18,27 +18,27 @@
  */
 
 #include "GoTo.h"
-#include "motion/modules/Walking.h"
+#include "motion/modules/walking_t.h"
 
 #define PI (3.14159265)
 
 
-bool Robot::GoTo::IsDone() const {
+bool drwn::GoTo::IsDone() const {
     return m_Done;
 }
 
-void Robot::GoTo::Process(Robot::Pose2D pos) {
+void drwn::GoTo::Process(drwn::Pose2D pos) {
     m_Done = true;
     float dist = hypot(pos.X(), pos.Y());
     float angle = atan2(pos.Y(), pos.X()) / M_PI * 180.0;
 
-    if (!Walking::GetInstance()->IsRunning() ||
-        Walking::GetInstance()->GetXMoveAmplitude() != m_X ||
-        Walking::GetInstance()->GetXMoveAmplitude() != m_Y ||
-        Walking::GetInstance()->GetXMoveAmplitude() != m_A) {
-        m_X = Walking::GetInstance()->GetXMoveAmplitude();
-        m_Y = Walking::GetInstance()->GetYMoveAmplitude();
-        m_A = Walking::GetInstance()->GetAMoveAmplitude();
+    if (!walking_t::GetInstance()->is_running() ||
+            walking_t::GetInstance()->get_x_move_amplitude() != m_X ||
+            walking_t::GetInstance()->get_x_move_amplitude() != m_Y ||
+            walking_t::GetInstance()->get_x_move_amplitude() != m_A) {
+        m_X = walking_t::GetInstance()->get_x_move_amplitude();
+        m_Y = walking_t::GetInstance()->get_y_move_amplitude();
+        m_A = walking_t::GetInstance()->get_a_move_amplitude();
     }
 
 
@@ -86,17 +86,17 @@ void Robot::GoTo::Process(Robot::Pose2D pos) {
 
 
     if (!m_Done) {
-        Walking::GetInstance()->Joint.SetEnableBodyWithoutHead(true, true);
-        Walking::GetInstance()->SetXMoveAmplitude(m_X);
-        Walking::GetInstance()->SetYMoveAmplitude(m_Y);
-        Walking::GetInstance()->SetAMoveAmplitude(m_A);
-        Walking::GetInstance()->Start();
+        walking_t::GetInstance()->joint.set_enable_body_without_head(true, true);
+        walking_t::GetInstance()->set_x_move_amplitude(m_X);
+        walking_t::GetInstance()->set_y_move_amplitude(m_Y);
+        walking_t::GetInstance()->set_a_move_amplitude(m_A);
+        walking_t::GetInstance()->start();
     } else {
-        Walking::GetInstance()->Stop();
+        walking_t::GetInstance()->stop();
     }
 }
 
-Robot::GoTo::GoTo() {
+drwn::GoTo::GoTo() {
     m_MaxSpeed = 20.0;
     m_FitSpeed = 3.0;
     m_MaxTurn = 35.0;

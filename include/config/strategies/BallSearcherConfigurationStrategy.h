@@ -8,7 +8,7 @@
 #include "config/ConfigurationStrategy.h"
 
 
-namespace Robot {
+namespace drwn {
     class BallSearcherConfigurationStrategy
             : public ConfigurationStrategy {
     public:

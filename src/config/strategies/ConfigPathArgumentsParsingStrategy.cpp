@@ -5,7 +5,7 @@
 
 #include "config/strategies/ConfigPathArgumentsParsingStrategy.h"
 
-using namespace Robot;
+using namespace drwn;
 
 void ConfigPathArgumentsParsingStrategy::DefineDescription(boost::program_options::options_description& desc) {
     namespace po = boost::program_options;

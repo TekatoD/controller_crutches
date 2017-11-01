@@ -5,7 +5,7 @@
 #include <gamecontroller/GameController.h>
 #include "config/strategies/GameControllerConfigurationStrategy.h"
 
-using namespace Robot;
+using namespace drwn;
 
 GameControllerConfigurationStrategy::GameControllerConfigurationStrategy(std::string section)
         : ConfigurationStrategy(std::move(section)) { }

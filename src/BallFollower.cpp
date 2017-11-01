@@ -6,14 +6,14 @@
  */
 
 #include <iostream>
-#include "hw/MX28.h"
-#include "motion/modules/Head.h"
-#include "motion/modules/Walking.h"
+#include "hw/MX28_t.h"
+#include "motion/modules/head_t.h"
+#include "motion/modules/walking_t.h"
 #include "BallFollower.h"
-#include "motion/MotionStatus.h"
+#include "motion/motion_status_t.h"
 
 
-using namespace Robot;
+using namespace drwn;
 
 
 BallFollower::BallFollower() {
@@ -41,7 +41,7 @@ BallFollower::BallFollower() {
     m_FBStep = 0;
     m_RLStep = 0;
     m_RLTurn = 0;
-    m_TiltOffset = MX28::RATIO_VALUE2DEGREES;
+    m_TiltOffset = MX28_t::RATIO_VALUE2DEGREES;
     m_KickBall = NO_KICKING;
 
     m_AimTiltOffset = 15;
@@ -54,7 +54,7 @@ BallFollower::~BallFollower() {
 }
 
 
-void BallFollower::Process(Point2D ball_pos,
+void BallFollower::Process(point_2D_t ball_pos,
                            float angle_top,
                            float angle_bot) {
     bool aim = false;
@@ -66,20 +66,20 @@ void BallFollower::Process(Point2D ball_pos,
             // can not find a ball
             m_GoalFBStep = 0;
             m_GoalRLTurn = 0;
-            Head::GetInstance()->MoveToHome();
+            head_t::GetInstance()->move_to_home();
         } else {
             m_NoBallCount++;
         }
     } else {
         m_NoBallCount = 0;
 
-        float pan = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_PAN);
-        float pan_range = Head::GetInstance()->GetLeftLimitAngle();
+        float pan = motion_status_t::m_current_joints.set_angle(joint_data_t::ID_HEAD_PAN);
+        float pan_range = head_t::GetInstance()->get_left_limit_angle();
         float pan_percent = pan / pan_range;
 
-        float tilt = MotionStatus::m_CurrentJoints.GetAngle(JointData::ID_HEAD_TILT);
-        float tilt_min = Head::GetInstance()->GetBottomLimitAngle();
-        float tilt_range = Head::GetInstance()->GetTopLimitAngle() - tilt_min;
+        float tilt = motion_status_t::m_current_joints.set_angle(joint_data_t::ID_HEAD_TILT);
+        float tilt_min = head_t::GetInstance()->get_bottom_limit_angle();
+        float tilt_range = head_t::GetInstance()->get_top_limit_angle() - tilt_min;
         float tilt_percent = (tilt - tilt_min) / tilt_range;
         if (tilt_percent < 0)
             tilt_percent = -tilt_percent;
@@ -140,31 +140,31 @@ void BallFollower::Process(Point2D ball_pos,
 
     if (m_GoalFBStep == 0 && m_GoalRLStep == 0 && m_GoalRLStep == 0 &&
             m_FBStep == 0 && m_RLTurn == 0 && m_RLStep == 0) {
-        if (Walking::GetInstance()->IsRunning()) {
-            Walking::GetInstance()->Stop();
+        if (walking_t::GetInstance()->is_running()) {
+            walking_t::GetInstance()->stop();
         } else {
             if (m_KickBallCount < m_KickBallMaxCount)
                 m_KickBallCount++;
         }
     } else {
-        if (!Walking::GetInstance()->IsRunning()) {
+        if (!walking_t::GetInstance()->is_running()) {
 
             m_FBStep = 0;
             m_RLStep = 0;
             m_RLTurn = 0;
             m_KickBallCount = 0;
             m_KickBall = NO_KICKING;
-            
-            Walking::GetInstance()->SetXMoveAmplitude(m_FBStep);
-            Walking::GetInstance()->SetYMoveAmplitude(m_RLStep);
-            Walking::GetInstance()->SetAMoveAmplitude(m_RLTurn);
-            Walking::GetInstance()->Start();
+
+            walking_t::GetInstance()->set_x_move_amplitude(m_FBStep);
+            walking_t::GetInstance()->set_y_move_amplitude(m_RLStep);
+            walking_t::GetInstance()->set_a_move_amplitude(m_RLTurn);
+            walking_t::GetInstance()->start();
         } else {
             if (m_FBStep < m_GoalFBStep)
                 m_FBStep += m_UnitFBStep;
             else if (m_FBStep > m_GoalFBStep)
                 m_FBStep = m_GoalFBStep;
-            Walking::GetInstance()->SetXMoveAmplitude(m_FBStep);
+            walking_t::GetInstance()->set_x_move_amplitude(m_FBStep);
 
             if (m_GoalRLStep > 0) {
                 if (m_RLStep < m_GoalRLStep)
@@ -177,14 +177,14 @@ void BallFollower::Process(Point2D ball_pos,
                 else if (m_FBStep < -m_GoalRLStep)
                     m_RLStep = -m_GoalRLStep;
             }
-            Walking::GetInstance()->SetYMoveAmplitude(m_RLStep);
+            walking_t::GetInstance()->set_y_move_amplitude(m_RLStep);
 
             if (m_RLTurn < m_GoalRLTurn)
                 m_RLTurn += m_UnitRLTurn;
             else if (m_RLTurn > m_GoalRLTurn)
                 m_RLTurn -= m_UnitRLTurn;
-            Walking::GetInstance()->SetAMoveAmplitude(m_RLTurn);
-            Walking::GetInstance()->SetMoveAimOn(aim);
+            walking_t::GetInstance()->set_a_move_amplitude(m_RLTurn);
+            walking_t::GetInstance()->set_move_aim_on(aim);
         }
     }
 }

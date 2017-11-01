@@ -2,11 +2,11 @@
  *  @autor tekatod
  *  @date 10/25/17
  */
-#include <motion/modules/Walking.h>
-#include <motion/MotionManager.h>
+#include <motion/modules/walking_t.h>
+#include <motion/motion_manager_t.h>
 #include "config/strategies/BallSearcherConfigurationStrategy.h"
 
-using namespace Robot;
+using namespace drwn;
 
 BallSearcherConfigurationStrategy::BallSearcherConfigurationStrategy(BallSearcher* ballSearcher, std::string section)
         : ConfigurationStrategy(std::move(section)), m_ball_searcher(ballSearcher) { }

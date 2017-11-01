@@ -231,22 +231,20 @@ int main(int argc, char** argv) {
 //            case ROLE_GOALKEEPER:
 //                goalie.Process();
 //                break;
-//            case ROLES_COUNT:break;
+//            case ROLES_COUNT:break;.0f
 //        }
 
         float HeightFromGround = Robot::Kinematics::LEG_LENGTH + 122.2f + 50.5f + Robot::Kinematics::CAMERA_OFFSET_Z;
-        HeightFromGround /= 1000.0f;
+        //HeightFromGround /= 1000.0f;
         // Z
-        float HeadPan = DarwinHead->GetPanAngle() * (M_PI / 180.0f);
+        float HeadPan = (DarwinHead->GetPanAngle()) * (M_PI / 180.0f);
         // Y
-        float HeadTilt = (90.0f + DarwinHead->GetTiltAngle()) * (M_PI / 180.0f);
+        float HeadTilt = (DarwinHead->GetTiltAngle()) * (M_PI / 180.0f);
         
         Matrix4x4f HeadTransformE;
         cv::Mat HeadTransform;
         Robot::Kinematics::ComputeHeadForwardKinematics(HeadTransformE, HeadPan, HeadTilt);
         cv::eigen2cv(HeadTransformE, HeadTransform);
-        
-        //HeadTransform = HeadTransform.inv();
         
         /*
         cv::Mat Rx = cv::Mat::eye(3, 3, CV_32F);
@@ -258,18 +256,16 @@ int main(int argc, char** argv) {
         */
         
         cv::Mat R = HeadTransform(cv::Range(0, 3), cv::Range(0, 3));
+        std::cout << "HeadTransform: " << HeadTransform << std::endl;
         // Translation is in mm
-        /*
         cv::Mat t = HeadTransform(cv::Range(0, 3), cv::Range(3, 4));
-        t /= 1000.0f;
+        //t /= 1000.0f;
         t.at<float>(2, 0) += HeightFromGround;
-        */
         
-        cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, HeightFromGround);
+        // cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, HeightFromGround);
         
         // works with y / x
-        float aspectRatio = 240.f/320.f;
-        ant::vision_utils::CameraParameters params(R, t, 0.02, aspectRatio);
+        ant::vision_utils::CameraParameters params(R, t, 0.02, 1.0f, 0.0f, 320.0f/2.0f, 240.0f/2.0f);
         ant::vision_utils::CameraProjection cameraToGround(params);
         
         camera.CaptureFrame();
@@ -284,6 +280,10 @@ int main(int argc, char** argv) {
             
             std::cout << "== Lines ==" << std::endl;
             for (auto& line : lines) {
+                if (line[0] > camera.getWidth() || line[2] > camera.getWidth() || line[1] > camera.getHeight() || line[3] > camera.getHeight()) {
+                    // why 
+                    continue;
+                }
                 // Point for viz
                 cv::Point p1(line[0], line[1]);
                 cv::Point p2(line[2], line[3]);
@@ -295,8 +295,8 @@ int main(int argc, char** argv) {
                 mp1 = (cv::Mat_<float>(3, 1) << line[0], line[1], 1);
                 mp2 = (cv::Mat_<float>(3, 1) << line[2], line[3], 1);
                 
-                gp1 = cameraToGround.ImageToWorld_explicit(mp1, R, t);
-                gp2 = cameraToGround.ImageToWorld_explicit(mp2, R, t);
+                gp1 = cameraToGround.ImageToWorld_explicit(mp1, R, t, 320.0f, 240.0f, 46.0f);
+                gp2 = cameraToGround.ImageToWorld_explicit(mp2, R, t, 320.0f, 240.0f, 46.0f);
                 
                 std::cout << "========" << std::endl;
                 std::cout << camera.getWidth() << " " << camera.getHeight() << std::endl;

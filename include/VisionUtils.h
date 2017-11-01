@@ -215,29 +215,34 @@ namespace ant {
                 return Proj;
             } 
             
-            cv::Mat ImageToWorld_explicit(const cv::Mat& ImagePoint, const cv::Mat& R, const cv::Mat& t) {
+            cv::Mat ImageToWorld_explicit(const cv::Mat& ImagePoint, const cv::Mat& R, const cv::Mat& t, float Width, float Height, float FovDeg) {
                 // Same functionality as in CamGeom in naomech behaviour
                 
                 float f = m_cameraParams.f;
-                float ratio = m_cameraParams.a;
                 float ix, iy;
                 ix = ImagePoint.at<float>(0, 0);
                 iy = ImagePoint.at<float>(1, 0);
                 // Magic number: height in pixels
                 // From top left origin (y downwards) to bottom left origin (y upwards)
-                iy = -iy + 240.0;
+                //iy = -iy + 240.0;
                 
                 //ix /= 320.0f;
                 //iy /= 240.0f;
                 
+                float cx = Width / 2.0f;
+                float cy = Height / 2.0f;
+                float FovRad = FovDeg * (M_PI/180.0f);
+                float focalDist = (0.5 * sqrt(Width*Width + Height*Height)) / tan(0.5 * FovRad);
                 
-                // Something like image to camera conversion?
-                // x axis in camera coordinates: points forward (focal length)
-                // y axis in camera coordinates: opposite to x axis in image coordinates (+offsets which are equal to 0)
-                // z axis in camera coordinates: z axis in image coordinates (+offsets which are equal to 0)
-                cv::Mat Pixel = (cv::Mat_<float>(3, 1) << f, -ix * f, iy * f * ratio);
                 
-                std::cout << "Pixel: " << std::endl << Pixel << std::endl;
+                //f = 239.53f;
+                float magicNumber = 1.45f;
+                focalDist = focalDist / magicNumber;
+                std::cout << "FocalDist: " << focalDist << std::endl;
+                cv::Mat Pixel = (cv::Mat_<float>(3, 1) << focalDist, -ix + cx, -iy + cy);
+                
+                //std::cout << "Pixel: " << std::endl << Pixel << std::endl;
+                
                 
                 Pixel = R * Pixel;
                 Pixel *= (-t.at<float>(2, 0) / Pixel.at<float>(2, 0));

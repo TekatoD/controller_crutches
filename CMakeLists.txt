@@ -46,6 +46,7 @@ include_directories(include/)
 find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED) # This lib is used by the linux camera
 find_package(Eigen3 REQUIRED)
+find_package(Msgpack REQUIRED)
 # Path to Boost and OpenCV needs to be set manually when crosscompiling
 find_package(Boost 1.54 COMPONENTS system log_setup log date_time filesystem thread program_options REQUIRED)
 find_package(OpenCV 3.3 REQUIRED)
@@ -172,7 +173,22 @@ set(SRC
         src/config/SingleOptionArgumentsParsingStrategy.cpp
         include/config/ArgumentsParsingStrategy.h
         src/config/strategies/HelpArgumentsParsingStrategy.cpp
-        include/config/strategies/HelpArgumentsParsingStrategy.h)
+        include/config/strategies/HelpArgumentsParsingStrategy.h
+        src/net/server_t.cpp
+        include/net/server_t.h
+        src/net/connection_manager_t.cpp
+        include/net/connection_manager_t.h
+        src/net/packet_header_t.cpp
+        include/net/packet_header_t.h
+        src/net/connection_holder_t.cpp
+        include/net/connection_holder_t.h
+        include/net/request_handler_t.h
+        src/net/connection_t.cpp
+        include/net/connection_t.h
+        src/net/request_parser_t.cpp
+        include/net/request_parser_t.h
+        include/net/request_t.h
+        include/net/server_listener_t.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})
@@ -183,7 +199,8 @@ target_link_libraries(controller
         ${JPEG_LIBRARIES}
         ${Boost_LIBRARIES}
         ${OpenCV_LIBRARIES}
-        ${LIBXML2_LIBRARIES})
+        ${LIBXML2_LIBRARIES}
+        ${MSGPACK_LIBRARIES})
 
 target_include_directories(controller PUBLIC
         ${JPEG_INCLUDE_DIR}
@@ -191,4 +208,5 @@ target_include_directories(controller PUBLIC
         ${JPEG_INCLUDE_DIR}
         ${OpenCV_INCLUDE_DIR}
         ${EIGEN3_INCLUDE_DIR}
-        ${LIBXML2_INCLUDE_DIR})
+        ${LIBXML2_INCLUDE_DIR}
+        ${MSGPACK_INCLUDE_DIR})

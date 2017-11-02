@@ -29,7 +29,7 @@
 using namespace drwn;
 
 soccer_behavior_t::soccer_behavior_t() {
-    m_PreviousState = STATE_INITIAL;
+    m_previous_state = STATE_INITIAL;
 }
 
 void soccer_behavior_t::process() {
@@ -50,8 +50,8 @@ void soccer_behavior_t::process() {
 //    }
 //
 //    if (State.state == STATE_READY) {
-//        if (m_PreviousState != STATE_INITIAL) {
-//            m_PreviousState = STATE_INITIAL;
+//        if (m_previous_state != STATE_INITIAL) {
+//            m_previous_state = STATE_INITIAL;
 //            walking_t::get_instance()->set_odo(Spawn);
 //        }
 //        head_t::get_instance()->joint.set_enable_head_only(true, true);
@@ -85,8 +85,8 @@ void soccer_behavior_t::process() {
 //            // TODO KickOff
 //        }
 
-        if (m_PreviousState != STATE_SET) {
-            m_PreviousState = STATE_SET;
+        if (m_previous_state != STATE_SET) {
+            m_previous_state = STATE_SET;
             walking_t::GetInstance()->set_odo(Starting);
         }
 

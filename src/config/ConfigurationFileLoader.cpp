@@ -26,7 +26,7 @@ void ConfigurationFileLoader::ConfigureAll() {
             if (m_debug)
                 LOG_DEBUG << "CONFIGURATION FILE LOADER: Reading configuration from file " << path << "...";
             for (auto& strategy : strategies) {
-                strategy->ReadConfig(prop);
+                strategy->read_config(prop);
             }
             if (m_debug)
                 LOG_DEBUG << "CONFIGURATION FILE LOADER: Reading configuration from file " << path << " was done successfully";
@@ -47,7 +47,7 @@ void ConfigurationFileLoader::DumpAll() {
         if (m_debug)
             LOG_DEBUG << "CONFIGURATION FILE LOADER: Dumping configuration to file " << path << "...";
         for (auto& strategy : strategies) {
-            strategy->WriteConfig(prop);
+            strategy->write_config(prop);
         }
         WritePropertyToFile(prop, path);
         if (m_debug)

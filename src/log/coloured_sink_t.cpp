@@ -20,11 +20,11 @@
 #include <iostream>
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
-#include "log/сoloured_sink_t.h"
+#include "log/coloured_sink_t.h"
 #include "log/console.h"
 
 
-void drwn::сoloured_sink_t::consume(const boost::log::record_view& rec, const string_type& formatted_string)
+void drwn::coloured_sink_t::consume(const boost::log::record_view& rec, const string_type& formatted_string)
 {
     auto severity = rec.attribute_values()["Severity"].extract<boost::log::trivial::severity_level>();
 

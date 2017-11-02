@@ -49,7 +49,7 @@ float vector_3D_t::length() {
 
 
 void vector_3D_t::normalize() {
-    float length = length();
+    float length = this->length();
 
     X = X / length;
     Y = Y / length;
@@ -78,7 +78,7 @@ float vector_3D_t::angle_between(vector_3D_t& vector) {
 
 float vector_3D_t::angle_between(vector_3D_t& vector, vector_3D_t& axis) {
     float angle = angle_between(vector);
-    vector_3D_t cross = cross(vector);
+    vector_3D_t cross = this->cross(vector);
     if (cross.dot(axis) < 0.0)
         angle *= -1.0;
 

@@ -28,7 +28,7 @@
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/support/date_time.hpp>
-#include <log/сoloured_sink_t.h>
+#include <log/coloured_sink_t.h>
 #include <log/trivial_logger_t.h>
 
 #include <robot_application_t.h>
@@ -48,7 +48,7 @@ void change_current_dir() {
 }
 
 void init_logger() {
-    using coloured_sink = sinks::synchronous_sink<drwn::сoloured_sink_t>;
+    using coloured_sink = sinks::synchronous_sink<drwn::coloured_sink_t>;
     auto sink = boost::make_shared<coloured_sink>();
     sink->set_formatter(expr::stream
                                 << expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%H:%M:%S.%f")

@@ -97,8 +97,8 @@ void motion_manager_t::process() {
 
         if (buf_idx < GYRO_WINDOW_SIZE) {
             if (m_CM730->m_bulk_read_data[CM730_t::ID_CM].error == 0) {
-                fb_gyro_array[buf_idx] = m_CM730->m_bulk_read_data[CM730_t::ID_CM].ReadWord(CM730_t::P_GYRO_Y_L);
-                rl_gyro_array[buf_idx] = m_CM730->m_bulk_read_data[CM730_t::ID_CM].ReadWord(CM730_t::P_GYRO_X_L);
+                fb_gyro_array[buf_idx] = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_GYRO_Y_L);
+                rl_gyro_array[buf_idx] = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_GYRO_X_L);
                 buf_idx++;
             }
         } else {
@@ -147,10 +147,10 @@ void motion_manager_t::process() {
         static int fb_array[ACCEL_WINDOW_SIZE] = {512,};
         static int buf_idx = 0;
         if (m_CM730->m_bulk_read_data[CM730_t::ID_CM].error == 0) {
-            motion_status_t::FB_GYRO = m_CM730->m_bulk_read_data[CM730_t::ID_CM].ReadWord(CM730_t::P_GYRO_Y_L) - m_fb_gyro_center;
-            motion_status_t::RL_GYRO = m_CM730->m_bulk_read_data[CM730_t::ID_CM].ReadWord(CM730_t::P_GYRO_X_L) - m_rl_gyro_center;
-            motion_status_t::RL_ACCEL = m_CM730->m_bulk_read_data[CM730_t::ID_CM].ReadWord(CM730_t::P_ACCEL_X_L);
-            motion_status_t::FB_ACCEL = m_CM730->m_bulk_read_data[CM730_t::ID_CM].ReadWord(CM730_t::P_ACCEL_Y_L);
+            motion_status_t::FB_GYRO = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_GYRO_Y_L) - m_fb_gyro_center;
+            motion_status_t::RL_GYRO = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_GYRO_X_L) - m_rl_gyro_center;
+            motion_status_t::RL_ACCEL = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_ACCEL_X_L);
+            motion_status_t::FB_ACCEL = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_ACCEL_Y_L);
             fb_array[buf_idx] = motion_status_t::FB_ACCEL;
             if (++buf_idx >= ACCEL_WINDOW_SIZE) buf_idx = 0;
         }
@@ -208,7 +208,7 @@ void motion_manager_t::process() {
     m_CM730->bulk_read();
 
     if (m_CM730->m_bulk_read_data[CM730_t::ID_CM].error == 0)
-        motion_status_t::BUTTON = m_CM730->m_bulk_read_data[CM730_t::ID_CM].ReadByte(CM730_t::P_BUTTON);
+        motion_status_t::BUTTON = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_byte(CM730_t::P_BUTTON);
 
     m_is_running = false;
 }

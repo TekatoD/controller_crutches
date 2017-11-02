@@ -97,9 +97,9 @@ void robot_application_t::init_CM730() {
 #else
     auto vrep_connector{std::make_unique<vrep_connector_t>()};
     auto vrep_cm730{std::make_unique<vrep_CM730_t>()};
-    vrep_connector->Connect();
-    vrep_cm730->SetClientId(vrep_connector->GetClientID());
-    vrep_cm730->Connect();
+    vrep_connector->connect();
+    vrep_cm730->set_client_id(vrep_connector->get_client_id());
+    vrep_cm730->connect();
     m_vrep_connector = move(vrep_connector);
     m_cm730 = move(vrep_cm730);
 #endif
@@ -110,7 +110,7 @@ void robot_application_t::init_CM730() {
 
 void robot_application_t::check_firmware() {
     int firm_ver = 0;
-    auto read_result = m_cm730->ReadByte(joint_data_t::ID_HEAD_PAN, MX28_t::P_VERSION, &firm_ver, nullptr);
+    auto read_result = m_cm730->read_byte(joint_data_t::ID_HEAD_PAN, MX28_t::P_VERSION, &firm_ver, nullptr);
     if (m_debug) LOG_DEBUG << "Firmware version: " << firm_ver;
     if (read_result != CM730_t::SUCCESS) {
         throw std::runtime_error("Can't read firmware version from Dynamixel ID " +
@@ -147,7 +147,7 @@ void robot_application_t::init_motion_modules() {
 void robot_application_t::init_motion_timer() {
     if (m_debug) LOG_DEBUG << "Initializing motion timer...";
     auto motion_timer = std::make_unique<linux_motion_timer_t>(motion_manager_t::GetInstance());
-    motion_timer->Start();
+    motion_timer->start();
     m_motion_timer = std::move(motion_timer);
     if (m_debug) LOG_INFO << "Motion timer is ready";
     check_firmware(); //This was moved here from Cm730 inititialization

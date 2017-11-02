@@ -119,8 +119,8 @@ set(SRC
         src/motion/modules/kicking_t.cpp
         include/motion/modules/kicking_t.h
         include/log/console.h
-        src/log/сoloured_sink_t.cpp
-        include/log/сoloured_sink_t.h
+        src/log/coloured_sink_t.cpp
+        include/log/coloured_sink_t.h
         src/log/trivial_logger_t.cpp
         include/log/trivial_logger_t.h
         src/robot_application_t.cpp
@@ -186,7 +186,8 @@ set(SRC
         src/vision/detectors/FieldDetector.cpp
         src/vision/detectors/LineDetector.cpp
         src/vision/Vision.cpp
-        include/config/strategies/ball_detector_configuration_strategy_t.h src/config/strategies/ball_detector_configuration_strategy_t.cpp)
+        include/config/strategies/ball_detector_configuration_strategy_t.h
+        src/config/strategies/ball_detector_configuration_strategy_t.cpp)
 
 #### Build targets #####
 add_executable(controller ${SRC})

@@ -197,12 +197,12 @@ cv::Mat BallDetector::Preproccess(const cv::Mat& image) {
     cv::filter2D(medianBlurFrame, gaborImage, -1, kernel);
 
 
-    const cv::Scalar minGaborColor(m_min_gabor_thresh[0],
-                                   m_min_gabor_thresh[1],
-                                   m_min_gabor_thresh[2]);
-    const cv::Scalar maxGaborColor(m_max_gabor_thresh[0],
-                                   m_max_gabor_thresh[1],
-                                   m_max_gabor_thresh[2]);
+    const cv::Scalar minGaborColor(m_conf.GaborThresh.min_1,
+                                   m_conf.GaborThresh.min_2,
+                                   m_conf.GaborThresh.min_3);
+    const cv::Scalar maxGaborColor(m_conf.GaborThresh.max_1,
+                                   m_conf.GaborThresh.max_2,
+                                   m_conf.GaborThresh.max_3);
     cv::Mat gaborInRange;
     cv::inRange(gaborImage, minGaborColor, maxGaborColor, gaborInRange);
 
@@ -276,7 +276,7 @@ bool BallDetector::IsWhite() const noexcept {
 }
 
 
-int BallDetector::GetMedianBlurSize() const {
+int BallDetector::GetMedianBlurSize() const noexcept {
     return m_median_blur_size;
 }
 

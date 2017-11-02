@@ -484,9 +484,9 @@ void walking_t::process() {
         m_right_odo_theta = -m_odo_a_factor * ep[5];
     }
 
-    Pose2D odo_offset = get_odo_offset();
-//    std::cout << "Odo: " << odo_offset.X() << ' ' << odo_offset.Y() << ' ' << odo_offset.Theta() << std::endl;
-    m_odometry_collector.odoTranslate(odo_offset);
+    pose_2D_t odo_offset = get_odo_offset();
+//    std::cout << "Odo: " << odo_offset.x() << ' ' << odo_offset.Y() << ' ' << odo_offset.Theta() << std::endl;
+    m_odometry_collector.odo_translate(odo_offset);
 
     // Compute body swing
     if (m_time <= m_cur_ssp_time_end_l) {
@@ -590,32 +590,32 @@ void walking_t::process() {
     }
 }
 
-Pose2D walking_t::get_odo_offset() {
-    Pose2D offset(m_odo_x, m_odo_y, m_odo_theta);
+pose_2D_t walking_t::get_odo_offset() {
+    pose_2D_t offset(m_odo_x, m_odo_y, m_odo_theta);
     m_odo_x = 0;
     m_odo_y = 0;
     m_odo_theta = 0;
     return offset;
 }
 
-Pose2D walking_t::get_odo() {
-    return m_odometry_collector.GetPose();
+pose_2D_t walking_t::get_odo() {
+    return m_odometry_collector.get_pose();
 }
 
-void walking_t::reset_odo(const Pose2D& pose) {
+void walking_t::reset_odo(const pose_2D_t& pose) {
     if (m_debug) {
         LOG_DEBUG << "WALKING: Odometry has been reset";
     }
-    m_odometry_collector.Reset();
+    m_odometry_collector.reset();
 }
 
-void walking_t::set_odo(const Pose2D& pose) {
+void walking_t::set_odo(const pose_2D_t& pose) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: odo_x = " << pose.X()
-                  << ", odo_y = " << pose.Y()
-                  << ", odo_theta = " << pose.Theta();
+        LOG_DEBUG << "WALKING: odo_x = " << pose.x()
+                  << ", odo_y = " << pose.y()
+                  << ", odo_theta = " << pose.theta();
     }
-    m_odometry_collector.SetPose(pose);
+    m_odometry_collector.set_pose(pose);
 }
 
 walking_t* walking_t::GetInstance() {

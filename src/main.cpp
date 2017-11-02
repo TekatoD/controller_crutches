@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
     change_current_dir();
     init_logger();
 
-    drwn::CommandArguments args{argc, argv};
+    drwn::command_arguments_t args{argc, argv};
     drwn::robot_application_t::GetInstance()->set_program_arguments(args);
     return drwn::robot_application_t::GetInstance()->exec();
 }

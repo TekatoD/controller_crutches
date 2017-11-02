@@ -20,23 +20,23 @@ void drwn::LEDs_t::set_panel_led(bool first, bool second, bool third) {
     }
 }
 
-void drwn::LEDs_t::set_head_led(const drwn::Color& color) {
+void drwn::LEDs_t::set_head_led(const drwn::color_t& color) {
     check_CM730();
-    int value = CM730_t::make_color(color.GetRed(), color.GetGreen(), color.GetBlue());
+    int value = CM730_t::make_color(color.get_red(), color.get_green(), color.get_blue());
     m_cm730->write_word(CM730_t::P_LED_EYE_L, value, nullptr);
     if (m_debug) {
         LOG_DEBUG << "LEDS: head_t LED color = ("
-                  << color.GetRed() << ' ' << color.GetGreen() << ' ' << color.GetBlue() << ')';
+                  << color.get_red() << ' ' << color.get_green() << ' ' << color.get_blue() << ')';
     }
 }
 
-void drwn::LEDs_t::set_eye_led(const drwn::Color& color) {
+void drwn::LEDs_t::set_eye_led(const drwn::color_t& color) {
     check_CM730();
-    int value = CM730_t::make_color(color.GetRed(), color.GetGreen(), color.GetBlue());
+    int value = CM730_t::make_color(color.get_red(), color.get_green(), color.get_blue());
     m_cm730->write_word(CM730_t::P_LED_EYE_L, value, nullptr);
     if (m_debug) {
         LOG_DEBUG << "LEDS: Eye LED color = ("
-                  << color.GetRed() << ' ' << color.GetGreen() << ' ' << color.GetBlue() << ')';
+                  << color.get_red() << ' ' << color.get_green() << ' ' << color.get_blue() << ')';
     }
 }
 

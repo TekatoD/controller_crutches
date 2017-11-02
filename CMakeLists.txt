@@ -58,9 +58,9 @@ include_directories( ${EIGEN3_INCLUDE_DIR}) #Eigen doesn't work either way
 # Don't forget include header files
 set(SRC
         include/motion/modules/action_t.h
-        include/BallFollower.h
-        #        include/BallTracker.h
-        include/Camera.h
+        include/ball_follower_t.h
+        #        include/ball_tracker_t.h
+        include/camera_t.h
         include/hw/FSR_t.h
         include/motion/modules/head_t.h
         include/motion/joint_data_t.h
@@ -72,7 +72,7 @@ set(SRC
         include/motion/motion_status_t.h
         include/hw/MX28_t.h
         include/math/point_t.h
-        include/StateMachine.h
+        include/state_machine_t.h
         include/math/vector_3D_t.h
         include/motion/modules/walking_t.h
         src/math/matrix_t.cpp
@@ -85,37 +85,37 @@ set(SRC
         src/motion/kinematics_t.cpp
         src/motion/motion_manager_t.cpp
         src/motion/motion_status_t.cpp
-        src/BallFollower.cpp
-        src/BallTracker.cpp
+        src/ball_follower_t.cpp
+        src/ball_tracker_t.cpp
         src/hw/linux_motion_timer_t.cpp
         src/main.cpp
-        src/StateMachine.cpp
-        include/gamecontroller/RoboCupGameControlData.h
-        include/gamecontroller/SPLCoachMessage.h
-        include/gamecontroller/SPLStandardMessage.h
-        src/gamecontroller/GameController.cpp
-        include/gamecontroller/GameController.h
-        include/UdpComm.h
-        src/UdpComm.cpp
-        src/Pose2D.cpp
-        include/Pose2D.h
-        src/OdometryCollector.cpp
-        include/OdometryCollector.h
-        src/GoTo.cpp
-        include/GoTo.h
-        include/SoccerBehavior.h
-        src/SoccerBehavior.cpp
-        src/Field.cpp
-        include/Field.h
-        src/BallSearcher.cpp
-        include/BallSearcher.h
+        src/state_machine_t.cpp
+        include/gamecontroller/robo_cup_game_control_data_t.h
+        include/gamecontroller/spl_coach_message.h
+        include/gamecontroller/spl_standard_message.h
+        src/gamecontroller/game_controller_t.cpp
+        include/gamecontroller/game_controller_t.h
+        include/udp_comm_t.h
+        src/udp_comm_t.cpp
+        src/pose_2D_t.cpp
+        include/pose_2D_t.h
+        src/odometry_collector_t.cpp
+        include/odometry_collector_t.h
+        src/go_to_t.cpp
+        include/go_to_t.h
+        include/soccer_behavior_t.h
+        src/soccer_behavior_t.cpp
+        src/field_t.cpp
+        include/field_t.h
+        src/ball_searcher_t.cpp
+        include/ball_searcher_t.h
         include/hw/CM730_t.h
         src/hw/CM730_t.cpp
         include/math/angle_tools.h
         include/math/eigen.h
         src/math/angle_tools.cpp
-        src/PropertyReader.cpp
-        include/PropertyReader.h
+        src/property_reader_t.cpp
+        include/property_reader_t.h
         src/motion/modules/kicking_t.cpp
         include/motion/modules/kicking_t.h
         include/log/console.h
@@ -125,54 +125,54 @@ set(SRC
         include/log/trivial_logger_t.h
         src/robot_application_t.cpp
         include/robot_application_t.h
-        include/behavior/Behavior.h
-        src/behavior/BaseBehavior.cpp
-        include/behavior/BaseBehavior.h
+        include/behavior/behavior_t.h
+        src/behavior/base_behavior_t.cpp
+        include/behavior/base_behavior_t.h
         src/hw/LEDs_t.cpp
         include/hw/LEDs_t.h
-        src/Color.cpp
-        include/Color.h
+        src/color_t.cpp
+        include/color_t.h
         src/hw/buttons_t.cpp
         include/hw/buttons_t.h
-        src/tool/Accumulator.cpp
-        include/tool/Accumulator.h
-        include/tool/Rate.h
-        include/config/ConfigurationStrategy.h
-        src/config/strategies/WalkingConfigurationStrategy.cpp
-        include/config/strategies/WalkingConfigurationStrategy.h
+        src/tool/accumulator_t.cpp
+        include/tool/accumulator_t.h
+        include/tool/rate_t.h
+        include/config/configuration_strategy_t.h
+        src/config/strategies/walking_configuration_strategy_t.cpp
+        include/config/strategies/walking_configuration_strategy_t.h
         src/config/ConfigurationFileLoader.cpp
         include/config/ConfigurationFileLoader.h
-        src/config/ConfigurationParser.cpp
-        include/config/ConfigurationParser.h
-        include/config/strategies/MotionManagerConfigurationStrategy.h
-        src/config/strategies/MotionManagerConfigurationStrategy.cpp
-        include/config/ConfigurationParser.h
-        src/config/CommandArguments.cpp
-        include/config/CommandArguments.h
-        src/config/ActionConfigurationFileLoader.cpp
-        include/config/ActionConfigurationFileLoader.h
-        include/config/CommandArguments.h
-        include/BallTracker.h
-        include/config/strategies/BallSearcherConfigurationStrategy.h
-        include/config/strategies/BallTrackerConfigurationStrategy.h
-        include/config/strategies/HeadConfigurationStrategy.h
-        include/config/strategies/GameControllerConfigurationStrategy.h
-        src/config/strategies/BallSearcherConfigurationStrategy.cpp
-        src/config/strategies/BallTrackerConfigurationStrategy.cpp
-        src/config/strategies/HeadConfigurationStrategy.cpp
-        src/config/strategies/GameControllerConfigurationStrategy.cpp
-        src/config/strategies/ConfigurationStrategy.cpp
-        src/config/ArgumentsParser.cpp
-        include/config/ArgumentsParser.h
-        include/config/SingleOptionArgumentsParsingStrategy.h
-        include/config/strategies/DebugModeArgumentsParsingStrategy.h
-        src/config/strategies/DebugModeArgumentsParsingStrategy.cpp
-        src/config/strategies/ConfigPathArgumentsParsingStrategy.cpp
-        include/config/strategies/ConfigPathArgumentsParsingStrategy.h
-        src/config/SingleOptionArgumentsParsingStrategy.cpp
-        include/config/ArgumentsParsingStrategy.h
-        src/config/strategies/HelpArgumentsParsingStrategy.cpp
-        include/config/strategies/HelpArgumentsParsingStrategy.h
+        src/config/configuration_parser_t.cpp
+        include/config/configuration_parser_t.h
+        include/config/strategies/motion_manager_configuration_strategy_t.h
+        src/config/strategies/motion_manager_configuration_strategy_t.cpp
+        include/config/configuration_parser_t.h
+        src/config/command_arguments_t.cpp
+        include/config/command_arguments_t.h
+        src/config/action_configuration_file_loader_t.cpp
+        include/config/action_configuration_file_loader_t.h
+        include/config/command_arguments_t.h
+        include/ball_tracker_t.h
+        include/config/strategies/ball_searcher_configuration_strategy_t.h
+        include/config/strategies/ball_tracker_configuration_strategy_t.h
+        include/config/strategies/head_configuration_strategy_t.h
+        include/config/strategies/game_controller_configuration_strategy_t.h
+        src/config/strategies/ball_searcher_configuration_strategy_t.cpp
+        src/config/strategies/ball_tracker_configuration_strategy_t.cpp
+        src/config/strategies/head_configuration_strategy_t.cpp
+        src/config/strategies/game_controller_configuration_strategy_t.cpp
+        src/config/strategies/configuration_strategy_t.cpp
+        src/config/arguments_parser_t.cpp
+        include/config/arguments_parser_t.h
+        include/config/single_option_arguments_parsing_strategy_t.h
+        include/config/strategies/debug_mode_arguments_parsing_strategy_t.h
+        src/config/strategies/debug_mode_arguments_parsing_strategy_t.cpp
+        src/config/strategies/config_path_arguments_parsing_strategy_t.cpp
+        include/config/strategies/config_path_arguments_parsing_strategy_t.h
+        src/config/single_option_arguments_parsing_strategy_t.cpp
+        include/config/arguments_parsing_strategy_t.h
+        src/config/strategies/help_arguments_parsing_strategy_t.cpp
+        include/config/strategies/help_arguments_parsing_strategy_t.h
         include/vision/detectors/AngleDetector.h
         include/vision/detectors/BallDetector.h
         include/vision/detectors/BaseDetector.h
@@ -186,7 +186,7 @@ set(SRC
         src/vision/detectors/FieldDetector.cpp
         src/vision/detectors/LineDetector.cpp
         src/vision/Vision.cpp
-        include/config/strategies/BallDetectorConfigurationStrategy.h src/config/strategies/BallDetectorConfigurationStrategy.cpp)
+        include/config/strategies/ball_detector_configuration_strategy_t.h src/config/strategies/ball_detector_configuration_strategy_t.cpp)
 
 #### Build targets #####
 add_executable(controller ${SRC})

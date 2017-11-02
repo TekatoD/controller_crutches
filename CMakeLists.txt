@@ -137,55 +137,17 @@ set(SRC
         src/tool/accumulator_t.cpp
         include/tool/accumulator_t.h
         include/tool/rate_t.h
-        include/config/configuration_strategy_t.h
-        src/config/strategies/walking_configuration_strategy_t.cpp
-        include/config/strategies/walking_configuration_strategy_t.h
-        src/config/ConfigurationFileLoader.cpp
-        include/config/ConfigurationFileLoader.h
-        src/config/ConfigurationParser.cpp
-        include/config/ConfigurationParser.h
-        include/config/strategies/MotionManagerConfigurationStrategy.h
-        src/config/strategies/MotionManagerConfigurationStrategy.cpp
-        include/config/ConfigurationParser.h
-        src/config/CommandArguments.cpp
-        include/config/CommandArguments.h
-        src/config/ActionConfigurationFileLoader.cpp
-        include/config/ActionConfigurationFileLoader.h
-        include/config/CommandArguments.h
-        include/BallTracker.h
-        include/config/strategies/BallSearcherConfigurationStrategy.h
-        include/config/strategies/BallTrackerConfigurationStrategy.h
-        include/config/strategies/HeadConfigurationStrategy.h
-        include/config/strategies/GameControllerConfigurationStrategy.h
-        src/config/strategies/BallSearcherConfigurationStrategy.cpp
-        src/config/strategies/BallTrackerConfigurationStrategy.cpp
-        src/config/strategies/HeadConfigurationStrategy.cpp
-        src/config/strategies/GameControllerConfigurationStrategy.cpp
-        src/config/strategies/ConfigurationStrategy.cpp
-        src/config/ArgumentsParser.cpp
-        include/config/ArgumentsParser.h
-        include/config/SingleOptionArgumentsParsingStrategy.h
-        include/config/strategies/DebugModeArgumentsParsingStrategy.h
-        src/config/strategies/DebugModeArgumentsParsingStrategy.cpp
-        src/config/strategies/ConfigPathArgumentsParsingStrategy.cpp
-        include/config/strategies/ConfigPathArgumentsParsingStrategy.h
-        src/config/SingleOptionArgumentsParsingStrategy.cpp
-        include/config/ArgumentsParsingStrategy.h
-        src/config/strategies/HelpArgumentsParsingStrategy.cpp
-        include/config/strategies/HelpArgumentsParsingStrategy.h
 #        include/vision/detectors/AngleDetector.h
 #        include/vision/detectors/ball_detector_t.h
         include/vision/detectors/field_detector_t.h
         include/vision/detectors/line_detector_t.h
-        include/vision/Vision.h
+#        include/vision/Vision.h
         include/vision/vision_utils.h
 #        src/vision/detectors/AngleDetector.cpp
 #        src/vision/detectors/ball_detector_t.cpp
         src/vision/detectors/field_detector_t.cpp
         src/vision/detectors/line_detector_t.cpp
-        src/vision/Vision.cpp
-        include/config/strategies/BallDetectorConfigurationStrategy.h
-        src/config/strategies/BallDetectorConfigurationStrategy.cpp
+#        src/vision/Vision.cpp
         include/vision/detectors/preprocessor_t.h
         src/vision/detectors/old_line_preprocessor_t.cpp
         include/vision/detectors/old_line_preprocessor_t.h
@@ -198,7 +160,40 @@ set(SRC
         src/vision/detectors/coloured_ball_detector_t.cpp
         include/vision/detectors/coloured_ball_detector_t.h
         src/vision/detectors/ball_preprocessor_t.cpp
-        include/vision/detectors/ball_preprocessor_t.h)
+        include/vision/detectors/ball_preprocessor_t.h
+        src/config/strategies/ball_searcher_configuration_strategy_t.cpp
+        src/config/strategies/ball_tracker_configuration_strategy_t.cpp
+        src/config/strategies/config_path_arguments_parsing_strategy_t.cpp
+        src/config/strategies/configuration_strategy_t.cpp
+        src/config/strategies/debug_mode_arguments_parsing_strategy_t.cpp
+        src/config/strategies/game_controller_configuration_strategy_t.cpp
+        src/config/strategies/head_configuration_strategy_t.cpp
+        src/config/strategies/help_arguments_parsing_strategy_t.cpp
+        src/config/strategies/motion_manager_configuration_strategy_t.cpp
+        src/config/strategies/walking_configuration_strategy_t.cpp
+        src/config/action_configuration_file_loader_t.cpp
+        src/config/arguments_parser_t.cpp
+        src/config/command_arguments_t.cpp
+        src/config/configuration_parser_t.cpp
+        src/config/configuration_file_loader_t.cpp
+        src/config/single_option_arguments_parsing_strategy_t.cpp
+        include/config/strategies/ball_searcher_configuration_strategy_t.h
+        include/config/strategies/ball_tracker_configuration_strategy_t.h
+        include/config/strategies/config_path_arguments_parsing_strategy_t.h
+        include/config/strategies/debug_mode_arguments_parsing_strategy_t.h
+        include/config/strategies/game_controller_configuration_strategy_t.h
+        include/config/strategies/head_configuration_strategy_t.h
+        include/config/strategies/help_arguments_parsing_strategy_t.h
+        include/config/strategies/motion_manager_configuration_strategy_t.h
+        include/config/strategies/walking_configuration_strategy_t.h
+        include/config/action_configuration_file_loader_t.h
+        include/config/arguments_parser_t.h
+        include/config/arguments_parsing_strategy_t.h
+        include/config/command_arguments_t.h
+        include/config/configuration_parser_t.h
+        include/config/configuration_strategy_t.h
+        include/config/configuration_file_loader_t.h
+        include/config/single_option_arguments_parsing_strategy_t.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

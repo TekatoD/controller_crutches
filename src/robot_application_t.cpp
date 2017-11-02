@@ -164,14 +164,14 @@ void robot_application_t::init_game_controller() {
 void robot_application_t::init_configuraion_loader() {
     if (m_debug) LOG_DEBUG << "Initializing configuration loader...";
     //TODO Don't forget uncomment this lines
-    m_configuration_loader.SetDefaultPath(m_arg_config_default);
+    m_configuration_loader.set_default_path(m_arg_config_default);
 
 //    m_configuration_loader.add_strategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
 //    m_configuration_loader.add_strategy(m_ball_tracker_configuration_strategy, m_arg_config_ball_searcher);
-    m_configuration_loader.AddStrategy(m_game_controller_configuration_strategy, m_arg_config_game_controller);
-    m_configuration_loader.AddStrategy(m_head_configuration_strategy, m_arg_config_head);
-    m_configuration_loader.AddStrategy(m_walking_configuration_strategy, m_arg_config_walking);
-    m_configuration_loader.AddStrategy(m_motion_manager_configuration_strategy, m_arg_config_motion_manager);
+    m_configuration_loader.add_strategy(m_game_controller_configuration_strategy, m_arg_config_game_controller);
+    m_configuration_loader.add_strategy(m_head_configuration_strategy, m_arg_config_head);
+    m_configuration_loader.add_strategy(m_walking_configuration_strategy, m_arg_config_walking);
+    m_configuration_loader.add_strategy(m_motion_manager_configuration_strategy, m_arg_config_motion_manager);
     // Action configuration loader uses self loader
     m_action_configuration_loader.set_path(m_arg_config_action);
     if (m_debug) LOG_INFO << "Configuration loader is ready";
@@ -265,7 +265,7 @@ void robot_application_t::apply_debug_arguments() {
 
 void robot_application_t::read_configuration() {
     if (m_debug) LOG_DEBUG << "Reading configuration...";
-    m_configuration_loader.ConfigureAll();
+    m_configuration_loader.configure_all();
     m_action_configuration_loader.read_motion_file();
     if (m_debug) LOG_INFO << "Reading configuration was finished";
 }

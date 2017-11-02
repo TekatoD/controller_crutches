@@ -40,15 +40,15 @@ namespace drwn {
         void set_line_equality_error_px(int line_equality_pred_error_px) noexcept;
 
     private:
-        void get_skeleton(const cv::Mat& img, cv::Mat& result);
+        void get_skeleton(const cv::Mat& img, cv::Mat& result) const;
 
-        void get_simple_skeleton(const cv::Mat& img, cv::Mat& result);
+        void get_simple_skeleton(const cv::Mat& img, cv::Mat& result) const;
 
-        void zhang_suen(const cv::Mat& img, cv::Mat& result);
+        void zhang_suen(const cv::Mat& img, cv::Mat& result) const;
 
-        std::vector<cv::Vec4i> join_lines(std::vector<cv::Vec4i>& lines);
+        std::vector<cv::Vec4i> join_lines(std::vector<cv::Vec4i>& lines) const;
 
-        bool is_lines_equal()(const cv::Vec4i& line1, const cv::Vec4i& line2) const;
+        bool is_lines_equal(const cv::Vec4i& line1, const cv::Vec4i& line2) const;
 
     private:
         float m_hough_lines_rho{0.5};

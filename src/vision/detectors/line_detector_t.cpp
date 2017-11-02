@@ -3,6 +3,7 @@
 //
 
 #include <cv.hpp>
+#include <functional>
 #include "vision/detectors/line_detector_t.h"
 #include "vision/vision_utils.h"
 
@@ -33,20 +34,23 @@ int fill_neighbours(const cv::Mat& window, bool* neighbours) {
 std::vector<cv::Vec4i> line_detector_t::detect(const cv::Mat& preproc_image) const {
     cv::Mat skeleton;
 
-    get_skeleton(preproc_image, skeleton); // O(n) n = h*w of img
+    this->get_skeleton(preproc_image, skeleton); // O(n) n = h*w of img
 
     std::vector<cv::Vec4i> lines;
     cv::HoughLinesP(skeleton, lines,
                     m_hough_lines_rho, m_hough_lines_theta, m_hough_lines_threshold,
                     m_hough_lines_min_line_length, m_hough_lines_max_line_gap);
 
-    join_lines(lines); // O(m^2) - m = countLines
+    this->join_lines(lines); // O(m^2) - m = countLines
     return lines;
 }
 
-std::vector<cv::Vec4i> line_detector_t::join_lines(std::vector<cv::Vec4i>& lines) {
+std::vector<cv::Vec4i> line_detector_t::join_lines(std::vector<cv::Vec4i>& lines) const {
+    using namespace std::placeholders;
+
     std::vector<int> clusters;
-    const size_t num_clusters = (size_t) cv::partition(lines, clusters, std::bind(is_lines_equal, this));
+    auto predicate = std::bind(&line_detector_t::is_lines_equal, this, _1, _2);
+    const size_t num_clusters = (size_t) cv::partition(lines, clusters, predicate);
     std::vector<cv::Vec4i> joined_lines(num_clusters);
 
     for (std::size_t i = 0; i < lines.size(); ++i)
@@ -55,11 +59,11 @@ std::vector<cv::Vec4i> line_detector_t::join_lines(std::vector<cv::Vec4i>& lines
     return joined_lines;
 }
 
-void line_detector_t::get_skeleton(const cv::Mat& img, cv::Mat& result) {
+void line_detector_t::get_skeleton(const cv::Mat& img, cv::Mat& result) const {
     zhang_suen(img, result);
 }
 
-void line_detector_t::get_simple_skeleton(const cv::Mat& img, cv::Mat& result) {
+void line_detector_t::get_simple_skeleton(const cv::Mat& img, cv::Mat& result) const {
     result = cv::Mat::zeros(img.rows, img.cols, CV_8UC1);
 
     //scan x
@@ -94,7 +98,7 @@ void line_detector_t::get_simple_skeleton(const cv::Mat& img, cv::Mat& result) {
     }
 }
 
-void line_detector_t::zhang_suen(const cv::Mat& img, cv::Mat& result) {
+void line_detector_t::zhang_suen(const cv::Mat& img, cv::Mat& result) const {
     static constexpr char table[]{
             0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1,

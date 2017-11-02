@@ -123,6 +123,8 @@ namespace Localization {
             NONE = 11
         };
         
+        const int MAX_DIST = 6000.0f;
+        
         FieldMap()
         {
         }
@@ -154,13 +156,12 @@ namespace Localization {
         {
             LineType type = LineType::NONE;
             Point2D isec(0.0f, 0.0f);
-            float dist = l.Length() * 100;
+            float dist = MAX_DIST;
             
             for (auto& kv : m_fieldLines) {
                 LineType temp_type = kv.first;
                 Point2D temp_isec;
                 if (Line::IntersectLines(l, kv.second, temp_isec)) {
-                    std::cout << (int)temp_type << "; " << temp_isec.X << ", " << temp_isec.Y << std::endl;
                     if (l.IsPointOnLine(temp_isec.X, temp_isec.Y)) {
                         // Line can intersect multiple lines on the field
                         // Find the line with the closest intersection point
@@ -174,7 +175,7 @@ namespace Localization {
                 }
             }
             
-            if (fabs(dist - l.Length() * 100) < 0.0001) {
+            if (fabs(dist - MAX_DIST) < 0.0001) {
                 type = LineType::NONE;
             }
             

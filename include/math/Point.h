@@ -29,6 +29,7 @@ namespace Robot {
 
         /*compute the euclidean distance between pt1 and pt2*/
         static float Distance(Point2D& pt1, Point2D& pt2);
+        static float Distance(const Point2D& pt1, const Point2D& pt2);
 
         Point2D& operator=(const Point2D& point);
 

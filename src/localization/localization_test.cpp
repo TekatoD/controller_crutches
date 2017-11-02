@@ -5,6 +5,7 @@
 
 #include <minIni.h>
 #include <Pose2D.h>
+#include <math/Point.h>
 #include <localization/DataReader.h>
 #include <localization/ParticleFilter.h>
 #include <localization/LocalizationUtil.h>
@@ -19,7 +20,24 @@ int main(int argc, char** argv)
     minIni ini(INI_FILE_PATH);
     Localization::FieldMap field;
     field.LoadIniSettings(&ini);
-    field.PrintFieldLines();
+    //field.PrintFieldLines();
+    
+    Localization::Line l1(0.0f, 0.0f, 10.0f, 10.0f);
+    Localization::Line l2(0.0f, 10.0f, 10.0f, 0.0f);
+    Point2D intersection;
+    
+    // Should be (5, 5)
+    if (Localization::Line::IntersectLines(l1, l2, intersection)) {
+        std::cout << intersection.X << ", " << intersection.Y << std::endl;
+    }
+    
+    Localization::Line l3(-5.0f, -5.0f, 0.0f, 0.0f);
+    Localization::Line l4(1.0f, 1.0f, 10.0f, 10.0f);
+    
+    // Doesn't intersect
+    if (Localization::Line::IntersectLines(l3, l4, intersection)) {
+        std::cout << intersection.X << ", " << intersection.Y << std::endl;
+    }
     
     /*
     if (argc != 3) {

@@ -40,6 +40,12 @@ float Point2D::Distance(Point2D& pt1, Point2D& pt2) {
     return sqrt(x * x + y * y);
 }
 
+float Point2D::Distance(const Point2D& pt1, const Point2D& pt2) {
+    float x = pt1.X - pt2.X;
+    float y = pt1.Y - pt2.Y;
+    return sqrt(x * x + y * y);
+}
+
 
 Point2D& Point2D::operator=(const Point2D& point) {
     X = point.X;

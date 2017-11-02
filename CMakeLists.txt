@@ -252,6 +252,7 @@ add_executable(localization
     src/localization/ParticleFilter.cpp
     src/localization/LocalizationUtil.cpp
     src/minIni/minIni.c
+    src/math/Point.cpp
 )
 
 target_link_libraries(localization

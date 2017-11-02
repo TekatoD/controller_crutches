@@ -97,9 +97,9 @@ void robot_application_t::init_CM730() {
 #else
     auto vrep_connector{std::make_unique<vrep_connector_t>()};
     auto vrep_cm730{std::make_unique<vrep_CM730_t>()};
-    vrep_connector->Connect();
-    vrep_cm730->SetClientId(vrep_connector->GetClientID());
-    vrep_cm730->Connect();
+    vrep_connector->connect();
+    vrep_cm730->set_client_id(vrep_connector->get_client_id());
+    vrep_cm730->connect();
     m_vrep_connector = move(vrep_connector);
     m_cm730 = move(vrep_cm730);
 #endif

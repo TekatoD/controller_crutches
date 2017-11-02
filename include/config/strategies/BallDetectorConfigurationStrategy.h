@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include <vision/detectors/BallDetector.h>
+#include <vision/detectors/ball_detector_t.h>
 #include "config/ConfigurationStrategy.h"
 
 namespace drwn {
@@ -14,13 +14,13 @@ namespace drwn {
 
         static constexpr char DEFAULT_SECTION[] = "BallDetector";
 
-        explicit BallDetectorConfigurationStrategy(BallDetector* ballDetector = nullptr, std::string section = DEFAULT_SECTION);
+        explicit BallDetectorConfigurationStrategy(ball_detector_t* ballDetector = nullptr, std::string section = DEFAULT_SECTION);
 
         void ReadConfig(const boost::property_tree::ptree& prop) override;
 
         void WriteConfig(boost::property_tree::ptree& prop) const override;
 
     private:
-        BallDetector* m_ball_detector{nullptr};
+        ball_detector_t* m_ball_detector{nullptr};
     };
 }

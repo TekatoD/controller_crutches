@@ -4,35 +4,12 @@
 
 #pragma once
 
-#include "BaseDetector.h"
-
 namespace drwn {
-    class BallDetector : public BaseDetector {
+    class ball_detector_t {
     public:
-        struct configuration {
-            bool white_ball;
-            struct {
-                uchar min_1, max_1;
-                uchar min_2, max_2;
-                uchar min_3, max_3;
-            } ColorThresh;
+        cv::Rect detect_white_ball(const cv::Mat& image, const std::vector<cv::Vec4i>& lines);
 
-            struct {
-                uchar min_1, max_1;
-                uchar min_2, max_2;
-                uchar min_3, max_3;
-            } GaborThresh;
-
-            int median_blur_size;
-        };
-
-        BallDetector();
-
-        cv::Mat Preproccess(const cv::Mat& image);
-
-        cv::Rect Detect(const cv::Mat& image, const std::vector<cv::Vec4i>& lines);
-
-        cv::Rect DetectOld(const cv::Mat& image);
+        cv::Rect detect_coloured_ball(const cv::Mat& image);
 
         bool IsWhite() const noexcept;
 
@@ -66,11 +43,12 @@ namespace drwn {
 
     private:
         configuration m_conf;
-        cv::Scalar m_min_gabor_color;
-        cv::Scalar m_max_gabor_color;
 
-        cv::Scalar m_min_color;
-        cv::Scalar m_max_color;
+        cv::Scalar m_min_gabor_bgr_color;
+        cv::Scalar m_max_gabor_bgr_color;
+
+        cv::Scalar m_min_bgr_color;
+        cv::Scalar m_max_bgr_color;
 
         int m_median_blur_size;
         bool m_debug{false};

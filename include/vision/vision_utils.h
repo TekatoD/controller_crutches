@@ -22,18 +22,18 @@ namespace drwn {
 
         template<class _Tp>
         inline
-        cv::Vec<_Tp, 2> getVector(const cv::Vec4i &segment) {
+        cv::Vec<_Tp, 2> get_vector(const cv::Vec4i& segment) {
             return cv::Vec<_Tp, 2>(segment(2) - segment(0), segment(3) - segment(1));
         }
 
 
-        inline float getAngle(const cv::Vec2f &vec1, const cv::Vec2f &vec2) {
+        inline float get_angle(const cv::Vec2f& vec1, const cv::Vec2f& vec2) {
             const float cosAlpha = vec1.dot(vec2) / (vision_utils::norm(vec1) * vision_utils::norm(vec2));
             return std::acos(cosAlpha);
         }
 
 
-        inline float getAltitude(const cv::Point &a, const cv::Point &b, const cv::Point &c) {
+        inline float get_altitude(const cv::Point& a, const cv::Point& b, const cv::Point& c) {
             const float dividend = std::abs((b.y - c.y) * a.x + (c.x - b.x) * a.y +
                                             (b.x * c.y - c.x * b.y));
             const float sum = (c.x - b.x) * (c.x - b.x) + (b.y - c.y) * (b.y - c.y);

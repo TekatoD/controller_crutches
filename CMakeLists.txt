@@ -119,8 +119,8 @@ set(SRC
         src/motion/modules/kicking_t.cpp
         include/motion/modules/kicking_t.h
         include/log/console.h
-        src/log/сoloured_sink_t.cpp
-        include/log/сoloured_sink_t.h
+        src/log/coloured_sink_t.cpp
+        include/log/coloured_sink_t.h
         src/log/trivial_logger_t.cpp
         include/log/trivial_logger_t.h
         src/robot_application_t.cpp
@@ -173,20 +173,32 @@ set(SRC
         include/config/ArgumentsParsingStrategy.h
         src/config/strategies/HelpArgumentsParsingStrategy.cpp
         include/config/strategies/HelpArgumentsParsingStrategy.h
-        include/vision/detectors/AngleDetector.h
-        include/vision/detectors/BallDetector.h
-        include/vision/detectors/BaseDetector.h
-        include/vision/detectors/FieldDetector.h
-        include/vision/detectors/LineDetector.h
+#        include/vision/detectors/AngleDetector.h
+#        include/vision/detectors/ball_detector_t.h
+        include/vision/detectors/field_detector_t.h
+        include/vision/detectors/line_detector_t.h
         include/vision/Vision.h
-        include/vision/VisionUtils.h
-        src/vision/detectors/AngleDetector.cpp
-        src/vision/detectors/BallDetector.cpp
-        src/vision/detectors/BaseDetector.cpp
-        src/vision/detectors/FieldDetector.cpp
-        src/vision/detectors/LineDetector.cpp
+        include/vision/vision_utils.h
+#        src/vision/detectors/AngleDetector.cpp
+#        src/vision/detectors/ball_detector_t.cpp
+        src/vision/detectors/field_detector_t.cpp
+        src/vision/detectors/line_detector_t.cpp
         src/vision/Vision.cpp
-        include/config/strategies/BallDetectorConfigurationStrategy.h src/config/strategies/BallDetectorConfigurationStrategy.cpp)
+        include/config/strategies/BallDetectorConfigurationStrategy.h
+        src/config/strategies/BallDetectorConfigurationStrategy.cpp
+        include/vision/detectors/preprocessor_t.h
+        src/vision/detectors/old_line_preprocessor_t.cpp
+        include/vision/detectors/old_line_preprocessor_t.h
+        src/vision/detectors/new_line_preprocessor_t.cpp
+        include/vision/detectors/new_line_preprocessor_t.h
+        src/vision/detectors/field_preprocessor_t.cpp
+        include/vision/detectors/field_preprocessor_t.h
+        src/vision/detectors/white_ball_detector_r.cpp
+        include/vision/detectors/white_ball_detector_r.h
+        src/vision/detectors/coloured_ball_detector_t.cpp
+        include/vision/detectors/coloured_ball_detector_t.h
+        src/vision/detectors/ball_preprocessor_t.cpp
+        include/vision/detectors/ball_preprocessor_t.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

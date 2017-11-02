@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <vision/detectors/BallDetector.h>
-#include <vision/detectors/LineDetector.h>
+#include <vision/detectors/ball_detector_t.h>
+#include <vision/detectors/line_detector_t.h>
 #include <vision/detectors/AngleDetector.h>
-#include <vision/detectors/FieldDetector.h>
+#include <vision/detectors/field_detector_t.h>
 
 namespace drwn {
     class Vision {
@@ -34,10 +34,10 @@ namespace drwn {
         std::vector<cv::Vec4i> LineDetectOld();
 
     private:
-        BallDetector m_ballDetector;
-        LineDetector m_lineDetector;
+        ball_detector_t m_ballDetector;
+        line_detector_t m_lineDetector;
         AngleDetector m_angleDetector;
-        FieldDetector m_fieldDetector;
+        field_detector_t m_fieldDetector;
         cv::Mat m_image;
         cv::Mat m_src_image;
         cv::Mat m_mask;

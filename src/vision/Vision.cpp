@@ -19,7 +19,7 @@ cv::Rect Vision::BallDetect() {
     FieldDetect();
     LineDetect();
     if (m_ballDetector.IsWhite()) {
-        return m_ballDetector.Detect(m_preprocImage, m_lines);
+        return m_ballDetector.detect_white_ball(m_preprocImage, m_lines);
     } else {
         return BallDetectOld();
     }
@@ -27,25 +27,25 @@ cv::Rect Vision::BallDetect() {
 
 cv::Rect Vision::BallDetectOld() {
     FieldDetect();
-    const cv::Mat preprocImage = m_ballDetector.Preproccess(m_image);
+    const cv::Mat preprocImage = m_ballDetector.preproccess(m_image);
     //        cv::imshow("preproc_ball",preprocImage);
-    return m_ballDetector.DetectOld(preprocImage);
+    return m_ballDetector.detect_coloured_ball(preprocImage);
 }
 
 std::vector<cv::Vec4i> Vision::LineDetect() {
     FieldDetect();
     if (m_lines.empty()) {
-        m_preprocImage = m_lineDetector.Preproccess(m_image);
-        m_lines = m_lineDetector.Detect(m_preprocImage);
+        m_preprocImage = m_lineDetector.preproccess(m_image);
+        m_lines = m_lineDetector.detect(m_preprocImage);
     }
     return m_lines;
 }
 
 std::vector<cv::Vec4i> Vision::LineDetectOld() {
-    const cv::Mat preprocImage = m_lineDetector.PreproccessOld(m_src_image);
+    const cv::Mat preprocImage = m_lineDetector.preproccess_old(m_src_image);
 
 
-    return m_lineDetector.DetectOld(preprocImage);
+    return m_lineDetector.detect_old(preprocImage);
 }
 
 std::vector<cv::Vec3d> Vision::AngleDetect() {
@@ -62,11 +62,12 @@ std::vector<cv::Vec3d> Vision::AngleDetect() {
 cv::Mat Vision::FieldDetect() {
     if (m_mask.empty()) {
         cv::Mat prep = m_fieldDetector.Preproccess(m_image);
-        m_mask = m_fieldDetector.Detect(prep);
+        m_mask = m_fieldDetector.detect(prep);
+        // we can use prep as mask
         cv::Mat tmp;
         cvtColor(m_image, m_src_image, CV_BGR2YUV);
         m_image.copyTo(tmp, m_mask);
-        m_image = tmp;
+        m_image = tmp; // we can simplify it by deleting convertation
         cv::cvtColor(m_image, m_image, CV_BGR2YUV);
     }
     return m_mask;

@@ -5,7 +5,7 @@
 
 #include "config/strategies/BallDetectorConfigurationStrategy.h"
 
-drwn::BallDetectorConfigurationStrategy::BallDetectorConfigurationStrategy(drwn::BallDetector* ballDetector,
+drwn::BallDetectorConfigurationStrategy::BallDetectorConfigurationStrategy(drwn::ball_detector_t* ballDetector,
                                                                             std::string section) :
         ConfigurationStrategy(std::move(section)), m_ball_detector(ballDetector) {
 

@@ -23,7 +23,7 @@
 
 
 namespace drwn {
-    class сoloured_sink_t
+    class coloured_sink_t
             : public boost::log::sinks::basic_formatted_sink_backend<char, boost::log::sinks::synchronized_feeding>  {
     public:
         static void consume(const boost::log::record_view& rec, const string_type& formatted_string);

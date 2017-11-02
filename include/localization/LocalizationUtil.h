@@ -38,14 +38,18 @@ namespace Localization {
             return Point2D::Distance(p1, p2);
         }
         
-        bool IsPointOnLine(float px, float py, float eps=0.001)
+        bool IsPointOnLine(float px, float py, float eps=0.001) const
         {
             Point2D point(px, py);
             float LengthTo = Line(p1, point).Length();
             float LengthFrom = Line(point, p2).Length();
             float LineLength = this->Length();
             
-            return LengthTo + LengthFrom - LineLength < eps;
+            bool Lengths = LengthTo + LengthFrom - LineLength < eps;
+            bool xAxis = (px >= p1.X && px <= p2.X) || (px <= p1.X && px >= p2.X);
+            bool yAxis = (py >= p1.Y && py <= p2.Y) || (py <= p1.Y && py >= p2.Y);
+            
+            return Lengths && xAxis && yAxis;
         }
         
         /*
@@ -84,7 +88,13 @@ namespace Localization {
             intersection.X = x1 + ua * (x2 - x1);
             intersection.Y = y1 + ua * (y2 - y1);
             
-            return true;
+            // Check intersection point if it lies on both lines
+            if (l1.IsPointOnLine(intersection.X, intersection.Y) && l2.IsPointOnLine(intersection.X, intersection.Y)) {
+                return true;
+            }
+            
+            // Point doesn't lie on both lines. No intersection
+            return false;
         }
         
         friend std::ostream& operator<<(std::ostream& out, const Line& l);
@@ -110,6 +120,7 @@ namespace Localization {
             PENALTY_RIGHT_TOP = 8,
             PENALTY_RIGHT_BOTTOM = 9,
             PENALTY_RIGHT_HEIGHT = 10,
+            NONE = 11
         };
         
         FieldMap()
@@ -136,6 +147,38 @@ namespace Localization {
             for (auto& kv : m_fieldLines) {
                 std::cout << (int)kv.first << " : " << kv.second << std::endl;
             }
+        }
+        
+        
+        std::tuple<LineType, Point2D> IntersectWithField(const Line& l)
+        {
+            LineType type = LineType::NONE;
+            Point2D isec(0.0f, 0.0f);
+            float dist = l.Length() * 100;
+            
+            for (auto& kv : m_fieldLines) {
+                LineType temp_type = kv.first;
+                Point2D temp_isec;
+                if (Line::IntersectLines(l, kv.second, temp_isec)) {
+                    std::cout << (int)temp_type << "; " << temp_isec.X << ", " << temp_isec.Y << std::endl;
+                    if (l.IsPointOnLine(temp_isec.X, temp_isec.Y)) {
+                        // Line can intersect multiple lines on the field
+                        // Find the line with the closest intersection point
+                        float temp_dist = Point2D::Distance(l.p1, temp_isec);
+                        if (temp_dist < dist) {
+                            type = temp_type; 
+                            isec = temp_isec;
+                            dist = temp_dist;
+                        }
+                    }
+                }
+            }
+            
+            if (fabs(dist - l.Length() * 100) < 0.0001) {
+                type = LineType::NONE;
+            }
+            
+            return std::make_tuple(type, isec);
         }
         
     private:

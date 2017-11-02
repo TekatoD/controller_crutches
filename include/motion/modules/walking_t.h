@@ -12,7 +12,7 @@
 #include <fstream>
 
 #include "motion/motion_module_t.h"
-#include "OdometryCollector.h"
+#include "odometry_collector_t.h"
 
 namespace drwn {
     class walking_t
@@ -111,7 +111,7 @@ namespace drwn {
         float m_odo_y_factor;
         float m_odo_a_factor;
 
-        OdometryCollector m_odometry_collector;
+        odometry_collector_t m_odometry_collector;
 
         walking_t();
 
@@ -121,7 +121,7 @@ namespace drwn {
 
         void update_param_balance();
 
-        Pose2D get_odo_offset();
+        pose_2D_t get_odo_offset();
 
         // Walking initial pose
         float m_x_offset;
@@ -170,11 +170,11 @@ namespace drwn {
 
         bool is_running();
 
-        Pose2D get_odo();
+        pose_2D_t get_odo();
 
-        void reset_odo(const Pose2D& pose);
+        void reset_odo(const pose_2D_t& pose);
 
-        void set_odo(const Pose2D& pose);
+        void set_odo(const pose_2D_t& pose);
 
         float get_x_offset() const;
 

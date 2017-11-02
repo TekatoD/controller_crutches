@@ -1,11 +1,11 @@
 #include <log/trivial_logger_t.h>
 #include <boost/filesystem.hpp>
-#include "config/ConfigurationParser.h"
+#include "config/configuration_parser_t.h"
 #include "config/ConfigurationFileLoader.h"
 
 using namespace drwn;
 
-void ConfigurationFileLoader::AddStrategy(ConfigurationStrategy& strategy, std::string path) {
+void ConfigurationFileLoader::AddStrategy(configuration_strategy_t& strategy, std::string path) {
     if (path.empty()) {
         m_strategies.emplace(&strategy, m_default_path);
     } else {
@@ -13,8 +13,8 @@ void ConfigurationFileLoader::AddStrategy(ConfigurationStrategy& strategy, std::
     }
 }
 
-void ConfigurationFileLoader::RemoveStrategy(const ConfigurationStrategy& strategy) {
-    m_strategies.erase((ConfigurationStrategy*) &strategy);
+void ConfigurationFileLoader::RemoveStrategy(const configuration_strategy_t& strategy) {
+    m_strategies.erase((configuration_strategy_t*) &strategy);
 }
 
 void ConfigurationFileLoader::ConfigureAll() {
@@ -26,7 +26,7 @@ void ConfigurationFileLoader::ConfigureAll() {
             if (m_debug)
                 LOG_DEBUG << "CONFIGURATION FILE LOADER: Reading configuration from file " << path << "...";
             for (auto& strategy : strategies) {
-                strategy->ReadConfig(prop);
+                strategy->read_config(prop);
             }
             if (m_debug)
                 LOG_DEBUG << "CONFIGURATION FILE LOADER: Reading configuration from file " << path << " was done successfully";
@@ -47,7 +47,7 @@ void ConfigurationFileLoader::DumpAll() {
         if (m_debug)
             LOG_DEBUG << "CONFIGURATION FILE LOADER: Dumping configuration to file " << path << "...";
         for (auto& strategy : strategies) {
-            strategy->WriteConfig(prop);
+            strategy->write_config(prop);
         }
         WritePropertyToFile(prop, path);
         if (m_debug)
@@ -56,11 +56,11 @@ void ConfigurationFileLoader::DumpAll() {
 }
 
 boost::property_tree::ptree ConfigurationFileLoader::ReadPropertyFromFile(const std::string& path) {
-    return ConfigurationParser::ReadFromFile(path);
+    return configuration_parser_t::read_from_file(path);
 }
 
 void ConfigurationFileLoader::WritePropertyToFile(const boost::property_tree::ptree& prop, const std::string& path) {
-    ConfigurationParser::WriteToFile(path, prop);
+    configuration_parser_t::write_to_file(path, prop);
 }
 
 const std::string& ConfigurationFileLoader::GetDefaultPath() const {
@@ -78,16 +78,16 @@ void ConfigurationFileLoader::SetDefaultPath(std::string path) {
     }
 }
 
-std::map<std::string, std::list<ConfigurationStrategy*>> ConfigurationFileLoader::GetFileAssotiatedStrategies() const {
+std::map<std::string, std::list<configuration_strategy_t*>> ConfigurationFileLoader::GetFileAssotiatedStrategies() const {
     namespace fs = boost::filesystem;
-    std::map<std::string, std::list<ConfigurationStrategy*>> result;
+    std::map<std::string, std::list<configuration_strategy_t*>> result;
     for (auto& [strategy, path] : m_strategies) {
         auto it = result.find(path);
         if (it != result.end()) {
             auto& strategies = it->second;
             strategies.emplace_front(strategy);
         } else {
-            result.emplace(path, std::list<ConfigurationStrategy*>{strategy});
+            result.emplace(path, std::list<configuration_strategy_t*>{strategy});
         }
     }
     return result;

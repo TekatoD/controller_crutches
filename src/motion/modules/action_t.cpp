@@ -511,7 +511,7 @@ void action_t::process() {
                     // ����, ����, �̷��� �������� ������ ���
                     ipAccelAngle1024[bID] = 0;
 
-                    // Find current target angle
+                    // Find current m_target angle
                     if (m_play_page.step[m_page_step_count - 1].position[bID] & INVALID_BIT_MASK)
                         wCurrentTargetAngle = wpTargetAngle1024[bID];
                     else
@@ -525,7 +525,7 @@ void action_t::process() {
                     // Find Moving offset
                     ipMovingAngle1024[bID] = (int) (wpTargetAngle1024[bID] - wpStartAngle1024[bID]);
 
-                    // Find Next target angle
+                    // Find Next m_target angle
                     if (m_page_step_count == m_play_page.header.stepnum) // ���� ������ �������̶��
                     {
                         if (m_playing_finished) // ���� �����̶��

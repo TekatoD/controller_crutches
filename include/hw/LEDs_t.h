@@ -2,7 +2,7 @@
 
 
 #include <hw/CM730_t.h>
-#include "Color.h"
+#include "color_t.h"
 
 namespace drwn {
     class LEDs_t {
@@ -13,9 +13,9 @@ namespace drwn {
 
         void set_panel_led(bool first, bool second, bool third);
 
-        void set_head_led(const Color& color);
+        void set_head_led(const color_t& color);
 
-        void set_eye_led(const Color& color);
+        void set_eye_led(const color_t& color);
 
         bool is_debug_enabled() const noexcept;
 

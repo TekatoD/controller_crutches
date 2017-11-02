@@ -3,7 +3,7 @@
 
 #include <list>
 #include <map>
-#include "ConfigurationStrategy.h"
+#include "configuration_strategy_t.h"
 
 namespace drwn {
     class ConfigurationFileLoader {
@@ -12,9 +12,9 @@ namespace drwn {
 
         ConfigurationFileLoader() = default;
 
-        void AddStrategy(ConfigurationStrategy& strategy, std::string path = "");
+        void AddStrategy(configuration_strategy_t& strategy, std::string path = "");
 
-        void RemoveStrategy(const ConfigurationStrategy& strategy);
+        void RemoveStrategy(const configuration_strategy_t& strategy);
 
         void ConfigureAll();
 
@@ -29,13 +29,13 @@ namespace drwn {
 
         static void WritePropertyToFile(const boost::property_tree::ptree& prop, const std::string& path);
 
-        std::map<std::string, std::list<ConfigurationStrategy*>> GetFileAssotiatedStrategies() const;;
+        std::map<std::string, std::list<configuration_strategy_t*>> GetFileAssotiatedStrategies() const;;
 
     private:
         bool m_debug{false};
 
         std::string m_default_path{DEFAULT_PATH};
-        std::map<ConfigurationStrategy*, std::string> m_strategies{};
+        std::map<configuration_strategy_t*, std::string> m_strategies{};
     };
 }
 

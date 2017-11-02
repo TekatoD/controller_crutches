@@ -58,9 +58,9 @@ include_directories( ${EIGEN3_INCLUDE_DIR}) #Eigen doesn't work either way
 # Don't forget include header files
 set(SRC
         include/motion/modules/action_t.h
-        include/BallFollower.h
-        #        include/BallTracker.h
-        include/Camera.h
+        include/ball_follower_t.h
+        #        include/ball_tracker_t.h
+        include/camera_t.h
         include/hw/FSR_t.h
         include/motion/modules/head_t.h
         include/motion/joint_data_t.h
@@ -72,7 +72,7 @@ set(SRC
         include/motion/motion_status_t.h
         include/hw/MX28_t.h
         include/math/point_t.h
-        include/StateMachine.h
+        include/state_machine_t.h
         include/math/vector_3D_t.h
         include/motion/modules/walking_t.h
         src/math/matrix_t.cpp
@@ -85,37 +85,37 @@ set(SRC
         src/motion/kinematics_t.cpp
         src/motion/motion_manager_t.cpp
         src/motion/motion_status_t.cpp
-        src/BallFollower.cpp
-        src/BallTracker.cpp
+        src/ball_follower_t.cpp
+        src/ball_tracker_t.cpp
         src/hw/linux_motion_timer_t.cpp
         src/main.cpp
-        src/StateMachine.cpp
-        include/gamecontroller/RoboCupGameControlData.h
-        include/gamecontroller/SPLCoachMessage.h
-        include/gamecontroller/SPLStandardMessage.h
-        src/gamecontroller/GameController.cpp
-        include/gamecontroller/GameController.h
-        include/UdpComm.h
-        src/UdpComm.cpp
-        src/Pose2D.cpp
-        include/Pose2D.h
-        src/OdometryCollector.cpp
-        include/OdometryCollector.h
-        src/GoTo.cpp
-        include/GoTo.h
-        include/SoccerBehavior.h
-        src/SoccerBehavior.cpp
-        src/Field.cpp
-        include/Field.h
-        src/BallSearcher.cpp
-        include/BallSearcher.h
+        src/state_machine_t.cpp
+        include/gamecontroller/robo_cup_game_control_data_t.h
+        include/gamecontroller/spl_coach_message.h
+        include/gamecontroller/spl_standard_message.h
+        src/gamecontroller/game_controller_t.cpp
+        include/gamecontroller/game_controller_t.h
+        include/udp_comm_t.h
+        src/udp_comm_t.cpp
+        src/pose_2D_t.cpp
+        include/pose_2D_t.h
+        src/odometry_collector_t.cpp
+        include/odometry_collector_t.h
+        src/go_to_t.cpp
+        include/go_to_t.h
+        include/soccer_behavior_t.h
+        src/soccer_behavior_t.cpp
+        src/field_t.cpp
+        include/field_t.h
+        src/ball_searcher_t.cpp
+        include/ball_searcher_t.h
         include/hw/CM730_t.h
         src/hw/CM730_t.cpp
         include/math/angle_tools.h
         include/math/eigen.h
         src/math/angle_tools.cpp
-        src/PropertyReader.cpp
-        include/PropertyReader.h
+        src/property_reader_t.cpp
+        include/property_reader_t.h
         src/motion/modules/kicking_t.cpp
         include/motion/modules/kicking_t.h
         include/log/console.h
@@ -125,21 +125,21 @@ set(SRC
         include/log/trivial_logger_t.h
         src/robot_application_t.cpp
         include/robot_application_t.h
-        include/behavior/Behavior.h
-        src/behavior/BaseBehavior.cpp
-        include/behavior/BaseBehavior.h
+        include/behavior/behavior_t.h
+        src/behavior/base_behavior_t.cpp
+        include/behavior/base_behavior_t.h
         src/hw/LEDs_t.cpp
         include/hw/LEDs_t.h
-        src/Color.cpp
-        include/Color.h
+        src/color_t.cpp
+        include/color_t.h
         src/hw/buttons_t.cpp
         include/hw/buttons_t.h
-        src/tool/Accumulator.cpp
-        include/tool/Accumulator.h
-        include/tool/Rate.h
-        include/config/ConfigurationStrategy.h
-        src/config/strategies/WalkingConfigurationStrategy.cpp
-        include/config/strategies/WalkingConfigurationStrategy.h
+        src/tool/accumulator_t.cpp
+        include/tool/accumulator_t.h
+        include/tool/rate_t.h
+        include/config/configuration_strategy_t.h
+        src/config/strategies/walking_configuration_strategy_t.cpp
+        include/config/strategies/walking_configuration_strategy_t.h
         src/config/ConfigurationFileLoader.cpp
         include/config/ConfigurationFileLoader.h
         src/config/ConfigurationParser.cpp

@@ -68,11 +68,11 @@ namespace Localization {
         {
             float fw, fh, pw, ph, gh;
             
-            fw = ini->getf("NewField", "field_width") / 1000.0f;
-            fh = ini->getf("NewField", "field_height") / 1000.0f;
-            pw = ini->getf("NewField", "penalty_width") / 1000.0f;
-            ph = ini->getf("NewField", "penalty_height") / 1000.0f;
-            gh = ini->getf("NewField", "gate_height") / 1000.0f;
+            fw = ini->getf("NewField", "field_width");
+            fh = ini->getf("NewField", "field_height");
+            pw = ini->getf("NewField", "penalty_width");
+            ph = ini->getf("NewField", "penalty_height");
+            gh = ini->getf("NewField", "gate_height");
             
             makeLines(fw, fh, pw, ph, gh);
         }

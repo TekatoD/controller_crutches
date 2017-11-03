@@ -4,10 +4,6 @@
 
 #pragma once
 
-#include "detectors/ball_detector_t.h"
-#include "detectors/line_detector_t.h"
-#include "detectors/AngleDetector.h"
-#include "detectors/field_detector_t.h"
 #include "vision_processor_t.h"
 
 namespace drwn {

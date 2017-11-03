@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "BaseDetector.h"
-
 namespace drwn {
     class AngleDetector : public BaseDetector {
     public:

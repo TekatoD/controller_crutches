@@ -60,7 +60,6 @@ set(SRC
         include/motion/modules/action_t.h
         include/ball_follower_t.h
         #        include/ball_tracker_t.h
-        include/camera_t.h
         include/hw/FSR_t.h
         include/motion/modules/head_t.h
         include/motion/joint_data_t.h
@@ -193,7 +192,10 @@ set(SRC
         include/config/configuration_parser_t.h
         include/config/configuration_strategy_t.h
         include/config/configuration_file_loader_t.h
-        include/config/single_option_arguments_parsing_strategy_t.h)
+        include/config/single_option_arguments_parsing_strategy_t.h
+        src/vision/camera_t.cpp
+        include/vision/camera_t.h
+        include/vision/image_source_t.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

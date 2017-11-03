@@ -3,7 +3,7 @@
  *  @date 5/11/17
  */
 
-#include <camera_t.h>
+#include <vision/camera_t.h>
 #include <motion/modules/head_t.h>
 #include <cmath>
 #include <motion/modules/walking_t.h>

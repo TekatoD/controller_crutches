@@ -154,8 +154,8 @@ set(SRC
         include/vision/detectors/new_line_preprocessor_t.h
         src/vision/detectors/field_preprocessor_t.cpp
         include/vision/detectors/field_preprocessor_t.h
-        src/vision/detectors/white_ball_detector_r.cpp
-        include/vision/detectors/white_ball_detector_r.h
+        src/vision/detectors/white_ball_detector_t.cpp
+        include/vision/detectors/white_ball_detector_t.h
         src/vision/detectors/coloured_ball_detector_t.cpp
         include/vision/detectors/coloured_ball_detector_t.h
         src/vision/detectors/ball_preprocessor_t.cpp
@@ -195,7 +195,12 @@ set(SRC
         include/config/single_option_arguments_parsing_strategy_t.h
         src/vision/camera_t.cpp
         include/vision/camera_t.h
-        include/vision/image_source_t.h)
+        include/vision/image_source_t.h
+        src/vision/vision_t.cpp
+        include/vision/vision_t.h
+        include/vision/vision_processor_t.h
+        src/vision/white_ball_vision_processor_t.cpp
+        include/vision/white_ball_vision_processor_t.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

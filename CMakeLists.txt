@@ -30,7 +30,9 @@ else (CROSSCOMPILE)
             include/hw/vrep_CM730_t.h
             include/hw/vrep_connector_t.h
             src/hw/vrep_connector_t.cpp
-            src/hw/vrep_CM730_t.cpp)
+            src/hw/vrep_CM730_t.cpp
+            include/hw/vrep_image_source_t.h
+            src/hw/vrep_image_source_t.cpp)
     target_link_libraries(hw ${VREP_LIBRARIES})
     target_include_directories(hw PUBLIC ${VREP_REMOTE} ${VREP_INCLUDE})
 endif (CROSSCOMPILE)
@@ -193,10 +195,11 @@ set(SRC
         include/config/configuration_strategy_t.h
         include/config/configuration_file_loader_t.h
         include/config/single_option_arguments_parsing_strategy_t.h
-        src/vision/camera_t.cpp
-        include/vision/camera_t.h
-        include/vision/image_source_t.h
-        src/vision/vision_t.cpp
+        src/hw/camera_t.cpp
+        include/hw/camera_t.h
+        include/hw/image_source_t.h
+        include/hw/image_source_failure.h
+        src/hw/image_source_failure.cpp
         include/vision/vision_t.h
         include/vision/vision_processor_t.h
         src/vision/white_ball_vision_processor_t.cpp

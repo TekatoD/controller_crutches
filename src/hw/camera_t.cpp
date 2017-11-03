@@ -1,7 +1,7 @@
 /// \autor arssivka
 /// \date 11/3/17
 
-#include "vision/camera_t.h"
+#include "hw/camera_t.h"
 
 using namespace drwn;
 

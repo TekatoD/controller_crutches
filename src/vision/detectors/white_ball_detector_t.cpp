@@ -3,11 +3,11 @@
 
 #include <cv.hpp>
 #include <algorithm>
-#include "vision/detectors/white_ball_detector_r.h"
+#include "vision/detectors/white_ball_detector_t.h"
 
 using namespace drwn;
 
-cv::Rect white_ball_detector_r::detect(const cv::Mat& prep_img, const std::vector<cv::Vec4i>& lines) const {
+cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const std::vector<cv::Vec4i>& lines) const {
     cv::Mat preproc = prep_img;
     for (auto&& line : lines) {
         double x0 = line(0);

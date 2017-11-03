@@ -81,5 +81,33 @@ namespace drwn {
                 throw std::runtime_error("Can't rotate image to 90 degrees");
             }
         }
+
+
+        void vertical_flip_rgb(unsigned char* binary_image, int width, int height) {
+            int sizeline = width * 3;
+            unsigned char line1[sizeline - 1];/*line1 buffer*/
+            unsigned char line2[sizeline - 1];/*line2 buffer*/
+            for (int h = 0; h < height / 2; h++) {   /*line iterator*/
+                memcpy(line1, binary_image + h * sizeline, sizeline);
+                memcpy(line2, binary_image + (height - 1 - h) * sizeline, sizeline);
+
+                memcpy(binary_image + h * sizeline, line2, sizeline);
+                memcpy(binary_image + (height - 1 - h) * sizeline, line1, sizeline);
+            }
+        }
+
+        void rgb_to_bgr(unsigned char* binary_image, int width, int height) {
+            int ir, ig, ib;
+            for (int i = 0; i < width * height; ++i) {
+                ir = binary_image[3 * i + 0];
+                ig = binary_image[3 * i + 1];
+                ib = binary_image[3 * i + 2];
+
+                binary_image[3 * i + 0] = ib;
+                binary_image[3 * i + 1] = ig;
+                binary_image[3 * i + 2] = ir;
+            }
+        }
+
     }
 }

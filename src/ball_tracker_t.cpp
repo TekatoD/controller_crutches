@@ -7,7 +7,7 @@
 
 #include <log/trivial_logger_t.h>
 #include "motion/modules/head_t.h"
-#include "vision/camera_t.h"
+#include "hw/camera_t.h"
 #include "ball_tracker_t.h"
 
 using namespace drwn;

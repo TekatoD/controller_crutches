@@ -15,6 +15,8 @@ namespace drwn {
         static constexpr int WIDTH = 320;
         static constexpr int HEIGHT = 240;
 
+        camera_t(camera_t&&) = delete;
+
         static camera_t* get_instance();
 
         void update_image();

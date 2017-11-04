@@ -41,7 +41,7 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         
         // TODO: Create matrix from vector
         Eigen::MatrixXf Qt = Eigen::MatrixXf::Identity(measurements.size()*2, measurements.size()*2);
-        Qt = Qt * 10.0f;
+        Qt = Qt * 50.0f;
         
         Eigen::MatrixXf Zdiff(measurements.size()*2, 1);
         int z_counter = 0;
@@ -104,12 +104,7 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         float new_weight = denom * std::exp((-1.0f / 2.0f) * temp);
         
         weight_normalizer = weight_normalizer + new_weight;
-        particle.weight = new_weight;
-    }
-    
-    if (fabs(weight_normalizer) < 0.0001) {
-        std::cout << "Weight normalizer is close to 0!" << std::endl;
-        return;
+        particle.weight = particle.weight * new_weight;
     }
     
     Pose2D meanAccum;
@@ -118,7 +113,13 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
     std::size_t highestWeightIndex = 0;
     for (std::size_t index = 0; index < m_particles.size(); index++) {
         Particle& particle = m_particles[index];
-        particle.weight = particle.weight / weight_normalizer;
+        
+        if (fabs(weight_normalizer) < 0.0001) {
+            particle.weight = 1.0f/m_particles.size();
+        } else {
+            particle.weight = particle.weight / weight_normalizer;
+            
+        }
         pw = particle.weight;
         px = particle.pose.X();
         py = particle.pose.Y();

@@ -42,6 +42,9 @@ namespace Robot {
         friend std::ostream& operator << (std::ostream& os, const Pose2D& data);
         
     private:
+        void normalizeThetaOld();
+        void normalizeThetaNew();
+        
         float m_x;
         float m_y;
         float m_theta;

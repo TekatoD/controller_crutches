@@ -39,12 +39,23 @@ void Robot::Pose2D::setTheta(float theta) {
 void Robot::Pose2D::normalizeTheta() {
 //    while (m_theta < 0) m_theta += 2 * M_PI;
 //    m_theta = fmod(m_theta, 2 * M_PI) - M_PI;
+    normalizeThetaNew();
+}
+
+void Robot::Pose2D::normalizeThetaOld() {
+//    while (m_theta < 0) m_theta += 2 * M_PI;
+//    m_theta = fmod(m_theta, 2 * M_PI) - M_PI;
     while (m_theta > M_PI) {
         m_theta -= 2 * M_PI;
     }
     while (m_theta < -M_PI) {
         m_theta += 2 * M_PI;
     }
+}
+
+void Robot::Pose2D::normalizeThetaNew() {
+    //phi - 2*math.pi * math.floor((phi + math.pi) / (2*math.pi))
+    m_theta = m_theta-2*M_PI*floor( (m_theta+M_PI)/(2*M_PI) );
 }
 
 Robot::Pose2D Robot::Pose2D::operator+(const Robot::Pose2D &rhs) const {

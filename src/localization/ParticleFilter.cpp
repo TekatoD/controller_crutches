@@ -79,7 +79,10 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
     
     Pose2D meanAccum;
     float pw, px, py, ptheta;
-    for (auto& particle : m_particles) {
+    float highestWeight = 0.0f;
+    std::size_t highestWeightIndex = 0;
+    for (std::size_t index = 0; index < m_particles.size(); index++) {
+        Particle& particle = m_particles[index];
         particle.weight = particle.weight / normalizer;
         pw = particle.weight;
         px = particle.pose.X();
@@ -87,7 +90,13 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         ptheta = particle.pose.Theta();
         
         meanAccum += Pose2D(px*pw, py*pw, pw*ptheta);
+        
+        if (pw > highestWeight) {
+            highestWeight = pw;
+            highestWeightIndex = index;
+        }
     }
+    m_topParticleIndex = highestWeightIndex;
     
     Pose2D covAccum;
     float mx, my, mtheta;
@@ -143,6 +152,7 @@ void ParticleFilter::low_variance_resampling()
 void ParticleFilter::init_particles(const Pose2D& pose, int num_particles)
 {
     float defaultWeight = 1.0f / num_particles;
+    m_topParticleIndex = 0;
     
     m_particles.resize(num_particles);
     for (auto& particle : m_particles) {

@@ -99,11 +99,15 @@ int main(int argc, char** argv)
         
         auto particles = pf.getParticles();
         for (const auto& particle : particles) {
-            std::cout << particle.pose << std::endl;
+            std::cout << particle.pose << " | " << particle.weight << std::endl;
         }
         
         std::cout << "Pose mean: " << pf.getPoseMean() << std::endl;
         std::cout << "Pose covariance: " << pf.getPoseCovariance() << std::endl;
+        
+        auto particle = pf.getTopParticle();
+        std::cout << "Top particle pose: " << particle.pose << std::endl;
+        std::cout << "Top particle weight: " << particle.weight << std::endl;
         
     } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;

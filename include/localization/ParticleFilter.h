@@ -43,7 +43,10 @@ public:
     // Weighted pose mean
     Pose2D getPoseMean() const { return m_poseMean; }
     // Weighted pose covariance
-    Pose2D getPoseCovariance() { return m_poseCovariance; }
+    Pose2D getPoseCovariance() const { return m_poseCovariance; }
+    // Get pose of the particle with highest weight
+    Particle getTopParticle() const { return m_particles[m_topParticleIndex]; }
+    
      
     /* Util functions, place in separate class */
     float sample_normal_distribution(float variance);
@@ -53,6 +56,7 @@ private:
     std::vector<Particle> m_particles;
     std::map<int, Eigen::Vector2f> m_world;
     Pose2D m_poseMean, m_poseCovariance;
+    std::size_t m_topParticleIndex;
     
     void init_particles(const Pose2D& pose, int num_particles);
     void prepare_world(const world_data& world);

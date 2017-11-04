@@ -32,6 +32,7 @@
 #include <VisionUtils.h>
 #include <motion/Kinematics.h>
 #include <localization/ParticleFilter.h>
+#include <OdometryCollector.h>
 
 #include "StateMachine.h"
 
@@ -206,6 +207,17 @@ int main(int argc, char** argv) {
     cv::namedWindow("line_image", cv::WINDOW_AUTOSIZE);
     
     Localization::ParticleFilter particleFilter(&ini);
+    Pose2D initPose = particleFilter.getTopParticle().pose;
+    Walking::GetInstance()->SetOdo(initPose);
+    
+    Pose2D oldRobotPose(initPose), robotPose(initPose);
+    
+    // Movement noise (odometry movement model format)
+    // Rotation1, translation, Rotation2
+    Eigen::Vector3f movementNoise = {0.01, 250.0f, 0.01};
+    // Measurement noise (range-bearing measurement model format)
+    // range, bearing
+    Eigen::Vector3f measurementNoise = {300.0f, 0.1, 0.0f};
     while (!finish) {
         // Update game controller
 //        GameController::GetInstance()->Update();
@@ -236,8 +248,29 @@ int main(int argc, char** argv) {
 //                goalie.Process();
 //                break;
 //            case ROLES_COUNT:break;.0f
-//        }
+//       float rx, ry, rtheta;
 
+        
+        /*
+         * Receive odometry data
+         */
+        std::cout << "=== Begin particle filter cycle ===" << std::endl;
+        float rx, ry, rtheta;
+        Pose2D robotPose = Walking::GetInstance()->GetOdo();
+        std::cout << " Received pose data from Walking: " << robotPose << std::endl;
+        rx = robotPose.X();
+        ry = robotPose.Y();
+        rtheta = robotPose.Theta();
+        
+        Eigen::Vector3f odometryCommand = particleFilter.get_odometry_command(oldRobotPose, robotPose);
+        particleFilter.predict(odometryCommand, movementNoise); 
+        
+        std::cout << " Successful prediction step using odometry command: " << std::endl;
+        std::cout << odometryCommand << std::endl;
+
+        /* 
+         * Receive sensor data
+         */
         float HeightFromGround = Robot::Kinematics::LEG_LENGTH + 122.2f + 50.5f + Robot::Kinematics::CAMERA_OFFSET_Z;
         //HeightFromGround /= 1000.0f;
         // Z
@@ -266,7 +299,6 @@ int main(int argc, char** argv) {
         
         camera.CaptureFrame();
         unsigned char* imgBuff = camera.getBGRFrame()->m_ImageData;
-        
         if (imgBuff) {
             // Mats that take buffer in the constructor don't release it 
             cv::Mat frame(camera.getHeight(), camera.getWidth(), CV_8UC3, imgBuff);
@@ -274,7 +306,8 @@ int main(int argc, char** argv) {
             vision.setFrame(frame);
             std::vector<cv::Vec4i> lines = vision.lineDetect();
             
-            std::cout << "== Lines ==" << std::endl;
+            ParticleFilter::measurement_bundle rangeBearingData;
+            std::cout << "== Start receiving measurement data ==" << std::endl;
             for (auto& line : lines) {
                 if (line[0] > camera.getWidth() || line[2] > camera.getWidth() || line[1] > camera.getHeight() || line[3] > camera.getHeight()) {
                     // why 
@@ -284,7 +317,6 @@ int main(int argc, char** argv) {
                 cv::Point p1(line[0], line[1]);
                 cv::Point p2(line[2], line[3]);
                 
-                
                 cv::line(frame, p1, p2, cv::Scalar(0, 0, 255), 5);
                 
                 cv::Mat mp1, mp2, gp1, gp2;
@@ -293,6 +325,50 @@ int main(int argc, char** argv) {
                 
                 gp1 = cameraToGround.ImageToWorld_explicit(mp1, R, t, 320.0f, 240.0f, 46.0f);
                 gp2 = cameraToGround.ImageToWorld_explicit(mp2, R, t, 320.0f, 240.0f, 46.0f);
+                float x1 = gp1.at<float>(0, 0);
+                // change direction of y axis
+                float y1 = -1*gp1.at<float>(1, 0);
+                
+                float x2 = gp2.at<float>(0, 0);
+                float y2 = -1*gp2.at<float>(1, 0);
+                
+                // Ignore lines that are projected  too far (Like goal keeper gate lines)
+                if ((x1 < 0.0f) || (x2 < 0.0f)) {
+                    continue;
+                }
+                
+                /*
+                 * Data conversion for particle filter correction step
+                 */
+                
+                // convert to global coordinate frame
+                float gx1, gy1, gx2, gy2;
+                gx1 = (x1-rx)*cos(rtheta) + (y1-ry)*sin(rtheta);
+                gy1 = -(x1-rx)*sin(rtheta) + (y1-ry)*cos(rtheta);
+                gx2 = (x2-rx)*cos(rtheta) + (y2-ry)*sin(rtheta);
+                gy2 = -(x2-rx)*sin(rtheta) + (y2-ry)*cos(rtheta);
+                
+                // Convert to range-bearing 
+                // format is (id, range, bearing)
+                // id is unknown, so it's -1
+                float dx1, dy1, dx2, dy2;
+                dx1 = gx1 - rx;
+                dy1 = gy1 - ry;
+                Robot::Pose2D normalizer(0.0, 0.0, atan2(dy1, dx1) - rtheta);
+                Eigen::Vector3f rb1 = {
+                    -1,
+                    sqrt(dx1*dx1 + dy1*dy1),
+                    normalizer.Theta()
+                };
+                
+                dx2 = gx2 - rx;
+                dy2 = gy2 - ry;
+                normalizer.setTheta(atan2(dy2, dx2) - rtheta);
+                Eigen::Vector3f rb2 = {
+                    -1,
+                    sqrt(dx2*dx2 + dy2*dy2),
+                    normalizer.Theta()
+                };
                 
                 std::cout << "========" << std::endl;
                 std::cout << p1 << std::endl;
@@ -300,12 +376,33 @@ int main(int argc, char** argv) {
                 std::cout << "--------" << std::endl;
                 std::cout << gp1 << std::endl;
                 std::cout << gp2 << std::endl;
-                std::cout << "========" << std::endl;
+                std::cout << "--------" << std::endl;
+                std::cout << gx1 <<  ", " << gy1 << std::endl;
+                std::cout << gx2 <<  ", " << gy2 << std::endl;
+                std::cout << "--------" << std::endl;
+                std::cout << rb1 << std::endl;
+                std::cout << rb2 << std::endl;
+                
+                rangeBearingData.push_back(rb1);
+                rangeBearingData.push_back(rb2);
             }
+            
+            std::cout << "Start correction and resampling steps" << std::endl;
+            particleFilter.correct(rangeBearingData, measurementNoise);
+            particleFilter.resample();
+            
+            std::cout << "==== PF pose ==" << std::endl;
+            std::cout << "Weighted pose mean: " << particleFilter.getPoseMean() << std::endl;
+            std::cout << "Weighted pose covariance: " << particleFilter.getPoseCovariance() << std::endl;
+            
+            
+            std::cout << "=== End particle filter cycle ===" << std::endl;
             
             cv::imshow("line_image", frame);
             cv::waitKey(0);
         }
+        
+        oldRobotPose = robotPose;
         
         
     }

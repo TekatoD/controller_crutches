@@ -32,8 +32,7 @@ void ParticleFilter::predict(const Eigen::Vector3f& command, const Eigen::Vector
 
 void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise)
 {
-    /*
-    float normalizer = 0;
+    float weight_normalizer = 0;
     for (auto& particle : m_particles) {
         float rx, ry, rtheta, vrange, vbearing;
         rx = particle.pose.X(); ry = particle.pose.Y(); rtheta = particle.pose.Theta();
@@ -42,26 +41,51 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         
         // TODO: Create matrix from vector
         Eigen::MatrixXf Qt = Eigen::MatrixXf::Identity(measurements.size()*2, measurements.size()*2);
-        Qt = Qt * 0.1;
+        Qt = Qt * 10.0f;
         
         Eigen::MatrixXf Zdiff(measurements.size()*2, 1);
         int z_counter = 0;
         float lid, srange, sbearing, lx, ly, dx, dy;
         for (const auto& reading : measurements) {
+            // Received measurement
+            // Id is unknown for us
             lid = reading(0); srange = reading(1); sbearing = reading(2);
             Eigen::Vector2f z_measured = {srange, sbearing};
             
-            Eigen::Vector2f lm = m_world[lid];
-            lx = lm(0); ly = lm(1);
+            // Predicted measurement
+            // Cast a line from robot position with same bearing
+            float epx, epy;
+            // Need to normalize angles everywhere
+            Pose2D normalizer(0.0, 0.0, sbearing + rtheta);
+            epx = rx + FieldMap::MAX_DIST * cos(normalizer.Theta());
+            epy = ry + FieldMap::MAX_DIST * sin(normalizer.Theta());
+            
+            FieldMap::LineType ret_type;
+            Point2D isec_point;
+            auto isec_res = m_fieldWorld.IntersectWithField(
+                Line(rx, ry, epx, epy)
+            );
+            if (ret_type == FieldMap::LineType::NONE) {
+                // Ignore this measurement
+                continue;
+            }
+            
+            lx = isec_point.X; ly = isec_point.Y;
             
             dx = lx - rx;
             dy = ly - ry;
             Eigen::Vector2f delta = { dx, dy };
             float q = delta.transpose() * delta;
+            float dst = std::sqrt(dst);
             
-            Pose2D normalizer(0, 0, std::atan2(dy, dx) - rtheta);
+            if (dst > FieldMap::MAX_DIST) {
+                // Ignore this measurement
+                continue;
+            }
+            
+            normalizer.setTheta( std::atan2(dy, dx) - rtheta);
             Eigen::Vector2f z_expected = {
-                std::sqrt(q),
+                dst,
                 normalizer.Theta()
             };
             
@@ -79,8 +103,13 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         float temp = (Zdiff.transpose() * Qt.inverse() * Zdiff)(0);
         float new_weight = denom * std::exp((-1.0f / 2.0f) * temp);
         
-        normalizer = normalizer + new_weight;
+        weight_normalizer = weight_normalizer + new_weight;
         particle.weight = new_weight;
+    }
+    
+    if (fabs(weight_normalizer) < 0.0001) {
+        std::cout << "Weight normalizer is close to 0!" << std::endl;
+        return;
     }
     
     Pose2D meanAccum;
@@ -89,7 +118,7 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
     std::size_t highestWeightIndex = 0;
     for (std::size_t index = 0; index < m_particles.size(); index++) {
         Particle& particle = m_particles[index];
-        particle.weight = particle.weight / normalizer;
+        particle.weight = particle.weight / weight_normalizer;
         pw = particle.weight;
         px = particle.pose.X();
         py = particle.pose.Y();
@@ -120,7 +149,6 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
     
     m_poseMean = meanAccum;
     m_poseCovariance = covAccum;
-    */
 }
 
 void ParticleFilter::resample()
@@ -202,4 +230,24 @@ Pose2D ParticleFilter::odometry_sample(Pose2D pose, Eigen::Vector3f command, Eig
     newPose.setTheta(rot1_h + rot2_h);
     
     return pose + newPose;
+}
+
+Eigen::Vector3f ParticleFilter::get_odometry_command(Pose2D prevPose, Pose2D currPose)
+{
+    float rot1, trans, rot2;
+    float dx, dy;
+    dx = currPose.X() - prevPose.X();
+    dy = currPose.Y() - prevPose.Y();
+    
+    trans = sqrt(dx*dx + dy*dy);
+    Pose2D normalizer(0.0f, 0.0f, atan2(dy, dx) - prevPose.Theta());
+    rot1 = normalizer.Theta();
+    normalizer.setTheta(currPose.Theta() - prevPose.Theta() - rot1);
+    rot2 = normalizer.Theta();
+    
+    return Eigen::Vector3f {
+        rot1,
+        trans,
+        rot2
+    };
 }

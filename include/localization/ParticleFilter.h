@@ -20,7 +20,6 @@ public:
     
     using control_data = std::vector<Eigen::Vector3f>;
     using measurement_bundle = std::vector<Eigen::Vector3f>;
-    using measurement_data = std::vector<measurement_bundle>;
     
     struct Particle {
         Pose2D pose;
@@ -51,6 +50,7 @@ public:
     /* Util functions, place in separate class */
     float sample_normal_distribution(float variance);
     Pose2D odometry_sample(Pose2D pose, Eigen::Vector3f command, Eigen::Vector3f noise);
+    Eigen::Vector3f get_odometry_command(Pose2D prevPose, Pose2D currPose);
     /* */
 private:
     std::vector<Particle> m_particles;

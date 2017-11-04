@@ -6,16 +6,21 @@
 using namespace Localization;
 using namespace Robot;
 
-ParticleFilter::ParticleFilter(const Robot::Pose2D& pose, world_data world, int num_particles)
+ParticleFilter::ParticleFilter(minIni* ini)
 {
-    init_particles(pose, num_particles);
-    prepare_world(world);
+    LoadIniSettings(ini);
 }
 
-ParticleFilter::ParticleFilter(world_data world, int num_particles)
+void ParticleFilter::LoadIniSettings(minIni* ini)
 {
-    init_particles(Robot::Pose2D(0, 0, 0), num_particles);
-    prepare_world(world);
+    m_fieldWorld.LoadIniSettings(ini);
+    
+    float poseX = ini->getf("ParticleFilter", "init_x");
+    float poseY = ini->getf("ParticleFilter", "init_y");
+    float poseTheta = ini->getf("ParticleFilter", "init_theta");
+    int num_particles = ini->geti("ParticleFilter", "particle_number", DEFAULT_PARTICLE_NUMBER); 
+    
+    init_particles(Robot::Pose2D(poseX, poseY, poseTheta), num_particles);
 }
 
 void ParticleFilter::predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise)
@@ -27,6 +32,7 @@ void ParticleFilter::predict(const Eigen::Vector3f& command, const Eigen::Vector
 
 void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise)
 {
+    /*
     float normalizer = 0;
     for (auto& particle : m_particles) {
         float rx, ry, rtheta, vrange, vbearing;
@@ -114,6 +120,7 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
     
     m_poseMean = meanAccum;
     m_poseCovariance = covAccum;
+    */
 }
 
 void ParticleFilter::resample()
@@ -158,14 +165,6 @@ void ParticleFilter::init_particles(const Pose2D& pose, int num_particles)
     for (auto& particle : m_particles) {
         particle.pose = pose;
         particle.weight = defaultWeight;
-    }
-}
-
-void ParticleFilter::prepare_world(const world_data& world)
-{
-    for (const auto& landmark : world) {
-        Eigen::Vector2f lpos = {landmark(1), landmark(2)};
-        m_world[landmark(0)] = lpos;
     }
 }
 

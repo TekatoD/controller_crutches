@@ -23,10 +23,6 @@ namespace Localization {
         
         float Length() const;
         bool IsPointOnLine(float px, float py, float eps=0.001) const;
-        
-        /*
-         * http://www-cs.ccny.cuny.edu/~wolberg/capstone/intersection/Intersection%20point%20of%20two%20lines.html
-         */
         static bool IntersectLines(const Line& l1, const Line& l2, Point2D& intersection, float eps=0.00001);
         
         friend std::ostream& operator<<(std::ostream& out, const Line& l);

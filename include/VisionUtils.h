@@ -238,7 +238,7 @@ namespace ant {
                 //f = 239.53f;
                 float magicNumber = 1.45f;
                 focalDist = focalDist / magicNumber;
-                std::cout << "FocalDist: " << focalDist << std::endl;
+                //std::cout << "FocalDist: " << focalDist << std::endl;
                 cv::Mat Pixel = (cv::Mat_<float>(3, 1) << focalDist, -ix + cx, -iy + cy);
                 
                 //std::cout << "Pixel: " << std::endl << Pixel << std::endl;

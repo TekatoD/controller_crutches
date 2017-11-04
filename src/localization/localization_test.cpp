@@ -71,6 +71,7 @@ int main(int argc, char** argv)
     }
     */
     
+    /*
     if (argc != 3) {
         std::cout << "Need data" << std::endl;
         return -1;
@@ -112,6 +113,7 @@ int main(int argc, char** argv)
     } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;
     }
+    */
     
     return 0;
 }

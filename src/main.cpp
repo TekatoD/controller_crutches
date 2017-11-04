@@ -31,7 +31,6 @@
 #include <Vision.h>
 #include <VisionUtils.h>
 #include <motion/Kinematics.h>
-#include <localization/LocalizationUtil.h>
 #include <localization/ParticleFilter.h>
 
 #include "StateMachine.h"
@@ -205,6 +204,8 @@ int main(int argc, char** argv) {
     
     ant::Vision vision("./res/vision_cfg/");
     cv::namedWindow("line_image", cv::WINDOW_AUTOSIZE);
+    
+    Localization::ParticleFilter particleFilter(&ini);
     while (!finish) {
         // Update game controller
 //        GameController::GetInstance()->Update();
@@ -249,17 +250,10 @@ int main(int argc, char** argv) {
         Robot::Kinematics::ComputeHeadForwardKinematics(HeadTransformE, HeadPan, HeadTilt);
         cv::eigen2cv(HeadTransformE, HeadTransform);
         
-        /*
-        cv::Mat Rx = cv::Mat::eye(3, 3, CV_32F);
-        cv::Mat Ry = (cv::Mat_<float>(3, 3) << cos(HeadTilt), 0.0f, sin(HeadTilt), 0.0f, 1.0f, 0.0f, -sin(HeadTilt), 0.0f, cos(HeadTilt));
-        cv::Mat Rz = (cv::Mat_<float>(3, 3) << cos(HeadPan), -sin(HeadPan), 0.0f, sin(HeadPan), cos(HeadPan), 0.0f, 0.0f, 0.0f, 1.0f);
-        
-        cv::Mat R = Rz * (Ry * Rx);
-        cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, HeightFromGround);
-        */
+        //std::cout << "HeadTransform: " << HeadTransform << std::endl;
         
         cv::Mat R = HeadTransform(cv::Range(0, 3), cv::Range(0, 3));
-        std::cout << "HeadTransform: " << HeadTransform << std::endl;
+        
         // Translation is in mm
         cv::Mat t = HeadTransform(cv::Range(0, 3), cv::Range(3, 4));
         //t /= 1000.0f;
@@ -267,7 +261,6 @@ int main(int argc, char** argv) {
         
         // cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, HeightFromGround);
         
-        // works with y / x
         ant::vision_utils::CameraParameters params(R, t, 0.02, 1.0f, 0.0f, 320.0f/2.0f, 240.0f/2.0f);
         ant::vision_utils::CameraProjection cameraToGround(params);
         
@@ -302,7 +295,6 @@ int main(int argc, char** argv) {
                 gp2 = cameraToGround.ImageToWorld_explicit(mp2, R, t, 320.0f, 240.0f, 46.0f);
                 
                 std::cout << "========" << std::endl;
-                std::cout << camera.getWidth() << " " << camera.getHeight() << std::endl;
                 std::cout << p1 << std::endl;
                 std::cout << p2 << std::endl;
                 std::cout << "--------" << std::endl;

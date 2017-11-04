@@ -18,6 +18,7 @@ using namespace Localization;
 int main(int argc, char** argv)
 {
     
+    /*
     minIni ini(INI_FILE_PATH);
     FieldMap field;
     field.LoadIniSettings(&ini);
@@ -49,6 +50,7 @@ int main(int argc, char** argv)
             std::cout << "Intersection point: " << isec.X << ", " << isec.Y << std::endl;
         }
     }
+    */
     
     /*
     Line l1(0.0f, 0.0f, 10.0f, 10.0f);
@@ -69,7 +71,6 @@ int main(int argc, char** argv)
     }
     */
     
-    /*
     if (argc != 3) {
         std::cout << "Need data" << std::endl;
         return -1;
@@ -83,7 +84,7 @@ int main(int argc, char** argv)
         auto worldData = reader.getWorldData();
         
         Robot::Pose2D pose(0, 0, 0);
-        Localization::ParticleFilter pf(pose, worldData, 100);
+        Localization::ParticleFilter pf(pose, worldData, 10);
         
         int max_timestep = controlData.size();
         Eigen::Vector3f noise = {0.01, 0.05, 0.01};
@@ -101,10 +102,12 @@ int main(int argc, char** argv)
             std::cout << particle.pose << std::endl;
         }
         
+        std::cout << "Pose mean: " << pf.getPoseMean() << std::endl;
+        std::cout << "Pose covariance: " << pf.getPoseCovariance() << std::endl;
+        
     } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;
     }
-    */
     
     return 0;
 }

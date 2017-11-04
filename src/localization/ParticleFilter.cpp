@@ -77,9 +77,34 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         particle.weight = new_weight;
     }
     
+    Pose2D meanAccum;
+    float pw, px, py, ptheta;
     for (auto& particle : m_particles) {
         particle.weight = particle.weight / normalizer;
+        pw = particle.weight;
+        px = particle.pose.X();
+        py = particle.pose.Y();
+        ptheta = particle.pose.Theta();
+        
+        meanAccum += Pose2D(px*pw, py*pw, pw*ptheta);
     }
+    
+    Pose2D covAccum;
+    float mx, my, mtheta;
+    mx = meanAccum.X();
+    my = meanAccum.Y();
+    mtheta = meanAccum.Theta();
+    for (auto& particle : m_particles) {
+        pw = particle.weight;
+        px = particle.pose.X();
+        py = particle.pose.Y();
+        ptheta = particle.pose.Theta();
+        
+        covAccum += Pose2D(pw*pow(px-mx, 2), pw*pow(py-my, 2), pw*pow(ptheta-mtheta, 2));
+    }
+    
+    m_poseMean = meanAccum;
+    m_poseCovariance = covAccum;
 }
 
 void ParticleFilter::resample()

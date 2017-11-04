@@ -31,6 +31,8 @@
 #include <Vision.h>
 #include <VisionUtils.h>
 #include <motion/Kinematics.h>
+#include <localization/LocalizationUtil.h>
+#include <localization/ParticleFilter.h>
 
 #include "StateMachine.h"
 
@@ -48,6 +50,7 @@ extern "C" {
 #define U2D_DEV_NAME1       "/dev/ttyUSB1"
 
 using namespace Robot;
+using namespace Localization;
 
 //LinuxCM730 linux_cm730(U2D_DEV_NAME0);
 VrepConnector vrepConnector;

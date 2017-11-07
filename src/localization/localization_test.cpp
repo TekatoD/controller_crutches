@@ -18,7 +18,6 @@ using namespace Localization;
 int main(int argc, char** argv)
 {
     
-    /*
     minIni ini(INI_FILE_PATH);
     FieldMap field;
     field.LoadIniSettings(&ini);
@@ -50,7 +49,6 @@ int main(int argc, char** argv)
             std::cout << "Intersection point: " << isec.X << ", " << isec.Y << std::endl;
         }
     }
-    */
     
     /*
     Line l1(0.0f, 0.0f, 10.0f, 10.0f);

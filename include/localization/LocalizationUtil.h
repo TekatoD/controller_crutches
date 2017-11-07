@@ -53,7 +53,7 @@ namespace Localization {
         void LoadIniSettings(minIni* ini);
         void PrintFieldLines() const;
         
-        std::tuple<LineType, Point2D> IntersectWithField(const Line& l);
+        std::tuple<LineType, Point2D> IntersectWithField(const Line& l, float minDist=0.0f);
         
     private:
         std::map<LineType, Line> m_fieldLines;

@@ -114,7 +114,7 @@ void Localization::FieldMap::PrintFieldLines() const
 }
 
 
-std::tuple<Localization::FieldMap::LineType, Point2D> Localization::FieldMap::IntersectWithField(const Line& l)
+std::tuple<Localization::FieldMap::LineType, Point2D> Localization::FieldMap::IntersectWithField(const Line& l, float minDist)
 {
     LineType type = LineType::NONE;
     Point2D isec(0.0f, 0.0f);
@@ -127,8 +127,9 @@ std::tuple<Localization::FieldMap::LineType, Point2D> Localization::FieldMap::In
             if (l.IsPointOnLine(temp_isec.X, temp_isec.Y)) {
                 // Line can intersect multiple lines on the field
                 // Find the line with the closest intersection point
+                // If minDist is specified, only accept intersections with this minimum distance
                 float temp_dist = Point2D::Distance(l.p1, temp_isec);
-                if (temp_dist < dist) {
+                if (temp_dist < dist && temp_dist >= minDist) {
                     type = temp_type; 
                     isec = temp_isec;
                     dist = temp_dist;

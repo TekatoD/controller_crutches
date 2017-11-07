@@ -32,7 +32,7 @@ void ParticleFilter::predict(const Eigen::Vector3f& command, const Eigen::Vector
 
 void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise)
 {
-    float weight_normalizer = 0;
+    float weight_normalizer = 0.0f;
     for (auto& particle : m_particles) {
         float rx, ry, rtheta, vrange, vbearing;
         rx = particle.pose.X(); ry = particle.pose.Y(); rtheta = particle.pose.Theta();
@@ -41,7 +41,7 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         
         // TODO: Create matrix from vector
         Eigen::MatrixXf Qt = Eigen::MatrixXf::Identity(measurements.size()*2, measurements.size()*2);
-        Qt = Qt * 50.0f;
+        Qt = Qt * 10.0f;
         
         Eigen::MatrixXf Zdiff(measurements.size()*2, 1);
         int z_counter = 0;
@@ -62,9 +62,13 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
             
             FieldMap::LineType ret_type;
             Point2D isec_point;
+            // Accept intersections with distance from robot to intersection point greater than minDist 
             auto isec_res = m_fieldWorld.IntersectWithField(
                 Line(rx, ry, epx, epy)
             );
+            
+            ret_type = std::get<0>(isec_res);
+            isec_point = std::get<1>(isec_res);
             if (ret_type == FieldMap::LineType::NONE) {
                 // Ignore this measurement
                 continue;
@@ -97,14 +101,29 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
             z_counter += 2;
         }
         
+        if (Zdiff.size() < 1) {
+            std::cout << "No measurements to process" << std::endl;
+            break;
+        }
+        
         float det = (2 * M_PI * Qt).determinant();
         float denom = 1 / std::sqrt(det);
         
         float temp = (Zdiff.transpose() * Qt.inverse() * Zdiff)(0);
-        float new_weight = denom * std::exp((-1.0f / 2.0f) * temp);
+        float new_weight = denom * std::exp((-1.0f / 2.0f) * temp) * 1000.0f;
+        
+        if (std::isnan(new_weight) || new_weight < 0.0001) {
+            new_weight = 0.0f;
+        }
         
         weight_normalizer = weight_normalizer + new_weight;
-        particle.weight = particle.weight * new_weight;
+        particle.weight = new_weight;
+    }
+    
+    if (weight_normalizer < 0.0001) {
+        std::cout << "weight normalizer is too close to 0!" << std::endl;
+    } else {
+        std::cout << "weight normalizer: " << weight_normalizer << std::endl;
     }
     
     Pose2D meanAccum;
@@ -114,7 +133,8 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
     for (std::size_t index = 0; index < m_particles.size(); index++) {
         Particle& particle = m_particles[index];
         
-        if (fabs(weight_normalizer) < 0.0001) {
+        // Temporary measure, so we don't divide by zero
+        if (fabs(weight_normalizer) < 0.0001 || std::isnan(weight_normalizer)) {
             particle.weight = 1.0f/m_particles.size();
         } else {
             particle.weight = particle.weight / weight_normalizer;

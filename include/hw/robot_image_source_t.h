@@ -38,7 +38,7 @@ namespace drwn {
 
         float get_height() const;
 
-        cv::Mat capture_frame() const override;
+        cv::Mat capture_frame() override;
 
         bool is_debug_enabled() const noexcept;
 

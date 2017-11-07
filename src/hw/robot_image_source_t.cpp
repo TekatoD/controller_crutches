@@ -78,7 +78,7 @@ float robot_image_source_t::get_height() const {
     return (float) m_capture.get(CV_CAP_PROP_FRAME_HEIGHT);
 }
 
-cv::Mat robot_image_source_t::capture_frame() const {
+cv::Mat robot_image_source_t::capture_frame() {
     cv::Mat frame;
     m_capture >> frame;
     if(m_debug) {

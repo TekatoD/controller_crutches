@@ -13,7 +13,7 @@ namespace drwn {
         image_source_t(const image_source_t&) = delete;
         image_source_t& operator=(const image_source_t&) = delete;
 
-        virtual cv::Mat capture_frame() const = 0;
+        virtual cv::Mat capture_frame() = 0;
 
         virtual ~image_source_t() = default;
 

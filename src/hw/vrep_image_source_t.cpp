@@ -59,7 +59,7 @@ void vrep_image_source_t::connect() {
     }
 }
 
-cv::Mat vrep_image_source_t::capture_frame() const {
+cv::Mat vrep_image_source_t::capture_frame() {
     simxSynchronousTrigger(m_client_id);
     if(simxGetVisionSensorImage(m_client_id, m_sensor_handle, m_resolution,
                                 &m_binary_image, 0, simx_opmode_buffer) == simx_return_ok) {

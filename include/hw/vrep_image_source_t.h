@@ -18,7 +18,7 @@ namespace drwn {
 
         void set_client_id(int client_id = -1);
 
-        cv::Mat capture_frame() const override;
+        cv::Mat capture_frame() override;
 
     private:
         bool m_debug{false};
@@ -31,9 +31,9 @@ namespace drwn {
         std::string m_sensor_name{"camera"};
         int m_width{320};
         int m_height{240};
-        mutable int m_resolution[2]{320, 240}; //Cause we need to change this while capturing frame in the const method
+        int m_resolution[2]{320, 240}; //Cause we need to change this while capturing frame in the const method
         int m_client_id{-1};
-        mutable unsigned char* m_binary_image; //Cause we need to change this while capturing frame in the const method
+        unsigned char* m_binary_image; //Cause we need to change this while capturing frame in the const method
         int m_sensor_handle{-1};
     };
 

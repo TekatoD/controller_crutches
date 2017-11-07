@@ -8,8 +8,8 @@
 
 using namespace drwn;
 
-ball_tracker_configuration_strategy_t::ball_tracker_configuration_strategy_t(ball_tracker_t* ballTracker, std::string section)
-        : configuration_strategy_t(std::move(section)), m_ball_tracker(ballTracker) { }
+ball_tracker_configuration_strategy_t::ball_tracker_configuration_strategy_t(ball_tracker_t* ball_tracker, std::string section)
+        : configuration_strategy_t(std::move(section)), m_ball_tracker(ball_tracker) { }
 
 void ball_tracker_configuration_strategy_t::read_config(const boost::property_tree::ptree& prop) {
     if (m_ball_tracker != nullptr) {

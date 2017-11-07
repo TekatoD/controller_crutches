@@ -640,7 +640,7 @@ void action_t::enable_debug(bool debug) noexcept {
     m_debug = debug;
 }
 
-action_t* action_t::GetInstance() {
+action_t* action_t::get_instance() {
     static action_t action;
     return &action;
 }

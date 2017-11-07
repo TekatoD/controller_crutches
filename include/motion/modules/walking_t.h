@@ -158,7 +158,7 @@ namespace drwn {
         int m_d_gain;
 
     public:
-        static walking_t* GetInstance();
+        static walking_t* get_instance();
 
         void initialize() override;
 

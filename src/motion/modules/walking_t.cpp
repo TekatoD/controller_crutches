@@ -618,7 +618,7 @@ void walking_t::set_odo(const pose_2D_t& pose) {
     m_odometry_collector.set_pose(pose);
 }
 
-walking_t* walking_t::GetInstance() {
+walking_t* walking_t::get_instance() {
     static walking_t walking;
     return &walking;
 }

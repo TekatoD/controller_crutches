@@ -35,7 +35,7 @@ void joint_data_t::set_enable(int id, bool enable) {
 
 void joint_data_t::set_enable(int id, bool enable, bool exclusive) {
 #ifndef WEBOTS // Because MotionManager is not included in the lite version of the Framework used in the simulation
-    if (enable && exclusive) motion_manager_t::GetInstance()->set_joint_disable(id);
+    if (enable && exclusive) motion_manager_t::get_instance()->set_joint_disable(id);
 #endif
     m_enable[id] = enable;
 }

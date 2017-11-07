@@ -27,20 +27,20 @@ state_machine_t::state_machine_t() {
 
 void state_machine_t::check(CM730_t* cm730) {
     if (motion_status_t::FALLEN != STANDUP && m_is_started == 1) {
-        walking_t::GetInstance()->stop();
-        while (walking_t::GetInstance()->is_running()) usleep(8000);
+        walking_t::get_instance()->stop();
+        while (walking_t::get_instance()->is_running()) usleep(8000);
 
-        action_t::GetInstance()->joint.set_enable_body(true, true);
+        action_t::get_instance()->joint.set_enable_body(true, true);
 
         if (motion_status_t::FALLEN == FORWARD)
-            action_t::GetInstance()->start(10);   // FORWARD GETUP
+            action_t::get_instance()->start(10);   // FORWARD GETUP
         else if (motion_status_t::FALLEN == BACKWARD)
-            action_t::GetInstance()->start(11);   // BACKWARD GETUP
+            action_t::get_instance()->start(11);   // BACKWARD GETUP
 
-        while (action_t::GetInstance()->is_running()) usleep(8000);
+        while (action_t::get_instance()->is_running()) usleep(8000);
 
-        head_t::GetInstance()->joint.set_enable_head_only(true, true);
-        walking_t::GetInstance()->joint.set_enable_body_without_head(true, true);
+        head_t::get_instance()->joint.set_enable_head_only(true, true);
+        walking_t::get_instance()->joint.set_enable_body_without_head(true, true);
     }
 
     if (m_old_btn == motion_status_t::BUTTON)
@@ -115,23 +115,23 @@ void state_machine_t::update_leds(CM730_t* cm730) const {
 
 void state_machine_t::enable() {
     m_is_started = true;
-    motion_manager_t::GetInstance()->reinitialize();
-    motion_manager_t::GetInstance()->set_enable(true);
+    motion_manager_t::get_instance()->reinitialize();
+    motion_manager_t::get_instance()->set_enable(true);
 
-    action_t::GetInstance()->joint.set_enable_body(true, true);
+    action_t::get_instance()->joint.set_enable_body(true, true);
 
-    action_t::GetInstance()->start(9);
-    while (action_t::GetInstance()->is_running()) usleep(8000);
+    action_t::get_instance()->start(9);
+    while (action_t::get_instance()->is_running()) usleep(8000);
 
-    head_t::GetInstance()->joint.set_enable_head_only(true, true);
-    walking_t::GetInstance()->joint.set_enable_body_without_head(true, true);
+    head_t::get_instance()->joint.set_enable_head_only(true, true);
+    walking_t::get_instance()->joint.set_enable_body_without_head(true, true);
 
-    motion_manager_t::GetInstance()->reset_gyro_calibration();
+    motion_manager_t::get_instance()->reset_gyro_calibration();
     while (true) {
-        if (motion_manager_t::GetInstance()->get_calibration_status() == 1) {
+        if (motion_manager_t::get_instance()->get_calibration_status() == 1) {
             break;
-        } else if (motion_manager_t::GetInstance()->get_calibration_status() == -1) {
-            motion_manager_t::GetInstance()->reset_gyro_calibration();
+        } else if (motion_manager_t::get_instance()->get_calibration_status() == -1) {
+            motion_manager_t::get_instance()->reset_gyro_calibration();
         }
         usleep(8000);
     }
@@ -139,11 +139,11 @@ void state_machine_t::enable() {
 
 void state_machine_t::disable() {
     m_is_started = false;
-    walking_t::GetInstance()->stop();
-    action_t::GetInstance()->joint.set_enable_body(true, true);
+    walking_t::get_instance()->stop();
+    action_t::get_instance()->joint.set_enable_body(true, true);
 
-    while (!action_t::GetInstance()->start(15)) usleep(8000);
-    while (action_t::GetInstance()->is_running()) usleep(8000);
+    while (!action_t::get_instance()->start(15)) usleep(8000);
+    while (action_t::get_instance()->is_running()) usleep(8000);
 }
 
 int state_machine_t::is_started() {

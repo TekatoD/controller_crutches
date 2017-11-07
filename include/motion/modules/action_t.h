@@ -68,7 +68,7 @@ namespace drwn {
 
         ~action_t();
 
-        static action_t* GetInstance();
+        static action_t* get_instance();
 
         void initialize() override;
 

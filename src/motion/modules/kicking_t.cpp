@@ -340,7 +340,7 @@ void drwn::kicking_t::update_active_params() noexcept {
     m_cur_balance_enabled = m_balance_enabled;
 }
 
-drwn::kicking_t* drwn::kicking_t::GetInstance() {
+drwn::kicking_t* drwn::kicking_t::get_instance() {
     static kicking_t instance;
     return &instance;
 }

@@ -7,9 +7,9 @@ walking_configuration_strategy_t::walking_configuration_strategy_t(std::string s
         : configuration_strategy_t(std::move(section)) { }
 
 void walking_configuration_strategy_t::read_config(const boost::property_tree::ptree& prop) {
-    if (prop.count(get_section()) == 0) return; // Section doesn't exist
+    if (prop.count(this->get_section()) == 0) return; // Section doesn't exist
 
-    walking_t* walking = walking_t::GetInstance();
+    walking_t* walking = walking_t::get_instance();
     auto& walking_section = prop.get_child(this->get_section());
 
     auto odo_x_factor = walking_section.get_optional<float>("odo_x_factor");
@@ -68,9 +68,9 @@ void walking_configuration_strategy_t::read_config(const boost::property_tree::p
 }
 
 void walking_configuration_strategy_t::write_config(boost::property_tree::ptree& prop) const {
-    if (prop.count(get_section()) == 0) prop.add_child(get_section(), {});
+    if (prop.count(this->get_section()) == 0) prop.add_child(this->get_section(), {});
 
-    walking_t* walking = walking_t::GetInstance();
+    walking_t* walking = walking_t::get_instance();
     auto& walking_section = prop.get_child(this->get_section());
 
     walking_section.put("odo_x_factor", walking->get_odo_x_factor());

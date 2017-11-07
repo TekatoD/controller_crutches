@@ -32,13 +32,13 @@ void drwn::go_to_t::process(drwn::pose_2D_t pos) {
     float dist = hypot(pos.x(), pos.y());
     float angle = atan2(pos.y(), pos.x()) / M_PI * 180.0;
 
-    if (!walking_t::GetInstance()->is_running() ||
-            walking_t::GetInstance()->get_x_move_amplitude() != m_x ||
-            walking_t::GetInstance()->get_x_move_amplitude() != m_y ||
-            walking_t::GetInstance()->get_x_move_amplitude() != m_a) {
-        m_x = walking_t::GetInstance()->get_x_move_amplitude();
-        m_y = walking_t::GetInstance()->get_y_move_amplitude();
-        m_a = walking_t::GetInstance()->get_a_move_amplitude();
+    if (!walking_t::get_instance()->is_running() ||
+            walking_t::get_instance()->get_x_move_amplitude() != m_x ||
+            walking_t::get_instance()->get_x_move_amplitude() != m_y ||
+            walking_t::get_instance()->get_x_move_amplitude() != m_a) {
+        m_x = walking_t::get_instance()->get_x_move_amplitude();
+        m_y = walking_t::get_instance()->get_y_move_amplitude();
+        m_a = walking_t::get_instance()->get_a_move_amplitude();
     }
 
 
@@ -86,13 +86,13 @@ void drwn::go_to_t::process(drwn::pose_2D_t pos) {
 
 
     if (!m_done) {
-        walking_t::GetInstance()->joint.set_enable_body_without_head(true, true);
-        walking_t::GetInstance()->set_x_move_amplitude(m_x);
-        walking_t::GetInstance()->set_y_move_amplitude(m_y);
-        walking_t::GetInstance()->set_a_move_amplitude(m_a);
-        walking_t::GetInstance()->start();
+        walking_t::get_instance()->joint.set_enable_body_without_head(true, true);
+        walking_t::get_instance()->set_x_move_amplitude(m_x);
+        walking_t::get_instance()->set_y_move_amplitude(m_y);
+        walking_t::get_instance()->set_a_move_amplitude(m_a);
+        walking_t::get_instance()->start();
     } else {
-        walking_t::GetInstance()->stop();
+        walking_t::get_instance()->stop();
     }
 }
 

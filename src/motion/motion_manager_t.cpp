@@ -263,3 +263,16 @@ int motion_manager_t::get_joint_offset(int id) const {
         throw std::runtime_error("Can't get joint offset. Wrong joint ID: " + std::to_string(id));
     }
 }
+
+motion_manager_t* motion_manager_t::get_instance() {
+    static motion_manager_t instance;
+    return &instance;
+}
+
+void motion_manager_t::reset_gyro_calibration() {
+    m_calibration_status = 0;
+    m_fb_gyro_center = 512;
+    m_rl_gyro_center = 512;
+}
+
+int motion_manager_t::get_calibration_status() const { return m_calibration_status; }

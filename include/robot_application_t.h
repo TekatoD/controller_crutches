@@ -14,6 +14,7 @@
 #include <config/strategies/config_path_arguments_parsing_strategy_t.h>
 #include <config/strategies/help_arguments_parsing_strategy_t.h>
 #include <hw/image_source_t.h>
+#include <config/strategies/robot_image_source_configuration_strategy_t.h>
 #include "config/configuration_file_loader_t.h"
 #include "config/strategies/walking_configuration_strategy_t.h"
 #include "config/strategies/motion_manager_configuration_strategy_t.h"
@@ -109,6 +110,7 @@ namespace drwn {
         head_configuration_strategy_t m_head_configuration_strategy;
         walking_configuration_strategy_t m_walking_configuration_strategy;
         motion_manager_configuration_strategy_t m_motion_manager_configuration_strategy;
+        robot_image_source_configuration_strategy_t m_robot_image_source_configuration_strategy;
 
         //*** Command line parsing strategies ***//
         help_arguments_parsing_strategy_t m_arg_help_requested;
@@ -137,6 +139,7 @@ namespace drwn {
         config_path_arguments_parsing_strategy_t m_arg_config_walking;
         config_path_arguments_parsing_strategy_t m_arg_config_action;
         config_path_arguments_parsing_strategy_t m_arg_config_kicking;
+        config_path_arguments_parsing_strategy_t m_arg_config_image_source;
 
         action_configuration_file_loader_t m_action_configuration_loader;
 

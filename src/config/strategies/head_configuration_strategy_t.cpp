@@ -13,7 +13,7 @@ head_configuration_strategy_t::head_configuration_strategy_t(std::string section
 void head_configuration_strategy_t::read_config(const boost::property_tree::ptree& prop) {
     if (prop.count(get_section()) == 0) return; // Section doesn't exist
 
-    head_t* head = head_t::GetInstance();
+    head_t* head = head_t::get_instance();
     auto& head_section = prop.get_child(this->get_section());
 
     auto pan_p_gain = head_section.get_optional<float>("pan_p_gain");
@@ -42,7 +42,7 @@ void head_configuration_strategy_t::read_config(const boost::property_tree::ptre
 void head_configuration_strategy_t::write_config(boost::property_tree::ptree& prop) const {
     if (prop.count(get_section()) == 0) prop.add_child(get_section(), {});
 
-    head_t* head = head_t::GetInstance();
+    head_t* head = head_t::get_instance();
     auto& head_section = prop.get_child(this->get_section());
 
     head_section.put("pan_p_gain", head->get_pan_p_gain());

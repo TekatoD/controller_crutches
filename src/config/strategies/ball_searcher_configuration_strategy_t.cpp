@@ -8,8 +8,8 @@
 
 using namespace drwn;
 
-ball_searcher_configuration_strategy_t::ball_searcher_configuration_strategy_t(ball_searcher_t* ballSearcher, std::string section)
-        : configuration_strategy_t(std::move(section)), m_ball_searcher(ballSearcher) { }
+ball_searcher_configuration_strategy_t::ball_searcher_configuration_strategy_t(ball_searcher_t* ball_searcher, std::string section)
+        : configuration_strategy_t(std::move(section)), m_ball_searcher(ball_searcher) { }
 
 void ball_searcher_configuration_strategy_t::read_config(const boost::property_tree::ptree& prop) {
     if (m_ball_searcher != nullptr) {

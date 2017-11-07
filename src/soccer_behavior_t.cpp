@@ -34,10 +34,10 @@ soccer_behavior_t::soccer_behavior_t() {
 
 void soccer_behavior_t::process() {
     // Update CV
-    walking_t::GetInstance()->set_move_aim_on(false);
-    const pose_2D_t& Spawn = state_machine_t::get_instance()->get_spawn_position();
+    walking_t::get_instance()->set_move_aim_on(false);
+    const pose_2D_t& spawn = state_machine_t::get_instance()->get_spawn_position();
     const pose_2D_t& Starting = state_machine_t::get_instance()->get_starting_position();
-    const pose_2D_t& Odo = walking_t::GetInstance()->get_odo();
+    const pose_2D_t& Odo = walking_t::get_instance()->get_odo();
 
 //    m_ball_tracker.process(ball);
 
@@ -73,10 +73,10 @@ void soccer_behavior_t::process() {
     if (State.state == STATE_SET || State.state == STATE_READY || State.state == STATE_INITIAL) {
         const pose_2D_t& Spawn = state_machine_t::get_instance()->get_spawn_position();
         if (m_ball_tracker.is_no_ball()) {
-            head_t::GetInstance()->move_to_home();
+            head_t::get_instance()->move_to_home();
         }
-        walking_t::GetInstance()->set_odo(Starting);
-        walking_t::GetInstance()->stop();
+        walking_t::get_instance()->set_odo(Starting);
+        walking_t::get_instance()->stop();
         return;
     }
 
@@ -87,13 +87,13 @@ void soccer_behavior_t::process() {
 
         if (m_previous_state != STATE_SET) {
             m_previous_state = STATE_SET;
-            walking_t::GetInstance()->set_odo(Starting);
+            walking_t::get_instance()->set_odo(Starting);
         }
 
-        if (action_t::GetInstance()->is_running() == 0) {
+        if (action_t::get_instance()->is_running() == 0) {
             // Switch to head and walking after action
-            head_t::GetInstance()->joint.set_enable_head_only(true, true);
-            walking_t::GetInstance()->joint.set_enable_body_without_head(true, true);
+            head_t::get_instance()->joint.set_enable_head_only(true, true);
+            walking_t::get_instance()->joint.set_enable_body_without_head(true, true);
 
             // Calculate angles to gate
             float free_space = (m_field.get_width() - m_field.get_gate_width()) / 2.0;
@@ -120,14 +120,14 @@ void soccer_behavior_t::process() {
 
             // Kicking the ball
             if (m_ball_follower.get_kicking_leg() != NO_KICKING) {
-                head_t::GetInstance()->joint.set_enable_head_only(true, true);
-                action_t::GetInstance()->joint.set_enable_body_without_head(true, true);
+                head_t::get_instance()->joint.set_enable_head_only(true, true);
+                action_t::get_instance()->joint.set_enable_body_without_head(true, true);
                 // Kick the ball
 
                 if (m_ball_follower.get_kicking_leg() == RIGHT_LEG_KICK) {
-                    action_t::GetInstance()->start(12);   // RIGHT KICK
+                    action_t::get_instance()->start(12);   // RIGHT KICK
                 } else if (m_ball_follower.get_kicking_leg() == LEFT_LEG_KICK) {
-                    action_t::GetInstance()->start(13);   // LEFT KICK
+                    action_t::get_instance()->start(13);   // LEFT KICK
                 }
             }
         }

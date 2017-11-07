@@ -29,7 +29,7 @@ void ball_tracker_t::process(point_2D_t pos) {
         m_ball_position.X = -1;
         m_ball_position.Y = -1;
         if (m_no_ball_count < m_no_ball_max_count) {
-            head_t::GetInstance()->move_tracking();
+            head_t::get_instance()->move_tracking();
             m_no_ball_count++;
         }
 //        else
@@ -42,7 +42,7 @@ void ball_tracker_t::process(point_2D_t pos) {
         offset.X *= (camera_t::VIEW_H_ANGLE / (float) camera_t::WIDTH); // pixel per angle
         offset.Y *= (camera_t::VIEW_V_ANGLE / (float) camera_t::HEIGHT); // pixel per angle
         m_ball_position = offset;
-        head_t::GetInstance()->move_tracking(m_ball_position);
+        head_t::get_instance()->move_tracking(m_ball_position);
     }
 }
 

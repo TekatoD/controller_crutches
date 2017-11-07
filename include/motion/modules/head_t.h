@@ -10,7 +10,7 @@ namespace drwn {
     class head_t
             : public motion_module_t {
     public:
-        static head_t* GetInstance() {
+        static head_t* get_instance() {
             static head_t head;
             return &head;
         }

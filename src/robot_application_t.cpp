@@ -153,7 +153,7 @@ void robot_application_t::init_cv() {
 
 void robot_application_t::init_motion_manager() {
     if (m_debug) LOG_DEBUG << "Initializing motion manager...";
-    if (!motion_manager_t::GetInstance()->initialize(m_cm730.get())) {
+    if (!motion_manager_t::get_instance()->initialize(m_cm730.get())) {
         throw std::runtime_error("Fail to initialize Motion Manager!");
     }
     if (m_debug) LOG_INFO << "Motion manager is ready";
@@ -161,16 +161,16 @@ void robot_application_t::init_motion_manager() {
 
 void robot_application_t::init_motion_modules() {
     if (m_debug) LOG_DEBUG << "Initializing motion modules...";
-    motion_manager_t::GetInstance()->add_module((motion_module_t*) action_t::GetInstance());
-    motion_manager_t::GetInstance()->add_module((motion_module_t*) head_t::GetInstance());
-    motion_manager_t::GetInstance()->add_module((motion_module_t*) walking_t::GetInstance());
-    motion_manager_t::GetInstance()->add_module((motion_module_t*) kicking_t::GetInstance());
+    motion_manager_t::get_instance()->add_module((motion_module_t*) action_t::get_instance());
+    motion_manager_t::get_instance()->add_module((motion_module_t*) head_t::get_instance());
+    motion_manager_t::get_instance()->add_module((motion_module_t*) walking_t::get_instance());
+    motion_manager_t::get_instance()->add_module((motion_module_t*) kicking_t::get_instance());
     if (m_debug) LOG_INFO << "Motion modules are ready";
 }
 
 void robot_application_t::init_motion_timer() {
     if (m_debug) LOG_DEBUG << "Initializing motion timer...";
-    auto motion_timer = std::make_unique<linux_motion_timer_t>(motion_manager_t::GetInstance());
+    auto motion_timer = std::make_unique<linux_motion_timer_t>(motion_manager_t::get_instance());
     motion_timer->start();
     m_motion_timer = std::move(motion_timer);
     if (m_debug) LOG_INFO << "Motion timer is ready";
@@ -189,13 +189,17 @@ void robot_application_t::init_configuraion_loader() {
     if (m_debug) LOG_DEBUG << "Initializing configuration loader...";
     //TODO Don't forget uncomment this lines
     m_configuration_loader.set_default_path(m_arg_config_default);
-
 //    m_configuration_loader.add_strategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
 //    m_configuration_loader.add_strategy(m_ball_tracker_configuration_strategy, m_arg_config_ball_searcher);
     m_configuration_loader.add_strategy(m_game_controller_configuration_strategy, m_arg_config_game_controller);
     m_configuration_loader.add_strategy(m_head_configuration_strategy, m_arg_config_head);
     m_configuration_loader.add_strategy(m_walking_configuration_strategy, m_arg_config_walking);
     m_configuration_loader.add_strategy(m_motion_manager_configuration_strategy, m_arg_config_motion_manager);
+
+#ifdef CROSSCOMPILATION
+    m_robot_image_source_configuration_strategy.set_image_source(m_image_source.get());
+    m_configuration_loader.add_strategy(m_robot_image_source_configuration_strategy, m_arg_config_image_source);
+#endif
     // Action configuration loader uses self loader
     m_action_configuration_loader.set_path(m_arg_config_action);
     if (m_debug) LOG_INFO << "Configuration loader is ready";
@@ -248,7 +252,6 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_kicking.set_option("dbg-kicking", "enable debug output for kicking motion module");
     m_arg_debug_buttons.set_option("dbg-kicking", "enable debug output for buttons");
     m_arg_debug_leds.set_option("dbg-kicking", "enable debug output for LEDs");
-    m_arg_debug_image_source.set_option("dbg-img-source", "enabled debut output for image source");
     m_arg_debug_camera.set_option("dbg-camera", "enable debug output for camera");
 
     m_arg_config_default.set_option("cfg,c", "default config file (res/config.ini by default)");
@@ -260,6 +263,12 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_config_walking.set_option("cfg-walking", "config file for walking motion module");
     m_arg_config_kicking.set_option("cfg-kicking", "config file for kicking motion module");
     m_arg_config_action.set_option("cfg-action", "path to motion_4096.bin");
+
+#ifdef CROSSCOMPILATION
+    m_arg_debug_image_source.set_option("dbg-img-source", "enabled debut output for image source");
+    m_arg_config_image_source.set_option("cfg-image-source", "config file for image source");
+#endif
+
 
     if (!parser.parse() || m_arg_help_requested.is_help_requested()) {
         parser.show_description_to_stream(std::cout);
@@ -276,15 +285,15 @@ void robot_application_t::apply_debug_arguments() {
     if (m_arg_debug_all || m_arg_debug_game_controller)
         game_controller_t::get_instance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_motion_manager)
-        motion_manager_t::GetInstance()->enable_debug(true);
+        motion_manager_t::get_instance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_head)
-        head_t::GetInstance()->enable_debug(true);
+        head_t::get_instance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_walking)
-        walking_t::GetInstance()->enable_debug(true);
+        walking_t::get_instance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_action)
-        action_t::GetInstance()->enable_debug(true);
+        action_t::get_instance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_kicking)
-        kicking_t::GetInstance()->enable_debug(true);
+        kicking_t::get_instance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_buttons)
         buttons_t::get_instance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_leds)

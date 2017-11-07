@@ -29,7 +29,7 @@ namespace drwn {
         };
 
     public:
-        static kicking_t* GetInstance();
+        static kicking_t* get_instance();
 
         void kick();
 

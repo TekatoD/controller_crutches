@@ -51,33 +51,33 @@ void ball_searcher_t::process() {
     m_pan_phase += m_pan_phase_step * m_pan_direction;
     m_tilt_phase += m_tilt_phase_step * m_turn_direction;
 
-    const float tilt_max = head_t::GetInstance()->get_top_limit_angle();
-    const float tilt_min = head_t::GetInstance()->get_bottom_limit_angle();
+    const float tilt_max = head_t::get_instance()->get_top_limit_angle();
+    const float tilt_min = head_t::get_instance()->get_bottom_limit_angle();
     const float tilt_diff = tilt_max - tilt_min;
-    const float pan_max = head_t::GetInstance()->get_left_limit_angle();
-    const float pan_min = head_t::GetInstance()->get_right_limit_angle();
+    const float pan_max = head_t::get_instance()->get_left_limit_angle();
+    const float pan_min = head_t::get_instance()->get_right_limit_angle();
     const float pan_diff = pan_max - pan_min;
 
 
 
     float pan = sinf(m_pan_phase / m_phase_size * M_2_PI) * pan_diff - pan_min;
     float tilt = sinf(m_tilt_phase / m_phase_size * M_2_PI) * tilt_diff - tilt_min;
-    head_t::GetInstance()->move_by_angle(pan, tilt);
+    head_t::get_instance()->move_by_angle(pan, tilt);
 
     if (m_walking_enabled) {
-        m_turn_speed = walking_t::GetInstance()->get_a_move_amplitude();
+        m_turn_speed = walking_t::get_instance()->get_a_move_amplitude();
         m_turn_speed += m_turn_step * m_turn_direction;
         if (fabsf(m_turn_speed) > m_max_turn) {
             m_turn_speed = m_max_turn * m_turn_direction;
         }
 
-        walking_t::GetInstance()->set_x_move_amplitude(0);
-        walking_t::GetInstance()->set_x_move_amplitude(0);
-        walking_t::GetInstance()->set_x_move_amplitude(m_turn_speed);
-        walking_t::GetInstance()->set_move_aim_on(false);
-        walking_t::GetInstance()->start();
+        walking_t::get_instance()->set_x_move_amplitude(0);
+        walking_t::get_instance()->set_x_move_amplitude(0);
+        walking_t::get_instance()->set_x_move_amplitude(m_turn_speed);
+        walking_t::get_instance()->set_move_aim_on(false);
+        walking_t::get_instance()->start();
     } else {
-        walking_t::GetInstance()->stop();
+        walking_t::get_instance()->stop();
     }
 }
 

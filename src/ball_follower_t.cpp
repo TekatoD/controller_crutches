@@ -66,7 +66,7 @@ void ball_follower_t::process(point_2D_t ball_pos,
             // can not find a ball
             m_goal_fb_step = 0;
             m_goal_rl_turn = 0;
-            head_t::GetInstance()->move_to_home();
+            head_t::get_instance()->move_to_home();
         } else {
             m_no_ball_count++;
         }
@@ -74,12 +74,12 @@ void ball_follower_t::process(point_2D_t ball_pos,
         m_no_ball_count = 0;
 
         float pan = motion_status_t::m_current_joints.set_angle(joint_data_t::ID_HEAD_PAN);
-        float pan_range = head_t::GetInstance()->get_left_limit_angle();
+        float pan_range = head_t::get_instance()->get_left_limit_angle();
         float pan_percent = pan / pan_range;
 
         float tilt = motion_status_t::m_current_joints.set_angle(joint_data_t::ID_HEAD_TILT);
-        float tilt_min = head_t::GetInstance()->get_bottom_limit_angle();
-        float tilt_range = head_t::GetInstance()->get_top_limit_angle() - tilt_min;
+        float tilt_min = head_t::get_instance()->get_bottom_limit_angle();
+        float tilt_range = head_t::get_instance()->get_top_limit_angle() - tilt_min;
         float tilt_percent = (tilt - tilt_min) / tilt_range;
         if (tilt_percent < 0)
             tilt_percent = -tilt_percent;
@@ -140,14 +140,14 @@ void ball_follower_t::process(point_2D_t ball_pos,
 
     if (m_goal_fb_step == 0 && m_goal_rl_step == 0 && m_goal_rl_step == 0 &&
             m_fb_step == 0 && m_rl_turn == 0 && m_rl_step == 0) {
-        if (walking_t::GetInstance()->is_running()) {
-            walking_t::GetInstance()->stop();
+        if (walking_t::get_instance()->is_running()) {
+            walking_t::get_instance()->stop();
         } else {
             if (m_kick_ball_count < m_kick_ball_max_count)
                 m_kick_ball_count++;
         }
     } else {
-        if (!walking_t::GetInstance()->is_running()) {
+        if (!walking_t::get_instance()->is_running()) {
 
             m_fb_step = 0;
             m_rl_step = 0;
@@ -155,16 +155,16 @@ void ball_follower_t::process(point_2D_t ball_pos,
             m_kick_ball_count = 0;
             m_kick_ball = NO_KICKING;
 
-            walking_t::GetInstance()->set_x_move_amplitude(m_fb_step);
-            walking_t::GetInstance()->set_y_move_amplitude(m_rl_step);
-            walking_t::GetInstance()->set_a_move_amplitude(m_rl_turn);
-            walking_t::GetInstance()->start();
+            walking_t::get_instance()->set_x_move_amplitude(m_fb_step);
+            walking_t::get_instance()->set_y_move_amplitude(m_rl_step);
+            walking_t::get_instance()->set_a_move_amplitude(m_rl_turn);
+            walking_t::get_instance()->start();
         } else {
             if (m_fb_step < m_goal_fb_step)
                 m_fb_step += m_unit_fb_step;
             else if (m_fb_step > m_goal_fb_step)
                 m_fb_step = m_goal_fb_step;
-            walking_t::GetInstance()->set_x_move_amplitude(m_fb_step);
+            walking_t::get_instance()->set_x_move_amplitude(m_fb_step);
 
             if (m_goal_rl_step > 0) {
                 if (m_rl_step < m_goal_rl_step)
@@ -177,14 +177,14 @@ void ball_follower_t::process(point_2D_t ball_pos,
                 else if (m_fb_step < -m_goal_rl_step)
                     m_rl_step = -m_goal_rl_step;
             }
-            walking_t::GetInstance()->set_y_move_amplitude(m_rl_step);
+            walking_t::get_instance()->set_y_move_amplitude(m_rl_step);
 
             if (m_rl_turn < m_goal_rl_turn)
                 m_rl_turn += m_unit_rl_turn;
             else if (m_rl_turn > m_goal_rl_turn)
                 m_rl_turn -= m_unit_rl_turn;
-            walking_t::GetInstance()->set_a_move_amplitude(m_rl_turn);
-            walking_t::GetInstance()->set_move_aim_on(aim);
+            walking_t::get_instance()->set_a_move_amplitude(m_rl_turn);
+            walking_t::get_instance()->set_move_aim_on(aim);
         }
     }
 }

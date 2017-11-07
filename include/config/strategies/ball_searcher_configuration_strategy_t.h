@@ -15,7 +15,7 @@ namespace drwn {
 
         static constexpr char DEFAULT_SECTION[] = "Ball Searcher";
 
-        explicit ball_searcher_configuration_strategy_t(ball_searcher_t* ballSearcher = nullptr, std::string section = DEFAULT_SECTION);
+        explicit ball_searcher_configuration_strategy_t(ball_searcher_t* ball_searcher = nullptr, std::string section = DEFAULT_SECTION);
 
         void read_config(const boost::property_tree::ptree& prop) override;
 

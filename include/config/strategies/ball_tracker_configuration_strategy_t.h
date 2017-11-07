@@ -14,7 +14,7 @@ namespace drwn {
 
         static constexpr char DEFAULT_SECTION[] = "Ball Tracker";
 
-        explicit ball_tracker_configuration_strategy_t(ball_tracker_t* ballTracker = nullptr, std::string section = DEFAULT_SECTION);
+        explicit ball_tracker_configuration_strategy_t(ball_tracker_t* ball_tracker = nullptr, std::string section = DEFAULT_SECTION);
 
         void read_config(const boost::property_tree::ptree& prop) override;
 

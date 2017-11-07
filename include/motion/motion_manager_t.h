@@ -10,10 +10,7 @@ namespace drwn {
     public:
         int Offset[joint_data_t::NUMBER_OF_JOINTS];
 
-        static motion_manager_t* GetInstance() {
-            static motion_manager_t instance;
-            return &instance;
-        }
+        static motion_manager_t* get_instance();
 
         bool initialize(CM730_t* cm730);
 
@@ -29,13 +26,9 @@ namespace drwn {
 
         void remove_module(motion_module_t* module);
 
-        void reset_gyro_calibration() {
-            m_calibration_status = 0;
-            m_fb_gyro_center = 512;
-            m_rl_gyro_center = 512;
-        }
+        void reset_gyro_calibration();
 
-        int get_calibration_status() const { return m_calibration_status; }
+        int get_calibration_status() const;
 
         void set_joint_disable(int index);
 

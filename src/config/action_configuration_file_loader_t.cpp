@@ -7,7 +7,7 @@
 #include "config/action_configuration_file_loader_t.h"
 
 void drwn::action_configuration_file_loader_t::read_motion_file() {
-    action_t::GetInstance()->load_file(m_path.c_str());
+    action_t::get_instance()->load_file(m_path.c_str());
 }
 
 const std::string& drwn::action_configuration_file_loader_t::get_path() const {

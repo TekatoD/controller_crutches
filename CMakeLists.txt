@@ -201,7 +201,9 @@ set(SRC
         src/vision/vision_t.cpp
         include/vision/vision_processor_t.h
         src/vision/white_ball_vision_processor_t.cpp
-        include/vision/white_ball_vision_processor_t.h)
+        include/vision/white_ball_vision_processor_t.h
+        src/hw/robot_image_source_t.cpp
+        include/hw/robot_image_source_t.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

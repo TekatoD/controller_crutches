@@ -22,7 +22,9 @@
 
 #ifdef CROSSCOMPILE
 #include "hw/linux_CM730_t.h"
+#include <hw/robot_image_source_t.h>
 #else
+#include "hw/vrep_image_source_t.h"
 #include "hw/vrep_connector_t.h"
 #endif
 
@@ -70,6 +72,8 @@ namespace drwn {
 
         void check_firmware();
 
+        void init_cv();
+
         void init_motion_manager();
 
         void init_motion_modules();
@@ -82,6 +86,10 @@ namespace drwn {
 
         void parse_command_line_arguments();
 
+        void apply_debug_arguments();
+
+        void apply_config_arguments();
+
         void read_configuration();
 
     private:
@@ -93,8 +101,6 @@ namespace drwn {
         std::atomic<bool> m_started{ATOMIC_VAR_INIT(false)};
         std::unique_ptr<CM730_t> m_cm730{nullptr};
         std::unique_ptr<linux_motion_timer_t> m_motion_timer{nullptr};
-
-        std::unique_ptr<image_source_t> m_image_source{nullptr};
 
         //*** Configuration members ***//
         configuration_file_loader_t m_configuration_loader;
@@ -121,6 +127,8 @@ namespace drwn {
         debug_mode_arguments_parsing_strategy_t m_arg_debug_kicking;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_buttons;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_leds;
+        debug_mode_arguments_parsing_strategy_t m_arg_debug_camera;
+        debug_mode_arguments_parsing_strategy_t m_arg_debug_image_source;
 
         config_path_arguments_parsing_strategy_t m_arg_config_default;
         config_path_arguments_parsing_strategy_t m_arg_config_ball_searcher;
@@ -138,13 +146,12 @@ namespace drwn {
 
 #ifdef CROSSCOMPILE
         std::unique_ptr<linux_CM730_t> m_linux_cm730{nullptr};
+        std::unique_ptr<robot_image_source_t> m_image_source{nullptr};
 #else
+        std::unique_ptr<vrep_image_source_t> m_image_source{nullptr};
         std::unique_ptr<vrep_connector_t> m_vrep_connector{nullptr};
 #endif
 
-        void apply_debug_arguments();
-
-        void apply_config_arguments();
     };
 }
 

@@ -27,10 +27,16 @@ namespace drwn {
 
         const cv::Mat& get_image() const noexcept;
 
+        bool is_debug_enabled() const noexcept;
+
+        void enable_debug(bool debug) noexcept;
+
     private:
         camera_t() = default;
 
     private:
+        bool m_debug{false};
+
         image_source_t* m_img_source{nullptr};
         cv::Mat m_img;
     };

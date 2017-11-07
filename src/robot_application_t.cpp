@@ -72,16 +72,18 @@ bool robot_application_t::is_running() const {
 }
 
 void robot_application_t::initialize() {
-    apply_debug_arguments();
+    this->apply_debug_arguments();
+    this->apply_config_arguments();
     if (m_debug) LOG_INFO << "=== Initialization was started ===";
-    check_hw_status();
-    init_CM730();
-    init_motion_manager();
-    init_motion_modules();
-    init_motion_timer();
-    init_game_controller();
-    init_configuraion_loader();
-    read_configuration();
+    this->check_hw_status();
+    this->init_CM730();
+    this->init_cv();
+    this->init_motion_manager();
+    this->init_motion_modules();
+    this->init_motion_timer();
+    this->init_game_controller();
+    this->init_configuraion_loader();
+    this->read_configuration();
     if (m_debug) LOG_INFO << "=== Initialization was finished ===";
 }
 
@@ -136,6 +138,10 @@ void robot_application_t::check_firmware() {
     } else {
         throw std::runtime_error("Unknown version of MX-28's firmware");
     }
+}
+
+void robot_application_t::init_cv() {
+
 }
 
 void robot_application_t::init_motion_manager() {
@@ -272,7 +278,16 @@ void robot_application_t::apply_debug_arguments() {
         buttons_t::get_instance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_leds)
         LEDs_t::GetInstance()->enable_debug(true);
+    if (m_arg_debug_all || m_arg_debug_camera)
+        camera_t::get_instance()->enable_debug(true);
+    if (m_arg_debug_all || m_arg_debug_image_source)
+        m_image_source->enable_debug(true);
 }
+
+void robot_application_t::apply_config_arguments() {
+
+}
+
 
 void robot_application_t::read_configuration() {
     if (m_debug) LOG_DEBUG << "Reading configuration...";

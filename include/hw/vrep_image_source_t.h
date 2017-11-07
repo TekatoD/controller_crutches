@@ -21,7 +21,13 @@ namespace drwn {
         cv::Mat capture_frame() const override;
 
     private:
+        bool m_debug{false};
+    public:
+        bool is_debug_enabled() const;
 
+        void enable_debug(bool debug);
+
+    private:
         std::string m_sensor_name{"camera"};
         int m_width{320};
         int m_height{240};

@@ -83,7 +83,7 @@ namespace drwn {
         }
 
 
-        void vertical_flip_rgb(unsigned char* binary_image, int width, int height) {
+        inline void vertical_flip_rgb(unsigned char* binary_image, int width, int height) {
             int sizeline = width * 3;
             unsigned char line1[sizeline - 1];/*line1 buffer*/
             unsigned char line2[sizeline - 1];/*line2 buffer*/
@@ -96,7 +96,7 @@ namespace drwn {
             }
         }
 
-        void rgb_to_bgr(unsigned char* binary_image, int width, int height) {
+        inline void rgb_to_bgr(unsigned char* binary_image, int width, int height) {
             int ir, ig, ib;
             for (int i = 0; i < width * height; ++i) {
                 ir = binary_image[3 * i + 0];

@@ -41,8 +41,9 @@ void drwn::vrep_image_source_t::connect() {
         }
         int sim_res_x;
         int sim_res_y;
-        simxGetObjectIntParameter(m_client_id, m_sensor_handle, 1002, &sim_res_x, simx_opmode_oneshot);
-        simxGetObjectIntParameter(m_client_id, m_sensor_handle, 1003, &sim_res_y, simx_opmode_oneshot);
+        while(simxGetObjectIntParameter(m_client_id, m_sensor_handle, 1002, &sim_res_x, simx_opmode_oneshot) != simx_return_ok) { }
+        while(simxGetObjectIntParameter(m_client_id, m_sensor_handle, 1003, &sim_res_y, simx_opmode_oneshot) != simx_return_ok) { }
+        LOG_INFO << "VREP IMAGE SOURCE: Set up camera resolution: " << sim_res_x << " X " << sim_res_y;
         if(sim_res_x != m_width || sim_res_y != m_height) {
             throw std::runtime_error("VREP IMAGE SOURCE: Missmatch of specified resolution with vrep camera");
         }
@@ -56,6 +57,7 @@ void drwn::vrep_image_source_t::connect() {
 }
 
 cv::Mat drwn::vrep_image_source_t::capture_frame() const {
+    simxSynchronousTrigger(m_client_id);
     if(simxGetVisionSensorImage(m_client_id, m_sensor_handle, m_resolution,
                                 &m_binary_image, 0, simx_opmode_buffer) == simx_return_ok) {
         if(m_resolution[0] != m_width || m_resolution[1] != m_height) {
@@ -63,6 +65,9 @@ cv::Mat drwn::vrep_image_source_t::capture_frame() const {
             throw image_source_failure("VREP IMAGE SOURCE: Received a broken frame from vrep");
         }
         else {
+            if(m_debug) {
+                LOG_DEBUG << "VREP IMAGE SOURCE: Received normal image";
+            }
             vision_utils::vertical_flip_rgb(m_binary_image, m_width, m_height);
             vision_utils::rgb_to_bgr(m_binary_image, m_width, m_height);
             return cv::Mat(m_height, m_width, CV_8UC3, m_binary_image);
@@ -71,4 +76,12 @@ cv::Mat drwn::vrep_image_source_t::capture_frame() const {
     else {
         throw image_source_failure("VREP IMAGE SOURCE: Vrep didn't respond in time");
     }
+}
+
+bool drwn::vrep_image_source_t::is_debug_enabled() const {
+    return m_debug;
+}
+
+void drwn::vrep_image_source_t::enable_debug(bool debug) {
+    m_debug = debug;
 }

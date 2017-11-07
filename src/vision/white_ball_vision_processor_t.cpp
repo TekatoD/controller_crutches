@@ -164,7 +164,7 @@ drwn::white_ball_vision_processor_t::set_line_preprocessor_threshold_gabor_bgr_m
     m_line_preproc.set_threshold_gabor_bgr_max(threshold_bgr_max);
 }
 
-const cv::Scalar& drwn::white_ball_vision_processor_t::get_line_preprocessor_threshold_gabor_hsv_min() const {
+const cv::Scalar& drwn::white_ball_vision_processor_t::get_line_preprocessor_threshold_color_hsv_min() const {
     return m_line_preproc.get_threshold_gabor_hsv_min();
 }
 
@@ -177,7 +177,8 @@ const cv::Scalar& drwn::white_ball_vision_processor_t::get_line_preprocessor_thr
     return m_line_preproc.get_threshold_color_hsv_max();
 }
 
-void drwn::white_ball_vision_processor_t::set_line_preprocessor_threshold_hsv_max(const cv::Scalar& threshold_hsv_max) {
+void drwn::white_ball_vision_processor_t::set_line_preprocessor_threshold_color_hsv_max(
+        const cv::Scalar& threshold_hsv_max) {
     m_line_preproc.set_threshold_hsv_max(threshold_hsv_max);
 }
 

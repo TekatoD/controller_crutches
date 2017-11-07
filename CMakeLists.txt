@@ -139,16 +139,13 @@ set(SRC
         include/tool/accumulator_t.h
         include/tool/rate_t.h
 #        include/vision/detectors/AngleDetector.h
-#        include/vision/detectors/ball_detector_t.h
         include/vision/detectors/field_detector_t.h
         include/vision/detectors/line_detector_t.h
 #        include/vision/Vision.h
         include/vision/vision_utils.h
 #        src/vision/detectors/AngleDetector.cpp
-#        src/vision/detectors/ball_detector_t.cpp
         src/vision/detectors/field_detector_t.cpp
         src/vision/detectors/line_detector_t.cpp
-#        src/vision/Vision.cpp
         include/vision/detectors/preprocessor_t.h
         src/vision/detectors/old_line_preprocessor_t.cpp
         include/vision/detectors/old_line_preprocessor_t.h
@@ -201,6 +198,7 @@ set(SRC
         include/hw/image_source_failure.h
         src/hw/image_source_failure.cpp
         include/vision/vision_t.h
+        src/vision/vision_t.cpp
         include/vision/vision_processor_t.h
         src/vision/white_ball_vision_processor_t.cpp
         include/vision/white_ball_vision_processor_t.h)

@@ -77,13 +77,13 @@ namespace drwn {
 
         void set_line_preprocessor_threshold_gabor_bgr_max(const cv::Scalar& threshold_bgr_max);
 
-        const cv::Scalar& get_line_preprocessor_threshold_gabor_hsv_min() const;
+        const cv::Scalar& get_line_preprocessor_threshold_color_hsv_min() const;
 
         void set_line_preprocessor_threshold_color_hsv_min(const cv::Scalar& threshold_hsv_min);
 
         const cv::Scalar& get_line_preprocessor_threshold_color_hsv_max() const;
 
-        void set_line_preprocessor_threshold_hsv_max(const cv::Scalar& threshold_hsv_max);
+        void set_line_preprocessor_threshold_color_hsv_max(const cv::Scalar& threshold_hsv_max);
 
 
         float get_line_detector_hough_lines_rho() const;

@@ -24,6 +24,8 @@ namespace drwn {
 
         void set_contrast(float contrast);
 
+        float get_contrast() const;
+
         void set_hue(float hue);
 
         float get_hue() const;

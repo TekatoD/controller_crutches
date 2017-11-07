@@ -41,6 +41,10 @@ void robot_image_source_t::set_contrast(float contrast) {
     m_capture.set(CV_CAP_PROP_CONTRAST, contrast);
 }
 
+float robot_image_source_t::get_contrast() const {
+    return (float) m_capture.get(CV_CAP_PROP_CONTRAST);
+}
+
 void robot_image_source_t::set_hue(float hue) {
     if(m_debug) {
         LOG_DEBUG << "ROBOT IMAGE SOURCE: hue = " << hue;

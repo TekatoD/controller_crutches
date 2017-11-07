@@ -88,8 +88,6 @@ namespace drwn {
 
         void apply_debug_arguments();
 
-        void apply_config_arguments();
-
         void read_configuration();
 
     private:

@@ -73,7 +73,6 @@ bool robot_application_t::is_running() const {
 
 void robot_application_t::initialize() {
     this->apply_debug_arguments();
-    this->apply_config_arguments();
     if (m_debug) LOG_INFO << "=== Initialization was started ===";
     this->check_hw_status();
     this->init_CM730();
@@ -107,14 +106,10 @@ void robot_application_t::init_CM730() {
     vrep_connector->connect();
     vrep_cm730->set_client_id(vrep_connector->get_client_id());
     vrep_cm730->connect();
-    vrep_image_source->set_client_id(vrep_connector->get_client_id());
-    vrep_image_source->connect();
     m_vrep_connector = move(vrep_connector);
     m_cm730 = move(vrep_cm730);
-    m_image_source = move(vrep_image_source);
     camera_t::get_instance()->set_image_source(m_image_source.get());
 
-    cv::namedWindow("Image", CV_WINDOW_AUTOSIZE);
 #endif
 
     LEDs_t::GetInstance()->initialize(m_cm730.get());
@@ -141,7 +136,19 @@ void robot_application_t::check_firmware() {
 }
 
 void robot_application_t::init_cv() {
-
+    if (m_debug) LOG_DEBUG << "Initializing camera...";
+#ifdef CROSSCOMPILATION
+    auto image_source = std::make_unique<robot_image_source_t>(camera_t::WIDTH, camera_t::HEIGHT);
+#else
+    auto image_source = std::make_unique<vrep_image_source_t>("camera", camera_t::WIDTH, camera_t::HEIGHT);
+    image_source->set_client_id(m_vrep_connector->get_client_id());
+    image_source->connect();
+#endif
+    m_image_source = std::move(image_source);
+    camera_t::get_instance()->set_image_source(m_image_source.get());
+    if (m_arg_debug_all || m_arg_debug_image_source)
+        m_image_source->enable_debug(true);
+    if (m_debug) LOG_INFO << "Camera is ready";
 }
 
 void robot_application_t::init_motion_manager() {
@@ -280,14 +287,8 @@ void robot_application_t::apply_debug_arguments() {
         LEDs_t::GetInstance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_camera)
         camera_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_image_source)
-        m_image_source->enable_debug(true);
+    // Image source debug placed located in init_cv
 }
-
-void robot_application_t::apply_config_arguments() {
-
-}
-
 
 void robot_application_t::read_configuration() {
     if (m_debug) LOG_DEBUG << "Reading configuration...";
@@ -298,6 +299,7 @@ void robot_application_t::read_configuration() {
 
 void robot_application_t::start_main_loop() {
     if (m_debug) LOG_INFO << "=== Controller was started ===";
+    cv::namedWindow("Image", CV_WINDOW_AUTOSIZE);
     while (is_running()) {
         try {
             camera_t::get_instance()->update_image();

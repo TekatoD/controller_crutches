@@ -30,3 +30,11 @@ void config_path_arguments_parsing_strategy_t::set_path(const std::string& path)
 config_path_arguments_parsing_strategy_t::operator const std::string&() const noexcept {
     return m_path;
 }
+
+bool config_path_arguments_parsing_strategy_t::is_set() const noexcept {
+    return !m_path.empty();
+}
+
+config_path_arguments_parsing_strategy_t::operator bool() const noexcept {
+    return this->is_set();
+}

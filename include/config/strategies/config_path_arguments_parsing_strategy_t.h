@@ -19,6 +19,10 @@ namespace drwn {
 
         void set_path(const std::string& path);
 
+        bool is_set() const noexcept;
+
+        operator bool() const noexcept;
+
         operator const std::string&() const noexcept;
 
     private:

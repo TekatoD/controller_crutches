@@ -13,6 +13,7 @@
 #include <config/strategies/debug_mode_arguments_parsing_strategy_t.h>
 #include <config/strategies/config_path_arguments_parsing_strategy_t.h>
 #include <config/strategies/help_arguments_parsing_strategy_t.h>
+#include <hw/image_source_t.h>
 #include "config/configuration_file_loader_t.h"
 #include "config/strategies/walking_configuration_strategy_t.h"
 #include "config/strategies/motion_manager_configuration_strategy_t.h"
@@ -92,6 +93,8 @@ namespace drwn {
         std::atomic<bool> m_started{ATOMIC_VAR_INIT(false)};
         std::unique_ptr<CM730_t> m_cm730{nullptr};
         std::unique_ptr<linux_motion_timer_t> m_motion_timer{nullptr};
+
+        std::unique_ptr<image_source_t> m_image_source{nullptr};
 
         //*** Configuration members ***//
         configuration_file_loader_t m_configuration_loader;

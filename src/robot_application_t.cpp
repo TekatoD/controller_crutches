@@ -1,6 +1,10 @@
 #include <config/arguments_parser_t.h>
 #include <hw/buttons_t.h>
 #include <hw/LEDs_t.h>
+#include <hw/vrep_image_source_t.h>
+#include <hw/camera_t.h>
+#include <hw/image_source_failure.h>
+#include <opencv/cv.hpp>
 #include "log/trivial_logger_t.h"
 #include "motion/motion_manager_t.h"
 #include "gamecontroller/game_controller_t.h"
@@ -97,11 +101,18 @@ void robot_application_t::init_CM730() {
 #else
     auto vrep_connector{std::make_unique<vrep_connector_t>()};
     auto vrep_cm730{std::make_unique<vrep_CM730_t>()};
+    auto vrep_image_source{std::make_unique<vrep_image_source_t>()};
     vrep_connector->connect();
     vrep_cm730->set_client_id(vrep_connector->get_client_id());
     vrep_cm730->connect();
+    vrep_image_source->set_client_id(vrep_connector->get_client_id());
+    vrep_image_source->connect();
     m_vrep_connector = move(vrep_connector);
     m_cm730 = move(vrep_cm730);
+    m_image_source = move(vrep_image_source);
+    camera_t::get_instance()->set_image_source(m_image_source.get());
+
+    cv::namedWindow("Image", CV_WINDOW_AUTOSIZE);
 #endif
 
     LEDs_t::GetInstance()->initialize(m_cm730.get());
@@ -273,6 +284,15 @@ void robot_application_t::read_configuration() {
 void robot_application_t::start_main_loop() {
     if (m_debug) LOG_INFO << "=== Controller was started ===";
     while (is_running()) {
+        try {
+            camera_t::get_instance()->update_image();
+            cv::Mat image = camera_t::get_instance()->get_image();
+            cv::imshow("Image", image);
+            cv::waitKey(1);
+        }
+        catch(image_source_failure& failure) {
+            continue;
+        }
 
     }
     if (m_debug) LOG_INFO << "=== Contoller was finished ===";

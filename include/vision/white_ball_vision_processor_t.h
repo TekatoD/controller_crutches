@@ -31,6 +31,89 @@ namespace drwn {
 
         void enable_debug(bool debug) noexcept;
 
+        const cv::Scalar& get_ball_preprocessor_threshold_gabor_bgr_min() const;
+
+        void set_ball_preprocessor_threshold_gabor_bgr_min(const cv::Scalar& threshold_gabor_bgr_min);
+
+        const cv::Scalar& get_ball_preprocessor_threshold_gabor_bgr_max() const;
+
+        void set_ball_preprocessor_threshold_gabor_bgr_max(const cv::Scalar& threshold_gabor_bgr_max);
+
+        const cv::Scalar& get_ball_preprocessor_threshold_color_bgr_min() const;
+
+        void set_ball_preprocessor_threshold_color_bgr_min(const cv::Scalar& threshold_color_bgr_min);
+
+        const cv::Scalar& get_ball_preprocessor_threshold_color_bgr_max() const;
+
+        void set_ball_preprocessor_threshold_color_bgr_max(const cv::Scalar& threshold_color_bgr_max);
+
+        int get_ball_preprocessor_median_blur_size() const;
+
+        void set_ball_preprocessor_median_blur_size(int median_blur_size);
+        
+
+        const cv::Scalar& get_field_preprocessor_threshold_gabor_bgr_min() const;
+
+        void set_field_preprocessor_threshold_gabor_bgr_min(const cv::Scalar& threshold_gabor_bgr_min);
+
+        const cv::Scalar& get_field_preprocessor_threshold_gabor_bgr_max() const;
+
+        void set_field_preprocessor_threshold_gabor_bgr_max(const cv::Scalar& threshold_gabor_bgr_max);
+
+        const cv::Scalar& get_field_preprocessor_threshold_color_hsv_min() const;
+
+        void set_field_preprocessor_threshold_color_hsv_min(const cv::Scalar& threshold_color_hsv_min);
+
+        const cv::Scalar& get_field_preprocessor_threshold_color_hsv_max() const;
+
+        void set_field_preprocessor_threshold_color_hsv_max(const cv::Scalar& threshold_color_hsv_max);
+
+
+        const cv::Scalar& get_line_preprocessor_threshold_gabor_bgr_min() const;
+
+        void set_line_preprocessor_threshold_gabor_bgr_min(const cv::Scalar& threshold_bgr_min);
+
+        const cv::Scalar& get_line_preprocessor_threshold_gabor_bgr_max() const;
+
+        void set_line_preprocessor_threshold_gabor_bgr_max(const cv::Scalar& threshold_bgr_max);
+
+        const cv::Scalar& get_line_preprocessor_threshold_gabor_hsv_min() const;
+
+        void set_line_preprocessor_threshold_color_hsv_min(const cv::Scalar& threshold_hsv_min);
+
+        const cv::Scalar& get_line_preprocessor_threshold_color_hsv_max() const;
+
+        void set_line_preprocessor_threshold_hsv_max(const cv::Scalar& threshold_hsv_max);
+
+
+        float get_line_detector_hough_lines_rho() const;
+
+        void set_line_detector_hough_lines_rho(float hough_lines_rho);
+
+        float get_line_detector_hough_lines_theta() const;
+
+        void set_line_detector_hough_lines_theta(float hough_lines_theta);
+
+        float get_line_detector_hough_lines_min_line_length() const;
+
+        void set_line_detector_hough_lines_min_line_length(float hough_lines_min_line_length);
+
+        float get_line_detector_hough_lines_max_line_gap() const;
+
+        void set_line_detector_hough_lines_max_line_gap(float hough_lines_max_line_gap);
+
+        int get_line_detector_hough_lines_threshold() const;
+
+        void set_line_detector_hough_lines_threshold(int hough_lines_threshold);
+
+        float get_line_detector_line_equality_angle_eps() const;
+
+        void set_line_detector_line_equality_angle_eps(float line_equality_pred_angle_eps);
+
+        int get_line_detector_line_equality_error_px() const;
+
+        void set_line_detector_line_equality_error_px(int line_equality_pred_error_px);
+
     private:
         void process();
 

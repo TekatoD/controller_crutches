@@ -221,6 +221,8 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_debug_kicking);
     parser.add_strategy(m_arg_debug_buttons);
     parser.add_strategy(m_arg_debug_leds);
+    parser.add_strategy(m_arg_debug_image_source);
+    parser.add_strategy(m_arg_debug_camera);
 
     parser.add_strategy(m_arg_config_default);
     parser.add_strategy(m_arg_config_ball_searcher);
@@ -246,6 +248,8 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_kicking.set_option("dbg-kicking", "enable debug output for kicking motion module");
     m_arg_debug_buttons.set_option("dbg-kicking", "enable debug output for buttons");
     m_arg_debug_leds.set_option("dbg-kicking", "enable debug output for LEDs");
+    m_arg_debug_image_source.set_option("dbg-img-source", "enabled debut output for image source");
+    m_arg_debug_camera.set_option("dbg-camera", "enable debug output for camera");
 
     m_arg_config_default.set_option("cfg,c", "default config file (res/config.ini by default)");
     m_arg_config_ball_tracker.set_option("cfg-ball-tracker", "config file for ball tracker");

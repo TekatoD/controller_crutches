@@ -45,7 +45,7 @@ namespace Localization {
             NONE = 11
         };
         
-        static constexpr float MAX_DIST = 6000.0f;
+        static constexpr float MAX_DIST = 12000.0f;
         
         FieldMap();
         ~FieldMap();

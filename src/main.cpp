@@ -392,8 +392,9 @@ int main(int argc, char** argv) {
             particleFilter.resample();
             
             std::cout << "==== PF pose ==" << std::endl;
-            std::cout << "Weighted pose mean: " << particleFilter.getPoseMean() << std::endl;
-            std::cout << "Weighted pose covariance: " << particleFilter.getPoseCovariance() << std::endl;
+            std::cout << "Pose mean: " << particleFilter.getPoseMean() << std::endl;
+            std::cout << "Pose covariance: " << particleFilter.getPoseCovariance() << std::endl;
+            std::cout << "Highest weight particle pose: " << particleFilter.getTopParticle().pose << std::endl;
             
             
             std::cout << "=== End particle filter cycle ===" << std::endl;

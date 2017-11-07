@@ -34,6 +34,11 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
 {
     float weight_normalizer = 0.0f;
     for (auto& particle : m_particles) {
+        if (measurements.size() < 1) {
+            weight_normalizer = 1.0f;
+            break;
+        }
+        
         float rx, ry, rtheta, vrange, vbearing;
         rx = particle.pose.X(); ry = particle.pose.Y(); rtheta = particle.pose.Theta();
         
@@ -41,7 +46,7 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         
         // TODO: Create matrix from vector
         Eigen::MatrixXf Qt = Eigen::MatrixXf::Identity(measurements.size()*2, measurements.size()*2);
-        Qt = Qt * 10.0f;
+        Qt = Qt * 0.1f;
         
         Eigen::MatrixXf Zdiff(measurements.size()*2, 1);
         int z_counter = 0;
@@ -64,15 +69,11 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
             Point2D isec_point;
             // Accept intersections with distance from robot to intersection point greater than minDist 
             auto isec_res = m_fieldWorld.IntersectWithField(
-                Line(rx, ry, epx, epy)
+                Line(rx, ry, epx, epy), (srange - srange*0.25f)
             );
             
             ret_type = std::get<0>(isec_res);
             isec_point = std::get<1>(isec_res);
-            if (ret_type == FieldMap::LineType::NONE) {
-                // Ignore this measurement
-                continue;
-            }
             
             lx = isec_point.X; ly = isec_point.Y;
             
@@ -81,13 +82,14 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
             Eigen::Vector2f delta = { dx, dy };
             float q = delta.transpose() * delta;
             float dst = std::sqrt(dst);
-            
-            if (dst > FieldMap::MAX_DIST) {
-                // Ignore this measurement
-                continue;
-            }
-            
+        
             normalizer.setTheta( std::atan2(dy, dx) - rtheta);
+            
+            if (ret_type == FieldMap::LineType::NONE) {
+                dst = FieldMap::MAX_DIST;
+                normalizer.setTheta(0.0f);
+            } 
+            
             Eigen::Vector2f z_expected = {
                 dst,
                 normalizer.Theta()
@@ -101,23 +103,21 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
             z_counter += 2;
         }
         
-        if (Zdiff.size() < 1) {
-            std::cout << "No measurements to process" << std::endl;
-            break;
-        }
+        float det = (2.0f * M_PI * Qt).determinant();
+        //float denom = 1 / std::sqrt(det);
         
-        float det = (2 * M_PI * Qt).determinant();
-        float denom = 1 / std::sqrt(det);
+        float temp = (Zdiff.transpose() * Qt.inverse() * Zdiff)(0) / 6000.0f;
+        float new_weight = det * std::exp((-1.0f / 2.0f) * temp);
         
-        float temp = (Zdiff.transpose() * Qt.inverse() * Zdiff)(0);
-        float new_weight = denom * std::exp((-1.0f / 2.0f) * temp) * 1000.0f;
+        std::cout << Zdiff << std::endl;
         
+        std::cout << det << " | " << temp << " | " << new_weight << std::endl;
         if (std::isnan(new_weight) || new_weight < 0.0001) {
-            new_weight = 0.0f;
+            new_weight = 1.0f;
         }
         
         weight_normalizer = weight_normalizer + new_weight;
-        particle.weight = new_weight;
+        particle.weight *= new_weight;
     }
     
     if (weight_normalizer < 0.0001) {
@@ -130,22 +130,24 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
     float pw, px, py, ptheta;
     float highestWeight = 0.0f;
     std::size_t highestWeightIndex = 0;
+    float divisor = 1.0f / m_particles.size();
     for (std::size_t index = 0; index < m_particles.size(); index++) {
         Particle& particle = m_particles[index];
         
         // Temporary measure, so we don't divide by zero
-        if (fabs(weight_normalizer) < 0.0001 || std::isnan(weight_normalizer)) {
-            particle.weight = 1.0f/m_particles.size();
+        if (fabs(weight_normalizer) < 0.0001 || std::isnan(weight_normalizer) || std::isnan(particle.weight)) {
+            particle.weight = 0.0f;
         } else {
             particle.weight = particle.weight / weight_normalizer;
             
         }
+        
         pw = particle.weight;
         px = particle.pose.X();
         py = particle.pose.Y();
         ptheta = particle.pose.Theta();
         
-        meanAccum += Pose2D(px*pw, py*pw, pw*ptheta);
+        meanAccum += Pose2D(px*divisor, py*divisor, divisor*ptheta);
         
         if (pw > highestWeight) {
             highestWeight = pw;
@@ -159,13 +161,15 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
     mx = meanAccum.X();
     my = meanAccum.Y();
     mtheta = meanAccum.Theta();
+    Pose2D angleNormalizer;
     for (auto& particle : m_particles) {
         pw = particle.weight;
         px = particle.pose.X();
         py = particle.pose.Y();
         ptheta = particle.pose.Theta();
         
-        covAccum += Pose2D(pw*pow(px-mx, 2), pw*pow(py-my, 2), pw*pow(ptheta-mtheta, 2));
+        angleNormalizer.setTheta(divisor*pow(ptheta-mtheta, 2));
+        covAccum += Pose2D(divisor*pow(px-mx, 2), divisor*pow(py-my, 2), angleNormalizer.Theta());
     }
     
     m_poseMean = meanAccum;

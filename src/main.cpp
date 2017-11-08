@@ -217,7 +217,7 @@ int main(int argc, char** argv) {
     Eigen::Vector3f movementNoise = {0.01, 50.0f, 0.01};
     // Measurement noise (range-bearing measurement model format)
     // range (in mm), bearing (in radians)
-    Eigen::Vector3f measurementNoise = {300.0f, 0.6, 0.0f};
+    Eigen::Vector3f measurementNoise = {400.0f, 0.6, 0.0f};
     while (!finish) {
         // Update game controller
 //        GameController::GetInstance()->Update();
@@ -256,8 +256,9 @@ int main(int argc, char** argv) {
          */
         std::cout << "=== Begin particle filter cycle ===" << std::endl;
         float rx, ry, rtheta;
-        Pose2D robotPose = Walking::GetInstance()->GetOdo();
-        std::cout << " Received pose data from Walking: " << robotPose << std::endl;
+        robotPose = Walking::GetInstance()->GetOdo();
+        
+        std::cout << "Old: " << oldRobotPose << ", Received: " << robotPose << std::endl;
         rx = robotPose.X();
         ry = robotPose.Y();
         rtheta = robotPose.Theta();
@@ -265,7 +266,7 @@ int main(int argc, char** argv) {
         Eigen::Vector3f odometryCommand = particleFilter.get_odometry_command(oldRobotPose, robotPose);
         particleFilter.predict(odometryCommand, movementNoise); 
         
-        std::cout << " Successful prediction step using odometry command: " << std::endl;
+        std::cout << "Successful prediction step using odometry command: " << std::endl;
         std::cout << odometryCommand << std::endl;
 
         /* 
@@ -369,6 +370,10 @@ int main(int argc, char** argv) {
                     sqrt(dx2*dx2 + dy2*dy2),
                     normalizer.Theta()
                 };
+                
+                if (rb1(1) > FieldMap::MAX_DIST || rb2(1) > FieldMap::MAX_DIST) {
+                    continue;
+                }
                 
                 std::cout << "========" << std::endl;
                 std::cout << p1 << std::endl;

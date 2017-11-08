@@ -125,10 +125,9 @@ namespace Robot {
 
         void update_param_balance();
 
+    public:
         Pose2D GetOdoOffset();
 
-
-    public:
         // Walking initial pose
         float X_OFFSET;
         float Y_OFFSET;

@@ -59,6 +59,7 @@ private:
     Localization::FieldMap m_fieldWorld;
     
     void init_particles(const Pose2D& pose, int num_particles);
+    void init_particles(float min_x, float max_x, float min_y, float max_y, float min_theta, float max_theta, int num_particles);
     
     void low_variance_resampling();
 };

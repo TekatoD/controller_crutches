@@ -19,8 +19,21 @@ void ParticleFilter::LoadIniSettings(minIni* ini)
     float poseY = ini->getf("ParticleFilter", "init_y");
     float poseTheta = ini->getf("ParticleFilter", "init_theta");
     int num_particles = ini->geti("ParticleFilter", "particle_number", DEFAULT_PARTICLE_NUMBER); 
+    int random_particles = ini->geti("ParticleFilter", "random_particles", 0);
     
-    init_particles(Robot::Pose2D(poseX, poseY, poseTheta), num_particles);
+    if (random_particles > 0) {
+        float min_x, min_y, min_theta, max_x, max_y, max_theta;
+        min_x = ini->getf("ParticleFilter", "min_x");
+        min_y = ini->getf("ParticleFilter", "min_y");
+        min_theta = ini->getf("ParticleFilter", "min_theta");
+        max_x = ini->getf("ParticleFilter", "max_x");
+        max_y = ini->getf("ParticleFilter", "max_y");
+        max_theta = ini->getf("ParticleFilter", "max_theta");
+        
+        init_particles(min_x, max_x, min_y, max_y, min_theta, max_theta, num_particles);
+    } else {
+        init_particles(Robot::Pose2D(poseX, poseY, poseTheta), num_particles);
+    }
 }
 
 void ParticleFilter::predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise)
@@ -125,7 +138,6 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
     float pw, px, py, ptheta;
     float highestWeight = 0.0f;
     std::size_t highestWeightIndex = 0;
-    float divisor = 1.0f / m_particles.size();
     for (std::size_t index = 0; index < m_particles.size(); index++) {
         Particle& particle = m_particles[index];
         
@@ -142,7 +154,7 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         py = particle.pose.Y();
         ptheta = particle.pose.Theta();
         
-        meanAccum += Pose2D(px*divisor, py*divisor, divisor*ptheta);
+        meanAccum += Pose2D(px*pw, py*pw, ptheta*pw);
         
         if (pw > highestWeight) {
             highestWeight = pw;
@@ -163,8 +175,8 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         py = particle.pose.Y();
         ptheta = particle.pose.Theta();
         
-        angleNormalizer.setTheta(divisor*pow(ptheta-mtheta, 2));
-        covAccum += Pose2D(divisor*pow(px-mx, 2), divisor*pow(py-my, 2), angleNormalizer.Theta());
+        angleNormalizer.setTheta(pw*pow(ptheta-mtheta, 2));
+        covAccum += Pose2D(pw*pow(px-mx, 2), pw*pow(py-my, 2), angleNormalizer.Theta());
     }
     
     m_poseMean = meanAccum;
@@ -215,6 +227,26 @@ void ParticleFilter::init_particles(const Pose2D& pose, int num_particles)
     m_particles.resize(num_particles);
     for (auto& particle : m_particles) {
         particle.pose = pose;
+        particle.weight = defaultWeight;
+    }
+}
+
+void ParticleFilter::init_particles(float min_x, float max_x, float min_y, float max_y, float min_theta, float max_theta, int num_particles)
+{
+    float defaultWeight = 1.0f / num_particles;
+    m_topParticleIndex = 0;
+    
+    m_particles.resize(num_particles);
+    
+    unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator(seed);
+    std::uniform_real_distribution<> dist_x(min_x, max_x);
+    std::uniform_real_distribution<> dist_y(min_y, max_y);
+    std::uniform_real_distribution<> dist_theta(min_theta, max_theta);
+    
+    for (auto& particle : m_particles) {
+        particle.pose = Pose2D(dist_x(generator), dist_y(generator), dist_theta(generator));
+        std::cout << particle.pose << std::endl;
         particle.weight = defaultWeight;
     }
 }

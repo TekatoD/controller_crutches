@@ -72,6 +72,7 @@ const cv::Scalar& drwn::white_ball_vision_processor_t::get_ball_preprocessor_thr
 
 void drwn::white_ball_vision_processor_t::set_ball_preprocessor_threshold_gabor_bgr_min(
         const cv::Scalar& threshold_gabor_bgr_min) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: threshold_gabor_bgr_min: " << threshold_gabor_bgr_min;
     m_ball_preproc.set_threshold_gabor_bgr_min(threshold_gabor_bgr_min);
 }
 
@@ -81,6 +82,7 @@ const cv::Scalar& drwn::white_ball_vision_processor_t::get_ball_preprocessor_thr
 
 void drwn::white_ball_vision_processor_t::set_ball_preprocessor_threshold_gabor_bgr_max(
         const cv::Scalar& threshold_gabor_bgr_max) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: threshold_gabor_bgr_max: " << threshold_gabor_bgr_max;
     m_ball_preproc.set_threshold_gabor_bgr_max(threshold_gabor_bgr_max);
 }
 
@@ -90,6 +92,7 @@ const cv::Scalar& drwn::white_ball_vision_processor_t::get_ball_preprocessor_thr
 
 void drwn::white_ball_vision_processor_t::set_ball_preprocessor_threshold_color_bgr_min(
         const cv::Scalar& threshold_color_bgr_min) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: threshold_color_bgr_min: " << threshold_color_bgr_min;
     m_ball_preproc.set_threshold_color_bgr_min(threshold_color_bgr_min);
 }
 
@@ -99,6 +102,7 @@ const cv::Scalar& drwn::white_ball_vision_processor_t::get_ball_preprocessor_thr
 
 void drwn::white_ball_vision_processor_t::set_ball_preprocessor_threshold_color_bgr_max(
         const cv::Scalar& threshold_color_bgr_max) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: threshold_color_bgr_max: " << threshold_color_bgr_max;
     m_ball_preproc.set_threshold_color_bgr_max(threshold_color_bgr_max);
 }
 
@@ -107,6 +111,7 @@ int drwn::white_ball_vision_processor_t::get_ball_preprocessor_median_blur_size(
 }
 
 void drwn::white_ball_vision_processor_t::set_ball_preprocessor_median_blur_size(int median_blur_size) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: median_blur_size: " << median_blur_size;
     m_ball_preproc.set_median_blur_size(median_blur_size);
 }
 
@@ -116,6 +121,7 @@ const cv::Scalar& drwn::white_ball_vision_processor_t::get_field_preprocessor_th
 
 void drwn::white_ball_vision_processor_t::set_field_preprocessor_threshold_gabor_bgr_min(
         const cv::Scalar& threshold_gabor_bgr_min) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: threshold_gabor_bgr_min: " << threshold_gabor_bgr_min;
     m_field_preproc.set_threshold_gabor_bgr_min(threshold_gabor_bgr_min);
 }
 
@@ -125,6 +131,7 @@ const cv::Scalar& drwn::white_ball_vision_processor_t::get_field_preprocessor_th
 
 void drwn::white_ball_vision_processor_t::set_field_preprocessor_threshold_gabor_bgr_max(
         const cv::Scalar& threshold_gabor_bgr_max) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: threshold_gabor_bgr_max: " << threshold_gabor_bgr_max;
     m_field_preproc.set_threshold_gabor_bgr_max(threshold_gabor_bgr_max);
 }
 
@@ -134,6 +141,7 @@ const cv::Scalar& drwn::white_ball_vision_processor_t::get_field_preprocessor_th
 
 void drwn::white_ball_vision_processor_t::set_field_preprocessor_threshold_color_hsv_min(
         const cv::Scalar& threshold_color_hsv_min) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: threshold_color_hsv_min: " << threshold_color_hsv_min;
     m_field_preproc.set_threshold_color_hsv_min(threshold_color_hsv_min);
 }
 
@@ -143,6 +151,7 @@ const cv::Scalar& drwn::white_ball_vision_processor_t::get_field_preprocessor_th
 
 void drwn::white_ball_vision_processor_t::set_field_preprocessor_threshold_color_hsv_max(
         const cv::Scalar& threshold_color_hsv_max) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: threshold_color_hsv_max: " << threshold_color_hsv_max;
     m_field_preproc.set_threshold_color_hsv_max(threshold_color_hsv_max);
 }
 
@@ -152,6 +161,7 @@ const cv::Scalar& drwn::white_ball_vision_processor_t::get_line_preprocessor_thr
 
 void
 drwn::white_ball_vision_processor_t::set_line_preprocessor_threshold_gabor_bgr_min(const cv::Scalar& threshold_bgr_min) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: threshold_bgr_min: " << threshold_bgr_min;
     m_line_preproc.set_threshold_gabor_bgr_min(threshold_bgr_min);
 }
 
@@ -161,6 +171,7 @@ const cv::Scalar& drwn::white_ball_vision_processor_t::get_line_preprocessor_thr
 
 void
 drwn::white_ball_vision_processor_t::set_line_preprocessor_threshold_gabor_bgr_max(const cv::Scalar& threshold_bgr_max) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: threshold_bgr_max: " << threshold_bgr_max;
     m_line_preproc.set_threshold_gabor_bgr_max(threshold_bgr_max);
 }
 
@@ -170,6 +181,7 @@ const cv::Scalar& drwn::white_ball_vision_processor_t::get_line_preprocessor_thr
 
 void
 drwn::white_ball_vision_processor_t::set_line_preprocessor_threshold_color_hsv_min(const cv::Scalar& threshold_hsv_min) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: threshold_hsv_min: " << threshold_hsv_min;
     m_line_preproc.set_threshold_color_hsv_min(threshold_hsv_min);
 }
 
@@ -179,6 +191,7 @@ const cv::Scalar& drwn::white_ball_vision_processor_t::get_line_preprocessor_thr
 
 void drwn::white_ball_vision_processor_t::set_line_preprocessor_threshold_color_hsv_max(
         const cv::Scalar& threshold_hsv_max) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: threshold_hsv_max: " << threshold_hsv_max;
     m_line_preproc.set_threshold_hsv_max(threshold_hsv_max);
 }
 
@@ -187,6 +200,7 @@ float drwn::white_ball_vision_processor_t::get_line_detector_hough_lines_rho() c
 }
 
 void drwn::white_ball_vision_processor_t::set_line_detector_hough_lines_rho(float hough_lines_rho) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: threshold_hsv_max: " << hough_lines_rho;
     m_line_detector.set_hough_lines_rho(hough_lines_rho);
 }
 
@@ -195,6 +209,7 @@ float drwn::white_ball_vision_processor_t::get_line_detector_hough_lines_theta()
 }
 
 void drwn::white_ball_vision_processor_t::set_line_detector_hough_lines_theta(float hough_lines_theta) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: hough_lines_theta: " << hough_lines_theta;
     m_line_detector.set_hough_lines_theta(hough_lines_theta);
 }
 
@@ -204,6 +219,7 @@ float drwn::white_ball_vision_processor_t::get_line_detector_hough_lines_min_lin
 
 void
 drwn::white_ball_vision_processor_t::set_line_detector_hough_lines_min_line_length(float hough_lines_min_line_length) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: hough_lines_min_line_length: " << hough_lines_min_line_length;
     m_line_detector.set_hough_lines_min_line_length(hough_lines_min_line_length);
 }
 
@@ -212,6 +228,7 @@ float drwn::white_ball_vision_processor_t::get_line_detector_hough_lines_max_lin
 }
 
 void drwn::white_ball_vision_processor_t::set_line_detector_hough_lines_max_line_gap(float hough_lines_max_line_gap) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: hough_lines_max_line_gap: " << hough_lines_max_line_gap;
     m_line_detector.set_hough_lines_max_line_gap(hough_lines_max_line_gap);
 }
 
@@ -220,6 +237,7 @@ int drwn::white_ball_vision_processor_t::get_line_detector_hough_lines_threshold
 }
 
 void drwn::white_ball_vision_processor_t::set_line_detector_hough_lines_threshold(int hough_lines_threshold) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: hough_lines_threshold: " << hough_lines_threshold;
     m_line_detector.set_hough_lines_threshold(hough_lines_threshold);
 }
 
@@ -228,6 +246,7 @@ float drwn::white_ball_vision_processor_t::get_line_detector_line_equality_angle
 }
 
 void drwn::white_ball_vision_processor_t::set_line_detector_line_equality_angle_eps(float line_equality_pred_angle_eps) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: line_equality_pred_angle_eps: " << line_equality_pred_angle_eps;
     m_line_detector.set_line_equality_angle_eps(line_equality_pred_angle_eps);
 }
 
@@ -236,5 +255,6 @@ int drwn::white_ball_vision_processor_t::get_line_detector_line_equality_error_p
 }
 
 void drwn::white_ball_vision_processor_t::set_line_detector_line_equality_error_px(int line_equality_pred_error_px) {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: line_equality_pred_error_px: " << line_equality_pred_error_px;
     m_line_detector.set_line_equality_error_px(line_equality_pred_error_px);
 }

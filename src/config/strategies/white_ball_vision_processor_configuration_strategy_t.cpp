@@ -73,7 +73,7 @@ void white_ball_vision_processor_configuration_strategy_t::read_config(const boo
             ));
         }
         if (line_preproc_color_thresh_max_h && line_preproc_color_thresh_max_s && line_preproc_color_thresh_max_v) {
-            m_white_ball_vision_processor->set_line_preprocessor_threshold_color_hsv_min(cv::Scalar(
+            m_white_ball_vision_processor->set_line_preprocessor_threshold_color_hsv_max(cv::Scalar(
                     line_preproc_color_thresh_max_h.get(),
                     line_preproc_color_thresh_max_s.get(),
                     line_preproc_color_thresh_max_v.get()
@@ -169,9 +169,7 @@ void white_ball_vision_processor_configuration_strategy_t::read_config(const boo
                     ball_detector_gabor_thresh_min_r.get()
             ));
         }
-        if (ball_detector_gabor_thresh_max_b &&
-                ball_detector_gabor_thresh_max_g &&
-                ball_detector_gabor_thresh_max_r) {
+        if (ball_detector_gabor_thresh_max_b && ball_detector_gabor_thresh_max_g && ball_detector_gabor_thresh_max_r) {
             m_white_ball_vision_processor->set_ball_preprocessor_threshold_gabor_bgr_max(cv::Scalar(
                     ball_detector_gabor_thresh_max_b.get(),
                     ball_detector_gabor_thresh_max_g.get(),
@@ -221,10 +219,10 @@ void white_ball_vision_processor_configuration_strategy_t::write_config(boost::p
         //FIELD CONFIGS
 //        auto field_kernel_size = field_section.get_optional<float>("kernel_size");
 //        auto field_min_thresh = field_section.get_optional<float>("min_thresh");
-        auto field_color_max = m_white_ball_vision_processor->get_field_preprocessor_threshold_gabor_bgr_max();
-        auto field_color_min = m_white_ball_vision_processor->get_field_preprocessor_threshold_gabor_bgr_min();
-        auto field_gabor_max = m_white_ball_vision_processor->get_field_preprocessor_threshold_color_hsv_max();
-        auto field_gabor_min = m_white_ball_vision_processor->get_field_preprocessor_threshold_color_hsv_min();
+        auto field_color_max = m_white_ball_vision_processor->get_field_preprocessor_threshold_color_hsv_max();
+        auto field_color_min = m_white_ball_vision_processor->get_field_preprocessor_threshold_color_hsv_min();
+        auto field_gabor_max = m_white_ball_vision_processor->get_field_preprocessor_threshold_gabor_bgr_max();
+        auto field_gabor_min = m_white_ball_vision_processor->get_field_preprocessor_threshold_gabor_bgr_min();
         section.put("field_detector_color_thresh_min_h", field_color_min[0]);
         section.put("field_detector_color_thresh_min_s", field_color_min[1]);
         section.put("field_detector_color_thresh_min_v", field_color_min[2]);

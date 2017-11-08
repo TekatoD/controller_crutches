@@ -44,24 +44,27 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         
         vrange = noise(0); vbearing = noise(1);
         
-        // TODO: Create matrix from vector
-        Eigen::MatrixXf Qt = Eigen::MatrixXf::Identity(measurements.size()*2, measurements.size()*2);
-        Qt = Qt * 0.1f;
+        //Eigen::MatrixXf Qt = Eigen::MatrixXf::Identity(measurements.size()*2, measurements.size()*2);
+        //Qt = Qt * 0.1f;
+        Eigen::Matrix2f Qt;
+        Qt << vrange, 0.0f, 0.0f, vbearing;
         
-        Eigen::MatrixXf Zdiff(measurements.size()*2, 1);
-        int z_counter = 0;
-        float lid, srange, sbearing, lx, ly, dx, dy;
+        //Eigen::MatrixXf Zdiff(measurements.size()*2, 1);
+        //int z_counter = 0;
+        float lid, measured_range, measured_bearing, lx, ly, dx, dy;
+        
+        float new_weight = particle.weight;
         for (const auto& reading : measurements) {
             // Received measurement
             // Id is unknown for us
-            lid = reading(0); srange = reading(1); sbearing = reading(2);
-            Eigen::Vector2f z_measured = {srange, sbearing};
+            lid = reading(0); measured_range = reading(1); measured_bearing = reading(2);
+            Eigen::Vector2f z_measured = {measured_range, measured_bearing};
             
             // Predicted measurement
             // Cast a line from robot position with same bearing
             float epx, epy;
             // Need to normalize angles everywhere
-            Pose2D normalizer(0.0, 0.0, sbearing + rtheta);
+            Pose2D normalizer(0.0, 0.0, measured_bearing + rtheta);
             epx = rx + FieldMap::MAX_DIST * cos(normalizer.Theta());
             epy = ry + FieldMap::MAX_DIST * sin(normalizer.Theta());
             
@@ -69,58 +72,50 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
             Point2D isec_point;
             // Accept intersections with distance from robot to intersection point greater than minDist 
             auto isec_res = m_fieldWorld.IntersectWithField(
-                Line(rx, ry, epx, epy), (srange - srange*0.25f)
+                Line(rx, ry, epx, epy), (measured_range - measured_range*0.25f)
             );
-            
             ret_type = std::get<0>(isec_res);
             isec_point = std::get<1>(isec_res);
             
-            lx = isec_point.X; ly = isec_point.Y;
+            if (ret_type == FieldMap::LineType::NONE) {
+                continue;
+            }
             
+            lx = isec_point.X; ly = isec_point.Y;
             dx = lx - rx;
             dy = ly - ry;
-            Eigen::Vector2f delta = { dx, dy };
-            float q = delta.transpose() * delta;
-            float dst = std::sqrt(dst);
+            float expected_range = std::sqrt(dx*dx + dy*dy);
+            
+            if (expected_range > FieldMap::MAX_DIST) {
+                continue;
+            }
         
-            normalizer.setTheta( std::atan2(dy, dx) - rtheta);
+            normalizer.setTheta(std::atan2(dy, dx) - rtheta);
+            float expected_bearing = normalizer.Theta();
             
-            if (ret_type == FieldMap::LineType::NONE) {
-                dst = FieldMap::MAX_DIST;
-                normalizer.setTheta(0.0f);
-            } 
-            
-            Eigen::Vector2f z_expected = {
-                dst,
+            normalizer.setTheta(expected_bearing - measured_bearing);
+            Eigen::Vector2f diff = {
+                expected_range - measured_range,
                 normalizer.Theta()
             };
             
-            Eigen::Vector2f diff = z_expected - z_measured;
-            normalizer.setTheta(diff(1));
-            diff(1) = normalizer.Theta();
+            float det = (2.0f * M_PI * Qt).determinant();
+            float temp = (diff.transpose() * Qt.inverse() * diff)(0);
+            new_weight *= det * std::exp((-1.0f / 2.0f) * temp);
             
-            Zdiff.block(z_counter, 0, 2, 1) = diff;
-            z_counter += 2;
-        }
-        
-        float det = (2.0f * M_PI * Qt).determinant();
-        //float denom = 1 / std::sqrt(det);
-        
-        float temp = (Zdiff.transpose() * Qt.inverse() * Zdiff)(0) / 6000.0f;
-        float new_weight = det * std::exp((-1.0f / 2.0f) * temp);
-        
-        std::cout << Zdiff << std::endl;
-        
-        std::cout << det << " | " << temp << " | " << new_weight << std::endl;
-        if (std::isnan(new_weight) || new_weight < 0.0001) {
-            new_weight = 1.0f;
+            if (std::isnan(new_weight)) {
+                new_weight = 0.0f;
+            }
+            
+            //Zdiff.block(z_counter, 0, 2, 1) = diff;
+            //z_counter += 2;
         }
         
         weight_normalizer = weight_normalizer + new_weight;
-        particle.weight *= new_weight;
+        particle.weight = new_weight;
     }
     
-    if (weight_normalizer < 0.0001) {
+    if (weight_normalizer < 0.00001) {
         std::cout << "weight normalizer is too close to 0!" << std::endl;
     } else {
         std::cout << "weight normalizer: " << weight_normalizer << std::endl;
@@ -135,8 +130,8 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         Particle& particle = m_particles[index];
         
         // Temporary measure, so we don't divide by zero
-        if (fabs(weight_normalizer) < 0.0001 || std::isnan(weight_normalizer) || std::isnan(particle.weight)) {
-            particle.weight = 0.0f;
+        if (fabs(weight_normalizer) < 0.00001 || std::isnan(weight_normalizer) || std::isnan(particle.weight)) {
+            particle.weight = 1.0f / m_particles.size();
         } else {
             particle.weight = particle.weight / weight_normalizer;
             
@@ -193,13 +188,16 @@ void ParticleFilter::low_variance_resampling()
     
     float c = m_particles[0].weight;
     int i = 0;
+    Particle new_particle;
     for (int j = 0; j < m_particles.size(); j++) {
        float U = r + (j-1) * Jinv; 
        while (U > c) {
            i++;
            c += m_particles[i].weight;
        }
-       new_particles.push_back(m_particles[i]);
+       new_particle.weight = 1.0f / m_particles.size();
+       new_particle.pose = m_particles[i].pose;
+       new_particles.push_back(new_particle);
     }
     
     if (new_particles.size() != m_particles.size()) {

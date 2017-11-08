@@ -216,8 +216,8 @@ int main(int argc, char** argv) {
     // Rotation1, translation, Rotation2
     Eigen::Vector3f movementNoise = {0.01, 50.0f, 0.01};
     // Measurement noise (range-bearing measurement model format)
-    // range, bearing
-    Eigen::Vector3f measurementNoise = {50.0f, 0.1, 0.0f};
+    // range (in mm), bearing (in radians)
+    Eigen::Vector3f measurementNoise = {300.0f, 0.6, 0.0f};
     while (!finish) {
         // Update game controller
 //        GameController::GetInstance()->Update();

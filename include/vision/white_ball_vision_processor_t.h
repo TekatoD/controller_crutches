@@ -114,25 +114,47 @@ namespace drwn {
 
         void set_line_detector_line_equality_error_px(int line_equality_pred_error_px);
 
+        bool is_show_images_enabled() const;
+
+        void enable_show_images(bool show_images_enabled);
+
+        bool is_dump_images_enabled() const;
+
+        void enable_dump_images(bool dump_images_enabled);
+
+        bool is_field_processing_enabled() const;
+
+        void enable_field_processing(bool field_processing_enabled);
+
     private:
         void process();
 
+        void update_members();
+
+        void show_windows();
+
+        void dump_images();
+
     private:
         bool m_debug{false};
+        bool m_show_images_enabled{false};
+        bool m_dump_images_enabled{false};
+        bool m_field_processing_enabled{true};
 
-        cv::Mat m_img;
-
+        cv::Mat m_src_img;
+        cv::Mat m_field_img;
+        cv::Mat m_line_preproc_img;
         cv::Rect m_ball;
         cv::Mat m_field_mask;
+
         std::vector<cv::Vec4i> m_lines{};
+
         std::vector<cv::Vec3d> m_angles{};
-
         bool m_img_processed{false};
-
         ball_preprocessor_t m_ball_preproc;
+
         new_line_preprocessor_t m_line_preproc;
         field_preprocessor_t m_field_preproc;
-
         white_ball_detector_t m_ball_detector;
         field_detector_t m_field_detector;
         line_detector_t m_line_detector;

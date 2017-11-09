@@ -3,6 +3,7 @@
  *  \date 10/27/17
  */
 
+#include <log/trivial_logger_t.h>
 #include "config/arguments_parser_t.h"
 
 using namespace drwn;
@@ -30,7 +31,7 @@ bool arguments_parser_t::parse() {
         po::notify(vm);
         apply_variables_map(vm);
     } catch (const boost::program_options::error& e) {
-        std::cout << e.what() << std::endl;
+        LOG_ERROR << "Can't parse command line arguments: " << e.what();
         return false;
     }
     return true;

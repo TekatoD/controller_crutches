@@ -1,3 +1,4 @@
+#include <iostream>
 #include <config/arguments_parser_t.h>
 #include <hw/buttons_t.h>
 #include <hw/LEDs_t.h>
@@ -17,9 +18,7 @@
 #ifdef CROSSCOMPILE
 #include "hw/robot_CM730_t.h"
 #else
-
 #include "hw/vrep_CM730_t.h"
-
 #endif
 
 using namespace drwn;

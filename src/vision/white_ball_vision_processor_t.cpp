@@ -2,6 +2,7 @@
 /// \date 11/3/17
 
 #include <cv.hpp>
+#include <boost/filesystem.hpp>
 #include <log/trivial_logger_t.h>
 #include "vision/white_ball_vision_processor_t.h"
 
@@ -51,8 +52,17 @@ void white_ball_vision_processor_t::enable_debug(bool debug) noexcept {
 void white_ball_vision_processor_t::process() {
     if (!m_img_processed) {
         this->update_members();
+        this->visualize();
         this->show_windows();
         this->dump_images();
+    }
+}
+
+void white_ball_vision_processor_t::visualize() {
+    if (m_show_images_enabled || m_dump_images_enabled) {
+        if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: Visualizing pipeline";
+        this->draw_lines();
+        this->draw_ball();
     }
 }
 
@@ -270,30 +280,51 @@ void white_ball_vision_processor_t::show_windows() {
         if (m_field_processing_enabled) {
             cv::imshow("field", m_field_img);
         }
-
-        cv::Mat lines_img = (m_field_processing_enabled)
-                           ? m_field_img.clone()
-                           : m_src_img.clone();
-
-        for (auto& line : m_lines) {
-            cv::line(lines_img, {line[0], line[1]}, {line[2], line[3]}, {255, 0, 0});
-        }
-        cv::imshow("lines", lines_img);
-
-        cv::Mat ball_img = (m_field_processing_enabled)
-                           ? m_field_img.clone()
-                           : m_src_img.clone();
-
-        cv::rectangle(ball_img, m_ball, {255, 0, 0});
-        cv::imshow("ball", ball_img);
+        cv::imshow("lines", m_lines_img);
+        cv::imshow("ball", m_ball_img);
 
         cv::waitKey(1);
     }
 }
 
-void white_ball_vision_processor_t::dump_images() {
-    if (m_dump_images_enabled) {
+void white_ball_vision_processor_t::draw_lines() {
+    m_lines_img = (m_field_processing_enabled)
+                           ? m_field_img.clone()
+                           : m_src_img.clone();
 
+    for (auto& line : m_lines) {
+            cv::line(m_lines_img, {line[0], line[1]}, {line[2], line[3]}, {255, 0, 0});
+        }
+}
+
+void white_ball_vision_processor_t::draw_ball() {
+    m_ball_img = (m_field_processing_enabled)
+                           ? m_field_img.clone()
+                           : m_src_img.clone();
+
+    rectangle(m_ball_img, m_ball, {255, 0, 0});
+}
+
+void white_ball_vision_processor_t::dump_images() {
+    namespace fs = boost::filesystem;
+    
+    if (m_dump_images_enabled) {
+        fs::path path(m_dump_directory_path);
+        if (fs::is_directory(path)) {
+            auto prefix_path = m_dump_directory_path + std::to_string(m_dump_counter);
+            cv::imwrite(prefix_path + "_src.jpg", m_src_img);
+            if (m_field_processing_enabled) {
+                cv::imwrite(prefix_path + "_field.jpg", m_field_img);
+            }
+            cv::imwrite(prefix_path + "_ball.jpg", m_ball_img);
+            cv::imwrite(prefix_path + "_lines.jpg", m_ball_img);
+
+            m_dump_counter += 1;
+        } else {
+            LOG_ERROR << "WHITE BALL VISION PROCESSOR: Can't dump images to the directory: "
+                      << m_dump_directory_path << ". Dumping is disabled." << std::endl;
+            m_dump_images_enabled = false;
+        }
     }
 }
 
@@ -343,4 +374,16 @@ void white_ball_vision_processor_t::enable_field_processing(bool field_processin
         }
         m_field_processing_enabled = field_processing_enabled;
     }
+}
+
+const std::string& white_ball_vision_processor_t::get_dump_directory_path() const noexcept {
+    return m_dump_directory_path;
+}
+
+void white_ball_vision_processor_t::set_dump_directory_path(std::string dump_directory_path) {
+    m_dump_directory_path = std::move(dump_directory_path);
+}
+
+unsigned int white_ball_vision_processor_t::get_dump_counter() const {
+    return m_dump_counter;
 }

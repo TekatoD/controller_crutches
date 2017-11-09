@@ -21,3 +21,28 @@ void white_ball_vision_processor_arhuments_parsing_strategy_t::apply_variables(
         const boost::program_options::variables_map& vm) {
     // Empty method
 }
+
+bool white_ball_vision_processor_arhuments_parsing_strategy_t::is_dump_images_enabled() const {
+    return m_dump_images_enabled;
+}
+
+void white_ball_vision_processor_arhuments_parsing_strategy_t::enable_dump_images(bool dump_images_enabled) {
+    m_dump_images_enabled = dump_images_enabled;
+}
+
+bool white_ball_vision_processor_arhuments_parsing_strategy_t::is_display_images_enabled() const {
+    return m_display_images_enabled;
+}
+
+void white_ball_vision_processor_arhuments_parsing_strategy_t::enable_display_images(bool display_images_enabled) {
+    m_display_images_enabled = display_images_enabled;
+}
+
+const std::string& white_ball_vision_processor_arhuments_parsing_strategy_t::get_dump_images_path() const {
+    return m_dump_images_path;
+}
+
+void
+white_ball_vision_processor_arhuments_parsing_strategy_t::set_dump_images_path(const std::string& dump_images_path) {
+    m_dump_images_path = dump_images_path;
+}

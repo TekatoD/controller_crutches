@@ -148,6 +148,14 @@ void robot_application_t::init_cv() {
     if (m_arg_debug_all || m_arg_debug_image_source)
         m_image_source->enable_debug(true);
     if (m_debug) LOG_INFO << "Camera is ready";
+
+    if (m_debug) LOG_DEBUG << "Initializing CV pipeline...";
+    auto vision_processor = std::make_unique<white_ball_vision_processor_t>();
+    vision_processor->set_dump_directory_path(m_arg_white_ball_vision_processor.get_dump_images_path());
+    vision_processor->enable_dump_images(m_arg_white_ball_vision_processor.is_dump_images_enabled());
+    vision_processor->enable_display_images(m_arg_white_ball_vision_processor.is_display_images_enabled());
+    m_vision_processor = std::move(vision_processor);
+    if (m_debug) LOG_INFO << "CV pipeline is ready";
 }
 
 void robot_application_t::init_motion_manager() {
@@ -236,6 +244,8 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_config_walking);
     parser.add_strategy(m_arg_config_action);
     parser.add_strategy(m_arg_config_kicking);
+
+    parser.add_strategy(m_arg_white_ball_vision_processor);
 
     m_arg_help_requested.set_option("help,h", "produce help message");
 

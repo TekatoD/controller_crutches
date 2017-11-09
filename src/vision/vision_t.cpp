@@ -17,7 +17,7 @@ cv::Rect vision_t::detect_ball() {
     return m_processor->detect_ball();
 }
 
-std::vector<cv::Vec3d> vision_t::denect_angles() {
+std::vector<cv::Vec3d> vision_t::detect_angles() {
     return m_processor->detect_angles();
 }
 

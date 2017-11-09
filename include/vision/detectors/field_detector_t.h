@@ -9,6 +9,6 @@
 namespace drwn {
     class field_detector_t {
     public:
-        cv::Mat detect(const cv::Mat& image) const;
+        cv::Mat detect(const cv::Mat& preproc_image) const;
     };
 }

@@ -17,7 +17,7 @@ namespace drwn {
             return m_processor->detect_lines();
         }
 
-        std::vector<cv::Vec3d> denect_angles();
+        std::vector<cv::Vec3d> detect_angles();
 
         cv::Mat detect_field();
 
@@ -26,6 +26,10 @@ namespace drwn {
         vision_processor_t* get_processor() const noexcept;
 
         void set_processor(vision_processor_t* processor) noexcept;
+
+        void process() {
+             m_processor->process();
+        }
 
     private:
         vision_t() = default;

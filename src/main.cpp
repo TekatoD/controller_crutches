@@ -66,7 +66,7 @@ void init_logger() {
 
 
 void sighandler(int /*sig*/) {
-    drwn::robot_application_t::GetInstance()->stop();
+    drwn::robot_application_t::get_instance()->stop();
 }
 
 
@@ -80,6 +80,6 @@ int main(int argc, char** argv) {
     init_logger();
 
     drwn::command_arguments_t args{argc, argv};
-    drwn::robot_application_t::GetInstance()->set_program_arguments(args);
-    return drwn::robot_application_t::GetInstance()->exec();
+    drwn::robot_application_t::get_instance()->set_program_arguments(args);
+    return drwn::robot_application_t::get_instance()->exec();
 }

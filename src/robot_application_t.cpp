@@ -6,6 +6,7 @@
 #include <hw/camera_t.h>
 #include <hw/image_source_failure.h>
 #include <opencv/cv.hpp>
+#include <vision/vision_t.h>
 #include "log/trivial_logger_t.h"
 #include "motion/motion_manager_t.h"
 #include "gamecontroller/game_controller_t.h"
@@ -24,7 +25,7 @@
 using namespace drwn;
 
 
-robot_application_t* robot_application_t::GetInstance() {
+robot_application_t* robot_application_t::get_instance() {
     static robot_application_t instance;
     return &instance;
 }
@@ -153,8 +154,11 @@ void robot_application_t::init_cv() {
     auto vision_processor = std::make_unique<white_ball_vision_processor_t>();
     vision_processor->set_dump_directory_path(m_arg_white_ball_vision_processor.get_dump_images_path());
     vision_processor->enable_dump_images(m_arg_white_ball_vision_processor.is_dump_images_enabled());
-    vision_processor->enable_display_images(m_arg_white_ball_vision_processor.is_display_images_enabled());
+    vision_processor->enable_show_images(m_arg_white_ball_vision_processor.is_display_images_enabled());
     m_vision_processor = std::move(vision_processor);
+    vision_t::get_instance()->set_processor(m_vision_processor.get());
+    if (m_arg_debug_all || m_arg_debug_vision_processor)
+        m_vision_processor->enable_debug(true);
     if (m_debug) LOG_INFO << "CV pipeline is ready";
 }
 
@@ -195,6 +199,7 @@ void robot_application_t::init_game_controller() {
 void robot_application_t::init_configuraion_loader() {
     if (m_debug) LOG_DEBUG << "Initializing configuration loader...";
     //TODO Don't forget uncomment this lines
+    m_white_ball_vision_processor_configuration_strategy.set_white_ball_vision_processor(m_vision_processor.get());
     m_configuration_loader.set_default_path(m_arg_config_default);
 //    m_configuration_loader.add_strategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
 //    m_configuration_loader.add_strategy(m_ball_tracker_configuration_strategy, m_arg_config_ball_searcher);
@@ -202,6 +207,7 @@ void robot_application_t::init_configuraion_loader() {
     m_configuration_loader.add_strategy(m_head_configuration_strategy, m_arg_config_head);
     m_configuration_loader.add_strategy(m_walking_configuration_strategy, m_arg_config_walking);
     m_configuration_loader.add_strategy(m_motion_manager_configuration_strategy, m_arg_config_motion_manager);
+    m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy, m_arg_config_white_ball_vision_processor);
 
 #ifdef CROSSCOMPILATION
     m_robot_image_source_configuration_strategy.set_image_source(m_image_source.get());
@@ -234,6 +240,7 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_debug_leds);
     parser.add_strategy(m_arg_debug_image_source);
     parser.add_strategy(m_arg_debug_camera);
+    parser.add_strategy(m_arg_debug_vision_processor);
 
     parser.add_strategy(m_arg_config_default);
     parser.add_strategy(m_arg_config_ball_searcher);
@@ -244,8 +251,10 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_config_walking);
     parser.add_strategy(m_arg_config_action);
     parser.add_strategy(m_arg_config_kicking);
+    parser.add_strategy(m_arg_config_white_ball_vision_processor);
 
     parser.add_strategy(m_arg_white_ball_vision_processor);
+
 
     m_arg_help_requested.set_option("help,h", "produce help message");
 
@@ -262,6 +271,7 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_buttons.set_option("dbg-kicking", "enable debug output for buttons");
     m_arg_debug_leds.set_option("dbg-kicking", "enable debug output for LEDs");
     m_arg_debug_camera.set_option("dbg-camera", "enable debug output for camera");
+    m_arg_debug_vision_processor.set_option("dbg-cv", "enable debug output for cv");
 
     m_arg_config_default.set_option("cfg,c", "default config file (res/config.ini by default)");
     m_arg_config_ball_tracker.set_option("cfg-ball-tracker", "config file for ball tracker");
@@ -272,6 +282,7 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_config_walking.set_option("cfg-walking", "config file for walking motion module");
     m_arg_config_kicking.set_option("cfg-kicking", "config file for kicking motion module");
     m_arg_config_action.set_option("cfg-action", "path to motion_4096.bin");
+    m_arg_config_white_ball_vision_processor.set_option("cfg-cv", "path to cv config");
 
 #ifdef CROSSCOMPILATION
     m_arg_debug_image_source.set_option("dbg-img-source", "enabled debut output for image source");
@@ -321,18 +332,8 @@ void robot_application_t::read_configuration() {
 
 void robot_application_t::start_main_loop() {
     if (m_debug) LOG_INFO << "=== Controller was started ===";
-    cv::namedWindow("Image", CV_WINDOW_AUTOSIZE);
     while (is_running()) {
-        try {
-            camera_t::get_instance()->update_image();
-            cv::Mat image = camera_t::get_instance()->get_image();
-            cv::imshow("Image", image);
-            cv::waitKey(1);
-        }
-        catch(image_source_failure& failure) {
-            continue;
-        }
-
+      this->update_image();
     }
     if (m_debug) LOG_INFO << "=== Contoller was finished ===";
 
@@ -344,4 +345,16 @@ bool robot_application_t::is_debug() const noexcept {
 
 void robot_application_t::enable_debug(bool debug) noexcept {
     m_debug = debug;
+}
+
+void robot_application_t::update_image() {
+    try {
+        camera_t::get_instance()->update_image();
+        cv::Mat frame = camera_t::get_instance()->get_image();
+        vision_t::get_instance()->set_frame(frame);
+        vision_t::get_instance()->process();
+    } catch(const image_source_failure& failure) {
+        LOG_WARNING << "CV loop iteration failed: " << failure.what();
+    }
+
 }

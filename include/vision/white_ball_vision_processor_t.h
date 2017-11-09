@@ -134,8 +134,11 @@ namespace drwn {
 
         unsigned int get_dump_counter() const;
 
+        void process() override;
+
+
+
     private:
-        void process();
 
         void update_members();
 

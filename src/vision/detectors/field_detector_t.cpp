@@ -7,11 +7,11 @@
 
 using namespace drwn;
 
-cv::Mat field_detector_t::detect(const cv::Mat& preprocImage) const {
+cv::Mat field_detector_t::detect(const cv::Mat& preproc_image) const {
   cv::Rect ans;
-  cv::Mat temp_image=cv::Mat::zeros(preprocImage.rows,preprocImage.cols,CV_8UC3);
+  cv::Mat temp_image=cv::Mat::zeros(preproc_image.rows,preproc_image.cols,CV_8UC3);
   std::vector<std::vector<cv::Point> > contours;
-  cv::findContours(preprocImage, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+  cv::findContours(preproc_image, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
   if (!contours.empty()) {
     double maxArea = 0;
     int maxAreaIdx = 0;
@@ -30,5 +30,5 @@ cv::Mat field_detector_t::detect(const cv::Mat& preprocImage) const {
     return temp_image;
   }
 
-  return cv::Mat::zeros(preprocImage.rows,preprocImage.cols,CV_8U);
+  return cv::Mat::zeros(preproc_image.rows,preproc_image.cols,CV_8U);
 }

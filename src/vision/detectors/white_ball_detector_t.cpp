@@ -8,7 +8,8 @@
 using namespace drwn;
 
 cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const std::vector<cv::Vec4i>& lines) const {
-    cv::Mat preproc = prep_img;
+    cv::Mat preproc;//TODO MAYBE CLONE
+    cv::cvtColor(prep_img, preproc, CV_BGR2GRAY);
     for (auto&& line : lines) {
         double x0 = line(0);
         double x1 = line(2);

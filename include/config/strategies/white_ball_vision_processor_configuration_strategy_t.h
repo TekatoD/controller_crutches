@@ -22,7 +22,13 @@ namespace drwn {
 
         void write_config(boost::property_tree::ptree& prop) const override;
 
+
+
     private:
         white_ball_vision_processor_t* m_white_ball_vision_processor{nullptr};
+    public:
+        white_ball_vision_processor_t* get_white_ball_vision_processor() const;
+
+        void set_white_ball_vision_processor(white_ball_vision_processor_t* white_ball_vision_processor);
     };
 }

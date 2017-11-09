@@ -21,6 +21,8 @@ namespace drwn {
 
         virtual void reset() = 0;
 
+        virtual void process() = 0;
+
         virtual ~vision_processor_t() = default;
     };
 }

@@ -98,6 +98,8 @@ void white_ball_vision_processor_configuration_strategy_t::read_config(const boo
         auto field_color_thresh_max_s = section.get_optional<float>("field_detector_color_thresh_max_s");
         auto field_color_thresh_max_v = section.get_optional<float>("field_detector_color_thresh_max_v");
 
+        auto field_enabled = section.get_optional<bool>("field_detector_enabled");
+
         if (field_gabor_thresh_min_b && field_gabor_thresh_min_g && field_gabor_thresh_min_r) {
             m_white_ball_vision_processor->set_field_preprocessor_threshold_gabor_bgr_min(cv::Scalar(
                     field_gabor_thresh_min_b.get(),
@@ -126,6 +128,7 @@ void white_ball_vision_processor_configuration_strategy_t::read_config(const boo
                     field_color_thresh_max_v.get()
             ));
         }
+        if(field_enabled) m_white_ball_vision_processor->enable_field_processing(field_enabled.get());
         //BALL CONFIGS
 
 //        auto ball_white_ball = ball_section.get_optional<int>("white_ball");
@@ -235,6 +238,7 @@ void white_ball_vision_processor_configuration_strategy_t::write_config(boost::p
         section.put("field_detector_gabor_thresh_max_b", field_gabor_max[0]);
         section.put("field_detector_gabor_thresh_max_g", field_gabor_max[1]);
         section.put("field_detector_gabor_thresh_max_r", field_gabor_max[2]);
+        section.put("field_detector_enbaled", m_white_ball_vision_processor->is_field_processing_enabled());
 
         //BALL CONFIGS
 
@@ -260,4 +264,14 @@ void white_ball_vision_processor_configuration_strategy_t::write_config(boost::p
     } else {
         throw std::runtime_error("Ball Tracker configuration write fail: BallTracker nullptr");
     }
+}
+
+white_ball_vision_processor_t*
+white_ball_vision_processor_configuration_strategy_t::get_white_ball_vision_processor() const {
+    return m_white_ball_vision_processor;
+}
+
+void white_ball_vision_processor_configuration_strategy_t::set_white_ball_vision_processor(
+        white_ball_vision_processor_t* white_ball_vision_processor) {
+    m_white_ball_vision_processor = white_ball_vision_processor;
 }

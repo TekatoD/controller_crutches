@@ -12,9 +12,9 @@ cv::Mat new_line_preprocessor_t::preprocess(const cv::Mat& img) const {
     constexpr auto kernel_lambda = M_PI;
     constexpr auto kernel_gamma = 0.0;
 
-    cv::Mat hsv_img, gray_img, bgr_img, tmp;
-
-    cv::cvtColor(img, bgr_img, CV_YUV2BGR);
+    cv::Mat hsv_img, gray_img, bgr_img, tmp, yuv_test;
+    cv::cvtColor(img, yuv_test, CV_BGR2YUV);
+    cv::cvtColor(yuv_test, bgr_img, CV_YUV2BGR);
     cv::GaussianBlur(bgr_img, bgr_img, cv::Size(5, 5), 1.5, 1.5);
     cv::cvtColor(bgr_img, hsv_img, CV_BGR2HSV);
 

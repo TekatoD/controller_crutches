@@ -16,6 +16,7 @@
 #include <hw/image_source_t.h>
 #include <config/strategies/robot_image_source_configuration_strategy_t.h>
 #include <config/strategies/white_ball_vision_processor_arhuments_parsing_strategy_t.h>
+#include <config/strategies/white_ball_vision_processor_configuration_strategy_t.h>
 #include "config/configuration_file_loader_t.h"
 #include "config/strategies/walking_configuration_strategy_t.h"
 #include "config/strategies/motion_manager_configuration_strategy_t.h"
@@ -42,7 +43,7 @@ namespace drwn {
         static constexpr char DEFAULT_MOTION_FILE[]{"res/motion_4096.bin"};
         static constexpr char DEFAULT_CONFIG_FILE[]{"res/config.ini"};
 
-        static robot_application_t* GetInstance();
+        static robot_application_t* get_instance();
 
         void set_program_arguments(const command_arguments_t& arguments);
 
@@ -113,6 +114,7 @@ namespace drwn {
         walking_configuration_strategy_t m_walking_configuration_strategy;
         motion_manager_configuration_strategy_t m_motion_manager_configuration_strategy;
         robot_image_source_configuration_strategy_t m_robot_image_source_configuration_strategy;
+        white_ball_vision_processor_configuration_strategy_t m_white_ball_vision_processor_configuration_strategy;
 
         //*** Command line parsing strategies ***//
         help_arguments_parsing_strategy_t m_arg_help_requested;
@@ -131,6 +133,7 @@ namespace drwn {
         debug_mode_arguments_parsing_strategy_t m_arg_debug_leds;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_camera;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_image_source;
+        debug_mode_arguments_parsing_strategy_t m_arg_debug_vision_processor;
 
         config_path_arguments_parsing_strategy_t m_arg_config_default;
         config_path_arguments_parsing_strategy_t m_arg_config_ball_searcher;
@@ -142,6 +145,7 @@ namespace drwn {
         config_path_arguments_parsing_strategy_t m_arg_config_action;
         config_path_arguments_parsing_strategy_t m_arg_config_kicking;
         config_path_arguments_parsing_strategy_t m_arg_config_image_source;
+        config_path_arguments_parsing_strategy_t m_arg_config_white_ball_vision_processor;
 
         action_configuration_file_loader_t m_action_configuration_loader;
         white_ball_vision_processor_arhuments_parsing_strategy_t m_arg_white_ball_vision_processor;
@@ -156,6 +160,7 @@ namespace drwn {
         std::unique_ptr<vrep_connector_t> m_vrep_connector{nullptr};
 #endif
 
+        void update_image();
     };
 }
 

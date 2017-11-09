@@ -217,7 +217,7 @@ int main(int argc, char** argv) {
     Eigen::Vector3f movementNoise = {0.01, 50.0f, 0.01};
     // Measurement noise (range-bearing measurement model format)
     // range (in mm), bearing (in radians)
-    Eigen::Vector3f measurementNoise = {400.0f, 0.6, 0.0f};
+    Eigen::Vector3f measurementNoise = {250.0f, 0.4, 0.0f};
     while (!finish) {
         // Update game controller
 //        GameController::GetInstance()->Update();
@@ -353,25 +353,21 @@ int main(int argc, char** argv) {
                 // format is (id, range, bearing)
                 // id is unknown, so it's -1
                 float dx1, dy1, dx2, dy2;
+                float range1, range2, bearing1, bearing2;
                 dx1 = gx1 - rx;
                 dy1 = gy1 - ry;
                 Robot::Pose2D normalizer(0.0, 0.0, atan2(dy1, dx1) - rtheta);
-                Eigen::Vector3f rb1 = {
-                    -1,
-                    sqrt(dx1*dx1 + dy1*dy1),
-                    normalizer.Theta()
-                };
+                range1 = sqrt(dx1*dx1 + dy1*dy1);
+                bearing1 = normalizer.Theta();
                 
                 dx2 = gx2 - rx;
                 dy2 = gy2 - ry;
                 normalizer.setTheta(atan2(dy2, dx2) - rtheta);
-                Eigen::Vector3f rb2 = {
-                    -1,
-                    sqrt(dx2*dx2 + dy2*dy2),
-                    normalizer.Theta()
-                };
                 
-                if (rb1(1) > FieldMap::MAX_DIST || rb2(1) > FieldMap::MAX_DIST) {
+                range2 = sqrt(dx2*dx2 + dy2*dy2);
+                bearing2 = normalizer.Theta();
+                
+                if (range1 > FieldMap::MAX_DIST || range2 > FieldMap::MAX_DIST) {
                     continue;
                 }
                 
@@ -385,11 +381,17 @@ int main(int argc, char** argv) {
                 std::cout << gx1 <<  ", " << gy1 << std::endl;
                 std::cout << gx2 <<  ", " << gy2 << std::endl;
                 std::cout << "--------" << std::endl;
-                std::cout << rb1 << std::endl;
-                std::cout << rb2 << std::endl;
+                std::cout << range1 << " , " << bearing1 << std::endl;
+                std::cout << range2 << " , " << bearing2 << std::endl;
                 
-                rangeBearingData.push_back(rb1);
-                rangeBearingData.push_back(rb2);
+                Eigen::Vector4f lineRangeBearing = {
+                    range1,
+                    bearing1,
+                    range2,
+                    bearing2
+                };
+                
+                rangeBearingData.push_back(lineRangeBearing);
             }
             
             std::cout << "Start correction and resampling steps" << std::endl;

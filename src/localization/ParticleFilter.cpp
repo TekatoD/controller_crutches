@@ -43,6 +43,22 @@ void ParticleFilter::predict(const Eigen::Vector3f& command, const Eigen::Vector
     }
 }
 
+std::tuple<FieldMap::LineType, Point2D> ParticleFilter::calc_expected_measurement(float rx, float ry, float rtheta, float measured_range, float measured_bearing)
+{
+    // Predicted measurement
+    // Cast a line from robot position with same bearing
+    float epx, epy;
+    // Need to normalize angles everywhere
+    Pose2D normalizer(0.0, 0.0, measured_bearing + rtheta);
+    epx = rx + FieldMap::MAX_DIST * cos(normalizer.Theta());
+    epy = ry + FieldMap::MAX_DIST * sin(normalizer.Theta());
+    
+    // Accept intersections with distance from robot to intersection point greater than minDist 
+    return m_fieldWorld.IntersectWithField(
+        Line(rx, ry, epx, epy), measured_range * 0.85
+    );
+}
+
 void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise)
 {
     float weight_normalizer = 0.0f;
@@ -56,72 +72,78 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         rx = particle.pose.X(); ry = particle.pose.Y(); rtheta = particle.pose.Theta();
         
         vrange = noise(0); vbearing = noise(1);
+        Eigen::MatrixXf Qt(4, 4);
+        Qt << vrange, 0.0f, 0.0f, 0.0f,
+              0.0f, vbearing, 0.0f, 0.0f,
+              0.0f, 0.0f, vrange, 0.0f,
+              0.0f, 0.0f, 0.0f, vbearing;
         
-        //Eigen::MatrixXf Qt = Eigen::MatrixXf::Identity(measurements.size()*2, measurements.size()*2);
-        //Qt = Qt * 0.1f;
-        Eigen::Matrix2f Qt;
-        Qt << vrange, 0.0f, 0.0f, vbearing;
-        
-        //Eigen::MatrixXf Zdiff(measurements.size()*2, 1);
-        //int z_counter = 0;
-        float lid, measured_range, measured_bearing, lx, ly, dx, dy;
+        Pose2D normalizer;
+        float range1, bearing1, range2, bearing2;
+        float dx1, dy1, dx2, dy2;
         
         float new_weight = particle.weight;
         for (const auto& reading : measurements) {
-            // Received measurement
-            // Id is unknown for us
-            lid = reading(0); measured_range = reading(1); measured_bearing = reading(2);
-            Eigen::Vector2f z_measured = {measured_range, measured_bearing};
+            // Received measurement range bearing to 2 line points
+            // Format: range1, bearing1, range2, bearing2
+            range1 = reading(0); bearing1 = reading(1);
+            range2 = reading(2); bearing2 = reading(3);
             
-            // Predicted measurement
-            // Cast a line from robot position with same bearing
-            float epx, epy;
-            // Need to normalize angles everywhere
-            Pose2D normalizer(0.0, 0.0, measured_bearing + rtheta);
-            epx = rx + FieldMap::MAX_DIST * cos(normalizer.Theta());
-            epy = ry + FieldMap::MAX_DIST * sin(normalizer.Theta());
+            auto test_line1 = calc_expected_measurement(rx, ry, rtheta, range1, bearing1);
+            FieldMap::LineType ret_type1 = std::get<0>(test_line1);
+            Point2D isec_point1 = std::get<1>(test_line1);
             
-            FieldMap::LineType ret_type;
-            Point2D isec_point;
-            // Accept intersections with distance from robot to intersection point greater than minDist 
-            auto isec_res = m_fieldWorld.IntersectWithField(
-                Line(rx, ry, epx, epy), (measured_range - measured_range*0.25f)
-            );
-            ret_type = std::get<0>(isec_res);
-            isec_point = std::get<1>(isec_res);
+            auto test_line2 = calc_expected_measurement(rx, ry, rtheta, range2, bearing2);
+            FieldMap::LineType ret_type2 = std::get<0>(test_line2);
+            Point2D isec_point2 = std::get<1>(test_line2);
             
-            if (ret_type == FieldMap::LineType::NONE) {
+            if (ret_type1 == FieldMap::LineType::NONE || ret_type2 == FieldMap::LineType::NONE) {
                 continue;
             }
             
-            lx = isec_point.X; ly = isec_point.Y;
-            dx = lx - rx;
-            dy = ly - ry;
-            float expected_range = std::sqrt(dx*dx + dy*dy);
-            
-            if (expected_range > FieldMap::MAX_DIST) {
+            dx1 = isec_point1.X - rx;
+            dy1 = isec_point1.Y - ry;
+            float expected_range1 = std::sqrt(dx1*dx1 + dy1*dy1);
+            if (expected_range1 > FieldMap::MAX_DIST) {
                 continue;
             }
-        
-            normalizer.setTheta(std::atan2(dy, dx) - rtheta);
-            float expected_bearing = normalizer.Theta();
+            normalizer.setTheta(std::atan2(dy1, dx1) - rtheta);
+            float expected_bearing1 = normalizer.Theta();
             
-            normalizer.setTheta(expected_bearing - measured_bearing);
-            Eigen::Vector2f diff = {
-                expected_range - measured_range,
-                normalizer.Theta()
+            dx2 = isec_point2.X - rx;
+            dy2 = isec_point2.Y - ry;
+            float expected_range2 = std::sqrt(dx2*dx2 + dy2*dy2);
+            if (expected_range2 > FieldMap::MAX_DIST) {
+                continue;
+            }
+            normalizer.setTheta(std::atan2(dy2, dx2) - rtheta);
+            float expected_bearing2 = normalizer.Theta();
+            
+            float bdiff1, bdiff2;
+            normalizer.setTheta(expected_bearing1 - bearing1);
+            bdiff1 = normalizer.Theta();
+            normalizer.setTheta(expected_bearing2 - bearing2);
+            bdiff2 = normalizer.Theta();
+            Eigen::Vector4f diff = {
+                expected_range1 - range1,
+                bdiff1,
+                expected_range2 - range2,
+                bdiff2,
             };
             
             float det = (2.0f * M_PI * Qt).determinant();
             float temp = (diff.transpose() * Qt.inverse() * diff)(0);
             new_weight *= det * std::exp((-1.0f / 2.0f) * temp);
             
+            // Penalize the particle if isec points are not on the same line
+            if (ret_type1 != ret_type2) {
+                new_weight = new_weight * 0.1 ;
+            }
+                
+            
             if (std::isnan(new_weight)) {
                 new_weight = 0.0f;
             }
-            
-            //Zdiff.block(z_counter, 0, 2, 1) = diff;
-            //z_counter += 2;
         }
         
         weight_normalizer = weight_normalizer + new_weight;
@@ -156,8 +178,8 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
 
 void ParticleFilter::resample()
 {
-    low_variance_resampling();
     calc_pose_mean_cov();
+    low_variance_resampling();
 }
 
 void ParticleFilter::low_variance_resampling()
@@ -193,9 +215,6 @@ void ParticleFilter::low_variance_resampling()
 
 void ParticleFilter::calc_pose_mean_cov()
 {
-    // Only the best particles remain after resampling
-    // Weights are uniform after resampling
-    
     Pose2D meanAccum;
     float pw, px, py, ptheta;
     for (const auto& particle : m_particles) {

@@ -19,7 +19,7 @@ public:
     static const int DEFAULT_PARTICLE_NUMBER = 100;
     
     using control_data = std::vector<Eigen::Vector3f>;
-    using measurement_bundle = std::vector<Eigen::Vector3f>;
+    using measurement_bundle = std::vector<Eigen::Vector4f>;
     
     struct Particle {
         Pose2D pose;
@@ -47,6 +47,8 @@ public:
     // Get pose of the particle with highest weight
     Particle getTopParticle() const { return m_particles[m_topParticleIndex]; }
      
+    void calc_pose_mean_cov();
+    
     /* Util functions, place in separate class */
     float sample_normal_distribution(float variance);
     Pose2D odometry_sample(Pose2D pose, Eigen::Vector3f command, Eigen::Vector3f noise);
@@ -62,7 +64,7 @@ private:
     void init_particles(float min_x, float max_x, float min_y, float max_y, float min_theta, float max_theta, int num_particles);
     
     void low_variance_resampling();
-    void calc_pose_mean_cov();
+    std::tuple<FieldMap::LineType, Point2D> calc_expected_measurement(float rx, float ry, float rtheta, float measured_range, float measured_bearing);
 };
 
 }

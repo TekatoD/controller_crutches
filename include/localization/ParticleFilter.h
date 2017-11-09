@@ -40,9 +40,9 @@ public:
     void resample();
     
     std::vector<Particle> getParticles() const { return m_particles; }
-    // Weighted pose mean
+    // Pose mean
     Pose2D getPoseMean() const { return m_poseMean; }
-    // Weighted pose covariance
+    // Pose covariance
     Pose2D getPoseCovariance() const { return m_poseCovariance; }
     // Get pose of the particle with highest weight
     Particle getTopParticle() const { return m_particles[m_topParticleIndex]; }
@@ -62,6 +62,7 @@ private:
     void init_particles(float min_x, float max_x, float min_y, float max_y, float min_theta, float max_theta, int num_particles);
     
     void low_variance_resampling();
+    void calc_pose_mean_cov();
 };
 
 }

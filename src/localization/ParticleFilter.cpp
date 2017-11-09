@@ -128,64 +128,36 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
         particle.weight = new_weight;
     }
     
+    // While debugging
     if (weight_normalizer < 0.00001) {
-        std::cout << "weight normalizer is too close to 0!" << std::endl;
-    } else {
-        std::cout << "weight normalizer: " << weight_normalizer << std::endl;
+        std::cout << "!!! weight normalizer is too close to 0 !!!" << std::endl;
     }
     
-    Pose2D meanAccum;
-    float pw, px, py, ptheta;
     float highestWeight = 0.0f;
     std::size_t highestWeightIndex = 0;
     for (std::size_t index = 0; index < m_particles.size(); index++) {
         Particle& particle = m_particles[index];
         
-        // Temporary measure, so we don't divide by zero
         if (fabs(weight_normalizer) < 0.00001 || std::isnan(weight_normalizer) || std::isnan(particle.weight)) {
+            // Reset all weights
             particle.weight = 1.0f / m_particles.size();
         } else {
             particle.weight = particle.weight / weight_normalizer;
             
         }
         
-        pw = particle.weight;
-        px = particle.pose.X();
-        py = particle.pose.Y();
-        ptheta = particle.pose.Theta();
-        
-        meanAccum += Pose2D(px*pw, py*pw, ptheta*pw);
-        
-        if (pw > highestWeight) {
-            highestWeight = pw;
+        if (particle.weight > highestWeight) {
+            highestWeight = particle.weight;
             highestWeightIndex = index;
         }
     }
     m_topParticleIndex = highestWeightIndex;
-    
-    Pose2D covAccum;
-    float mx, my, mtheta;
-    mx = meanAccum.X();
-    my = meanAccum.Y();
-    mtheta = meanAccum.Theta();
-    Pose2D angleNormalizer;
-    for (auto& particle : m_particles) {
-        pw = particle.weight;
-        px = particle.pose.X();
-        py = particle.pose.Y();
-        ptheta = particle.pose.Theta();
-        
-        angleNormalizer.setTheta(pw*pow(ptheta-mtheta, 2));
-        covAccum += Pose2D(pw*pow(px-mx, 2), pw*pow(py-my, 2), angleNormalizer.Theta());
-    }
-    
-    m_poseMean = meanAccum;
-    m_poseCovariance = covAccum;
 }
 
 void ParticleFilter::resample()
 {
     low_variance_resampling();
+    calc_pose_mean_cov();
 }
 
 void ParticleFilter::low_variance_resampling()
@@ -219,6 +191,43 @@ void ParticleFilter::low_variance_resampling()
     m_particles.swap(new_particles);
 }
 
+void ParticleFilter::calc_pose_mean_cov()
+{
+    // Only the best particles remain after resampling
+    // Weights are uniform after resampling
+    
+    Pose2D meanAccum;
+    float pw, px, py, ptheta;
+    for (const auto& particle : m_particles) {
+        
+        pw = particle.weight;
+        px = particle.pose.X();
+        py = particle.pose.Y();
+        ptheta = particle.pose.Theta();
+        
+        meanAccum += Pose2D(px*pw, py*pw, ptheta*pw);
+    }
+    
+    Pose2D covAccum, angleNormalizer;
+    float mx, my, mtheta;
+    mx = meanAccum.X();
+    my = meanAccum.Y();
+    mtheta = meanAccum.Theta();
+    for (const auto& particle : m_particles) {
+        pw = particle.weight;
+        px = particle.pose.X();
+        py = particle.pose.Y();
+        ptheta = particle.pose.Theta();
+        
+        angleNormalizer.setTheta(ptheta-mtheta);
+        covAccum += Pose2D(pw*pow(px-mx, 2), pw*pow(py-my, 2), pw*pow(angleNormalizer.Theta(), 2));
+    }
+    
+    m_poseMean = meanAccum;
+    m_poseCovariance = covAccum;
+}
+
+
 void ParticleFilter::init_particles(const Pose2D& pose, int num_particles)
 {
     float defaultWeight = 1.0f / num_particles;
@@ -246,7 +255,6 @@ void ParticleFilter::init_particles(float min_x, float max_x, float min_y, float
     
     for (auto& particle : m_particles) {
         particle.pose = Pose2D(dist_x(generator), dist_y(generator), dist_theta(generator));
-        std::cout << particle.pose << std::endl;
         particle.weight = defaultWeight;
     }
 }

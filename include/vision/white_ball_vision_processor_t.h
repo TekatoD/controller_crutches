@@ -146,6 +146,15 @@ namespace drwn {
 
         void dump_images();
 
+        void draw_ball();
+
+        void draw_lines();
+
+        void visualize();
+
+        void prepare_output();
+
+
     private:
         bool m_debug{false};
         bool m_show_images_enabled{false};
@@ -164,6 +173,8 @@ namespace drwn {
         cv::Mat m_lines_img;
         cv::Mat m_ball_img;
 
+        cv::Mat m_dbg_src_img;
+
         std::vector<cv::Vec4i> m_lines{};
         std::vector<cv::Vec3d> m_angles{};
 
@@ -175,11 +186,6 @@ namespace drwn {
         field_detector_t m_field_detector;
         line_detector_t m_line_detector;
 
-        void draw_ball();
-
-        void draw_lines();
-
-        void visualize();
     };
 }
 

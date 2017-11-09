@@ -53,6 +53,7 @@ void white_ball_vision_processor_t::process() {
     if (!m_img_processed) {
         this->update_members();
         this->visualize();
+        this->prepare_output();
         this->show_windows();
         this->dump_images();
     }
@@ -73,9 +74,13 @@ void white_ball_vision_processor_t::update_members() {
         cv::Mat field_prep = m_field_preproc.preprocess(m_src_img);
         m_field_mask = m_field_detector.detect(field_prep);
         cv::Mat tmp;
-        m_src_img.copyTo(tmp, m_field_mask);
+        cv::cvtColor(m_src_img, tmp, CV_BGR2YUV);
+        tmp.copyTo(tmp, m_field_mask);
         m_field_img = tmp;
+//        cv::cvtColor(m_field_img, m_field_img, CV_BGR2YUV);
     }
+    cv::cvtColor(m_src_img, m_src_img, CV_BGR2YUV);
+
 
     auto& img = (m_field_processing_enabled) ? m_field_img : m_src_img;
 
@@ -83,7 +88,7 @@ void white_ball_vision_processor_t::update_members() {
     m_line_preproc_img = m_line_preproc.preprocess(img);
     m_lines = m_line_detector.detect(m_line_preproc_img);
     if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: Detecting white ball";
-    m_ball_detector.detect(img, m_lines);
+    m_ball = m_ball_detector.detect(m_line_preproc_img, m_lines);
     m_img_processed = true;
     if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: Processing has been finished";
 }
@@ -283,14 +288,20 @@ void drwn::white_ball_vision_processor_t::set_line_detector_line_equality_error_
 
 void white_ball_vision_processor_t::show_windows() {
     if (m_show_images_enabled) {
-        cv::imshow("source", m_src_img);
+        cv::imshow("source", m_dbg_src_img);
         if (m_field_processing_enabled) {
-            cv::imshow("field", m_field_img);
+            cv::imshow("field", m_field_mask);
         }
         cv::imshow("lines", m_lines_img);
         cv::imshow("ball", m_ball_img);
 
         cv::waitKey(1);
+    }
+}
+
+void white_ball_vision_processor_t::prepare_output() {
+    if(m_dump_images_enabled || m_show_images_enabled) {
+        cv::cvtColor(m_src_img, m_dbg_src_img, CV_YUV2BGR);
     }
 }
 
@@ -302,11 +313,12 @@ void white_ball_vision_processor_t::draw_lines() {
 }
 
 void white_ball_vision_processor_t::draw_ball() {
-    m_ball_img = (m_field_processing_enabled)
-                           ? m_field_img.clone()
-                           : m_src_img.clone();
+    auto img = (m_field_processing_enabled)
+                 ? m_field_img
+                 : m_src_img;
+    cv::cvtColor(img, m_ball_img, CV_YUV2BGR);
 
-    rectangle(m_ball_img, m_ball, {255, 0, 0});
+    cv::rectangle(m_ball_img, m_ball, {0, 0, 255}, 5);
 }
 
 void white_ball_vision_processor_t::dump_images() {
@@ -316,12 +328,12 @@ void white_ball_vision_processor_t::dump_images() {
         fs::path path(m_dump_directory_path);
         if (fs::is_directory(path)) {
             auto prefix_path = m_dump_directory_path + std::to_string(m_dump_counter);
-            cv::imwrite(prefix_path + "_src.jpg", m_src_img);
+            cv::imwrite(prefix_path + "_src.jpg", m_dbg_src_img);
             if (m_field_processing_enabled) {
-                cv::imwrite(prefix_path + "_field.jpg", m_field_img);
+                cv::imwrite(prefix_path + "_field.jpg", m_field_mask);
             }
             cv::imwrite(prefix_path + "_ball.jpg", m_ball_img);
-            cv::imwrite(prefix_path + "_lines.jpg", m_ball_img);
+            cv::imwrite(prefix_path + "_lines.jpg", m_lines_img);
 
             m_dump_counter += 1;
         } else {

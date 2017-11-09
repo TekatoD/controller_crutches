@@ -152,7 +152,10 @@ void robot_application_t::init_cv() {
 
     if (m_debug) LOG_DEBUG << "Initializing CV pipeline...";
     auto vision_processor = std::make_unique<white_ball_vision_processor_t>();
-    vision_processor->set_dump_directory_path(m_arg_white_ball_vision_processor.get_dump_images_path());
+    const std::string& path = m_arg_white_ball_vision_processor.get_dump_images_path();
+    if(!path.empty()) {
+        vision_processor->set_dump_directory_path(path);
+    }
     vision_processor->enable_dump_images(m_arg_white_ball_vision_processor.is_dump_images_enabled());
     vision_processor->enable_show_images(m_arg_white_ball_vision_processor.is_display_images_enabled());
     m_vision_processor = std::move(vision_processor);

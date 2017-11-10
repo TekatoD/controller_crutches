@@ -73,6 +73,7 @@ void white_ball_vision_processor_t::update_members() {
         if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: Processing field";
         cv::Mat field_prep = m_field_preproc.preprocess(m_src_img);
         m_field_mask = m_field_detector.detect(field_prep);
+//        m_field_mask = m_field_preproc.preprocess(m_src_img);
         cv::Mat tmp;
         cv::cvtColor(m_src_img, tmp, CV_BGR2YUV);
         tmp.copyTo(tmp, m_field_mask);

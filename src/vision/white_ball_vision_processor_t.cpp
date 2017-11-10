@@ -358,15 +358,19 @@ void white_ball_vision_processor_t::enable_show_images(bool show_images_enabled)
             cv::namedWindow("ball");
             cv::namedWindow("lines");
         } else {
-            cv::destroyWindow("source");
-            if (m_field_processing_enabled) {
-                cv::destroyWindow("field");
-            }
-            cv::destroyWindow("ball");
-            cv::destroyWindow("lines");
+            this->destroy_windows();
         }
         m_show_images_enabled = show_images_enabled;
     }
+}
+
+void white_ball_vision_processor_t::destroy_windows() const {
+    cv::destroyWindow("source");
+    if (m_field_processing_enabled) {
+                cv::destroyWindow("field");
+            }
+    cv::destroyWindow("ball");
+    cv::destroyWindow("lines");
 }
 
 bool white_ball_vision_processor_t::is_dump_images_enabled() const {
@@ -383,10 +387,12 @@ bool white_ball_vision_processor_t::is_field_processing_enabled() const {
 
 void white_ball_vision_processor_t::enable_field_processing(bool field_processing_enabled) {
     if (m_field_processing_enabled != field_processing_enabled) {
-        if (field_processing_enabled) {
-            cv::namedWindow("field");
-        } else {
-            cv::destroyWindow("field");
+        if (m_show_images_enabled) {
+            if (field_processing_enabled) {
+                cv::namedWindow("field");
+            } else {
+                cv::destroyWindow("field");
+            }
         }
         m_field_processing_enabled = field_processing_enabled;
     }
@@ -402,4 +408,10 @@ void white_ball_vision_processor_t::set_dump_directory_path(std::string dump_dir
 
 unsigned int white_ball_vision_processor_t::get_dump_counter() const {
     return m_dump_counter;
+}
+
+white_ball_vision_processor_t::~white_ball_vision_processor_t() {
+    if (m_show_images_enabled) {
+        this->destroy_windows();
+    }
 }

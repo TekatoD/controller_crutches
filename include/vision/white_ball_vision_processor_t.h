@@ -136,7 +136,7 @@ namespace drwn {
 
         void process() override;
 
-
+        ~white_ball_vision_processor_t();
 
     private:
 
@@ -186,6 +186,7 @@ namespace drwn {
         field_detector_t m_field_detector;
         line_detector_t m_line_detector;
 
+        void destroy_windows() const;
     };
 }
 

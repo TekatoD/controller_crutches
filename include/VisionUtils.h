@@ -235,8 +235,26 @@ namespace ant {
                 float focalDist = (0.5 * sqrt(Width*Width + Height*Height)) / tan(0.5 * FovRad);
                 
                 
+                // Optical center x axis shift
+                // line iy is (168)
+                // 0.25 ix (0, 319); gx -1682, 1334
+                // 0.30 ix (0, 319); gx -1641, 1440
+                // 0.35 ix (0, 319); gx -1531, 1485
+                // 0.375 ix (0, 319);gx -1493, 1523
+                float shiftCoeff = 0.375;
+                cx -= (Width / 2.0f) * shiftCoeff;
+                
                 //f = 239.53f;
-                float magicNumber = 1.45f;
+                // Focal distance "magicNumber" = scaling number for correct value
+                // Distance to line with y = 168 and x = (0, 319)
+                // Pick correct distance to "left" point
+                // treat "right-left" x coord (in world frame) difference as an error for sensors
+                // 2.0 iy (168); lx 2094 rx 2626
+                // 1.75 iy (168); lx 2412 rx 2944
+                // 1.65 iy (168); lx 2620 rx 3164 - for penalty nearest horizontal penalty line
+                // 1.45 for correct close measurements
+                
+                float magicNumber = 1.65f;
                 focalDist = focalDist / magicNumber;
                 //std::cout << "FocalDist: " << focalDist << std::endl;
                 cv::Mat Pixel = (cv::Mat_<float>(3, 1) << focalDist, -ix + cx, -iy + cy);

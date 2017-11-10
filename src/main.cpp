@@ -221,7 +221,7 @@ int main(int argc, char** argv) {
     Eigen::Vector3f movementNoise = {0.01, 50.0f, 0.01};
     // Measurement noise (range-bearing measurement model format)
     // range (in mm), bearing (in radians)
-    Eigen::Vector3f measurementNoise = {250.0f, 0.4, 0.0f};
+    Eigen::Vector3f measurementNoise = {600.0f, 0.05, 0.0f};
     
     while (!finish) {
         // Update game controller
@@ -273,8 +273,8 @@ int main(int argc, char** argv) {
         particleFilter.predict(odometryCommand, movementNoise); 
         auto pf_predict_diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - pf_pred_start);
         
-        std::cout << "Successful prediction step using odometry command: " << std::endl;
-        std::cout << odometryCommand << std::endl;
+        //std::cout << "Successful prediction step using odometry command: " << std::endl;
+        //std::cout << odometryCommand << std::endl;
 
         /* 
          * Receive sensor data
@@ -315,7 +315,6 @@ int main(int argc, char** argv) {
             std::vector<cv::Vec4i> lines = vision.lineDetect();
             
             ParticleFilter::measurement_bundle rangeBearingData;
-            std::cout << "== Start receiving measurement data ==" << std::endl;
             for (auto& line : lines) {
                 if (line[0] > camera.getWidth() || line[2] > camera.getWidth() || line[1] > camera.getHeight() || line[3] > camera.getHeight()) {
                     // why 
@@ -378,6 +377,7 @@ int main(int argc, char** argv) {
                     continue;
                 }
                 
+                /*
                 std::cout << "========" << std::endl;
                 std::cout << p1 << std::endl;
                 std::cout << p2 << std::endl;
@@ -390,6 +390,7 @@ int main(int argc, char** argv) {
                 std::cout << "--------" << std::endl;
                 std::cout << range1 << " , " << bearing1 << std::endl;
                 std::cout << range2 << " , " << bearing2 << std::endl;
+                */
                 
                 Eigen::Vector4f lineRangeBearing = {
                     range1,
@@ -401,9 +402,6 @@ int main(int argc, char** argv) {
                 rangeBearingData.push_back(lineRangeBearing);
             }
             
-            /*
-            std::cout << "Start correction and resampling steps" << std::endl;
-            
             auto pf_correct_start = Clock::now();
             particleFilter.correct(rangeBearingData, measurementNoise);
             auto pf_correct_diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - pf_correct_start);
@@ -414,7 +412,7 @@ int main(int argc, char** argv) {
             
             std::cout << "==== PF pose ==" << std::endl;
             std::cout << "Pose mean: " << particleFilter.getPoseMean() << std::endl;
-            std::cout << "Pose covariance: " << particleFilter.getPoseCovariance() << std::endl;
+            std::cout << "Pose std dev: " << particleFilter.getPoseStdDev() << std::endl;
             std::cout << "Highest weight particle pose: " << particleFilter.getTopParticle().pose << std::endl;
             
             
@@ -423,10 +421,9 @@ int main(int argc, char** argv) {
             std::cout << "PF resampling: " << pf_resample_diff.count() << "ms" << std::endl;
             std::cout << "PF total time: " << (pf_predict_diff + pf_correct_diff + pf_resample_diff).count() << "ms" << std::endl;
             std::cout << "=== End particle filter cycle ===" << std::endl;
-            */
             
             cv::imshow("line_image", frame);
-            cv::waitKey(0);
+            cv::waitKey(1);
         }
         
         oldRobotPose = robotPose;

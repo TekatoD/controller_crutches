@@ -42,8 +42,8 @@ public:
     std::vector<Particle> getParticles() const { return m_particles; }
     // Pose mean
     Pose2D getPoseMean() const { return m_poseMean; }
-    // Pose covariance
-    Pose2D getPoseCovariance() const { return m_poseCovariance; }
+    // Pose standard deviation
+    Pose2D getPoseStdDev() const { return m_poseDev; }
     // Get pose of the particle with highest weight
     Particle getTopParticle() const { return m_particles[m_topParticleIndex]; }
      
@@ -56,7 +56,7 @@ public:
     /* */
 private:
     std::vector<Particle> m_particles;
-    Pose2D m_poseMean, m_poseCovariance;
+    Pose2D m_poseMean, m_poseDev;
     std::size_t m_topParticleIndex;
     Localization::FieldMap m_fieldWorld;
     

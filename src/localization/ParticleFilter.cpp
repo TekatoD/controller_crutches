@@ -55,7 +55,7 @@ std::tuple<FieldMap::LineType, Point2D> ParticleFilter::calc_expected_measuremen
     
     // Accept intersections with distance from robot to intersection point greater than minDist 
     return m_fieldWorld.IntersectWithField(
-        Line(rx, ry, epx, epy), measured_range * 0.85
+        Line(rx, ry, epx, epy), measured_range * 0.7
     );
 }
 
@@ -137,7 +137,7 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
             
             // Penalize the particle if isec points are not on the same line
             if (ret_type1 != ret_type2) {
-                new_weight = new_weight * 0.1 ;
+                new_weight = new_weight * 0.1; 
             }
                 
             
@@ -178,8 +178,8 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
 
 void ParticleFilter::resample()
 {
-    calc_pose_mean_cov();
     low_variance_resampling();
+    calc_pose_mean_cov();
 }
 
 void ParticleFilter::low_variance_resampling()
@@ -218,32 +218,56 @@ void ParticleFilter::calc_pose_mean_cov()
     Pose2D meanAccum;
     float pw, px, py, ptheta;
     for (const auto& particle : m_particles) {
-        
-        pw = particle.weight;
         px = particle.pose.X();
         py = particle.pose.Y();
         ptheta = particle.pose.Theta();
         
+        // For correct mean calculation
+        pw = 1.0 / m_particles.size();
         meanAccum += Pose2D(px*pw, py*pw, ptheta*pw);
     }
     
-    Pose2D covAccum, angleNormalizer;
+    Pose2D devAccum, angleNormalizer;
     float mx, my, mtheta;
     mx = meanAccum.X();
     my = meanAccum.Y();
     mtheta = meanAccum.Theta();
     for (const auto& particle : m_particles) {
-        pw = particle.weight;
         px = particle.pose.X();
         py = particle.pose.Y();
         ptheta = particle.pose.Theta();
         
+        // for correct stddev calculation
+        // square root of mean of (xi-x.mean)**2 for all i
+        pw = 1.0 / m_particles.size();
         angleNormalizer.setTheta(ptheta-mtheta);
-        covAccum += Pose2D(pw*pow(px-mx, 2), pw*pow(py-my, 2), pw*pow(angleNormalizer.Theta(), 2));
+        devAccum += Pose2D(pw*pow(px-mx, 2), pw*pow(py-my, 2), pw*pow(angleNormalizer.Theta(), 2));
     }
+    // sqrt(mean((xi - x.mean())**2))
+    devAccum.setX(sqrt(devAccum.X()));
+    devAccum.setY(sqrt(devAccum.Y()));
+    devAccum.setTheta(sqrt(devAccum.Theta()));
     
     m_poseMean = meanAccum;
-    m_poseCovariance = covAccum;
+    m_poseDev = devAccum;
+    
+    // DEBUG
+    // Sometimes reset particles around current mean
+    Pose2D nmz;
+    if (m_poseDev.X() > 200.0f || m_poseDev.Y() > 200.0f || m_poseDev.Theta() > 10.0f) {
+        std::cout << "======================== REGENERATING PARTICLES ===========================" << std::endl;
+        float min_x, min_y, min_theta, max_x, max_y, max_theta;
+        min_x = m_poseMean.X() - m_poseDev.X();
+        max_x = m_poseMean.X() + m_poseDev.X();
+        min_y = m_poseMean.Y() - m_poseDev.Y();
+        max_y = m_poseMean.Y() + m_poseDev.Y();
+        nmz.setTheta(m_poseMean.Theta() - (m_poseDev.Theta() * (M_PI / 180.0f)));
+        min_theta = nmz.Theta();
+        nmz.setTheta(m_poseMean.Theta() + (m_poseDev.Theta() * (M_PI / 180.0f)));
+        max_theta = nmz.Theta();
+        init_particles(min_x, max_x, min_y, max_y, min_theta, max_theta, m_particles.size());
+    }    
+    
 }
 
 

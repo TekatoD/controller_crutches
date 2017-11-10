@@ -10,6 +10,7 @@
 #include <libgen.h>
 #include <signal.h>
 #include <memory>
+#include <chrono>
 #include <Eigen/Dense>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/eigen.hpp>
@@ -51,6 +52,9 @@ extern "C" {
 
 using namespace Robot;
 using namespace Localization;
+
+using Clock =  std::chrono::high_resolution_clock;
+using Duration = std::chrono::duration<float>;
 
 //LinuxCM730 linux_cm730(U2D_DEV_NAME0);
 VrepConnector vrepConnector;
@@ -218,6 +222,7 @@ int main(int argc, char** argv) {
     // Measurement noise (range-bearing measurement model format)
     // range (in mm), bearing (in radians)
     Eigen::Vector3f measurementNoise = {250.0f, 0.4, 0.0f};
+    
     while (!finish) {
         // Update game controller
 //        GameController::GetInstance()->Update();
@@ -263,8 +268,10 @@ int main(int argc, char** argv) {
         ry = robotPose.Y();
         rtheta = robotPose.Theta();
         
+        auto pf_pred_start = Clock::now();
         Eigen::Vector3f odometryCommand = particleFilter.get_odometry_command(oldRobotPose, robotPose);
         particleFilter.predict(odometryCommand, movementNoise); 
+        auto pf_predict_diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - pf_pred_start);
         
         std::cout << "Successful prediction step using odometry command: " << std::endl;
         std::cout << odometryCommand << std::endl;
@@ -394,9 +401,16 @@ int main(int argc, char** argv) {
                 rangeBearingData.push_back(lineRangeBearing);
             }
             
+            /*
             std::cout << "Start correction and resampling steps" << std::endl;
+            
+            auto pf_correct_start = Clock::now();
             particleFilter.correct(rangeBearingData, measurementNoise);
+            auto pf_correct_diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - pf_correct_start);
+            
+            auto pf_resample_start = Clock::now();
             particleFilter.resample();
+            auto pf_resample_diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - pf_resample_start);
             
             std::cout << "==== PF pose ==" << std::endl;
             std::cout << "Pose mean: " << particleFilter.getPoseMean() << std::endl;
@@ -404,7 +418,12 @@ int main(int argc, char** argv) {
             std::cout << "Highest weight particle pose: " << particleFilter.getTopParticle().pose << std::endl;
             
             
+            std::cout << "PF prediction: " << pf_predict_diff.count() << "ms" << std::endl;
+            std::cout << "PF correction: " << pf_correct_diff.count() << "ms" << std::endl;
+            std::cout << "PF resampling: " << pf_resample_diff.count() << "ms" << std::endl;
+            std::cout << "PF total time: " << (pf_predict_diff + pf_correct_diff + pf_resample_diff).count() << "ms" << std::endl;
             std::cout << "=== End particle filter cycle ===" << std::endl;
+            */
             
             cv::imshow("line_image", frame);
             cv::waitKey(0);

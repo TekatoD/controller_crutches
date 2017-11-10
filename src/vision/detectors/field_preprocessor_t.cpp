@@ -7,7 +7,7 @@
 cv::Mat drwn::field_preprocessor_t::preprocess(const cv::Mat& img) const {
     cv::Mat preproc_img, hsv_img;
     img.copyTo(preproc_img);
-    cv::cvtColor(preproc_img,hsv_img,cv::COLOR_BGR2HSV);
+    cv::cvtColor(preproc_img, hsv_img, cv::COLOR_BGR2HSV);
     cv::Mat medianBlurFrame;
     cv::medianBlur(preproc_img, medianBlurFrame, 3);
     cv::Mat afterGaborRange, gaborImage;

@@ -294,7 +294,6 @@ void white_ball_vision_processor_t::show_windows() {
         }
         cv::imshow("lines", m_lines_img);
         cv::imshow("ball", m_ball_img);
-
         cv::waitKey(1);
     }
 }
@@ -414,4 +413,22 @@ white_ball_vision_processor_t::~white_ball_vision_processor_t() {
     if (m_show_images_enabled) {
         this->destroy_windows();
     }
+}
+
+int white_ball_vision_processor_t::get_ball_detector_area_top() {
+    return m_ball_detector.get_area_top();
+}
+
+void white_ball_vision_processor_t::set_ball_detector_area_top(int top_area) {
+    if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: ball_detector_top_area = " << top_area;
+    m_ball_detector.set_area_top(top_area);
+}
+
+void white_ball_vision_processor_t::set_ball_detector_area_low(double low_area) {
+    if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: ball_detector_are_low = " << low_area;
+    m_ball_detector.set_area_top(low_area);
+}
+
+double white_ball_vision_processor_t::get_ball_detector_area_low() {
+    return m_ball_detector.get_area_low();
 }

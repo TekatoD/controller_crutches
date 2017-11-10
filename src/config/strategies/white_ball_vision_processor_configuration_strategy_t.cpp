@@ -148,6 +148,12 @@ void white_ball_vision_processor_configuration_strategy_t::read_config(const boo
         auto ball_detector_gabor_thresh_max_g = section.get_optional<float>("ball_detector_gabor_thresh_max_g");
         auto ball_detector_gabor_thresh_max_r = section.get_optional<float>("ball_detector_gabor_thresh_max_r");
 
+        auto ball_detector_area_top = section.get_optional<int>("ball_detector_area_top");
+        auto ball_detector_area_low = section.get_optional<double>("ball_detector_area_low");
+
+        if(ball_detector_area_low) m_white_ball_vision_processor->set_ball_detector_area_low(ball_detector_area_low.get());
+        if(ball_detector_area_top) m_white_ball_vision_processor->set_ball_detector_area_top(ball_detector_area_top.get());
+
         if (ball_median_blur_size)
             m_white_ball_vision_processor->set_ball_preprocessor_median_blur_size(ball_median_blur_size.get());
 
@@ -261,6 +267,8 @@ void white_ball_vision_processor_configuration_strategy_t::write_config(boost::p
         section.put("ball_detector_gabor_thresh_max_b", ball_gabor_max[0]);
         section.put("ball_detector_gabor_thresh_max_g", ball_gabor_max[1]);
         section.put("ball_detector_gabor_thresh_max_r", ball_gabor_max[2]);
+        section.put("ball_detector_area_low", m_white_ball_vision_processor->get_ball_detector_area_low());
+        section.put("ball_detector_area_top", m_white_ball_vision_processor->get_ball_detector_area_top());
     } else {
         throw std::runtime_error("Ball Tracker configuration write fail: BallTracker nullptr");
     }

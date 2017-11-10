@@ -116,6 +116,14 @@ namespace drwn {
 
         void set_line_detector_line_equality_error_px(int line_equality_pred_error_px);
 
+        void set_ball_detector_area_top(int top_area);
+
+        int get_ball_detector_area_top();
+
+        void set_ball_detector_area_low(double low_area);
+
+        double get_ball_detector_area_low();
+
         bool is_show_images_enabled() const;
 
         void enable_show_images(bool show_images_enabled);

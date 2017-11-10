@@ -2,14 +2,12 @@
 /// \date 11/2/17
 
 #include <cv.hpp>
-#include <algorithm>
 #include "vision/detectors/white_ball_detector_t.h"
 
 using namespace drwn;
 
 cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const std::vector<cv::Vec4i>& lines) const {
-    cv::Mat preproc = prep_img;//TODO MAYBE CLONE
-//    cv::cvtColor(prep_img, preproc, CV_BGR2GRAY);
+    cv::Mat preproc = prep_img;
     for (auto&& line : lines) {
         double x0 = line(0);
         double x1 = line(2);
@@ -22,13 +20,22 @@ cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const std::vecto
             std::swap(y0, y1);
             k = -k;
         }
-        auto R = 4;
-        for (auto x = x0; x <= x1; x++) {
-            auto y = k * x + m;
-            for (auto i = (((x - R) >= 0) ? x - R : 0); i < ((x + R < preproc.cols) ? x + R : preproc.cols); i++) {
-                for (auto j = (((y - R) >= 0) ? y - R : 0);
-                     j < ((y + R < preproc.rows) ? y + R : preproc.rows); j++) {
-                    preproc.at<uchar>(j, i) = 0;
+        auto R = 10;
+        for (int x = x0; x <= x1; x++) {
+            auto y = k * (double) x + m;
+            auto i_limit = (x + R < preproc.cols) ? x + R : preproc.cols;
+            for (int i = (((x - R) >= 0) ? x - R : 0); i < i_limit; i++) {
+                if (y != y) {
+                    auto j_limit = y0 > y1 ? y0 : y1;
+                    for (int j = (y0 < y1 ? y0 : y1); j < j_limit; j++) {
+                        preproc.at<uchar>(j, i) = 0;
+                    }
+                } else {
+                    auto j_limit = (y + R < preproc.rows) ? y + R : preproc.rows;
+                    for (int j = (((y - R) >= 0) ? y - R : 0);
+                         j < j_limit; j++) {
+                        preproc.at<uchar>(j, i) = 0;
+                    }
                 }
             }
         }
@@ -40,6 +47,7 @@ cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const std::vecto
     double max_c = 2.0;
     double min_c = 0.5;
     double cur_c = 0.0;
+
 
     if (!contours.empty()) {
         double max_area = 0;
@@ -53,44 +61,50 @@ cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const std::vecto
                 cv::Mat b_vector = cv::Mat::zeros(5, 1, CV_64F);
                 for (auto&& point : contours[i]) {
                     a_matrix.at<double>(0, 0) += std::pow((double) point.x, 4.0);
-                    a_matrix.at<double>(0, 1) += std::pow((double) point.x, 2.0) * std::pow((double) point.y, 2.0);
-                    a_matrix.at<double>(0, 2) += 2.0 * std::pow((double) point.x, 3.0) * point.y;
-                    a_matrix.at<double>(0, 3) += 2.0 * std::pow((double) point.x, 3.0);
-                    a_matrix.at<double>(0, 4) += 2.0 * std::pow((double) point.x, 2.0) * point.y;
+                    auto x_2 = std::pow((double) point.x, 2.0);
+                    auto x_3 = std::pow((double) point.x, 3.0);
+                    auto y_2 = std::pow((double) point.y, 2.0);
+                    auto y_4 = std::pow((double) point.y, 4.0);
+                    auto y_3 = std::pow((double) point.y, 3.0);
+
+                    a_matrix.at<double>(0, 1) += x_2 * y_2;
+                    a_matrix.at<double>(0, 2) += 2.0 * x_3 * point.y;
+                    a_matrix.at<double>(0, 3) += 2.0 * x_3;
+                    a_matrix.at<double>(0, 4) += 2.0 * x_2 * point.y;
                     //
-                    a_matrix.at<double>(1, 0) += std::pow((double) point.x, 2.0) * std::pow((double) point.y, 2.0);
-                    a_matrix.at<double>(1, 1) += std::pow((double) point.y, 4.0);
-                    a_matrix.at<double>(1, 2) += 2.0 * point.x * std::pow((double) point.y, 3.0);
-                    a_matrix.at<double>(1, 3) += 2.0 * point.x * std::pow((double) point.y, 2.0);
-                    a_matrix.at<double>(1, 4) += 2.0 * std::pow((double) point.y, 3.0);
+                    a_matrix.at<double>(1, 0) += x_2 * y_2;
+                    a_matrix.at<double>(1, 1) += y_4;
+                    a_matrix.at<double>(1, 2) += 2.0 * point.x * y_3;
+                    a_matrix.at<double>(1, 3) += 2.0 * point.x * y_2;
+                    a_matrix.at<double>(1, 4) += 2.0 * y_3;
                     //
                     a_matrix.at<double>(2, 0) += std::pow((long double) point.x, 3.0) * (long double) point.y;
-                    a_matrix.at<double>(2, 1) += point.x * std::pow((double) point.y, 3.0);
+                    a_matrix.at<double>(2, 1) += point.x * y_3;
                     a_matrix.at<double>(2, 2) +=
-                            2.0 * std::pow((double) point.x, 2.0) * std::pow((double) point.y, 2.0);
-                    a_matrix.at<double>(2, 3) += 2.0 * std::pow((double) point.x, 2.0) * point.y;
-                    a_matrix.at<double>(2, 4) += 2.0 * point.x * std::pow((double) point.y, 2.0);
+                            2.0 * x_2 * y_2;
+                    a_matrix.at<double>(2, 3) += 2.0 * x_2 * point.y;
+                    a_matrix.at<double>(2, 4) += 2.0 * point.x * y_2;
                     //
-                    a_matrix.at<double>(3, 0) += std::pow((double) point.x, 3.0);
-                    a_matrix.at<double>(3, 1) += point.x * std::pow((double) point.y, 2.0);
-                    a_matrix.at<double>(3, 2) += 2.0 * point.x * std::pow((double) point.y, 2.0);
-                    a_matrix.at<double>(3, 3) += 2.0 * std::pow((double) point.x, 2.0);
+                    a_matrix.at<double>(3, 0) += x_3;
+                    a_matrix.at<double>(3, 1) += point.x * y_2;
+                    a_matrix.at<double>(3, 2) += 2.0 * point.x * y_2;
+                    a_matrix.at<double>(3, 3) += 2.0 * x_2;
                     a_matrix.at<double>(3, 4) += 2.0 * point.x * point.y;
                     //
-                    a_matrix.at<double>(4, 0) += std::pow((double) point.x, 2.0) * point.y;
-                    a_matrix.at<double>(4, 1) += std::pow((double) point.y, 3.0);
-                    a_matrix.at<double>(4, 2) += 2.0 * point.x * std::pow((double) point.y, 2.0);
+                    a_matrix.at<double>(4, 0) += x_2 * point.y;
+                    a_matrix.at<double>(4, 1) += y_3;
+                    a_matrix.at<double>(4, 2) += 2.0 * point.x * y_2;
                     a_matrix.at<double>(4, 3) += 2.0 * point.x * point.y;
-                    a_matrix.at<double>(4, 4) += 2.0 * std::pow((double) point.y, 2.0);
+                    a_matrix.at<double>(4, 4) += 2.0 * y_2;
                     //
-                    b_vector.at<double>(0) += std::pow((double) point.x, 2.0);
-                    b_vector.at<double>(1) += std::pow((double) point.y, 2.0);
+                    b_vector.at<double>(0) += x_2;
+                    b_vector.at<double>(1) += y_2;
                     b_vector.at<double>(2) += (double) point.x * (double) point.y;
                     b_vector.at<double>(3) += point.x;
                     b_vector.at<double>(4) += point.y;
                 }
-                cv::Mat inverse_A_matrix = a_matrix.inv();
-                cv::Mat params = inverse_A_matrix * b_vector;
+                cv::Mat inverse_a_matrix = a_matrix.inv();
+                cv::Mat params = inverse_a_matrix * b_vector;
                 double a11 = params.at<double>(0);
                 double a22 = params.at<double>(1);
                 double a12 = params.at<double>(2);
@@ -109,16 +123,16 @@ cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const std::vecto
                 delta.at<double>(2, 0) = a13;
                 delta.at<double>(2, 1) = a23;
                 delta.at<double>(2, 2) = a33;
-                cv::Mat D_matrix = cv::Mat::zeros(2, 2, CV_64F);
-                D_matrix.at<double>(0, 0) = a11;
-                D_matrix.at<double>(0, 1) = a12;
-                D_matrix.at<double>(1, 0) = a12;
-                D_matrix.at<double>(1, 1) = a22;
+                cv::Mat d_matrix = cv::Mat::zeros(2, 2, CV_64F);
+                d_matrix.at<double>(0, 0) = a11;
+                d_matrix.at<double>(0, 1) = a12;
+                d_matrix.at<double>(1, 0) = a12;
+                d_matrix.at<double>(1, 1) = a22;
                 cv::Mat lam;
-                cv::eigen(D_matrix, lam);
+                cv::eigen(d_matrix, lam);
                 if (!lam.empty()) {
                     double delta_det = cv::determinant(delta);
-                    double d_det = cv::determinant(D_matrix);
+                    double d_det = cv::determinant(d_matrix);
                     if (std::abs(lam.at<double>(0)) < 0.0001) {
                         lam.at<double>(0) = -std::abs(lam.at<double>(0));
                     }

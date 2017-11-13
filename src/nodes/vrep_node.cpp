@@ -45,7 +45,7 @@ int main(int argc, char** argv)
             vision.setFrame(frame);
             std::vector<cv::Vec4i> lines = vision.lineDetect();
             
-            std::cout << "Line count: " << lines.size() << std::endl;
+            std::cout << "line_t count: " << lines.size() << std::endl;
 
             for (auto& line : lines) {
                 cv::Point p1(line[0], line[1]);

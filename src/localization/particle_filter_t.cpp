@@ -1,34 +1,36 @@
 #include <cmath>
 #include <chrono>
 #include <random>
-#include "localization/ParticleFilter.h"
+#include "localization/particle_filter_t.h"
 
-using namespace Localization;
+using namespace localization;
 using namespace Robot;
 
-ParticleFilter::ParticleFilter(minIni* ini)
+particle_filter_t::particle_filter_t(minIni* ini)
 {
-    LoadIniSettings(ini);
+    load_ini_settings(ini);
 }
 
-void ParticleFilter::LoadIniSettings(minIni* ini)
+void particle_filter_t::load_ini_settings(minIni *ini)
 {
-    m_fieldWorld.LoadIniSettings(ini);
+    m_fieldWorld.load_ini_settings(ini);
     
-    float poseX = ini->getf("ParticleFilter", "init_x");
-    float poseY = ini->getf("ParticleFilter", "init_y");
-    float poseTheta = ini->getf("ParticleFilter", "init_theta");
-    int num_particles = ini->geti("ParticleFilter", "particle_number", DEFAULT_PARTICLE_NUMBER); 
-    int random_particles = ini->geti("ParticleFilter", "random_particles", 0);
+    float poseX = ini->getf("particle_filter", "init_x");
+    float poseY = ini->getf("particle_filter", "init_y");
+    float poseTheta = ini->getf("particle_filter", "init_theta");
+    int num_particles = ini->geti("particle_filter", "particle_number", DEFAULT_PARTICLE_NUMBER);
+    int random_particles = ini->geti("particle_filter", "random_particles", 0);
+
+    std::cout << poseX << " " << poseY << " " << poseTheta << " " << num_particles << " " << random_particles << std::endl;
     
     if (random_particles > 0) {
         float min_x, min_y, min_theta, max_x, max_y, max_theta;
-        min_x = ini->getf("ParticleFilter", "min_x");
-        min_y = ini->getf("ParticleFilter", "min_y");
-        min_theta = ini->getf("ParticleFilter", "min_theta");
-        max_x = ini->getf("ParticleFilter", "max_x");
-        max_y = ini->getf("ParticleFilter", "max_y");
-        max_theta = ini->getf("ParticleFilter", "max_theta");
+        min_x = ini->getf("particle_filter", "min_x");
+        min_y = ini->getf("particle_filter", "min_y");
+        min_theta = ini->getf("particle_filter", "min_theta");
+        max_x = ini->getf("particle_filter", "max_x");
+        max_y = ini->getf("particle_filter", "max_y");
+        max_theta = ini->getf("particle_filter", "max_theta");
         
         init_particles(min_x, max_x, min_y, max_y, min_theta, max_theta, num_particles);
     } else {
@@ -36,30 +38,30 @@ void ParticleFilter::LoadIniSettings(minIni* ini)
     }
 }
 
-void ParticleFilter::predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise)
+void particle_filter_t::predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise)
 {
     for (auto& particle : m_particles) {
         particle.pose = odometry_sample(particle.pose, command, noise);
     }
 }
 
-std::tuple<FieldMap::LineType, Point2D> ParticleFilter::calc_expected_measurement(float rx, float ry, float rtheta, float measured_range, float measured_bearing)
+std::tuple<field_map_t::line_type_t, Point2D> particle_filter_t::calc_expected_measurement(float rx, float ry, float rtheta, float measured_range, float measured_bearing)
 {
     // Predicted measurement
     // Cast a line from robot position with same bearing
     float epx, epy;
     // Need to normalize angles everywhere
     Pose2D normalizer(0.0, 0.0, measured_bearing + rtheta);
-    epx = rx + FieldMap::MAX_DIST * cos(normalizer.Theta());
-    epy = ry + FieldMap::MAX_DIST * sin(normalizer.Theta());
+    epx = rx + field_map_t::MAX_DIST * cos(normalizer.Theta());
+    epy = ry + field_map_t::MAX_DIST * sin(normalizer.Theta());
     
     // Accept intersections with distance from robot to intersection point greater than minDist 
-    return m_fieldWorld.IntersectWithField(
-        Line(rx, ry, epx, epy), measured_range * 0.7
+    return m_fieldWorld.intersect_with_field(
+            line_t(rx, ry, epx, epy), measured_range * 0.7
     );
 }
 
-void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise)
+void particle_filter_t::correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise)
 {
     float weight_normalizer = 0.0f;
     for (auto& particle : m_particles) {
@@ -90,21 +92,21 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
             range2 = reading(2); bearing2 = reading(3);
             
             auto test_line1 = calc_expected_measurement(rx, ry, rtheta, range1, bearing1);
-            FieldMap::LineType ret_type1 = std::get<0>(test_line1);
+            field_map_t::line_type_t ret_type1 = std::get<0>(test_line1);
             Point2D isec_point1 = std::get<1>(test_line1);
             
             auto test_line2 = calc_expected_measurement(rx, ry, rtheta, range2, bearing2);
-            FieldMap::LineType ret_type2 = std::get<0>(test_line2);
+            field_map_t::line_type_t ret_type2 = std::get<0>(test_line2);
             Point2D isec_point2 = std::get<1>(test_line2);
             
-            if (ret_type1 == FieldMap::LineType::NONE || ret_type2 == FieldMap::LineType::NONE) {
+            if (ret_type1 == field_map_t::line_type_t::NONE || ret_type2 == field_map_t::line_type_t::NONE) {
                 continue;
             }
             
             dx1 = isec_point1.X - rx;
             dy1 = isec_point1.Y - ry;
             float expected_range1 = std::sqrt(dx1*dx1 + dy1*dy1);
-            if (expected_range1 > FieldMap::MAX_DIST) {
+            if (expected_range1 > field_map_t::MAX_DIST) {
                 continue;
             }
             normalizer.setTheta(std::atan2(dy1, dx1) - rtheta);
@@ -113,7 +115,7 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
             dx2 = isec_point2.X - rx;
             dy2 = isec_point2.Y - ry;
             float expected_range2 = std::sqrt(dx2*dx2 + dy2*dy2);
-            if (expected_range2 > FieldMap::MAX_DIST) {
+            if (expected_range2 > field_map_t::MAX_DIST) {
                 continue;
             }
             normalizer.setTheta(std::atan2(dy2, dx2) - rtheta);
@@ -158,7 +160,7 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
     float highestWeight = 0.0f;
     std::size_t highestWeightIndex = 0;
     for (std::size_t index = 0; index < m_particles.size(); index++) {
-        Particle& particle = m_particles[index];
+        particle_t& particle = m_particles[index];
         
         if (fabs(weight_normalizer) < 0.00001 || std::isnan(weight_normalizer) || std::isnan(particle.weight)) {
             // Reset all weights
@@ -176,15 +178,15 @@ void ParticleFilter::correct(const measurement_bundle& measurements, const Eigen
     m_topParticleIndex = highestWeightIndex;
 }
 
-void ParticleFilter::resample()
+void particle_filter_t::resample()
 {
     low_variance_resampling();
     calc_pose_mean_cov();
 }
 
-void ParticleFilter::low_variance_resampling()
+void particle_filter_t::low_variance_resampling()
 {
-    std::vector<Particle> new_particles;
+    std::vector<particle_t> new_particles;
     
     float Jinv = 1.0f / m_particles.size();
     
@@ -194,7 +196,7 @@ void ParticleFilter::low_variance_resampling()
     
     float c = m_particles[0].weight;
     int i = 0;
-    Particle new_particle;
+    particle_t new_particle;
     for (int j = 0; j < m_particles.size(); j++) {
        float U = r + (j-1) * Jinv; 
        while (U > c) {
@@ -213,7 +215,7 @@ void ParticleFilter::low_variance_resampling()
     m_particles.swap(new_particles);
 }
 
-void ParticleFilter::calc_pose_mean_cov()
+void particle_filter_t::calc_pose_mean_cov()
 {
     Pose2D meanAccum;
     float pw, px, py, ptheta;
@@ -271,7 +273,7 @@ void ParticleFilter::calc_pose_mean_cov()
 }
 
 
-void ParticleFilter::init_particles(const Pose2D& pose, int num_particles)
+void particle_filter_t::init_particles(const Pose2D& pose, int num_particles)
 {
     float defaultWeight = 1.0f / num_particles;
     m_topParticleIndex = 0;
@@ -283,7 +285,7 @@ void ParticleFilter::init_particles(const Pose2D& pose, int num_particles)
     }
 }
 
-void ParticleFilter::init_particles(float min_x, float max_x, float min_y, float max_y, float min_theta, float max_theta, int num_particles)
+void particle_filter_t::init_particles(float min_x, float max_x, float min_y, float max_y, float min_theta, float max_theta, int num_particles)
 {
     float defaultWeight = 1.0f / num_particles;
     m_topParticleIndex = 0;
@@ -302,7 +304,7 @@ void ParticleFilter::init_particles(float min_x, float max_x, float min_y, float
     }
 }
 
-float ParticleFilter::sample_normal_distribution(float variance)
+float particle_filter_t::sample_normal_distribution(float variance)
 {
     unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::default_random_engine generator(seed);
@@ -311,7 +313,7 @@ float ParticleFilter::sample_normal_distribution(float variance)
     return normal(generator);
 }
 
-Pose2D ParticleFilter::odometry_sample(Pose2D pose, Eigen::Vector3f command, Eigen::Vector3f noise)
+Pose2D particle_filter_t::odometry_sample(Pose2D pose, Eigen::Vector3f command, Eigen::Vector3f noise)
 {
     float rot1, trans, rot2;
     rot1 = command(0); trans = command(1); rot2 = command(2);
@@ -338,7 +340,7 @@ Pose2D ParticleFilter::odometry_sample(Pose2D pose, Eigen::Vector3f command, Eig
     return pose + newPose;
 }
 
-Eigen::Vector3f ParticleFilter::get_odometry_command(Pose2D prevPose, Pose2D currPose)
+Eigen::Vector3f particle_filter_t::get_odometry_command(Pose2D prevPose, Pose2D currPose)
 {
     float rot1, trans, rot2;
     float dx, dy;

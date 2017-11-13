@@ -330,7 +330,7 @@ namespace ant {
             // Distance
             float eps = W.at<float>(W.rows-1, 0);
             
-            // Line parameters 
+            // line_t parameters
             cv::Mat l, m;
             l = L(cv::Range(0, L.rows/2), cv::Range::all());
             m = L(cv::Range(L.rows/2, L.rows), cv::Range::all());

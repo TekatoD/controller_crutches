@@ -32,7 +32,7 @@
 #include <Vision.h>
 #include <VisionUtils.h>
 #include <motion/Kinematics.h>
-#include <localization/ParticleFilter.h>
+#include <localization/particle_filter_t.h>
 #include <OdometryCollector.h>
 
 #include "StateMachine.h"
@@ -51,7 +51,7 @@ extern "C" {
 #define U2D_DEV_NAME1       "/dev/ttyUSB1"
 
 using namespace Robot;
-using namespace Localization;
+using namespace localization;
 
 using Clock =  std::chrono::high_resolution_clock;
 using Duration = std::chrono::duration<float>;
@@ -210,8 +210,8 @@ int main(int argc, char** argv) {
     ant::Vision vision("./res/vision_cfg/");
     cv::namedWindow("line_image", cv::WINDOW_AUTOSIZE);
     
-    Localization::ParticleFilter particleFilter(&ini);
-    Pose2D initPose = particleFilter.getTopParticle().pose;
+    localization::particle_filter_t particleFilter(&ini);
+    Pose2D initPose = particleFilter.get_top_particle().pose;
     Walking::GetInstance()->SetOdo(initPose);
     
     Pose2D oldRobotPose(initPose), robotPose(initPose);
@@ -314,7 +314,7 @@ int main(int argc, char** argv) {
             vision.setFrame(frame);
             std::vector<cv::Vec4i> lines = vision.lineDetect();
             
-            ParticleFilter::measurement_bundle rangeBearingData;
+            particle_filter_t::measurement_bundle rangeBearingData;
             for (auto& line : lines) {
                 if (line[0] > camera.getWidth() || line[2] > camera.getWidth() || line[1] > camera.getHeight() || line[3] > camera.getHeight()) {
                     // why 
@@ -373,7 +373,7 @@ int main(int argc, char** argv) {
                 range2 = sqrt(dx2*dx2 + dy2*dy2);
                 bearing2 = normalizer.Theta();
                 
-                if (range1 > FieldMap::MAX_DIST || range2 > FieldMap::MAX_DIST) {
+                if (range1 > field_map_t::MAX_DIST || range2 > field_map_t::MAX_DIST) {
                     continue;
                 }
                 
@@ -411,9 +411,9 @@ int main(int argc, char** argv) {
             auto pf_resample_diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - pf_resample_start);
             
             std::cout << "==== PF pose ==" << std::endl;
-            std::cout << "Pose mean: " << particleFilter.getPoseMean() << std::endl;
-            std::cout << "Pose std dev: " << particleFilter.getPoseStdDev() << std::endl;
-            std::cout << "Highest weight particle pose: " << particleFilter.getTopParticle().pose << std::endl;
+            std::cout << "Pose mean: " << particleFilter.get_pose_mean() << std::endl;
+            std::cout << "Pose std dev: " << particleFilter.get_pose_std_dev() << std::endl;
+            std::cout << "Highest weight particle pose: " << particleFilter.get_top_particle().pose << std::endl;
             
             
             std::cout << "PF prediction: " << pf_predict_diff.count() << "ms" << std::endl;

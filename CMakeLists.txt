@@ -135,10 +135,10 @@ set(SRC
         include/detectors/FieldDetector.h
         src/detectors/LineDetector.cpp
         include/detectors/LineDetector.h
-        src/localization/ParticleFilter.cpp
-        include/localization/ParticleFilter.h
-        src/localization/LocalizationUtil.cpp
-        include/localization/LocalizationUtil.h)
+        src/localization/particle_filter_t.cpp
+        include/localization/particle_filter_t.h
+        src/localization/localization_util_t.cpp
+        include/localization/localization_util_t.h)
         
 set(VISION_SRC
     include/minIni.h
@@ -248,9 +248,8 @@ target_include_directories(vrep_vision PUBLIC
 add_executable(localization
     src/localization/localization_test.cpp
     src/Pose2D.cpp
-    src/localization/DataReader.cpp
-    src/localization/ParticleFilter.cpp
-    src/localization/LocalizationUtil.cpp
+    src/localization/particle_filter_t.cpp
+    src/localization/localization_util_t.cpp
     src/minIni/minIni.c
     src/math/Point.cpp
 )

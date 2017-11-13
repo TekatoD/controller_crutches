@@ -302,8 +302,8 @@ int main(int argc, char** argv) {
         
         // cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, HeightFromGround);
         
-        ant::vision_utils::CameraParameters params(R, t, 0.02, 1.0f, 0.0f, 320.0f/2.0f, 240.0f/2.0f);
-        ant::vision_utils::CameraProjection cameraToGround(params);
+        ant::vision_utils::camera_parameters_t params(R, t, 0.02, 1.0f, 0.0f, 320.0f/2.0f, 240.0f/2.0f);
+        ant::vision_utils::camera_projection_t cameraToGround(params);
         
         camera.CaptureFrame();
         unsigned char* imgBuff = camera.getBGRFrame()->m_ImageData;
@@ -330,8 +330,8 @@ int main(int argc, char** argv) {
                 mp1 = (cv::Mat_<float>(3, 1) << line[0], line[1], 1);
                 mp2 = (cv::Mat_<float>(3, 1) << line[2], line[3], 1);
                 
-                gp1 = cameraToGround.ImageToWorld_explicit(mp1, R, t, 320.0f, 240.0f, 46.0f);
-                gp2 = cameraToGround.ImageToWorld_explicit(mp2, R, t, 320.0f, 240.0f, 46.0f);
+                gp1 = cameraToGround.image_to_world_explicit(mp1, R, t, 320.0f, 240.0f, 46.0f);
+                gp2 = cameraToGround.image_to_world_explicit(mp2, R, t, 320.0f, 240.0f, 46.0f);
                 float x1 = gp1.at<float>(0, 0);
                 // change direction of y axis
                 float y1 = -1*gp1.at<float>(1, 0);

@@ -11,7 +11,7 @@
 namespace ant {
     namespace vision_utils {
         
-        struct CameraParameters {
+        struct camera_parameters_t {
             /*
              * Intrinsic calibration parameters (camera to image coordinates transform)
              */
@@ -31,18 +31,18 @@ namespace ant {
              * cx = offset x
              * cx = offset y
              */
-            CameraParameters(float f, float a = 1.0f, float s = 0.0f, float cx = 0.0f, float cy = 0.0f)
+            camera_parameters_t(float f, float a = 1.0f, float s = 0.0f, float cx = 0.0f, float cy = 0.0f)
             {
-                SetIntrinsicParameters(f, a, s, cx, cy);
+                set_intrinsic_parameters(f, a, s, cx, cy);
             }
             
-            CameraParameters(cv::Mat& R, cv::Mat& t, float f, float a = 1.0f, float s = 0.0f, float cx = 0.0f, float cy = 0.0f)
+            camera_parameters_t(cv::Mat& R, cv::Mat& t, float f, float a = 1.0f, float s = 0.0f, float cx = 0.0f, float cy = 0.0f)
             {
-                SetExtrinsicParameters(R, t);
-                SetIntrinsicParameters(f, a, s, cx, cy);
+                set_extrinsic_parameters(R, t);
+                set_intrinsic_parameters(f, a, s, cx, cy);
             }
             
-            void SetIntrinsicParameters(float f, float a = 1.0f, float s = 0.0f, float cx = 0.0f, float cy = 0.0f)
+            void set_intrinsic_parameters(float f, float a = 1.0f, float s = 0.0f, float cx = 0.0f, float cy = 0.0f)
             {
                 this->f = f;
                 this->a = a;
@@ -51,7 +51,7 @@ namespace ant {
                 this->cy = cy;
             }
             
-            void SetExtrinsicParameters(cv::Mat& Rot, cv::Mat& Trans)
+            void set_extrinsic_parameters(cv::Mat &Rot, cv::Mat &Trans)
             {
                 if (Rot.rows != 3 || Rot.rows != 3) {
                     throw std::runtime_error{"Rotation matrix must be 3x3"};
@@ -68,7 +68,7 @@ namespace ant {
             /*
              * Returns 3x3 intrinsic calibration matrix 
              */
-            cv::Mat GetIntCalibrationMatrix33() const
+            cv::Mat get_intrinsic_calibration_matrix33() const
             {
                 return (cv::Mat_<float>(3, 3) << f, s, cx, 0, a*f, cy, 0, 0, 1);
             } 
@@ -76,7 +76,7 @@ namespace ant {
             /*
              * Returns 3x4 intrinsic calibration matrix 
              */
-            cv::Mat GetIntCalibrationMatrix34() const
+            cv::Mat get_intrinsic_calibration_matrix34() const
             {
                 return (cv::Mat_<float>(3, 4) << f, s, cx, 0, 0, a*f, cy, 0, 0, 0, 1, 0);
             }
@@ -84,7 +84,7 @@ namespace ant {
             /*
              * Returns 3x4 extrinsic calibration matrix
              */
-            cv::Mat GetExtCalibrationMatrix34() const
+            cv::Mat get_extrinsic_calibration_matrix34() const
             {
                 cv::Mat T;
                 cv::hconcat(Rot, Trans, T);
@@ -94,7 +94,7 @@ namespace ant {
             /*
              * Returns 4x4 extrinsic calibration matrix
              */
-            cv::Mat GetExtCalibrationMatrix44() const
+            cv::Mat get_extrinsic_calibration_matrix44() const
             {
                 cv::Mat T, pad;
                 pad = (cv::Mat_<float>(1, 4) << 0, 0, 0, 1);
@@ -104,11 +104,11 @@ namespace ant {
             }
         };
         
-        class CameraProjection {
+        class camera_projection_t {
         public:
-            CameraProjection(CameraParameters cameraParams) : m_cameraParams(cameraParams) {}
+            camera_projection_t(camera_parameters_t cameraParams) : m_cameraParams(cameraParams) {}
             
-            void SetCameraParameters(CameraParameters cameraParams)
+            void set_camera_parameters(camera_parameters_t cameraParams)
             {
                 m_cameraParams = cameraParams;
             }
@@ -117,14 +117,14 @@ namespace ant {
              * World coords to camera coords
              * Result is 3x1 vector in homogeneous coordinates 
              */
-            cv::Mat WorldToImage(float x, float y, float z)
+            cv::Mat world_to_image(float x, float y, float z)
             {
-                return CameraToImage(WorldToCamera(x, y, z));
+                return camera_to_image(world_to_camera(x, y, z));
             }
             
-            cv::Mat WorldToImage(cv::Mat WorldPoint)
+            cv::Mat world_to_image(cv::Mat WorldPoint)
             {
-                return CameraToImage(WorldToCamera(WorldPoint));
+                return camera_to_image(world_to_camera(WorldPoint));
             }
             
             
@@ -132,15 +132,15 @@ namespace ant {
              * Transform point in world coordinates to camera coordinates
              * Result is 4x1 vector in homogeneous coordinates
              */
-            cv::Mat WorldToCamera(float x, float y, float z)
+            cv::Mat world_to_camera(float x, float y, float z)
             {
                 cv::Mat WorldPoint = (cv::Mat_<float>(4, 1) << x, y, z, 1);
-                return m_cameraParams.GetExtCalibrationMatrix44() * WorldPoint;
+                return m_cameraParams.get_extrinsic_calibration_matrix44() * WorldPoint;
             }
             
-            cv::Mat WorldToCamera(cv::Mat WorldPoint)
+            cv::Mat world_to_camera(cv::Mat WorldPoint)
             {
-                return m_cameraParams.GetExtCalibrationMatrix44() * WorldPoint;
+                return m_cameraParams.get_extrinsic_calibration_matrix44() * WorldPoint;
             }
             
             
@@ -149,15 +149,15 @@ namespace ant {
              * Result is 3x1 vector in homogeneous coordinates
              */
             
-            cv::Mat CameraToImage(float x, float y, float z)
+            cv::Mat camera_to_image(float x, float y, float z)
              {
                 cv::Mat CameraPoint = (cv::Mat_<float>(4, 1) << x, y, z, 1);
-                return m_cameraParams.GetIntCalibrationMatrix34() * CameraPoint;
+                return m_cameraParams.get_intrinsic_calibration_matrix34() * CameraPoint;
             }
             
-            cv::Mat CameraToImage(cv::Mat CameraPoint)
+            cv::Mat camera_to_image(cv::Mat CameraPoint)
             {
-                return m_cameraParams.GetIntCalibrationMatrix34() * CameraPoint;
+                return m_cameraParams.get_intrinsic_calibration_matrix34() * CameraPoint;
             }
             
             /*
@@ -165,37 +165,37 @@ namespace ant {
              * Result is 3x1 vector in homogeneous coordinates (sx, sy, s)
              * (Ray from camera COP through the x, y point on the camera projective plane)
              */
-            cv::Mat ImageToCamera(float x, float y)
+            cv::Mat image_to_camera(float x, float y)
             {
                 cv::Mat ImagePoint = (cv::Mat_<float>(3, 1) << x, y, 1);
-                return m_cameraParams.GetIntCalibrationMatrix33().inv() * ImagePoint;
+                return m_cameraParams.get_intrinsic_calibration_matrix33().inv() * ImagePoint;
             }
             
-            cv::Mat ImageToCamera(cv::Mat ImagePoint)
+            cv::Mat image_to_camera(cv::Mat ImagePoint)
             {
-                return m_cameraParams.GetIntCalibrationMatrix33().inv() * ImagePoint;
+                return m_cameraParams.get_intrinsic_calibration_matrix33().inv() * ImagePoint;
             }
             
             /*
              * Transform a point in camera coordinates to world coordinates
              * Result is 4x1 vector of world coordinates in homogeneous coordinates (x, y, z, w)
              */
-            cv::Mat CameraToWorld(float x, float y, float z)
+            cv::Mat camera_to_world(float x, float y, float z)
             {
                 cv::Mat CameraPoint = (cv::Mat_<float>(4, 1) << x, y, z, 1);
-                return m_cameraParams.GetExtCalibrationMatrix44().inv() * CameraPoint;
+                return m_cameraParams.get_extrinsic_calibration_matrix44().inv() * CameraPoint;
             }
             
-            cv::Mat CameraToWorld(cv::Mat CameraPoint)
+            cv::Mat camera_to_world(cv::Mat CameraPoint)
             {
-                return m_cameraParams.GetExtCalibrationMatrix44().inv() * CameraPoint;
+                return m_cameraParams.get_extrinsic_calibration_matrix44().inv() * CameraPoint;
             }
             
-            cv::Mat ImageToImage(cv::Mat ImagePoint)
+            cv::Mat image_to_image(cv::Mat ImagePoint)
             {
                 cv::Mat H, Ext, Proj, r1, r2, t;
                 
-                Ext = m_cameraParams.GetExtCalibrationMatrix34();
+                Ext = m_cameraParams.get_extrinsic_calibration_matrix34();
                 
                 H = cv::Mat::zeros(3, 3, CV_32F);
                 
@@ -206,7 +206,7 @@ namespace ant {
                 cv::hconcat(r1, r2, H);
                 cv::hconcat(H, t, H);
                 
-                cv::Mat Ht = m_cameraParams.GetIntCalibrationMatrix33() * H;
+                cv::Mat Ht = m_cameraParams.get_intrinsic_calibration_matrix33() * H;
                 Ht /= t.at<float>(2, 0);
                 
                 Proj = Ht * ImagePoint;
@@ -215,7 +215,8 @@ namespace ant {
                 return Proj;
             } 
             
-            cv::Mat ImageToWorld_explicit(const cv::Mat& ImagePoint, const cv::Mat& R, const cv::Mat& t, float Width, float Height, float FovDeg) {
+            cv::Mat image_to_world_explicit(const cv::Mat &ImagePoint, const cv::Mat &R, const cv::Mat &t, float Width,
+                                            float Height, float FovDeg) {
                 // Same functionality as in CamGeom in naomech behaviour
                 
                 float f = m_cameraParams.f;
@@ -269,7 +270,7 @@ namespace ant {
                 return Pixel;
             }
         private:
-            CameraParameters m_cameraParams;
+            camera_parameters_t m_cameraParams;
         };
         
         /*
@@ -277,12 +278,12 @@ namespace ant {
          * instead of using cross product operator a x b
          * use matrix multiplication a_cross * b
          */
-        inline cv::Mat XproductMatrix33(float x, float y, float z)
+        inline cv::Mat xproduct_matrix33(float x, float y, float z)
         {
             return (cv::Mat_<float>(3, 3) << 0, -z, y, z, 0, -x, y, x, 0);
         }
 
-        inline cv::Mat XproductMatrix33(cv::Mat vec)
+        inline cv::Mat xproduct_matrix33(cv::Mat vec)
         {
             float x, y, z;
             
@@ -298,7 +299,7 @@ namespace ant {
          * P1, P2 - points on the line
          * Returns line in Plucker coordinates (6 points)
          */
-        inline cv::Mat PluckerLine(cv::Mat P1, cv::Mat P2)
+        inline cv::Mat plucker_line(cv::Mat P1, cv::Mat P2)
         {
             int rows = P1.rows;
             cv::Mat p1, p2;
@@ -312,7 +313,7 @@ namespace ant {
             cv::Mat PLine = cv::Mat_<float>(p1.rows * 2, 1);
             
             PLine(cv::Range(0, p1.rows), cv::Range::all()) = d1 * p2 - d2 * p1;
-            PLine(cv::Range(p1.rows, PLine.rows), cv::Range::all()) = XproductMatrix33(p1) * p2;
+            PLine(cv::Range(p1.rows, PLine.rows), cv::Range::all()) = xproduct_matrix33(p1) * p2;
             
             return PLine;
         }
@@ -322,7 +323,7 @@ namespace ant {
          * L - line in Plucker coordinates 
          *  https://math.stackexchange.com/questions/400268/equation-for-a-line-through-a-plane-in-homogeneous-coordinates
          */
-        inline cv::Mat PlaneRayIntersection(cv::Mat W, cv::Mat L)
+        inline cv::Mat plane_ray_intersection(cv::Mat W, cv::Mat L)
         {
             // Plane parameters
             // Normal
@@ -334,10 +335,10 @@ namespace ant {
             cv::Mat l, m;
             l = L(cv::Range(0, L.rows/2), cv::Range::all());
             m = L(cv::Range(L.rows/2, L.rows), cv::Range::all());
-            
+
             // meet operator
             cv::Mat meet, last;
-            cv::hconcat((-eps) * cv::Mat::eye(3, 3, CV_32F), XproductMatrix33(w), meet);
+            cv::hconcat((-eps) * cv::Mat::eye(3, 3, CV_32F), xproduct_matrix33(w), meet);
             cv::hconcat(w.t(), cv::Mat::zeros(1, 3, CV_32F), last);
             cv::vconcat(meet, last, meet);
             

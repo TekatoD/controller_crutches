@@ -1,116 +1,436 @@
-#include <iostream>
-#include <stdexcept>
-#include <string>
-#include <eigen3/Eigen/Dense>
+/*
+ * main.cpp
+ *
+ *  Created on: 2011. 1. 4.
+ *      Author: robotis
+ */
 
-#include <minIni.h>
-#include <Pose2D.h>
-#include <math/Point.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <libgen.h>
+#include <signal.h>
+#include <memory>
+#include <chrono>
+#include <Eigen/Dense>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/eigen.hpp>
+
+#include <GameController.h>
+#include <GoTo.h>
+#include <SoccerBehavior.h>
+#include <VrepConnector.h>
+#include <VrepCM730.h>
+#include <VREPCamera.h>
+#include <GoalieBehavior.h>
+#include <LinuxCM730.h>
+#include <LinuxCamera.h>
+#include <motion/MotionManager.h>
+#include <motion/modules/Walking.h>
+#include <LinuxMotionTimer.h>
+#include <motion/modules/Action.h>
+#include <motion/modules/Head.h>
+#include <Vision.h>
+#include <VisionUtils.h>
+#include <motion/Kinematics.h>
 #include <localization/particle_filter_t.h>
-#include <localization/localization_util_t.h>
+#include <OdometryCollector.h>
 
-using namespace Eigen;
+#include "StateMachine.h"
+
+#define MAX_EXT_API_CONNECTIONS 255
+#define NON_MATLAB_PARSING
+extern "C" {
+#include "extApi.h"
+#include "extApiPlatform.h"
+}
+
+#define MOTION_FILE_PATH    "res/motion_4096.bin"
+#define INI_FILE_PATH       "res/config.ini"
+
+#define U2D_DEV_NAME0       "/dev/ttyUSB0"
+#define U2D_DEV_NAME1       "/dev/ttyUSB1"
+
+using namespace Robot;
 using namespace localization;
 
-#define INI_FILE_PATH "res/config.ini"
+using Clock =  std::chrono::high_resolution_clock;
+using Duration = std::chrono::duration<float>;
 
-int main(int argc, char** argv)
-{
-    
-    minIni ini(INI_FILE_PATH);
-    field_map_t field;
-    field.load_ini_settings(&ini);
-    field.print_field_lines();
-    
-    std::vector< std::tuple<line_t, field_map_t::line_type_t>> tests {
-        std::make_tuple(line_t(500.0f, 900.0f, 4000.0f, 900.0f), field_map_t::line_type_t::PENALTY_RIGHT_HEIGHT),
-        std::make_tuple(line_t(500.0f, 0.0f, 500.0f, 3000.0f), field_map_t::line_type_t::FIELD_TOP),
-    };
-    
-    for (auto& tuple : tests) {
-        line_t intersectingLine = std::get<0>(tuple);
-        field_map_t::line_type_t correctType = std::get<1>(tuple);
-        
-        field_map_t::line_type_t retType = field_map_t::line_type_t::NONE;
-        Robot::Point2D isec;
-        auto result = field.intersect_with_field(intersectingLine);
-        
-        retType = std::get<0>(result);
-        isec = std::get<1>(result);
-        
-        std::cout << "=========" << std::endl;
-        if (retType == correctType) {
-            std::cout << "Correct" << std::endl;
-            std::cout << "Intersected with line_type_t: " << (int)retType << std::endl;
-            std::cout << "Intersection point: " << isec.X << ", " << isec.Y << std::endl;
-        } else {
-            std::cout << "Incorrect. Intersected with: " << (int)retType << ". Should be: " << (int)correctType << std::endl;
-            std::cout << "Intersection point: " << isec.X << ", " << isec.Y << std::endl;
-        }
+//LinuxCM730 linux_cm730(U2D_DEV_NAME0);
+VrepConnector vrepConnector;
+CM730* cm730 = new VrepCM730();
+
+
+void change_current_dir() {
+    char exepath[1024] = {0};
+    if (readlink("/proc/self/exe", exepath, sizeof(exepath)) != -1) {
+        if (chdir(dirname(exepath)))
+            fprintf(stderr, "chdir error!! \n");
     }
-    
-    /*
-    line_t l1(0.0f, 0.0f, 10.0f, 10.0f);
-    line_t l2(0.0f, 10.0f, 10.0f, 0.0f);
-    Point2D intersection;
-    
-    // Should be (5, 5)
-    if (line_t::IntersectLines(l1, l2, intersection)) {
-        std::cout << intersection.X << ", " << intersection.Y << std::endl;
-    }
-    
-    line_t l3(0.0, 5.0, 5.0, 5.0);
-    line_t l4(10.0, 0.0, 10.0, 10.0);
-    
-    // Doesn't intersect. (line are collinear but don't intersect)
-    if (line_t::intersect_lines(l3, l4, intersection)) {
-        std::cout << intersection.X << ", " << intersection.Y << std::endl;
-    }
-    */
-    
-    /*
-    if (argc != 3) {
-        std::cout << "Need data" << std::endl;
-        return -1;
-    }
-    
+}
+
+
+bool finish = false;
+
+
+void sighandler(int sig) {
+    finish = true;
+}
+
+
+int main(int argc, char** argv) {
+    signal(SIGABRT, &sighandler);
+    signal(SIGTERM, &sighandler);
+    signal(SIGQUIT, &sighandler);
+    signal(SIGINT, &sighandler);
+
+    change_current_dir();
+
+    VREPCamera camera(320, 240, "camera");
+
     try {
-        localization::DataReader reader(argv[1], argv[2]);
-        
-        auto controlData = reader.getControlData();
-        auto measurementData = reader.getMeasurementData();
-        auto worldData = reader.getWorldData();
-        
-        Robot::Pose2D pose(0, 0, 0);
-        localization::particle_filter_t pf(pose, worldData, 10);
-        
-        int max_timestep = controlData.size();
-        Eigen::Vector3f noise = {0.01, 0.05, 0.01};
-        for (int t = 0; t < max_timestep; t++) {
-            auto& command = controlData[t];
-            auto& measurementBundle = measurementData[t];
-            
-            pf.predict(command, noise);
-            pf.correct(measurementBundle, noise);
-            pf.resample();
-        }
-        
-        auto particles = pf.get_particles();
-        for (const auto& particle : particles) {
-            std::cout << particle.pose << " | " << particle.weight << std::endl;
-        }
-        
-        std::cout << "Pose mean: " << pf.get_pose_mean() << std::endl;
-        std::cout << "Pose covariance: " << pf.getPoseCovariance() << std::endl;
-        
-        auto particle = pf.get_top_particle();
-        std::cout << "Top particle pose: " << particle.pose << std::endl;
-        std::cout << "Top particle weight: " << particle.weight << std::endl;
-        
-    } catch (const std::runtime_error& e) {
-        std::cout << e.what() << std::endl;
+        VrepCM730* vrepCM730 = static_cast<VrepCM730*>(cm730);
+        vrepConnector.Connect();
+        vrepCM730->SetClientId(vrepConnector.GetClientID());
+        cm730->Connect();
+
+        camera.connect(vrepConnector.GetClientID());
     }
-    */
-    
+    catch(std::runtime_error& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+    }
+
+
+    minIni ini(argc == 1 ? INI_FILE_PATH : argv[1]);
+
+//    LinuxCamera::GetInstance()->Initialize(0);
+//    LinuxCamera::GetInstance()->SetCameraSettings(CameraSettings());    // set default
+//    LinuxCamera::GetInstance()->LoadINISettings(&ini);                   // load from ini
+
+//    auto ball_finder = std::make_unique<ColorFinder>();
+//    ball_finder->LoadINISettings(ini.get());
+
+//    BallTracker tracker = BallTracker();
+//    BallFollower follower = BallFollower();
+//    GoTo goTo = GoTo();
+
+//    goTo.LoadINISettings(ini.get());
+
+    //////////////////// Framework Initialize ///////////////////////////
+    if (!MotionManager::GetInstance()->Initialize(cm730)) {
+//        linux_cm730.SetPortName(U2D_DEV_NAME1);
+        if (!MotionManager::GetInstance()->Initialize(cm730)) {
+            std::cerr << "Fail to initialize Motion Manager!" << std::endl;
+            return 1;
+        }
+    }
+
+    Walking::GetInstance()->LoadINISettings(&ini);
+
+    MotionManager::GetInstance()->AddModule((MotionModule*) Action::GetInstance());
+    MotionManager::GetInstance()->AddModule((MotionModule*) Head::GetInstance());
+    MotionManager::GetInstance()->AddModule((MotionModule*) Walking::GetInstance());
+
+    LinuxMotionTimer motion_timer(MotionManager::GetInstance());
+    motion_timer.Start();
+
+    /////////////////////////////////////////////////////////////////////
+
+    MotionManager::GetInstance()->LoadINISettings(&ini);
+    StateMachine::GetInstance()->LoadINISettings(&ini);
+
+    int firm_ver = 0;
+    if (cm730->ReadByte(JointData::ID_HEAD_PAN, MX28::P_VERSION, &firm_ver, 0) != CM730::SUCCESS) {
+        std::cerr << "Can't read firmware version from Dynamixel ID " << JointData::ID_HEAD_PAN << "!!\n" << std::endl;
+        return 1;
+    }
+
+    if (0 < firm_ver && firm_ver < 27) {
+        std::cerr << "MX-28's firmware is not support 4096 resolution!! \n"
+                  << "Upgrade MX-28's firmware to version 27(0x1B) or higher.\n"
+                  << std::endl;
+        return 1;
+    } else if (27 <= firm_ver) {
+        Action::GetInstance()->LoadFile(argc <= 2 ? (char*) MOTION_FILE_PATH : argv[2]);
+    } else {
+        return 1;
+    }
+
+    ///////////////////// Init game controller //////////////////////////
+
+//    GameController::GetInstance()->LoadINISettings(&ini);
+//    if (!GameController::GetInstance()->Connect()) {
+//        std::cerr << "ERROR: Can't connect to game controller!" << std::endl;
+//        return 1;
+//    }
+
+    /////////////////////////////////////////////////////////////////////
+
+
+
+    ///////////////////////// Init speech ///////////////////////////////
+//    if (!Speech::GetInstance()->Start()) {
+//        std::cerr << "ERROR: Can't start speech module!" << std::endl;
+//        return 1;
+//    }
+    /////////////////////////////////////////////////////////////////////
+
+
+//    SoccerBehavior soccer(cm730);
+//    MotionManager::GetInstance()->SetEnable(true);
+//    Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+//    Walking::GetInstance()->X_MOVE_AMPLITUDE = 10.0;
+//    Walking::GetInstance()->Start();
+//    while (true) {
+//        std::cout << "hui" << std::endl;
+//    }
+//    Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+//    MotionManager::GetInstance()->SetEnable(true);
+//
+//    cm730.WriteByte(CM730::P_LED_PANNEL, 0x01 | 0x02 | 0x04, NULL);
+//
+//    SoccerBehavior soccer(cm730);
+//    GoalieBehavior goalie;
+//
+//    soccer.LoadINISettings(&ini);
+//    goalie.LoadINISettings(&ini);
+//
+//    Action::GetInstance()->Start(15);
+//    while (Action::GetInstance()->IsRunning()) usleep(8 * 1000);
+    sleep(1);
+    StateMachine::GetInstance()->Enable();
+    Head::GetInstance()->m_Joint.SetEnableHeadOnly(true, true);
+    Action::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+//
+////    Action::GetInstance()->Start(12);
+//    Action::GetInstance()->Start(13);
+
+    auto DarwinHead = Head::GetInstance();
+
+    ant::Vision vision("./res/vision_cfg/");
+    cv::namedWindow("line_image", cv::WINDOW_AUTOSIZE);
+
+    localization::particle_filter_t particleFilter(&ini);
+    Pose2D initPose = particleFilter.get_top_particle().pose;
+    Walking::GetInstance()->SetOdo(initPose);
+
+    Pose2D oldRobotPose(initPose), robotPose(initPose);
+
+    // Movement noise (odometry movement model format)
+    // Rotation1, translation, Rotation2
+    Eigen::Vector3f movementNoise = {0.01, 50.0f, 0.01};
+    // Measurement noise (range-bearing measurement model format)
+    // range (in mm), bearing (in radians)
+    Eigen::Vector3f measurementNoise = {600.0f, 0.05, 0.0f};
+
+    while (!finish) {
+        // Update game controller
+//        GameController::GetInstance()->Update();
+
+        // Update state machine
+        StateMachine::GetInstance()->Check(cm730);
+//
+        /*
+        if (!Action::GetInstance()->IsRunning()) {
+            Walking::GetInstance()->m_Joint.SetEnableBodyWithoutHead(true, true);
+            Walking::GetInstance()->X_MOVE_AMPLITUDE = 20.0;
+            Walking::GetInstance()->A_MOVE_AMPLITUDE = 20.0;
+            Walking::GetInstance()->Start();
+        }
+        */
+
+//        if (StateMachine::GetInstance()->IsStarted() == 0) {
+//            continue;
+//        }
+//
+//        switch (StateMachine::GetInstance()->GetRole()) {
+//            case ROLE_IDLE:break;
+//            case ROLE_SOCCER:
+//                soccer.Process();
+//                break;
+//            case ROLE_PENALTY:break;
+//            case ROLE_GOALKEEPER:
+//                goalie.Process();
+//                break;
+//            case ROLES_COUNT:break;.0f
+//       float rx, ry, rtheta;
+
+
+        /*
+         * Receive odometry data
+         */
+        std::cout << "=== Begin particle filter cycle ===" << std::endl;
+        float rx, ry, rtheta;
+        robotPose = Walking::GetInstance()->GetOdo();
+
+        std::cout << "Old: " << oldRobotPose << ", Received: " << robotPose << std::endl;
+        rx = robotPose.X();
+        ry = robotPose.Y();
+        rtheta = robotPose.Theta();
+
+        auto pf_pred_start = Clock::now();
+        Eigen::Vector3f odometryCommand = particleFilter.get_odometry_command(oldRobotPose, robotPose);
+        particleFilter.predict(odometryCommand, movementNoise);
+        auto pf_predict_diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - pf_pred_start);
+
+        //std::cout << "Successful prediction step using odometry command: " << std::endl;
+        //std::cout << odometryCommand << std::endl;
+
+        /*
+         * Receive sensor data
+         */
+        float HeightFromGround = Robot::Kinematics::LEG_LENGTH + 122.2f + 50.5f + Robot::Kinematics::CAMERA_OFFSET_Z;
+        //HeightFromGround /= 1000.0f;
+        // Z
+        float HeadPan = (DarwinHead->GetPanAngle()) * (M_PI / 180.0f);
+        // Y
+        float HeadTilt = (DarwinHead->GetTiltAngle()) * (M_PI / 180.0f);
+
+        Matrix4x4f HeadTransformE;
+        cv::Mat HeadTransform;
+        Robot::Kinematics::ComputeHeadForwardKinematics(HeadTransformE, HeadPan, HeadTilt);
+        cv::eigen2cv(HeadTransformE, HeadTransform);
+
+        //std::cout << "HeadTransform: " << HeadTransform << std::endl;
+
+        cv::Mat R = HeadTransform(cv::Range(0, 3), cv::Range(0, 3));
+
+        // Translation is in mm
+        cv::Mat t = HeadTransform(cv::Range(0, 3), cv::Range(3, 4));
+        //t /= 1000.0f;
+        t.at<float>(2, 0) += HeightFromGround;
+
+        // cv::Mat t = (cv::Mat_<float>(3, 1) << 0.0f, 0.0f, HeightFromGround);
+
+        ant::vision_utils::camera_parameters_t params(R, t, 0.02, 1.0f, 0.0f, 320.0f/2.0f, 240.0f/2.0f);
+        ant::vision_utils::camera_projection_t cameraToGround(params);
+
+        camera.CaptureFrame();
+        unsigned char* imgBuff = camera.getBGRFrame()->m_ImageData;
+        if (imgBuff) {
+            // Mats that take buffer in the constructor don't release it
+            cv::Mat frame(camera.getHeight(), camera.getWidth(), CV_8UC3, imgBuff);
+
+            vision.setFrame(frame);
+            std::vector<cv::Vec4i> lines = vision.lineDetect();
+
+            particle_filter_t::measurement_bundle rangeBearingData;
+            for (auto& line : lines) {
+                if (line[0] > camera.getWidth() || line[2] > camera.getWidth() || line[1] > camera.getHeight() || line[3] > camera.getHeight()) {
+                    // why
+                    continue;
+                }
+                // Point for viz
+                cv::Point p1(line[0], line[1]);
+                cv::Point p2(line[2], line[3]);
+
+                cv::line(frame, p1, p2, cv::Scalar(0, 0, 255), 5);
+
+                cv::Mat mp1, mp2, gp1, gp2;
+                mp1 = (cv::Mat_<float>(3, 1) << line[0], line[1], 1);
+                mp2 = (cv::Mat_<float>(3, 1) << line[2], line[3], 1);
+
+                gp1 = cameraToGround.image_to_world_explicit(mp1, R, t, 320.0f, 240.0f, 46.0f);
+                gp2 = cameraToGround.image_to_world_explicit(mp2, R, t, 320.0f, 240.0f, 46.0f);
+                float x1 = gp1.at<float>(0, 0);
+                // change direction of y axis
+                float y1 = -1*gp1.at<float>(1, 0);
+
+                float x2 = gp2.at<float>(0, 0);
+                float y2 = -1*gp2.at<float>(1, 0);
+
+                // Ignore lines that are projected  too far (Like goal keeper gate lines)
+                if ((x1 < 0.0f) || (x2 < 0.0f)) {
+                    continue;
+                }
+
+                /*
+                 * Data conversion for particle filter correction step
+                 */
+
+                // convert to global coordinate frame
+                float gx1, gy1, gx2, gy2;
+                gx1 = (x1-rx)*cos(rtheta) + (y1-ry)*sin(rtheta);
+                gy1 = -(x1-rx)*sin(rtheta) + (y1-ry)*cos(rtheta);
+                gx2 = (x2-rx)*cos(rtheta) + (y2-ry)*sin(rtheta);
+                gy2 = -(x2-rx)*sin(rtheta) + (y2-ry)*cos(rtheta);
+
+                // Convert to range-bearing
+                // format is (id, range, bearing)
+                // id is unknown, so it's -1
+                float dx1, dy1, dx2, dy2;
+                float range1, range2, bearing1, bearing2;
+                dx1 = gx1 - rx;
+                dy1 = gy1 - ry;
+                Robot::Pose2D normalizer(0.0, 0.0, atan2(dy1, dx1) - rtheta);
+                range1 = sqrt(dx1*dx1 + dy1*dy1);
+                bearing1 = normalizer.Theta();
+
+                dx2 = gx2 - rx;
+                dy2 = gy2 - ry;
+                normalizer.setTheta(atan2(dy2, dx2) - rtheta);
+
+                range2 = sqrt(dx2*dx2 + dy2*dy2);
+                bearing2 = normalizer.Theta();
+
+                if (range1 > field_map_t::MAX_DIST || range2 > field_map_t::MAX_DIST) {
+                    continue;
+                }
+
+                /*
+                std::cout << "========" << std::endl;
+                std::cout << p1 << std::endl;
+                std::cout << p2 << std::endl;
+                std::cout << "--------" << std::endl;
+                std::cout << gp1 << std::endl;
+                std::cout << gp2 << std::endl;
+                std::cout << "--------" << std::endl;
+                std::cout << gx1 <<  ", " << gy1 << std::endl;
+                std::cout << gx2 <<  ", " << gy2 << std::endl;
+                std::cout << "--------" << std::endl;
+                std::cout << range1 << " , " << bearing1 << std::endl;
+                std::cout << range2 << " , " << bearing2 << std::endl;
+                */
+
+                Eigen::Vector4f lineRangeBearing = {
+                        range1,
+                        bearing1,
+                        range2,
+                        bearing2
+                };
+
+                rangeBearingData.push_back(lineRangeBearing);
+            }
+
+            auto pf_correct_start = Clock::now();
+            particleFilter.correct(rangeBearingData, measurementNoise);
+            auto pf_correct_diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - pf_correct_start);
+
+            auto pf_resample_start = Clock::now();
+            particleFilter.resample();
+            auto pf_resample_diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - pf_resample_start);
+
+            std::cout << "==== PF pose ==" << std::endl;
+            std::cout << "Pose mean: " << particleFilter.get_pose_mean() << std::endl;
+            std::cout << "Pose std dev: " << particleFilter.get_pose_std_dev() << std::endl;
+            std::cout << "Highest weight particle pose: " << particleFilter.get_top_particle().pose << std::endl;
+
+
+            std::cout << "PF prediction: " << pf_predict_diff.count() << "ms" << std::endl;
+            std::cout << "PF correction: " << pf_correct_diff.count() << "ms" << std::endl;
+            std::cout << "PF resampling: " << pf_resample_diff.count() << "ms" << std::endl;
+            std::cout << "PF total time: " << (pf_predict_diff + pf_correct_diff + pf_resample_diff).count() << "ms" << std::endl;
+            std::cout << "=== End particle filter cycle ===" << std::endl;
+
+            cv::imshow("line_image", frame);
+            cv::waitKey(1);
+        }
+
+        oldRobotPose = robotPose;
+
+
+    }
+    vrepConnector.Disconnect();
+
     return 0;
 }

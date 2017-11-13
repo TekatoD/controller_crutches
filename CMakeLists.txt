@@ -245,23 +245,23 @@ target_include_directories(vrep_vision PUBLIC
         ${JPEG_INCLUDE_DIR}
         ${OpenCV_INCLUDE_DIR})
 
-add_executable(localization
-    src/localization/localization_test.cpp
-    src/Pose2D.cpp
-    src/localization/particle_filter_t.cpp
-    src/localization/localization_util_t.cpp
-    src/minIni/minIni.c
-    src/math/Point.cpp
-)
+add_executable(localization_util
+        src/localization/localization_util_test.cpp
+        src/Pose2D.cpp
+        src/localization/particle_filter_t.cpp
+        src/localization/localization_util_t.cpp
+        src/minIni/minIni.c
+        src/math/Point.cpp
+        )
 
-target_link_libraries(localization
+target_link_libraries(localization_util
         ${CMAKE_THREAD_LIBS_INIT}
         ${JPEG_LIBRARIES}
         ${BOOST_LIBRARIES}
         ${OpenCV_LIBRARIES}
         Eigen3::Eigen)
 
-target_include_directories(localization PUBLIC
+target_include_directories(localization_util PUBLIC
         ${BOOST_INCLUDE_DIR}
         ${JPEG_INCLUDE_DIR}
         ${OpenCV_INCLUDE_DIR})

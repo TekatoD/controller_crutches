@@ -347,15 +347,15 @@ int main(int argc, char** argv) {
                 /*
                  * Data conversion for particle filter correction step
                  */
-                
+
                 // convert to global coordinate frame
                 float gx1, gy1, gx2, gy2;
                 gx1 = (x1-rx)*cos(rtheta) + (y1-ry)*sin(rtheta);
                 gy1 = -(x1-rx)*sin(rtheta) + (y1-ry)*cos(rtheta);
                 gx2 = (x2-rx)*cos(rtheta) + (y2-ry)*sin(rtheta);
                 gy2 = -(x2-rx)*sin(rtheta) + (y2-ry)*cos(rtheta);
-                
-                // Convert to range-bearing 
+
+                // Convert to range-bearing
                 // format is (id, range, bearing)
                 // id is unknown, so it's -1
                 float dx1, dy1, dx2, dy2;
@@ -365,18 +365,18 @@ int main(int argc, char** argv) {
                 Robot::Pose2D normalizer(0.0, 0.0, atan2(dy1, dx1) - rtheta);
                 range1 = sqrt(dx1*dx1 + dy1*dy1);
                 bearing1 = normalizer.Theta();
-                
+
                 dx2 = gx2 - rx;
                 dy2 = gy2 - ry;
                 normalizer.setTheta(atan2(dy2, dx2) - rtheta);
-                
+
                 range2 = sqrt(dx2*dx2 + dy2*dy2);
                 bearing2 = normalizer.Theta();
-                
+
                 if (range1 > field_map_t::MAX_DIST || range2 > field_map_t::MAX_DIST) {
                     continue;
                 }
-                
+
                 /*
                 std::cout << "========" << std::endl;
                 std::cout << p1 << std::endl;
@@ -391,14 +391,14 @@ int main(int argc, char** argv) {
                 std::cout << range1 << " , " << bearing1 << std::endl;
                 std::cout << range2 << " , " << bearing2 << std::endl;
                 */
-                
+
                 Eigen::Vector4f lineRangeBearing = {
                     range1,
                     bearing1,
                     range2,
                     bearing2
                 };
-                
+
                 rangeBearingData.push_back(lineRangeBearing);
             }
             

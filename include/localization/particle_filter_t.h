@@ -46,7 +46,9 @@ public:
     Pose2D get_pose_std_dev() const { return m_poseDev; }
     // Get pose of the particle with highest weight
     particle_t get_top_particle() const { return m_particles[m_topParticleIndex]; }
-     
+
+    static Eigen::Vector4f get_line_range_bearing(Pose2D robot_pose, float x1, float y1, float x2, float y2);
+
     void calc_pose_mean_cov();
     
     /* Util functions, place in separate class */

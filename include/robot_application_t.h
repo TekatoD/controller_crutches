@@ -15,8 +15,9 @@
 #include <config/strategies/help_arguments_parsing_strategy_t.h>
 #include <hw/image_source_t.h>
 #include <config/strategies/robot_image_source_configuration_strategy_t.h>
-#include <config/strategies/white_ball_vision_processor_arhuments_parsing_strategy_t.h>
+#include <config/strategies/white_ball_vision_processor_arguments_parsing_strategy_t.h>
 #include <config/strategies/white_ball_vision_processor_configuration_strategy_t.h>
+#include <behavior/behavior_t.h>
 #include "config/configuration_file_loader_t.h"
 #include "config/strategies/walking_configuration_strategy_t.h"
 #include "config/strategies/motion_manager_configuration_strategy_t.h"
@@ -53,7 +54,7 @@ namespace drwn {
 
         bool is_running() const;
 
-        bool is_debug() const noexcept;
+        bool is_debug_enabled() const noexcept;
 
         void enable_debug(bool debug) noexcept;
 
@@ -67,6 +68,8 @@ namespace drwn {
         void start_main_loop();
 
         //*** Initialization methods ***//
+        void init_cat();
+
         void check_hw_status();
 
         void initialize();
@@ -93,6 +96,8 @@ namespace drwn {
 
         void read_configuration();
 
+        void init_behavior();
+
     private:
         bool m_debug{false}; // Debug output to console
         bool m_show_help_message{false};
@@ -103,6 +108,7 @@ namespace drwn {
         std::unique_ptr<CM730_t> m_cm730{nullptr};
         std::unique_ptr<linux_motion_timer_t> m_motion_timer{nullptr};
         std::unique_ptr<white_ball_vision_processor_t> m_vision_processor{nullptr};
+        std::unique_ptr<behavior_t> m_behavior{nullptr};
 
         //*** Configuration members ***//
         configuration_file_loader_t m_configuration_loader;
@@ -148,7 +154,7 @@ namespace drwn {
         config_path_arguments_parsing_strategy_t m_arg_config_white_ball_vision_processor;
 
         action_configuration_file_loader_t m_action_configuration_loader;
-        white_ball_vision_processor_arhuments_parsing_strategy_t m_arg_white_ball_vision_processor;
+        white_ball_vision_processor_arguments_parsing_strategy_t m_arg_white_ball_vision_processor;
 
         //*** Platform specific members ***//
 
@@ -159,8 +165,6 @@ namespace drwn {
         std::unique_ptr<vrep_image_source_t> m_image_source{nullptr};
         std::unique_ptr<vrep_connector_t> m_vrep_connector{nullptr};
 #endif
-
-        void update_image();
     };
 }
 

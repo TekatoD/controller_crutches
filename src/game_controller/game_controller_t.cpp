@@ -4,7 +4,7 @@
  */
 
 #include <log/trivial_logger_t.h>
-#include "gamecontroller/game_controller_t.h"
+#include "game_controller/game_controller_t.h"
 
 
 using namespace drwn;

@@ -1,7 +1,7 @@
 #include <log/trivial_logger_t.h>
 #include "hw/LEDs_t.h"
 
-drwn::LEDs_t* drwn::LEDs_t::GetInstance() {
+drwn::LEDs_t* drwn::LEDs_t::get_instance() {
     static LEDs_t instance;
     return &instance;
 }

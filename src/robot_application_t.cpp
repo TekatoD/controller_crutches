@@ -4,12 +4,13 @@
 #include <hw/LEDs_t.h>
 #include <hw/vrep_image_source_t.h>
 #include <hw/camera_t.h>
-#include <hw/image_source_failure.h>
 #include <opencv/cv.hpp>
 #include <vision/vision_t.h>
+#include <behavior/image_processing_behavior_t.h>
+#include <behavior/soccer_behavior_t.h>
 #include "log/trivial_logger_t.h"
 #include "motion/motion_manager_t.h"
-#include "gamecontroller/game_controller_t.h"
+#include "game_controller/game_controller_t.h"
 #include "motion/modules/action_t.h"
 #include "motion/modules/kicking_t.h"
 #include "motion/modules/walking_t.h"
@@ -19,7 +20,9 @@
 #ifdef CROSSCOMPILE
 #include "hw/robot_CM730_t.h"
 #else
+
 #include "hw/vrep_CM730_t.h"
+
 #endif
 
 using namespace drwn;
@@ -74,6 +77,7 @@ bool robot_application_t::is_running() const {
 void robot_application_t::initialize() {
     this->apply_debug_arguments();
     if (m_debug) LOG_INFO << "=== Initialization was started ===";
+    this->init_cat();
     this->check_hw_status();
     this->init_CM730();
     this->init_cv();
@@ -83,7 +87,31 @@ void robot_application_t::initialize() {
     this->init_game_controller();
     this->init_configuraion_loader();
     this->read_configuration();
+    this->init_behavior();
     if (m_debug) LOG_INFO << "=== Initialization was finished ===";
+}
+
+void robot_application_t::init_cat() {
+    if (m_debug) {
+        LOG_DEBUG << "Initializing cat...";
+        LOG_DEBUG << "───────────────────────────────────────";
+        LOG_DEBUG << "───▐▀▄───────▄▀▌───▄▄▄▄▄▄▄─────────────";
+        LOG_DEBUG << "───▌▒▒▀▄▄▄▄▄▀▒▒▐▄▀▀▒██▒██▒▀▀▄──────────";
+        LOG_DEBUG << "──▐▒▒▒▒▀▒▀▒▀▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▀▄────────";
+        LOG_DEBUG << "──▌▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▄▒▒▒▒▒▒▒▒▒▒▒▒▀▄──────";
+        LOG_DEBUG << "▀█▒▒▒█▌▒▒█▒▒▐█▒▒▒▀▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▌─────";
+        LOG_DEBUG << "▀▌▒▒▒▒▒▒▀▒▀▒▒▒▒▒▒▀▀▒▒▒▒▒▒▒▒▒▒▒▒▒▒▐───▄▄";
+        LOG_DEBUG << "▐▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▌▄█▒█";
+        LOG_DEBUG << "▐▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█▒█▀─";
+        LOG_DEBUG << "▐▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█▀───";
+        LOG_DEBUG << "▐▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▌────";
+        LOG_DEBUG << "─▌▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▐─────";
+        LOG_DEBUG << "─▐▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▌─────";
+        LOG_DEBUG << "──▌▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▐──────";
+        LOG_DEBUG << "──▐▄▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▄▌──────";
+        LOG_DEBUG << "────▀▄▄▀▀▀▀▀▄▄▀▀▀▀▀▀▀▄▄▀▀▀▀▀▄▄▀────────";
+        LOG_INFO << "Cat is ready! ^^";
+    }
 }
 
 void robot_application_t::check_hw_status() {
@@ -112,7 +140,7 @@ void robot_application_t::init_CM730() {
 
 #endif
 
-    LEDs_t::GetInstance()->initialize(m_cm730.get());
+    LEDs_t::get_instance()->initialize(m_cm730.get());
     if (m_debug) LOG_INFO << "Hardware is ready";
 }
 
@@ -153,7 +181,7 @@ void robot_application_t::init_cv() {
     if (m_debug) LOG_DEBUG << "Initializing CV pipeline...";
     auto vision_processor = std::make_unique<white_ball_vision_processor_t>();
     const std::string& path = m_arg_white_ball_vision_processor.get_dump_images_path();
-    if(!path.empty()) {
+    if (!path.empty()) {
         vision_processor->set_dump_directory_path(path);
     }
     vision_processor->enable_dump_images(m_arg_white_ball_vision_processor.is_dump_images_enabled());
@@ -210,7 +238,8 @@ void robot_application_t::init_configuraion_loader() {
     m_configuration_loader.add_strategy(m_head_configuration_strategy, m_arg_config_head);
     m_configuration_loader.add_strategy(m_walking_configuration_strategy, m_arg_config_walking);
     m_configuration_loader.add_strategy(m_motion_manager_configuration_strategy, m_arg_config_motion_manager);
-    m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy, m_arg_config_white_ball_vision_processor);
+    m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy,
+                                        m_arg_config_white_ball_vision_processor);
 
 #ifdef CROSSCOMPILATION
     m_robot_image_source_configuration_strategy.set_image_source(m_image_source.get());
@@ -275,6 +304,9 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_leds.set_option("dbg-kicking", "enable debug output for LEDs");
     m_arg_debug_camera.set_option("dbg-camera", "enable debug output for camera");
     m_arg_debug_vision_processor.set_option("dbg-cv", "enable debug output for cv");
+#ifdef CROSSCOMPILATION
+    m_arg_debug_image_source.set_option("dbg-img-source", "enabled debug output for image source");
+#endif
 
     m_arg_config_default.set_option("cfg,c", "default config file (res/config.ini by default)");
     m_arg_config_ball_tracker.set_option("cfg-ball-tracker", "config file for ball tracker");
@@ -286,9 +318,7 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_config_kicking.set_option("cfg-kicking", "config file for kicking motion module");
     m_arg_config_action.set_option("cfg-action", "path to motion_4096.bin");
     m_arg_config_white_ball_vision_processor.set_option("cfg-cv", "path to cv config");
-
 #ifdef CROSSCOMPILATION
-    m_arg_debug_image_source.set_option("dbg-img-source", "enabled debut output for image source");
     m_arg_config_image_source.set_option("cfg-image-source", "config file for image source");
 #endif
 
@@ -301,10 +331,8 @@ void robot_application_t::parse_command_line_arguments() {
 void robot_application_t::apply_debug_arguments() {
     if (m_arg_debug_all || m_arg_debug_application)
         enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_ball_searcher)
-        ; // TODO Enable debug for ball searcher
-    if (m_arg_debug_all || m_arg_debug_ball_tracker)
-        ; // TODO Setting debug for ball tracker
+    if (m_arg_debug_all || m_arg_debug_ball_searcher); // TODO Enable debug for ball searcher
+    if (m_arg_debug_all || m_arg_debug_ball_tracker); // TODO Setting debug for ball tracker
     if (m_arg_debug_all || m_arg_debug_game_controller)
         game_controller_t::get_instance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_motion_manager)
@@ -320,7 +348,7 @@ void robot_application_t::apply_debug_arguments() {
     if (m_arg_debug_all || m_arg_debug_buttons)
         buttons_t::get_instance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_leds)
-        LEDs_t::GetInstance()->enable_debug(true);
+        LEDs_t::get_instance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_camera)
         camera_t::get_instance()->enable_debug(true);
     // Image source debug placed located in init_cv
@@ -333,31 +361,27 @@ void robot_application_t::read_configuration() {
     if (m_debug) LOG_INFO << "Reading configuration was finished";
 }
 
+void robot_application_t::init_behavior() {
+    if (m_vision_processor->is_show_images_enabled() || m_vision_processor->is_dump_images_enabled()) {
+        m_behavior = std::make_unique<image_processing_behavior_t>();
+    } else {
+        m_behavior = std::make_unique<soccer_behavior_t>();
+    }
+}
+
 void robot_application_t::start_main_loop() {
     if (m_debug) LOG_INFO << "=== Controller was started ===";
     while (is_running()) {
-      this->update_image();
+        m_behavior->process();
     }
-    if (m_debug) LOG_INFO << "=== Contoller was finished ===";
+    if (m_debug) LOG_INFO << "=== Controller was finished ===";
 
 }
 
-bool robot_application_t::is_debug() const noexcept {
+bool robot_application_t::is_debug_enabled() const noexcept {
     return m_debug;
 }
 
 void robot_application_t::enable_debug(bool debug) noexcept {
     m_debug = debug;
-}
-
-void robot_application_t::update_image() {
-    try {
-        camera_t::get_instance()->update_image();
-        cv::Mat frame = camera_t::get_instance()->get_image();
-        vision_t::get_instance()->set_frame(frame);
-        vision_t::get_instance()->process();
-    } catch(const image_source_failure& failure) {
-        LOG_WARNING << "CV loop iteration failed: " << failure.what();
-    }
-
 }

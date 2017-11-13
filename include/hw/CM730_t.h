@@ -168,7 +168,7 @@ For instance, linux_CM730_t is a concretisation of this class.
 
         bulk_read_data_t m_bulk_read_data[ID_BROADCAST];
 
-//        virtual ~CM730_t() = 0;
+        virtual ~CM730_t() = default;
 
 /*this method is to be used first to connect to the robot. Returns true when success and false when fail*/
         virtual bool connect() = 0;

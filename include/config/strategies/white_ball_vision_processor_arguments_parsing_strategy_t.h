@@ -10,7 +10,7 @@
 
 
 namespace drwn {
-    class white_ball_vision_processor_arhuments_parsing_strategy_t
+    class white_ball_vision_processor_arguments_parsing_strategy_t
             : public arguments_parsing_strategy_t {
     public:
         void define_description(boost::program_options::options_description& desc) override;

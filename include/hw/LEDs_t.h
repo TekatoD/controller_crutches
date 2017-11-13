@@ -7,7 +7,7 @@
 namespace drwn {
     class LEDs_t {
     public:
-        static LEDs_t* GetInstance();
+        static LEDs_t* get_instance();
 
         void initialize(CM730_t* cm730) noexcept;
 

@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include <gamecontroller/game_controller_t.h>
+#include <game_controller/game_controller_t.h>
 
 #include "state_machine_t.h"
 #include "motion/modules/head_t.h"

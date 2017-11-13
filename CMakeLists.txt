@@ -91,11 +91,11 @@ set(SRC
         src/hw/linux_motion_timer_t.cpp
         src/main.cpp
         src/state_machine_t.cpp
-        include/gamecontroller/robo_cup_game_control_data_t.h
-        include/gamecontroller/spl_coach_message.h
-        include/gamecontroller/spl_standard_message.h
-        src/gamecontroller/game_controller_t.cpp
-        include/gamecontroller/game_controller_t.h
+        include/game_controller/robo_cup_game_control_data_t.h
+        include/game_controller/spl_coach_message.h
+        include/game_controller/spl_standard_message.h
+        src/game_controller/game_controller_t.cpp
+        include/game_controller/game_controller_t.h
         include/udp_comm_t.h
         src/udp_comm_t.cpp
         src/pose_2D_t.cpp
@@ -104,8 +104,6 @@ set(SRC
         include/odometry_collector_t.h
         src/go_to_t.cpp
         include/go_to_t.h
-        include/soccer_behavior_t.h
-        src/soccer_behavior_t.cpp
         src/field_t.cpp
         include/field_t.h
         src/ball_searcher_t.cpp
@@ -127,8 +125,6 @@ set(SRC
         src/robot_application_t.cpp
         include/robot_application_t.h
         include/behavior/behavior_t.h
-        src/behavior/base_behavior_t.cpp
-        include/behavior/base_behavior_t.h
         src/hw/LEDs_t.cpp
         include/hw/LEDs_t.h
         src/color_t.cpp
@@ -208,8 +204,11 @@ set(SRC
         include/hw/robot_image_source_t.h
         src/config/strategies/robot_image_source_configuration_strategy_t.cpp
         include/config/strategies/robot_image_source_configuration_strategy_t.h
-        src/config/strategies/white_ball_vision_processor_arhuments_parsing_strategy_t.cpp
-        include/config/strategies/white_ball_vision_processor_arhuments_parsing_strategy_t.h)
+        src/config/strategies/white_ball_vision_processor_arguments_parsing_strategy_t.cpp
+        include/config/strategies/white_ball_vision_processor_arguments_parsing_strategy_t.h
+        src/behavior/image_processing_behavior_t.cpp
+        include/behavior/image_processing_behavior_t.h
+        src/behavior/soccer_behavior_t.cpp include/behavior/soccer_behavior_t.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

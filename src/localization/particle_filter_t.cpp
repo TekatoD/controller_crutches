@@ -4,37 +4,37 @@
 #include "localization/particle_filter_t.h"
 
 using namespace localization;
-using namespace Robot;
+using namespace drwn;
 
-particle_filter_t::particle_filter_t(minIni* ini)
+particle_filter_t::particle_filter_t()
 {
-    load_ini_settings(ini);
+    initialize_particle_filter();
 }
 
-void particle_filter_t::load_ini_settings(minIni *ini)
+void particle_filter_t::initialize_particle_filter()
 {
-    m_fieldWorld.load_ini_settings(ini);
+    m_fieldWorld.initialize_field();
     
-    float poseX = ini->getf("particle_filter", "init_x");
-    float poseY = ini->getf("particle_filter", "init_y");
-    float poseTheta = ini->getf("particle_filter", "init_theta");
-    int num_particles = ini->geti("particle_filter", "particle_number", DEFAULT_PARTICLE_NUMBER);
-    int random_particles = ini->geti("particle_filter", "random_particles", 0);
+    float poseX = m_config.init_x;
+    float poseY = m_config.init_y;
+    float poseTheta = m_config.init_theta;
+    int num_particles = m_config.num_particles;
+    int random_particles = m_config.random_particles;
 
-    std::cout << poseX << " " << poseY << " " << poseTheta << " " << num_particles << " " << random_particles << std::endl;
+    //std::cout << poseX << " " << poseY << " " << poseTheta << " " << num_particles << " " << random_particles << std::endl;
     
     if (random_particles > 0) {
         float min_x, min_y, min_theta, max_x, max_y, max_theta;
-        min_x = ini->getf("particle_filter", "min_x");
-        min_y = ini->getf("particle_filter", "min_y");
-        min_theta = ini->getf("particle_filter", "min_theta");
-        max_x = ini->getf("particle_filter", "max_x");
-        max_y = ini->getf("particle_filter", "max_y");
-        max_theta = ini->getf("particle_filter", "max_theta");
+        min_x = m_config.min_x;
+        min_y = m_config.min_y;
+        min_theta = m_config.min_theta;
+        max_x = m_config.max_x;
+        max_y = m_config.max_y;
+        max_theta = m_config.max_theta;
         
         init_particles(min_x, max_x, min_y, max_y, min_theta, max_theta, num_particles);
     } else {
-        init_particles(Robot::Pose2D(poseX, poseY, poseTheta), num_particles);
+        init_particles(drwn::pose_2D_t(poseX, poseY, poseTheta), num_particles);
     }
 }
 
@@ -45,15 +45,16 @@ void particle_filter_t::predict(const Eigen::Vector3f& command, const Eigen::Vec
     }
 }
 
-std::tuple<field_map_t::line_type_t, Point2D> particle_filter_t::calc_expected_measurement(float rx, float ry, float rtheta, float measured_range, float measured_bearing)
+std::tuple<field_map_t::line_type_t, point_2D_t> particle_filter_t::calc_expected_measurement(float rx, float ry, float rtheta, float measured_range, float measured_bearing)
 {
     // Predicted measurement
     // Cast a line from robot position with same bearing
     float epx, epy;
     // Need to normalize angles everywhere
-    Pose2D normalizer(0.0, 0.0, measured_bearing + rtheta);
-    epx = rx + field_map_t::MAX_DIST * cos(normalizer.Theta());
-    epy = ry + field_map_t::MAX_DIST * sin(normalizer.Theta());
+    pose_2D_t normalizer(0.0, 0.0, measured_bearing + rtheta);
+
+    epx = rx + field_map_t::MAX_DIST * cos(normalizer.theta());
+    epy = ry + field_map_t::MAX_DIST * sin(normalizer.theta());
     
     // Accept intersections with distance from robot to intersection point greater than minDist 
     return m_fieldWorld.intersect_with_field(
@@ -71,7 +72,7 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
         }
         
         float rx, ry, rtheta, vrange, vbearing;
-        rx = particle.pose.X(); ry = particle.pose.Y(); rtheta = particle.pose.Theta();
+        rx = particle.pose.x(); ry = particle.pose.y(); rtheta = particle.pose.theta();
         
         vrange = noise(0); vbearing = noise(1);
         Eigen::MatrixXf Qt(4, 4);
@@ -80,7 +81,7 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
               0.0f, 0.0f, vrange, 0.0f,
               0.0f, 0.0f, 0.0f, vbearing;
         
-        Pose2D normalizer;
+        pose_2D_t normalizer;
         float range1, bearing1, range2, bearing2;
         float dx1, dy1, dx2, dy2;
         
@@ -93,11 +94,11 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
             
             auto test_line1 = calc_expected_measurement(rx, ry, rtheta, range1, bearing1);
             field_map_t::line_type_t ret_type1 = std::get<0>(test_line1);
-            Point2D isec_point1 = std::get<1>(test_line1);
+            point_2D_t isec_point1 = std::get<1>(test_line1);
             
             auto test_line2 = calc_expected_measurement(rx, ry, rtheta, range2, bearing2);
             field_map_t::line_type_t ret_type2 = std::get<0>(test_line2);
-            Point2D isec_point2 = std::get<1>(test_line2);
+            point_2D_t isec_point2 = std::get<1>(test_line2);
             
             if (ret_type1 == field_map_t::line_type_t::NONE || ret_type2 == field_map_t::line_type_t::NONE) {
                 continue;
@@ -109,8 +110,8 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
             if (expected_range1 > field_map_t::MAX_DIST) {
                 continue;
             }
-            normalizer.setTheta(std::atan2(dy1, dx1) - rtheta);
-            float expected_bearing1 = normalizer.Theta();
+            normalizer.set_theta(std::atan2(dy1, dx1) - rtheta);
+            float expected_bearing1 = normalizer.theta();
             
             dx2 = isec_point2.X - rx;
             dy2 = isec_point2.Y - ry;
@@ -118,14 +119,14 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
             if (expected_range2 > field_map_t::MAX_DIST) {
                 continue;
             }
-            normalizer.setTheta(std::atan2(dy2, dx2) - rtheta);
-            float expected_bearing2 = normalizer.Theta();
+            normalizer.set_theta(std::atan2(dy2, dx2) - rtheta);
+            float expected_bearing2 = normalizer.theta();
             
             float bdiff1, bdiff2;
-            normalizer.setTheta(expected_bearing1 - bearing1);
-            bdiff1 = normalizer.Theta();
-            normalizer.setTheta(expected_bearing2 - bearing2);
-            bdiff2 = normalizer.Theta();
+            normalizer.set_theta(expected_bearing1 - bearing1);
+            bdiff1 = normalizer.theta();
+            normalizer.set_theta(expected_bearing2 - bearing2);
+            bdiff2 = normalizer.theta();
             Eigen::Vector4f diff = {
                 expected_range1 - range1,
                 bdiff1,
@@ -215,13 +216,13 @@ void particle_filter_t::low_variance_resampling()
     m_particles.swap(new_particles);
 }
 
-Eigen::Vector4f get_line_range_bearing(Pose2D robotPose, float x1, float y1, float x2, float y2)
+Eigen::Vector4f get_line_range_bearing(pose_2D_t robotPose, float x1, float y1, float x2, float y2)
 {
     float rx, ry, rtheta;
 
-    rx = robotPose.X();
-    ry = robotPose.Y();
-    rtheta = robotPose.Theta();
+    rx = robotPose.x();
+    ry = robotPose.y();
+    rtheta = robotPose.theta();
 
     float gx1, gy1, gx2, gy2;
     gx1 = (x1-rx)*cos(rtheta) + (y1-ry)*sin(rtheta);
@@ -236,16 +237,16 @@ Eigen::Vector4f get_line_range_bearing(Pose2D robotPose, float x1, float y1, flo
     float range1, range2, bearing1, bearing2;
     dx1 = gx1 - rx;
     dy1 = gy1 - ry;
-    Robot::Pose2D normalizer(0.0, 0.0, atan2(dy1, dx1) - rtheta);
+    drwn::pose_2D_t normalizer(0.0, 0.0, atan2(dy1, dx1) - rtheta);
     range1 = sqrt(dx1*dx1 + dy1*dy1);
-    bearing1 = normalizer.Theta();
+    bearing1 = normalizer.theta();
 
     dx2 = gx2 - rx;
     dy2 = gy2 - ry;
-    normalizer.setTheta(atan2(dy2, dx2) - rtheta);
+    normalizer.set_theta(atan2(dy2, dx2) - rtheta);
 
     range2 = sqrt(dx2*dx2 + dy2*dy2);
-    bearing2 = normalizer.Theta();
+    bearing2 = normalizer.theta();
 
     Eigen::Vector4f lineRangeBearing = {
             range1,
@@ -253,67 +254,69 @@ Eigen::Vector4f get_line_range_bearing(Pose2D robotPose, float x1, float y1, flo
             range2,
             bearing2
     };
+
+    return lineRangeBearing;
 }
 
 void particle_filter_t::calc_pose_mean_cov()
 {
-    Pose2D meanAccum;
+    pose_2D_t meanAccum;
     float pw, px, py, ptheta;
     for (const auto& particle : m_particles) {
-        px = particle.pose.X();
-        py = particle.pose.Y();
-        ptheta = particle.pose.Theta();
+        px = particle.pose.x();
+        py = particle.pose.y();
+        ptheta = particle.pose.theta();
         
         // For correct mean calculation
         pw = 1.0 / m_particles.size();
-        meanAccum += Pose2D(px*pw, py*pw, ptheta*pw);
+        meanAccum += pose_2D_t(px*pw, py*pw, ptheta*pw);
     }
     
-    Pose2D devAccum, angleNormalizer;
+    pose_2D_t devAccum, angleNormalizer;
     float mx, my, mtheta;
-    mx = meanAccum.X();
-    my = meanAccum.Y();
-    mtheta = meanAccum.Theta();
+    mx = meanAccum.x();
+    my = meanAccum.y();
+    mtheta = meanAccum.theta();
     for (const auto& particle : m_particles) {
-        px = particle.pose.X();
-        py = particle.pose.Y();
-        ptheta = particle.pose.Theta();
+        px = particle.pose.x();
+        py = particle.pose.y();
+        ptheta = particle.pose.theta();
         
         // for correct stddev calculation
         // square root of mean of (xi-x.mean)**2 for all i
         pw = 1.0 / m_particles.size();
-        angleNormalizer.setTheta(ptheta-mtheta);
-        devAccum += Pose2D(pw*pow(px-mx, 2), pw*pow(py-my, 2), pw*pow(angleNormalizer.Theta(), 2));
+        angleNormalizer.set_theta(ptheta-mtheta);
+        devAccum += pose_2D_t(pw*pow(px-mx, 2), pw*pow(py-my, 2), pw*pow(angleNormalizer.theta(), 2));
     }
     // sqrt(mean((xi - x.mean())**2))
-    devAccum.setX(sqrt(devAccum.X()));
-    devAccum.setY(sqrt(devAccum.Y()));
-    devAccum.setTheta(sqrt(devAccum.Theta()));
+    devAccum.set_x(sqrt(devAccum.x()));
+    devAccum.set_y(sqrt(devAccum.y()));
+    devAccum.set_theta(sqrt(devAccum.theta()));
     
     m_poseMean = meanAccum;
     m_poseDev = devAccum;
     
     // DEBUG
     // Sometimes reset particles around current mean
-    Pose2D nmz;
-    if (m_poseDev.X() > 200.0f || m_poseDev.Y() > 200.0f || m_poseDev.Theta() > 10.0f) {
+    pose_2D_t nmz;
+    if (m_poseDev.x() > 200.0f || m_poseDev.y() > 200.0f || m_poseDev.theta() > 10.0f) {
         std::cout << "======================== REGENERATING PARTICLES ===========================" << std::endl;
         float min_x, min_y, min_theta, max_x, max_y, max_theta;
-        min_x = m_poseMean.X() - m_poseDev.X();
-        max_x = m_poseMean.X() + m_poseDev.X();
-        min_y = m_poseMean.Y() - m_poseDev.Y();
-        max_y = m_poseMean.Y() + m_poseDev.Y();
-        nmz.setTheta(m_poseMean.Theta() - (m_poseDev.Theta() * (M_PI / 180.0f)));
-        min_theta = nmz.Theta();
-        nmz.setTheta(m_poseMean.Theta() + (m_poseDev.Theta() * (M_PI / 180.0f)));
-        max_theta = nmz.Theta();
+        min_x = m_poseMean.x() - m_poseDev.x();
+        max_x = m_poseMean.x() + m_poseDev.x();
+        min_y = m_poseMean.y() - m_poseDev.y();
+        max_y = m_poseMean.y() + m_poseDev.y();
+        nmz.set_theta(m_poseMean.theta() - (m_poseDev.theta() * (M_PI / 180.0f)));
+        min_theta = nmz.theta();
+        nmz.set_theta(m_poseMean.theta() + (m_poseDev.theta() * (M_PI / 180.0f)));
+        max_theta = nmz.theta();
         init_particles(min_x, max_x, min_y, max_y, min_theta, max_theta, m_particles.size());
     }    
     
 }
 
 
-void particle_filter_t::init_particles(const Pose2D& pose, int num_particles)
+void particle_filter_t::init_particles(const pose_2D_t& pose, int num_particles)
 {
     float defaultWeight = 1.0f / num_particles;
     m_topParticleIndex = 0;
@@ -339,7 +342,7 @@ void particle_filter_t::init_particles(float min_x, float max_x, float min_y, fl
     std::uniform_real_distribution<> dist_theta(min_theta, max_theta);
     
     for (auto& particle : m_particles) {
-        particle.pose = Pose2D(dist_x(generator), dist_y(generator), dist_theta(generator));
+        particle.pose = pose_2D_t(dist_x(generator), dist_y(generator), dist_theta(generator));
         particle.weight = defaultWeight;
     }
 }
@@ -353,7 +356,7 @@ float particle_filter_t::sample_normal_distribution(float variance)
     return normal(generator);
 }
 
-Pose2D particle_filter_t::odometry_sample(Pose2D pose, Eigen::Vector3f command, Eigen::Vector3f noise)
+pose_2D_t particle_filter_t::odometry_sample(pose_2D_t pose, Eigen::Vector3f command, Eigen::Vector3f noise)
 {
     float rot1, trans, rot2;
     rot1 = command(0); trans = command(1); rot2 = command(2);
@@ -361,37 +364,37 @@ Pose2D particle_filter_t::odometry_sample(Pose2D pose, Eigen::Vector3f command, 
     float r1_noise, t_noise, r2_noise;
     r1_noise = noise(0); t_noise = noise(1), r2_noise = noise(2);
     
-    pose.normalizeTheta();
-    float theta_old = pose.Theta();
+    pose.normalize_theta();
+    float theta_old = pose.theta();
     
     float rot1_h, trans_h, rot2_h;
     rot1_h = rot1 - sample_normal_distribution(r1_noise);
     trans_h = trans - sample_normal_distribution(t_noise);
     rot2_h = rot2 - sample_normal_distribution(r2_noise);
     
-    Pose2D newPose;
-    newPose.setTheta(theta_old + rot1_h);
-    float normalized = newPose.Theta();
+    pose_2D_t newPose;
+    newPose.set_theta(theta_old + rot1_h);
+    float normalized = newPose.theta();
     
-    newPose.setX(trans_h * std::cos(normalized));
-    newPose.setY(trans_h * std::sin(normalized));
-    newPose.setTheta(rot1_h + rot2_h);
+    newPose.set_x(trans_h * std::cos(normalized));
+    newPose.set_y(trans_h * std::sin(normalized));
+    newPose.set_theta(rot1_h + rot2_h);
     
     return pose + newPose;
 }
 
-Eigen::Vector3f particle_filter_t::get_odometry_command(Pose2D prevPose, Pose2D currPose)
+Eigen::Vector3f particle_filter_t::get_odometry_command(pose_2D_t prevPose, pose_2D_t currPose)
 {
     float rot1, trans, rot2;
     float dx, dy;
-    dx = currPose.X() - prevPose.X();
-    dy = currPose.Y() - prevPose.Y();
+    dx = currPose.x() - prevPose.x();
+    dy = currPose.y() - prevPose.y();
     
     trans = sqrt(dx*dx + dy*dy);
-    Pose2D normalizer(0.0f, 0.0f, atan2(dy, dx) - prevPose.Theta());
-    rot1 = normalizer.Theta();
-    normalizer.setTheta(currPose.Theta() - prevPose.Theta() - rot1);
-    rot2 = normalizer.Theta();
+    pose_2D_t normalizer(0.0f, 0.0f, atan2(dy, dx) - prevPose.theta());
+    rot1 = normalizer.theta();
+    normalizer.set_theta(currPose.theta() - prevPose.theta() - rot1);
+    rot2 = normalizer.theta();
     
     return Eigen::Vector3f {
         rot1,

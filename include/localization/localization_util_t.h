@@ -5,11 +5,10 @@
 #include <map>
 #include <ostream>
 
-#include <minIni.h>
 #include <math/point_t.h>
 
 /*
- *  Units: meters
+ *  Units: mm
  */
 
 using namespace drwn;
@@ -46,18 +45,51 @@ namespace localization {
         };
         
         static constexpr float MAX_DIST = 12000.0f;
+        static constexpr float DEFAULT_FIELD_WIDTH = 6000.0f;
+        static constexpr float DEFAULT_FIELD_HEIGHT = 4000.0f;
+        static constexpr float DEFAULT_GATE_HEIGHT = 1400.0f;
+        static constexpr float DEFAULT_PENALTY_WIDTH = 600.0f;
+        static constexpr float DEFAULT_PENALTY_HEIGHT = 2200.0f;
         
         field_map_t();
         ~field_map_t();
-        
-        void load_ini_settings(minIni *ini);
+
+        void initialize_field();
         void print_field_lines() const;
-        
+
         std::tuple<line_type_t, point_2D_t> intersect_with_field(const line_t &l, float minDist = 0.0f);
-        
+
+        void set_field_width(float field_width) { m_config.field_width = field_width; }
+        float get_field_width() const { return m_config.field_height; }
+
+        void set_field_height(float field_height) { m_config.field_height = field_height; }
+        float get_field_height() const { return m_config.field_height; }
+
+        void set_gate_height(float gate_height) { m_config.gate_height = gate_height; }
+        float get_gate_height() const { return m_config.gate_height;}
+
+        void set_penalty_width(float penalty_width) { m_config.penalty_width = penalty_width; }
+        float get_penalty_width() const { return m_config.penalty_width; }
+
+        void set_penalty_height(float penalty_height) { m_config.penalty_height = penalty_height; }
+        float get_penalty_height() const { return m_config.penalty_height; }
     private:
+        struct config_t {
+            float field_width, field_height;
+            float gate_height;
+            float penalty_width, penalty_height;
+
+            config_t()
+            : field_width(DEFAULT_FIELD_WIDTH), field_height(DEFAULT_FIELD_HEIGHT),
+              gate_height(DEFAULT_GATE_HEIGHT),
+              penalty_width(DEFAULT_PENALTY_WIDTH), penalty_height(DEFAULT_PENALTY_HEIGHT)
+            {
+
+            }
+        } m_config;
+
         std::map<line_type_t, line_t> m_fieldLines;
-        
+
         void make_lines(float fw, float fh, float pw, float ph, float gh);
     };
 

@@ -89,21 +89,14 @@ namespace localization {
 
 localization::field_map_t::field_map_t()
 {
+    initialize_field();
 }
 
 localization::field_map_t::~field_map_t() {}
 
-void localization::field_map_t::load_ini_settings(minIni *ini)
+void localization::field_map_t::initialize_field()
 {
-    float fw, fh, pw, ph, gh;
-    
-    fw = ini->getf("NewField", "field_width");
-    fh = ini->getf("NewField", "field_height");
-    pw = ini->getf("NewField", "penalty_width");
-    ph = ini->getf("NewField", "penalty_height");
-    gh = ini->getf("NewField", "gate_height");
-
-    make_lines(fw, fh, pw, ph, gh);
+    make_lines(m_config.field_width, m_config.field_height, m_config.penalty_width, m_config.penalty_height, m_config.gate_height);
 }
 
 void localization::field_map_t::print_field_lines() const
@@ -151,6 +144,10 @@ void localization::field_map_t::make_lines(float fw, float fh, float pw, float p
     // Middle of the field is the origin (0.0, 0.0)
     // x: left is negative, right is positive
     // y: bottom is negative, top is positive
+    if (m_fieldLines.size() > 0) {
+        m_fieldLines.clear();
+    }
+
     m_fieldLines = {
         {line_type_t::CENTRAL_LINE, line_t(0.0f, fh/2.0f, 0.0f, -fh/2.0f)},
         {line_type_t::FIELD_LEFT, line_t(-fw/2.0f, fh/2.0f, -fw/2.0f, -fh/2.0f)},

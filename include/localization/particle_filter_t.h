@@ -72,6 +72,9 @@ public:
     void set_init_theta(float init_theta) { m_config.init_theta = init_theta; }
     float get_init_theta() const { return m_config.init_theta; }
 
+    void set_random_particles(int random_particles) { m_config.random_particles = random_particles; }
+    int get_random_particles() const { return m_config.random_particles; }
+
     void set_min_x(float min_x) { m_config.min_x = min_x; }
     float get_min_x() const { return m_config.min_x; }
 

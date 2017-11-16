@@ -213,7 +213,11 @@ set(SRC
         include/localization/localization_util_t.h
         src/localization/localization_util_t.cpp
         include/localization/particle_filter_t.h
-        src/localization/particle_filter_t.cpp)
+        src/localization/particle_filter_t.cpp
+        include/config/strategies/particle_filter_configuration_strategy_t.h
+        src/config/strategies/particle_filter_configuration_strategy_t.cpp
+        include/config/strategies/localization_field_configuration_strategy_t.h
+        src/config/strategies/localization_field_configuration_strategy_t.cpp)
 
 #### Build targets #####
 add_executable(controller ${SRC})

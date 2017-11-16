@@ -5,9 +5,11 @@
 #include <vector>
 #include <map>
 #include <eigen3/Eigen/Dense>
+#include <log/trivial_logger_t.h>
 
 #include "pose_2D_t.h"
 #include "localization/localization_util_t.h"
+
 
 
 namespace drwn {
@@ -68,47 +70,81 @@ namespace drwn {
 
         void calc_pose_mean_cov();
 
-        void set_particle_number(int num_particles) { m_config.num_particles = num_particles; }
+        void set_particle_number(int num_particles) {
+            if (m_debug) LOG_DEBUG << "num_particles: " << num_particles;
+            m_config.num_particles = num_particles;
+        }
 
         int get_particle_number() const { return m_config.num_particles; }
 
-        void set_init_x(float init_x) { m_config.init_x = init_x; }
+        void set_init_x(float init_x) {
+            if (m_debug) LOG_DEBUG << "init_x: " << init_x;
+            m_config.init_x = init_x;
+        }
 
         float get_init_x() const { return m_config.init_x; }
 
-        void set_init_y(float init_y) { m_config.init_y = init_y; }
+        void set_init_y(float init_y) {
+            if (m_debug) LOG_DEBUG << "init_y: " << init_y;
+            m_config.init_y = init_y;
+        }
 
         float get_init_y() const { return m_config.init_y; }
 
-        void set_init_theta(float init_theta) { m_config.init_theta = init_theta; }
+        void set_init_theta(float init_theta) {
+            if (m_debug) LOG_DEBUG << "init_theta: " << init_theta;
+            m_config.init_theta = init_theta;
+        }
 
         float get_init_theta() const { return m_config.init_theta; }
 
-        void set_random_particles(int random_particles) { m_config.random_particles = random_particles; }
+        void set_random_particles(int random_particles) {
+            if (m_debug) LOG_DEBUG << "random_particles: " << random_particles;
+            m_config.random_particles = random_particles;
+        }
 
         int get_random_particles() const { return m_config.random_particles; }
 
-        void set_min_x(float min_x) { m_config.min_x = min_x; }
+        void set_min_x(float min_x) {
+            if (m_debug) LOG_DEBUG << "min_x: " << min_x;
+            m_config.min_x = min_x;
+        }
 
         float get_min_x() const { return m_config.min_x; }
 
-        void set_min_y(float min_y) { m_config.min_y = min_y; }
+        void set_min_y(float min_y) {
+            if (m_debug) LOG_DEBUG << "min_y: " << min_y;
+            m_config.min_y = min_y;
+        }
 
         float get_min_y() const { return m_config.min_y; }
 
-        void set_min_theta(float min_theta) { m_config.min_theta = min_theta; }
+        void set_min_theta(float min_theta) {
+            if (m_debug) LOG_DEBUG << "min_theta:  " << min_theta;
+            m_config.min_theta = min_theta;
+        }
 
         float get_min_theta() const { return m_config.min_theta; }
 
-        void set_max_x(float max_x) { m_config.max_x = max_x; }
+        void set_max_x(float max_x) {
+            if (m_debug) LOG_DEBUG << "max_x:  " << max_x;
+
+            m_config.max_x = max_x;
+        }
 
         float get_max_x() const { return m_config.max_x; }
 
-        void set_max_y(float max_y) { m_config.max_y = max_y; }
+        void set_max_y(float max_y) {
+            if (m_debug) LOG_DEBUG << "max_y:  " << max_y;
+            m_config.max_y = max_y;
+        }
 
         float get_max_y() const { return m_config.max_y; }
 
-        void set_max_theta(float max_theta) { m_config.max_theta = max_theta; }
+        void set_max_theta(float max_theta) {
+            if (m_debug) LOG_DEBUG << "max_theta:  " << max_theta;
+            m_config.max_theta = max_theta;
+        }
 
         float get_max_theta() const { return m_config.max_theta; }
 

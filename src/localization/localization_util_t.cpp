@@ -97,12 +97,16 @@ drwn::field_map_t::~field_map_t() {}
 void drwn::field_map_t::initialize_field()
 {
     make_lines(m_config.field_width, m_config.field_height, m_config.penalty_width, m_config.penalty_height, m_config.gate_height);
+    if (m_debug) log_field_lines();
 }
 
-void drwn::field_map_t::print_field_lines() const
+void drwn::field_map_t::log_field_lines() const
 {
+    if (!m_debug) return;
+
+    LOG_DEBUG << "Field lines";
     for (auto& kv : m_fieldLines) {
-        std::cout << (int)kv.first << " : " << kv.second << std::endl;
+        LOG_DEBUG << (int)kv.first << " : " << kv.second;
     }
 }
 

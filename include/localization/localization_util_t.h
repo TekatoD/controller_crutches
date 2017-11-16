@@ -4,6 +4,7 @@
 #include <cmath>
 #include <map>
 #include <ostream>
+#include <log/trivial_logger_t.h>
 
 #include <math/point_t.h>
 
@@ -55,25 +56,43 @@ namespace drwn {
         ~field_map_t();
 
         void initialize_field();
-        // TODO: debug log print
-        void print_field_lines() const;
+        void log_field_lines() const;
 
         std::tuple<line_type_t, point_2D_t> intersect_with_field(const line_t &l, float minDist = 0.0f);
 
-        void set_field_width(float field_width) { m_config.field_width = field_width; }
+        void set_field_width(float field_width) {
+            if (m_debug) LOG_DEBUG << "Field width: " << field_width;
+            m_config.field_width = field_width;
+        }
         float get_field_width() const { return m_config.field_height; }
 
-        void set_field_height(float field_height) { m_config.field_height = field_height; }
+        void set_field_height(float field_height) {
+            if (m_debug) LOG_DEBUG << "Field height: " << field_height;
+            m_config.field_height = field_height;
+        }
         float get_field_height() const { return m_config.field_height; }
 
-        void set_gate_height(float gate_height) { m_config.gate_height = gate_height; }
+        void set_gate_height(float gate_height) {
+            if (m_debug) LOG_DEBUG << "Gate height: " << gate_height;
+            m_config.gate_height = gate_height;
+        }
         float get_gate_height() const { return m_config.gate_height;}
 
-        void set_penalty_width(float penalty_width) { m_config.penalty_width = penalty_width; }
+        void set_penalty_width(float penalty_width) {
+            if (m_debug) LOG_DEBUG << "Penalty width: " << penalty_width;
+            m_config.penalty_width = penalty_width;
+        }
         float get_penalty_width() const { return m_config.penalty_width; }
 
-        void set_penalty_height(float penalty_height) { m_config.penalty_height = penalty_height; }
+        void set_penalty_height(float penalty_height) {
+            if (m_debug) LOG_DEBUG << "Penalty height: " << penalty_height;
+            m_config.penalty_height = penalty_height;
+        }
         float get_penalty_height() const { return m_config.penalty_height; }
+
+
+        bool is_debug_enabled() const { return m_debug; }
+        void enable_debug(bool debug) { m_debug = debug; }
     private:
         struct config_t {
             float field_width, field_height;
@@ -88,6 +107,8 @@ namespace drwn {
 
             }
         } m_config;
+
+        bool m_debug;
 
         std::map<line_type_t, line_t> m_fieldLines;
 

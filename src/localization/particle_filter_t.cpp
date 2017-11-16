@@ -13,8 +13,9 @@ particle_filter_t::particle_filter_t()
 
 void particle_filter_t::initialize()
 {
+    m_fieldWorld.enable_debug(m_debug);
     m_fieldWorld.initialize_field();
-    
+
     float poseX = m_config.init_x;
     float poseY = m_config.init_y;
     float poseTheta = m_config.init_theta;

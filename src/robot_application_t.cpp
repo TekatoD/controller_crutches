@@ -177,7 +177,7 @@ void robot_application_t::init_localization() {
         m_particle_filter->enable_debug(true);
     }
 
-    if (m_debug) LOG_DEBUG << "Localization is ready";
+    if (m_debug) LOG_INFO << "Localization is ready";
 }
 
 void robot_application_t::init_motion_manager() {
@@ -264,6 +264,7 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_debug_image_source);
     parser.add_strategy(m_arg_debug_camera);
     parser.add_strategy(m_arg_debug_vision_processor);
+    parser.add_strategy(m_arg_debug_localization);
 
     parser.add_strategy(m_arg_config_default);
     parser.add_strategy(m_arg_config_ball_searcher);
@@ -276,6 +277,7 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_config_kicking);
     parser.add_strategy(m_arg_config_white_ball_vision_processor);
     parser.add_strategy(m_arg_config_localization_field);
+    parser.add_strategy(m_arg_config_particle_filter);
 
     parser.add_strategy(m_arg_white_ball_vision_processor);
 
@@ -296,6 +298,7 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_leds.set_option("dbg-kicking", "enable debug output for LEDs");
     m_arg_debug_camera.set_option("dbg-camera", "enable debug output for camera");
     m_arg_debug_vision_processor.set_option("dbg-cv", "enable debug output for cv");
+    m_arg_debug_localization.set_option("dbg-localization", "enable debug output for localization module");
 
     m_arg_config_default.set_option("cfg,c", "default config file (res/config.ini by default)");
     m_arg_config_ball_tracker.set_option("cfg-ball-tracker", "config file for ball tracker");

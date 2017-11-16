@@ -28,6 +28,8 @@ namespace drwn {
              * cx = offset x
              * cx = offset y
              */
+            camera_parameters_t() : camera_parameters_t(1.0f) {}
+
             camera_parameters_t(float f, float a = 1.0f, float s = 0.0f, float cx = 0.0f, float cy = 0.0f)
             {
                 set_intrinsic_parameters(f, a, s, cx, cy);
@@ -103,6 +105,7 @@ namespace drwn {
 
         class camera_projection_t {
         public:
+            camera_projection_t() {}
             camera_projection_t(camera_parameters_t cameraParams) : m_cameraParams(cameraParams) {}
 
             void set_camera_parameters(camera_parameters_t cameraParams)

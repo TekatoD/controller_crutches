@@ -136,7 +136,11 @@ bool game_controller_t::send(uint8_t message) {
     return_packet.team = (uint8_t) m_team_number;
     return_packet.player = (uint8_t) m_player_number;
     return_packet.message = message;
-    return !m_udp || m_udp->write((const char*) &return_packet, sizeof(return_packet));
+    auto result = !m_udp || m_udp->write((const char*) &return_packet, sizeof(return_packet));
+    if (m_debug) {
+        LOG_DEBUG << "GAME CONTROLLER: " << (result) ? "Message has been sent" : "Can't send message";
+    }
+    return result;
 }
 
 
@@ -170,4 +174,8 @@ bool game_controller_t::is_debug_enabled() const {
 
 void game_controller_t::enable_debug(bool debug) {
     m_debug = debug;
+}
+
+const robo_cup_game_control_data_t& game_controller_t::get_game_ctrl_data() const noexcept {
+    return m_game_ctrl_data;
 }

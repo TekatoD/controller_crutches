@@ -98,13 +98,13 @@ void action_t::load_file(const char* filename) {
     FILE* action = fopen(filename, "r+b");
 
     if (action == nullptr) {
-        throw std::runtime_error("Can not open action_t file!");
+        throw std::runtime_error("Can not open action file!");
     }
 
     fseek(action, 0, SEEK_END);
     if (ftell(action) != (long) (sizeof(PAGE) * MAXNUM_PAGE)) {
         fclose(action);
-        throw std::runtime_error("It's not an action_t file!");
+        throw std::runtime_error("It's not an action file!");
     }
 
     if (m_action_file != nullptr)
@@ -117,7 +117,7 @@ void action_t::load_file(const char* filename) {
 bool action_t::create_file(char* filename) {
     FILE* action = fopen(filename, "ab");
     if (action == nullptr) {
-        LOG_ERROR << "ACTION: Can not create Action file!";
+        LOG_ERROR << "ACTION: Can not create action file!";
         return false;
     }
 

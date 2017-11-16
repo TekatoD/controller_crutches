@@ -36,16 +36,14 @@ void ball_follower_t::process(point2d_t ball_pos,
     } else {
         m_no_ball_count = 0;
 
-        float pan = motion_status_t::current_joints.set_angle(joint_data_t::ID_HEAD_PAN);
+        float pan = motion_status_t::current_joints.get_angle(joint_data_t::ID_HEAD_PAN);
         float pan_range = head_t::get_instance()->get_left_limit_angle();
         float pan_percent = pan / pan_range;
 
-        float tilt = motion_status_t::current_joints.set_angle(joint_data_t::ID_HEAD_TILT);
+        float tilt = motion_status_t::current_joints.get_angle(joint_data_t::ID_HEAD_TILT);
         float tilt_min = head_t::get_instance()->get_bottom_limit_angle();
         float tilt_range = head_t::get_instance()->get_top_limit_angle() - tilt_min;
-        float tilt_percent = (tilt - tilt_min) / tilt_range;
-        if (tilt_percent < 0)
-            tilt_percent = -tilt_percent;
+        float tilt_percent = fabsf((tilt - tilt_min) / tilt_range);
         if (pan > m_kick_right_angle && pan < m_kick_left_angle) {
             if (tilt <= (tilt_min + m_aim_tilt_offset) && (angle_top > 0 || angle_bot < 0)) {
                 m_kick_ball_count = 0;

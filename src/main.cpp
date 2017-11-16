@@ -28,10 +28,10 @@
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/support/date_time.hpp>
-#include <log/ColouredSink.h>
-#include <log/Logger.h>
+#include <log/coloured_sink_t.h>
+#include <log/trivial_logger_t.h>
 
-#include <RobotApplication.h>
+#include <robot_application_t.h>
 
 namespace logging = boost::log;
 namespace src = boost::log::sources;
@@ -48,7 +48,7 @@ void change_current_dir() {
 }
 
 void init_logger() {
-    using coloured_sink = sinks::synchronous_sink<Robot::ColouredSink>;
+    using coloured_sink = sinks::synchronous_sink<drwn::coloured_sink_t>;
     auto sink = boost::make_shared<coloured_sink>();
     sink->set_formatter(expr::stream
                                 << expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%H:%M:%S.%f")
@@ -66,7 +66,7 @@ void init_logger() {
 
 
 void sighandler(int /*sig*/) {
-    Robot::RobotApplication::GetInstance()->Stop();
+    drwn::robot_application_t::get_instance()->stop();
 }
 
 
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
     change_current_dir();
     init_logger();
 
-    Robot::CommandArguments args{argc, argv};
-    Robot::RobotApplication::GetInstance()->SetProgramArguments(args);
-    return Robot::RobotApplication::GetInstance()->Exec();
+    drwn::command_arguments_t args{argc, argv};
+    drwn::robot_application_t::get_instance()->set_program_arguments(args);
+    return drwn::robot_application_t::get_instance()->exec();
 }

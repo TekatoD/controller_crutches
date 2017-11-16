@@ -37,7 +37,6 @@ using namespace drwn;
 
 robot_CM730_t::robot_CM730_t(platform_CM730_t* platform) {
     m_platform = platform;
-    DEBUG_PRINT = true;
     m_bulk_read_tx_packet[LENGTH] = 0;
     for (int i = 0; i < ID_BROADCAST; i++)
         m_bulk_read_data[i] = bulk_read_data_t();
@@ -63,47 +62,47 @@ int robot_CM730_t::TxRx_packet(unsigned char* txpacket, unsigned char* rxpacket,
     txpacket[1] = 0xFF;
     txpacket[length - 1] = calculate_checksum(txpacket);
 
-    if (DEBUG_PRINT == true) {
-        fprintf(stderr, "\nTX: ");
+    if (m_debug) {
+        fprintf(stdout, "\nTX: ");
         for (int n = 0; n < length; n++)
-            fprintf(stderr, "%.2X ", txpacket[n]);
+            fprintf(stdout, "%.2X ", txpacket[n]);
 
-        fprintf(stderr, "INST: ");
+        fprintf(stdout, "INST: ");
         switch (txpacket[INSTRUCTION]) {
             case INST_PING:
-                fprintf(stderr, "PING\n");
+                fprintf(stdout, "PING\n");
                 break;
 
             case INST_READ:
-                fprintf(stderr, "READ\n");
+                fprintf(stdout, "READ\n");
                 break;
 
             case INST_WRITE:
-                fprintf(stderr, "WRITE\n");
+                fprintf(stdout, "WRITE\n");
                 break;
 
             case INST_REG_WRITE:
-                fprintf(stderr, "REG_WRITE\n");
+                fprintf(stdout, "REG_WRITE\n");
                 break;
 
             case INST_ACTION:
-                fprintf(stderr, "ACTION\n");
+                fprintf(stdout, "ACTION\n");
                 break;
 
             case INST_RESET:
-                fprintf(stderr, "RESET\n");
+                fprintf(stdout, "RESET\n");
                 break;
 
             case INST_SYNC_WRITE:
-                fprintf(stderr, "SYNC_WRITE\n");
+                fprintf(stdout, "SYNC_WRITE\n");
                 break;
 
             case INST_BULK_READ:
-                fprintf(stderr, "BULK_READ\n");
+                fprintf(stdout, "BULK_READ\n");
                 break;
 
             default:
-                fprintf(stderr, "UNKNOWN\n");
+                fprintf(stdout, "UNKNOWN\n");
                 break;
         }
     }
@@ -122,14 +121,14 @@ int robot_CM730_t::TxRx_packet(unsigned char* txpacket, unsigned char* rxpacket,
                 m_platform->set_packet_timeout(length);
 
                 int get_length = 0;
-                if (DEBUG_PRINT == true)
-                    fprintf(stderr, "RX: ");
+                if (m_debug)
+                    fprintf(stdout, "RX: ");
 
-                while (1) {
+                while (true) {
                     length = m_platform->read_port(&rxpacket[get_length], to_length - get_length);
-                    if (DEBUG_PRINT == true) {
+                    if (m_debug) {
                         for (int n = 0; n < length; n++)
-                            fprintf(stderr, "%.2X ", rxpacket[get_length + n]);
+                            fprintf(stdout, "%.2X ", rxpacket[get_length + n]);
                     }
                     get_length += length;
 
@@ -146,8 +145,8 @@ int robot_CM730_t::TxRx_packet(unsigned char* txpacket, unsigned char* rxpacket,
                         if (i == 0) {
                             // Check checksum
                             unsigned char checksum = calculate_checksum(rxpacket);
-                            if (DEBUG_PRINT == true)
-                                fprintf(stderr, "CHK:%.2X\n", checksum);
+                            if (m_debug)
+                                fprintf(stdout, "CHK:%.2X\n", checksum);
 
                             if (rxpacket[get_length - 1] == checksum)
                                 res = SUCCESS;
@@ -161,7 +160,7 @@ int robot_CM730_t::TxRx_packet(unsigned char* txpacket, unsigned char* rxpacket,
                             get_length -= i;
                         }
                     } else {
-                        if (m_platform->is_packet_timeout() == true) {
+                        if (m_platform->is_packet_timeout()) {
                             if (get_length == 0)
                                 res = RX_TIMEOUT;
                             else
@@ -188,14 +187,14 @@ int robot_CM730_t::TxRx_packet(unsigned char* txpacket, unsigned char* rxpacket,
                 m_platform->set_packet_timeout(to_length * 1.5);
 
                 int get_length = 0;
-                if (DEBUG_PRINT == true)
-                    fprintf(stderr, "RX: ");
+                if (m_debug)
+                    fprintf(stdout, "RX: ");
 
-                while (1) {
+                while (true) {
                     length = m_platform->read_port(&rxpacket[get_length], to_length - get_length);
-                    if (DEBUG_PRINT == true) {
+                    if (m_debug) {
                         for (int n = 0; n < length; n++)
-                            fprintf(stderr, "%.2X ", rxpacket[get_length + n]);
+                            fprintf(stdout, "%.2X ", rxpacket[get_length + n]);
                     }
                     get_length += length;
 
@@ -203,7 +202,7 @@ int robot_CM730_t::TxRx_packet(unsigned char* txpacket, unsigned char* rxpacket,
                         res = SUCCESS;
                         break;
                     } else {
-                        if (m_platform->is_packet_timeout() == true) {
+                        if (m_platform->is_packet_timeout()) {
                             if (get_length == 0)
                                 res = RX_TIMEOUT;
                             else
@@ -219,7 +218,7 @@ int robot_CM730_t::TxRx_packet(unsigned char* txpacket, unsigned char* rxpacket,
                     m_bulk_read_data[_id].error = -1;
                 }
 
-                while (1) {
+                while (true) {
                     int i;
                     for (i = 0; i < get_length - 1; i++) {
                         if (rxpacket[i] == 0xFF && rxpacket[i + 1] == 0xFF)
@@ -231,8 +230,8 @@ int robot_CM730_t::TxRx_packet(unsigned char* txpacket, unsigned char* rxpacket,
                     if (i == 0) {
                         // Check checksum
                         unsigned char checksum = calculate_checksum(rxpacket);
-                        if (DEBUG_PRINT == true)
-                            fprintf(stderr, "CHK:%.2X\n", checksum);
+                        if (m_debug)
+                            fprintf(stdout, "CHK:%.2X\n", checksum);
 
                         if (rxpacket[LENGTH + rxpacket[LENGTH]] == checksum) {
                             for (int j = 0; j < (rxpacket[LENGTH] - 2); j++)
@@ -277,36 +276,36 @@ int robot_CM730_t::TxRx_packet(unsigned char* txpacket, unsigned char* rxpacket,
     } else
         res = TX_CORRUPT;
 
-    if (DEBUG_PRINT == true) {
-        fprintf(stderr, "Time:%.2fms  ", m_platform->get_packet_time());
-        fprintf(stderr, "RETURN: ");
+    if (m_debug) {
+        fprintf(stdout, "Time:%.2fms  ", m_platform->get_packet_time());
+        fprintf(stdout, "RETURN: ");
         switch (res) {
             case SUCCESS:
-                fprintf(stderr, "SUCCESS\n");
+                fprintf(stdout, "SUCCESS\n");
                 break;
 
             case TX_CORRUPT:
-                fprintf(stderr, "TX_CORRUPT\n");
+                fprintf(stdout, "TX_CORRUPT\n");
                 break;
 
             case TX_FAIL:
-                fprintf(stderr, "TX_FAIL\n");
+                fprintf(stdout, "TX_FAIL\n");
                 break;
 
             case RX_FAIL:
-                fprintf(stderr, "RX_FAIL\n");
+                fprintf(stdout, "RX_FAIL\n");
                 break;
 
             case RX_TIMEOUT:
-                fprintf(stderr, "RX_TIMEOUT\n");
+                fprintf(stdout, "RX_TIMEOUT\n");
                 break;
 
             case RX_CORRUPT:
-                fprintf(stderr, "RX_CORRUPT\n");
+                fprintf(stdout, "RX_CORRUPT\n");
                 break;
 
             default:
-                fprintf(stderr, "UNKNOWN\n");
+                fprintf(stdout, "UNKNOWN\n");
                 break;
         }
     }
@@ -402,9 +401,11 @@ int robot_CM730_t::sync_write(int start_addr, int each_length, int number, int* 
 
 
 bool robot_CM730_t::connect() {
-    if (m_platform->open_port() == false) {
-        fprintf(stderr, "\n Fail to open port\n");
-        fprintf(stderr, " CM-730 is used by another program or do not have root privileges.\n\n");
+    if (!m_platform->open_port()) {
+        if (m_debug) {
+            fprintf(stdout, "\n Fail to open port\n");
+            fprintf(stdout, " CM-730 is used by another program or do not have root privileges.\n\n");
+        }
         return false;
     }
 
@@ -413,8 +414,8 @@ bool robot_CM730_t::connect() {
 
 
 bool robot_CM730_t::change_baud(int baud) {
-    if (m_platform->set_baud(baud) == false) {
-        fprintf(stderr, "\n Fail to change baudrate\n");
+    if (!m_platform->set_baud(baud)) {
+        fprintf(stdout, "\n Fail to change baudrate\n");
         return false;
     }
 
@@ -423,17 +424,17 @@ bool robot_CM730_t::change_baud(int baud) {
 
 
 bool robot_CM730_t::DXL_power_on() {
-    if (write_byte(CM730_t::ID_CM, CM730_t::P_DXL_POWER, 1, 0) == CM730_t::SUCCESS) {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, " Succeed to change Dynamixel power!\n");
+    if (write_byte(CM730_t::ID_CM, CM730_t::P_DXL_POWER, 1, nullptr) == CM730_t::SUCCESS) {
+        if (m_debug)
+            fprintf(stdout, " Succeed to change Dynamixel power!\n");
 
-        write_word(CM730_t::ID_CM, CM730_t::P_LED_HEAD_L, make_color(255, 128, 0), 0);
-	fprintf(stderr, "write word\n");
+        write_word(CM730_t::ID_CM, CM730_t::P_LED_HEAD_L, make_color(255, 128, 0), nullptr);
+	fprintf(stdout, "write word\n");
         m_platform->sleep(300); // about 300msec
-	fprintf(stderr, "sleep\n");
+	fprintf(stdout, "sleep\n");
     } else {
-        if (DEBUG_PRINT == true)
-            fprintf(stderr, " Fail to change Dynamixel power!\n");
+        if (m_debug)
+            fprintf(stdout, " Fail to change Dynamixel power!\n");
         return false;
     }
 
@@ -447,140 +448,140 @@ bool robot_CM730_t::MX28_init_all() {
 
     if (write_word(joint_data_t::ID_R_SHOULDER_ROLL, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_R_SHOULDER_ROLL), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_SHOULDER_ROLL!\n");
+        fprintf(stdout, " Fail to change CW limit of R_SHOULDER_ROLL!\n");
     if (write_word(joint_data_t::ID_R_SHOULDER_ROLL, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_R_SHOULDER_ROLL), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_SHOULDER_ROLL!\n");
+        fprintf(stdout, " Fail to change CCW limit of R_SHOULDER_ROLL!\n");
 
     if (write_word(joint_data_t::ID_L_SHOULDER_ROLL, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_L_SHOULDER_ROLL), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_SHOULDER_ROLL!\n");
+        fprintf(stdout, " Fail to change CW limit of L_SHOULDER_ROLL!\n");
     if (write_word(joint_data_t::ID_L_SHOULDER_ROLL, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_L_SHOULDER_ROLL), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_SHOULDER_ROLL!\n");
+        fprintf(stdout, " Fail to change CCW limit of L_SHOULDER_ROLL!\n");
 
     if (write_word(joint_data_t::ID_R_ELBOW, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_R_ELBOW),
                    0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_ELBOW!\n");
+        fprintf(stdout, " Fail to change CW limit of R_ELBOW!\n");
     if (write_word(joint_data_t::ID_R_ELBOW, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_R_ELBOW),
                    0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_ELBOW!\n");
+        fprintf(stdout, " Fail to change CCW limit of R_ELBOW!\n");
 
     if (write_word(joint_data_t::ID_L_ELBOW, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_L_ELBOW),
                    0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_ELBOW!\n");
+        fprintf(stdout, " Fail to change CW limit of L_ELBOW!\n");
     if (write_word(joint_data_t::ID_L_ELBOW, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_L_ELBOW),
                    0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_ELBOW!\n");
+        fprintf(stdout, " Fail to change CCW limit of L_ELBOW!\n");
 
     if (write_word(joint_data_t::ID_R_HIP_YAW, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_R_HIP_YAW),
                    0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_HIP_YAW!\n");
+        fprintf(stdout, " Fail to change CW limit of R_HIP_YAW!\n");
     if (write_word(joint_data_t::ID_R_HIP_YAW, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_R_HIP_YAW), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_HIP_YAW!\n");
+        fprintf(stdout, " Fail to change CCW limit of R_HIP_YAW!\n");
 
     if (write_word(joint_data_t::ID_L_HIP_YAW, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_L_HIP_YAW),
                    0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_HIP_YAW!\n");
+        fprintf(stdout, " Fail to change CW limit of L_HIP_YAW!\n");
     if (write_word(joint_data_t::ID_L_HIP_YAW, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_L_HIP_YAW), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_HIP_YAW!\n");
+        fprintf(stdout, " Fail to change CCW limit of L_HIP_YAW!\n");
 
     if (write_word(joint_data_t::ID_R_HIP_ROLL, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_R_HIP_ROLL), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_HIP_ROLL!\n");
+        fprintf(stdout, " Fail to change CW limit of R_HIP_ROLL!\n");
     if (write_word(joint_data_t::ID_R_HIP_ROLL, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_R_HIP_ROLL), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_HIP_ROLL!\n");
+        fprintf(stdout, " Fail to change CCW limit of R_HIP_ROLL!\n");
 
     if (write_word(joint_data_t::ID_L_HIP_ROLL, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_L_HIP_ROLL), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_HIP_ROLL!\n");
+        fprintf(stdout, " Fail to change CW limit of L_HIP_ROLL!\n");
     if (write_word(joint_data_t::ID_L_HIP_ROLL, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_L_HIP_ROLL), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_HIP_ROLL!\n");
+        fprintf(stdout, " Fail to change CCW limit of L_HIP_ROLL!\n");
 
     if (write_word(joint_data_t::ID_R_HIP_PITCH, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_R_HIP_PITCH), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_HIP_PITCH!\n");
+        fprintf(stdout, " Fail to change CW limit of R_HIP_PITCH!\n");
     if (write_word(joint_data_t::ID_R_HIP_PITCH, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_R_HIP_PITCH), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_HIP_PITCH!\n");
+        fprintf(stdout, " Fail to change CCW limit of R_HIP_PITCH!\n");
 
     if (write_word(joint_data_t::ID_L_HIP_PITCH, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_L_HIP_PITCH), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_HIP_PITCH!\n");
+        fprintf(stdout, " Fail to change CW limit of L_HIP_PITCH!\n");
     if (write_word(joint_data_t::ID_L_HIP_PITCH, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_L_HIP_PITCH), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_HIP_PITCH!\n");
+        fprintf(stdout, " Fail to change CCW limit of L_HIP_PITCH!\n");
 
     if (write_word(joint_data_t::ID_R_KNEE, MX28_t::P_CW_ANGLE_LIMIT_L, MX28_t::angle_2_value(kinematics_t::CW_LIMIT_R_KNEE), 0) !=
         CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_KNEE!\n");
+        fprintf(stdout, " Fail to change CW limit of R_KNEE!\n");
     if (write_word(joint_data_t::ID_R_KNEE, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_R_KNEE),
                    0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_KNEE!\n");
+        fprintf(stdout, " Fail to change CCW limit of R_KNEE!\n");
 
     if (write_word(joint_data_t::ID_L_KNEE, MX28_t::P_CW_ANGLE_LIMIT_L, MX28_t::angle_2_value(kinematics_t::CW_LIMIT_L_KNEE), 0) !=
         CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_KNEE!\n");
+        fprintf(stdout, " Fail to change CW limit of L_KNEE!\n");
     if (write_word(joint_data_t::ID_L_KNEE, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_L_KNEE),
                    0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_KNEE!\n");
+        fprintf(stdout, " Fail to change CCW limit of L_KNEE!\n");
 
     if (write_word(joint_data_t::ID_R_ANKLE_PITCH, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_R_ANKLE_PITCH), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_ANKLE_PITCH!\n");
+        fprintf(stdout, " Fail to change CW limit of R_ANKLE_PITCH!\n");
     if (write_word(joint_data_t::ID_R_ANKLE_PITCH, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_R_ANKLE_PITCH), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_ANKLE_PITCH!\n");
+        fprintf(stdout, " Fail to change CCW limit of R_ANKLE_PITCH!\n");
 
     if (write_word(joint_data_t::ID_L_ANKLE_PITCH, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_L_ANKLE_PITCH), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_ANKLE_PITCH!\n");
+        fprintf(stdout, " Fail to change CW limit of L_ANKLE_PITCH!\n");
     if (write_word(joint_data_t::ID_L_ANKLE_PITCH, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_L_ANKLE_PITCH), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_ANKLE_PITCH!\n");
+        fprintf(stdout, " Fail to change CCW limit of L_ANKLE_PITCH!\n");
 
     if (write_word(joint_data_t::ID_R_ANKLE_ROLL, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_R_ANKLE_ROLL), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of R_ANKLE_ROLL!\n");
+        fprintf(stdout, " Fail to change CW limit of R_ANKLE_ROLL!\n");
     if (write_word(joint_data_t::ID_R_ANKLE_ROLL, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_R_ANKLE_ROLL), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of R_ANKLE_ROLL!\n");
+        fprintf(stdout, " Fail to change CCW limit of R_ANKLE_ROLL!\n");
 
     if (write_word(joint_data_t::ID_L_ANKLE_ROLL, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_L_ANKLE_ROLL), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of L_ANKLE_ROLL!\n");
+        fprintf(stdout, " Fail to change CW limit of L_ANKLE_ROLL!\n");
     if (write_word(joint_data_t::ID_L_ANKLE_ROLL, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_L_ANKLE_ROLL), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of L_ANKLE_ROLL!\n");
+        fprintf(stdout, " Fail to change CCW limit of L_ANKLE_ROLL!\n");
 
     if (write_word(joint_data_t::ID_HEAD_PAN, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_HEAD_PAN),
                    0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of HEAD_PAN!\n");
+        fprintf(stdout, " Fail to change CW limit of HEAD_PAN!\n");
     if (write_word(joint_data_t::ID_HEAD_PAN, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_HEAD_PAN),
                    0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of HEAD_PAN!\n");
+        fprintf(stdout, " Fail to change CCW limit of HEAD_PAN!\n");
 
     if (write_word(joint_data_t::ID_HEAD_TILT, MX28_t::P_CW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CW_LIMIT_HEAD_TILT),
                    0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CW limit of HEAD_TILT!\n");
+        fprintf(stdout, " Fail to change CW limit of HEAD_TILT!\n");
     if (write_word(joint_data_t::ID_HEAD_TILT, MX28_t::P_CCW_ANGLE_LIMIT_L,
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_HEAD_TILT), 0) != CM730_t::SUCCESS)
-        fprintf(stderr, " Fail to change CCW limit of HEAD_TILT!\n");
+        fprintf(stdout, " Fail to change CCW limit of HEAD_TILT!\n");
 
     return true;
 }

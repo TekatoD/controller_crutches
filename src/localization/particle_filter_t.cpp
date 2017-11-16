@@ -3,15 +3,15 @@
 #include <random>
 #include "localization/particle_filter_t.h"
 
-using namespace localization;
+using namespace drwn;
 using namespace drwn;
 
 particle_filter_t::particle_filter_t()
 {
-    initialize_particle_filter();
+    initialize();
 }
 
-void particle_filter_t::initialize_particle_filter()
+void particle_filter_t::initialize()
 {
     m_fieldWorld.initialize_field();
     
@@ -216,7 +216,7 @@ void particle_filter_t::low_variance_resampling()
     m_particles.swap(new_particles);
 }
 
-Eigen::Vector4f get_line_range_bearing(pose_2D_t robotPose, float x1, float y1, float x2, float y2)
+Eigen::Vector4f particle_filter_t::get_line_range_bearing(pose_2D_t robotPose, float x1, float y1, float x2, float y2)
 {
     float rx, ry, rtheta;
 
@@ -401,4 +401,12 @@ Eigen::Vector3f particle_filter_t::get_odometry_command(pose_2D_t prevPose, pose
         trans,
         rot2
     };
+}
+
+bool particle_filter_t::is_debug_enabled() const {
+    return m_debug;
+}
+
+void particle_filter_t::enable_debug(bool debug) {
+    m_debug = debug;
 }

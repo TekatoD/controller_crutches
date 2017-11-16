@@ -3,22 +3,22 @@
 #include "localization/localization_util_t.h"
 
 
-localization::line_t::line_t(float x1, float y1, float x2, float y2)
+drwn::line_t::line_t(float x1, float y1, float x2, float y2)
 : p1(x1, y1), p2(x2, y2)
 {
 }
 
-localization::line_t::line_t(const point_2D_t& p1, const point_2D_t& p2)
+drwn::line_t::line_t(const point_2D_t& p1, const point_2D_t& p2)
 : p1(p1), p2(p2)
 {
 }
 
-float localization::line_t::length() const
+float drwn::line_t::length() const
 {
     return point_2D_t::Distance(p1, p2);
 }
 
-bool localization::line_t::is_point_on_line(float px, float py, float eps) const
+bool drwn::line_t::is_point_on_line(float px, float py, float eps) const
 {
     point_2D_t point(px, py);
     float LengthTo = line_t(p1, point).length();
@@ -35,7 +35,7 @@ bool localization::line_t::is_point_on_line(float px, float py, float eps) const
 /*
  * http://www-cs.ccny.cuny.edu/~wolberg/capstone/intersection/Intersection%20point%20of%20two%20lines.html
  */
-bool localization::line_t::intersect_lines(const line_t &l1, const line_t &l2, point_2D_t &intersection, float eps)
+bool drwn::line_t::intersect_lines(const line_t &l1, const line_t &l2, point_2D_t &intersection, float eps)
 {
     float num1, num2, denom, ua, ub;
     float x1, x2, x3, x4, y1, y2, y3, y4;
@@ -77,7 +77,7 @@ bool localization::line_t::intersect_lines(const line_t &l1, const line_t &l2, p
     return false;
 }
 
-namespace localization {
+namespace drwn {
 
     std::ostream& operator<<(std::ostream& out, const line_t& l)
     {
@@ -87,19 +87,19 @@ namespace localization {
 
 };
 
-localization::field_map_t::field_map_t()
+drwn::field_map_t::field_map_t()
 {
     initialize_field();
 }
 
-localization::field_map_t::~field_map_t() {}
+drwn::field_map_t::~field_map_t() {}
 
-void localization::field_map_t::initialize_field()
+void drwn::field_map_t::initialize_field()
 {
     make_lines(m_config.field_width, m_config.field_height, m_config.penalty_width, m_config.penalty_height, m_config.gate_height);
 }
 
-void localization::field_map_t::print_field_lines() const
+void drwn::field_map_t::print_field_lines() const
 {
     for (auto& kv : m_fieldLines) {
         std::cout << (int)kv.first << " : " << kv.second << std::endl;
@@ -107,7 +107,7 @@ void localization::field_map_t::print_field_lines() const
 }
 
 
-std::tuple<localization::field_map_t::line_type_t, point_2D_t> localization::field_map_t::intersect_with_field(
+std::tuple<drwn::field_map_t::line_type_t, point_2D_t> drwn::field_map_t::intersect_with_field(
         const line_t &l, float minDist)
 {
     line_type_t type = line_type_t::NONE;
@@ -139,7 +139,7 @@ std::tuple<localization::field_map_t::line_type_t, point_2D_t> localization::fie
     return std::make_tuple(type, isec);
 }
 
-void localization::field_map_t::make_lines(float fw, float fh, float pw, float ph, float gh)
+void drwn::field_map_t::make_lines(float fw, float fh, float pw, float ph, float gh)
 {
     // Middle of the field is the origin (0.0, 0.0)
     // x: left is negative, right is positive

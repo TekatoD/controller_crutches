@@ -13,7 +13,7 @@
 
 using namespace drwn;
 
-namespace localization {
+namespace drwn {
     struct line_t {
         point_2D_t p1, p2;
 
@@ -55,6 +55,7 @@ namespace localization {
         ~field_map_t();
 
         void initialize_field();
+        // TODO: debug log print
         void print_field_lines() const;
 
         std::tuple<line_type_t, point_2D_t> intersect_with_field(const line_t &l, float minDist = 0.0f);

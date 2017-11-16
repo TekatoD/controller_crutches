@@ -41,7 +41,7 @@ namespace drwn {
 
         void init_tracking();
 
-        void move_tracking(point_2D_t err); // For image processing
+        void move_tracking(point2d_t err); // For image processing
         void move_tracking();
 
         float get_left_limit() const;

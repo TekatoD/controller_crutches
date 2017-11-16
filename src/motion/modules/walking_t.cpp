@@ -230,7 +230,7 @@ void walking_t::process() {
     //                     R_HIP_YAW, R_HIP_ROLL, R_HIP_PITCH, R_KNEE, R_ANKLE_PITCH, R_ANKLE_ROLL, L_HIP_YAW, L_HIP_ROLL, L_HIP_PITCH, L_KNEE, L_ANKLE_PITCH, L_ANKLE_ROLL, R_ARM_SWING, L_ARM_SWING
     constexpr int dir[14] = {-1, -1, 1, 1, -1, 1, -1, -1, -1, -1, 1, 1, 1, -1};
     constexpr float initAngle[14] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -48.345f, 41.313f};
-    int outValue[14];
+    int out_value[14];
 
     // Update walk parameters
     if (m_time == 0) {
@@ -484,7 +484,7 @@ void walking_t::process() {
         m_right_odo_theta = -m_odo_a_factor * ep[5];
     }
 
-    pose_2D_t odo_offset = get_odo_offset();
+    pose2d_t odo_offset = get_odo_offset();
 //    std::cout << "Odo: " << odo_offset.x() << ' ' << odo_offset.Y() << ' ' << odo_offset.Theta() << std::endl;
     m_odometry_collector.odo_translate(odo_offset);
 
@@ -534,7 +534,7 @@ void walking_t::process() {
         else if (i == 8) // L_HIP_PITCH
             offset += (float) dir[i] * (/*-pelvis_offset_l * sin(ep[11])*/ - m_hip_pitch_offset * cos(ep[11])) * MX28_t::RATIO_DEGREES2VALUE;
 
-        outValue[i] = MX28_t::angle_2_value(initAngle[i]) + (int) offset;
+        out_value[i] = MX28_t::angle_2_value(initAngle[i]) + (int) offset;
     }
 
 //    // Compute motor value
@@ -547,40 +547,40 @@ void walking_t::process() {
 //        else if (i == 2 || i == 8) // R_HIP_PITCH or L_HIP_PITCH
 //            offset -= (float) dir[i] * m_hip_pitch_offset * MX28_t::RATIO_DEGREES2VALUE;
 //
-//        outValue[i] = MX28_t::angle_2_value(initAngle[i]) + (int) offset;
+//        out_value[i] = MX28_t::angle_2_value(initAngle[i]) + (int) offset;
 //    }
 
     // adjust balance offset
     if (m_balance_enable) {
-        float rlGyroErr = motion_status_t::RL_GYRO;
-        float fbGyroErr = motion_status_t::FB_GYRO;
-        outValue[1] += (int) (dir[1] * rlGyroErr * m_balance_hip_roll_gain * 4); // R_HIP_ROLL
-        outValue[7] += (int) (dir[7] * rlGyroErr * m_balance_hip_roll_gain * 4); // L_HIP_ROLL
+        float y_gyro_err = motion_status_t::y_gyro;
+        float x_gyro_err = motion_status_t::x_gyro;
+        out_value[1] += (int) (dir[1] * x_gyro_err * m_balance_hip_roll_gain * 4); // R_HIP_ROLL
+        out_value[7] += (int) (dir[7] * x_gyro_err * m_balance_hip_roll_gain * 4); // L_HIP_ROLL
 
-        outValue[3] -= (int) (dir[3] * fbGyroErr * m_balance_knee_gain * 4); // R_KNEE
-        outValue[9] -= (int) (dir[9] * fbGyroErr * m_balance_knee_gain * 4); // L_KNEE
+        out_value[3] -= (int) (dir[3] * y_gyro_err * m_balance_knee_gain * 4); // R_KNEE
+        out_value[9] -= (int) (dir[9] * y_gyro_err * m_balance_knee_gain * 4); // L_KNEE
 
-        outValue[4] -= (int) (dir[4] * fbGyroErr * m_balance_ankle_pitch_gain * 4); // R_ANKLE_PITCH
-        outValue[10] -= (int) (dir[10] * fbGyroErr * m_balance_ankle_pitch_gain * 4); // L_ANKLE_PITCH
+        out_value[4] -= (int) (dir[4] * y_gyro_err * m_balance_ankle_pitch_gain * 4); // R_ANKLE_PITCH
+        out_value[10] -= (int) (dir[10] * y_gyro_err * m_balance_ankle_pitch_gain * 4); // L_ANKLE_PITCH
 
-        outValue[5] -= (int) (dir[5] * rlGyroErr * m_balance_ankle_roll_gain * 4); // R_ANKLE_ROLL
-        outValue[11] -= (int) (dir[11] * rlGyroErr * m_balance_ankle_roll_gain * 4); // L_ANKLE_ROLL
+        out_value[5] -= (int) (dir[5] * x_gyro_err * m_balance_ankle_roll_gain * 4); // R_ANKLE_ROLL
+        out_value[11] -= (int) (dir[11] * x_gyro_err * m_balance_ankle_roll_gain * 4); // L_ANKLE_ROLL
     }
 
-    joint.set_value(joint_data_t::ID_R_HIP_YAW, outValue[0]);
-    joint.set_value(joint_data_t::ID_R_HIP_ROLL, outValue[1]);
-    joint.set_value(joint_data_t::ID_R_HIP_PITCH, outValue[2]);
-    joint.set_value(joint_data_t::ID_R_KNEE, outValue[3]);
-    joint.set_value(joint_data_t::ID_R_ANKLE_PITCH, outValue[4]);
-    joint.set_value(joint_data_t::ID_R_ANKLE_ROLL, outValue[5]);
-    joint.set_value(joint_data_t::ID_L_HIP_YAW, outValue[6]);
-    joint.set_value(joint_data_t::ID_L_HIP_ROLL, outValue[7]);
-    joint.set_value(joint_data_t::ID_L_HIP_PITCH, outValue[8]);
-    joint.set_value(joint_data_t::ID_L_KNEE, outValue[9]);
-    joint.set_value(joint_data_t::ID_L_ANKLE_PITCH, outValue[10]);
-    joint.set_value(joint_data_t::ID_L_ANKLE_ROLL, outValue[11]);
-    joint.set_value(joint_data_t::ID_R_SHOULDER_PITCH, outValue[12]);
-    joint.set_value(joint_data_t::ID_L_SHOULDER_PITCH, outValue[13]);
+    joint.set_value(joint_data_t::ID_R_HIP_YAW, out_value[0]);
+    joint.set_value(joint_data_t::ID_R_HIP_ROLL, out_value[1]);
+    joint.set_value(joint_data_t::ID_R_HIP_PITCH, out_value[2]);
+    joint.set_value(joint_data_t::ID_R_KNEE, out_value[3]);
+    joint.set_value(joint_data_t::ID_R_ANKLE_PITCH, out_value[4]);
+    joint.set_value(joint_data_t::ID_R_ANKLE_ROLL, out_value[5]);
+    joint.set_value(joint_data_t::ID_L_HIP_YAW, out_value[6]);
+    joint.set_value(joint_data_t::ID_L_HIP_ROLL, out_value[7]);
+    joint.set_value(joint_data_t::ID_L_HIP_PITCH, out_value[8]);
+    joint.set_value(joint_data_t::ID_L_KNEE, out_value[9]);
+    joint.set_value(joint_data_t::ID_L_ANKLE_PITCH, out_value[10]);
+    joint.set_value(joint_data_t::ID_L_ANKLE_ROLL, out_value[11]);
+    joint.set_value(joint_data_t::ID_R_SHOULDER_PITCH, out_value[12]);
+    joint.set_value(joint_data_t::ID_L_SHOULDER_PITCH, out_value[13]);
     joint.set_angle(joint_data_t::ID_HEAD_PAN, m_a_move_amplitude);
 
     for (int id = joint_data_t::ID_R_HIP_YAW; id <= joint_data_t::ID_L_ANKLE_ROLL; id++) {
@@ -590,26 +590,26 @@ void walking_t::process() {
     }
 }
 
-pose_2D_t walking_t::get_odo_offset() {
-    pose_2D_t offset(m_odo_x, m_odo_y, m_odo_theta);
+pose2d_t walking_t::get_odo_offset() {
+    pose2d_t offset(m_odo_x, m_odo_y, m_odo_theta);
     m_odo_x = 0;
     m_odo_y = 0;
     m_odo_theta = 0;
     return offset;
 }
 
-pose_2D_t walking_t::get_odo() {
+pose2d_t walking_t::get_odo() {
     return m_odometry_collector.get_pose();
 }
 
-void walking_t::reset_odo(const pose_2D_t& pose) {
+void walking_t::reset_odo(const pose2d_t& pose) {
     if (m_debug) {
         LOG_DEBUG << "WALKING: Odometry has been reset";
     }
     m_odometry_collector.reset();
 }
 
-void walking_t::set_odo(const pose_2D_t& pose) {
+void walking_t::set_odo(const pose2d_t& pose) {
     if (m_debug) {
         LOG_DEBUG << "WALKING: odo_x = " << pose.x()
                   << ", odo_y = " << pose.y()

@@ -8,7 +8,7 @@
 #include <cmath>
 #include <motion/modules/walking_t.h>
 #include <log/trivial_logger_t.h>
-#include "ball_searcher_t.h"
+#include "behavior/ball_searcher_t.h"
 
 using namespace drwn;
 
@@ -29,14 +29,14 @@ ball_searcher_t::ball_searcher_t() {
     m_pan_direction = 0;
 
     m_walking_enabled = true;
-    m_last_position = point_2D_t(camera_t::WIDTH / 2, camera_t::HEIGHT / 2);
+    m_last_position = point2d_t(camera_t::WIDTH / 2, camera_t::HEIGHT / 2);
 }
 
 void ball_searcher_t::process() {
    if (!m_active) {
        // TODO Pan checking
-        point_2D_t center = point_2D_t(camera_t::WIDTH / 2, camera_t::HEIGHT / 2);
-        point_2D_t offset = m_last_position - center;
+        point2d_t center = point2d_t(camera_t::WIDTH / 2, camera_t::HEIGHT / 2);
+        point2d_t offset = m_last_position - center;
 
         m_pan_phase = 0.0;
         m_tilt_phase = 0.0;
@@ -81,23 +81,19 @@ void ball_searcher_t::process() {
     }
 }
 
-void ball_searcher_t::enable_walking() {
-    m_walking_enabled = true;
-}
-
-void ball_searcher_t::disable_walking() {
-    m_walking_enabled = false;
+void ball_searcher_t::enable_walking(bool enabled) {
+    m_walking_enabled = enabled;
 }
 
 bool ball_searcher_t::is_walking_enabled() const {
     return m_walking_enabled;
 }
 
-const point_2D_t& ball_searcher_t::get_last_position() const {
+const point2d_t& ball_searcher_t::get_last_position() const {
     return m_last_position;
 }
 
-void ball_searcher_t::set_last_position(const point_2D_t& pos) {
+void ball_searcher_t::set_last_position(const point2d_t& pos) {
     if(m_debug) {
         LOG_DEBUG << "BALL SEARCHER: last_position_x = " << pos.X << " last_position_y = " << pos.Y;
     }
@@ -165,3 +161,8 @@ void ball_searcher_t::set_max_turn(float max_turn) {
 void ball_searcher_t::enable_debug(bool debug) { m_debug = debug; }
 
 bool ball_searcher_t::is_debug_enabled() const { return m_debug; }
+
+ball_searcher_t* ball_searcher_t::get_instance() {
+    static ball_searcher_t instance;
+    return &instance;
+}

@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include "vector_3D_t.h"
+#include "vector3d_t.h"
 #include "point_t.h"
 
 
 namespace drwn {
-    class matrix_3D_t {
+    class matrix3d_t {
     public:
         enum {
             m00 = 0,
@@ -41,32 +41,32 @@ namespace drwn {
     public:
         float m[MAXNUM_ELEMENT]; // Element
 
-        matrix_3D_t();
+        matrix3d_t();
 
-        matrix_3D_t(const matrix_3D_t& mat);
+        matrix3d_t(const matrix3d_t& mat);
 
-        ~matrix_3D_t();
+        ~matrix3d_t();
 
         void identity();
 
         bool inverse();
 
-        void scale(vector_3D_t scale);
+        void scale(vector3d_t scale);
 
-        void rotate(float angle, vector_3D_t axis);
+        void rotate(float angle, vector3d_t axis);
 
-        void translate(vector_3D_t offset);
+        void translate(vector3d_t offset);
 
-        point_3D_t transform(point_3D_t point);
+        point3d_t transform(point3d_t point);
 
-        vector_3D_t transform(vector_3D_t vector);
+        vector3d_t transform(vector3d_t vector);
 
-        void set_transform(point_3D_t point, vector_3D_t angle);
+        void set_transform(point3d_t point, vector3d_t angle);
 
-        matrix_3D_t& operator=(const matrix_3D_t& mat);
+        matrix3d_t& operator=(const matrix3d_t& mat);
 
-        matrix_3D_t& operator*=(const matrix_3D_t& mat);
+        matrix3d_t& operator*=(const matrix3d_t& mat);
 
-        matrix_3D_t operator*(const matrix_3D_t& mat);
+        matrix3d_t operator*(const matrix3d_t& mat);
     };
 }

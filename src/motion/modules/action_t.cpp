@@ -90,7 +90,7 @@ void action_t::initialize() {
     m_playing = false;
 
     for (int id = joint_data_t::ID_R_SHOULDER_PITCH; id < joint_data_t::NUMBER_OF_JOINTS; id++)
-        joint.set_value(id, motion_status_t::m_current_joints.get_value(id));
+        joint.set_value(id, motion_status_t::current_joints.get_value(id));
 }
 
 
@@ -321,7 +321,7 @@ void action_t::process() {
 
         for (bID = joint_data_t::ID_R_SHOULDER_PITCH; bID < joint_data_t::NUMBER_OF_JOINTS; bID++) {
             if (joint.get_enable(bID)) {
-                wpTargetAngle1024[bID] = motion_status_t::m_current_joints.get_value(bID);
+                wpTargetAngle1024[bID] = motion_status_t::current_joints.get_value(bID);
                 ipLastOutSpeed1024[bID] = 0;
                 ipMovingAngle1024[bID] = 0;
                 ipGoalSpeed1024[bID] = 0;

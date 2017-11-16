@@ -2,19 +2,19 @@
  *  @autor tekatod
  *  @date 4/28/17
  */
-#include "odometry_collector_t.h"
+#include "motion/odometry_collector_t.h"
 #include <math.h>
 
 drwn::odometry_collector_t::odometry_collector_t()
         : m_initial(0, 0, 0), m_pose(0, 0, 0) { }
 
-drwn::odometry_collector_t::odometry_collector_t(pose_2D_t initial)
+drwn::odometry_collector_t::odometry_collector_t(pose2d_t initial)
         : m_initial(initial), m_pose(initial) { }
 
 drwn::odometry_collector_t::odometry_collector_t(float x, float y, float theta)
         : m_initial(x, y, theta), m_pose(x, y, theta) { }
 
-void drwn::odometry_collector_t::odo_translate(pose_2D_t offset) {
+void drwn::odometry_collector_t::odo_translate(pose2d_t offset) {
     float dst = hypot(offset.x(), offset.y());
     float angle = atan2(offset.y(), offset.x());
     m_pose.set_x(m_pose.x() + (cos(m_pose.theta() + angle) * dst));
@@ -23,15 +23,15 @@ void drwn::odometry_collector_t::odo_translate(pose_2D_t offset) {
     m_pose.normalize_theta();
 }
 
-drwn::pose_2D_t drwn::odometry_collector_t::get_pose() const {
+drwn::pose2d_t drwn::odometry_collector_t::get_pose() const {
     return m_pose;
 }
 
-void drwn::odometry_collector_t::set_pose(drwn::pose_2D_t offset) {
+void drwn::odometry_collector_t::set_pose(drwn::pose2d_t offset) {
     m_pose = offset;
 }
 
-void drwn::odometry_collector_t::set_initial(drwn::pose_2D_t offset) {
+void drwn::odometry_collector_t::set_initial(drwn::pose2d_t offset) {
     m_initial = offset;
 }
 

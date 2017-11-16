@@ -127,8 +127,6 @@ namespace drwn {
 
         debug_mode_arguments_parsing_strategy_t m_arg_debug_all;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_application;
-        debug_mode_arguments_parsing_strategy_t m_arg_debug_ball_searcher;
-        debug_mode_arguments_parsing_strategy_t m_arg_debug_ball_tracker;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_game_controller;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_motion_manager;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_head;
@@ -140,10 +138,12 @@ namespace drwn {
         debug_mode_arguments_parsing_strategy_t m_arg_debug_camera;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_image_source;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_vision_processor;
+        debug_mode_arguments_parsing_strategy_t m_arg_debug_ball_tracker;
+        debug_mode_arguments_parsing_strategy_t m_arg_debug_ball_searcher;
+        debug_mode_arguments_parsing_strategy_t m_arg_debug_ball_follower;
+        debug_mode_arguments_parsing_strategy_t m_arg_debug_go_to;
 
         config_path_arguments_parsing_strategy_t m_arg_config_default;
-        config_path_arguments_parsing_strategy_t m_arg_config_ball_searcher;
-        config_path_arguments_parsing_strategy_t m_arg_config_ball_tracker;
         config_path_arguments_parsing_strategy_t m_arg_config_game_controller;
         config_path_arguments_parsing_strategy_t m_arg_config_motion_manager;
         config_path_arguments_parsing_strategy_t m_arg_config_head;
@@ -152,6 +152,10 @@ namespace drwn {
         config_path_arguments_parsing_strategy_t m_arg_config_kicking;
         config_path_arguments_parsing_strategy_t m_arg_config_image_source;
         config_path_arguments_parsing_strategy_t m_arg_config_white_ball_vision_processor;
+        config_path_arguments_parsing_strategy_t m_arg_config_ball_searcher;
+        config_path_arguments_parsing_strategy_t m_arg_config_ball_tracker;
+        config_path_arguments_parsing_strategy_t m_arg_config_ball_follower;
+        config_path_arguments_parsing_strategy_t m_arg_config_go_to;
 
         action_configuration_file_loader_t m_action_configuration_loader;
         white_ball_vision_processor_arguments_parsing_strategy_t m_arg_white_ball_vision_processor;

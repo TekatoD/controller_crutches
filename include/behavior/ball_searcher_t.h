@@ -9,24 +9,20 @@
 #include <vector>
 #include <math/point_t.h>
 
-#define FINDER_SECTION "Ball Searcher"
-
 namespace drwn {
     class ball_searcher_t {
     public:
-        ball_searcher_t();
+        static ball_searcher_t* get_instance();
 
-        void set_last_position(const point_2D_t& pos);
+        void set_last_position(const point2d_t& pos);
 
         void process();
 
-        void enable_walking();
-
-        void disable_walking();
+        void enable_walking(bool enabled);
 
         bool is_walking_enabled() const;
 
-        const point_2D_t& get_last_position() const;
+        const point2d_t& get_last_position() const;
 
         float get_tilt_phase_step() const;
 
@@ -52,11 +48,13 @@ namespace drwn {
 
         bool is_debug_enabled() const;
 
+    private:
+        ball_searcher_t();
 
     private:
         bool m_debug{false};
         bool m_active;
-        point_2D_t m_last_position;
+        point2d_t m_last_position;
 
         float m_tilt_phase;
         float m_pan_phase;

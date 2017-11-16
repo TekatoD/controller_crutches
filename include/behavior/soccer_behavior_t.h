@@ -4,6 +4,7 @@
 #pragma once
 
 
+#include <tool/rate_t.h>
 #include "behavior_t.h"
 
 namespace drwn {
@@ -21,6 +22,16 @@ namespace drwn {
     class game_controller_t;
 
     class soccer_behavior_t : public behavior_t {
+        enum class state_t {
+            UNKNOWN,
+            DISABLED,
+            IDLE,
+            STANDING_UP,
+            GO_TO_STARTING_POSITION,
+            KICK_OFF,
+            FINDING_BALL
+        };
+
     public:
         explicit soccer_behavior_t();
 
@@ -29,9 +40,22 @@ namespace drwn {
         ~soccer_behavior_t() override;
 
     private:
+
+        void process_decision();
+
+        void process_buttons();
+
+        void process_game_controller();
+
         void process_cv();
 
     private:
+        state_t m_state{state_t::UNKNOWN};
+
+        bool m_behavior_active{false};
+        steady_rate_t m_rate_processing_behavior{std::chrono::milliseconds(10)};
+        steady_rate_t m_rate_buttons_check{std::chrono::milliseconds(100)};
+
         camera_t* m_camera{nullptr};
         vision_t* m_vision{nullptr};
         head_t* m_head{nullptr};
@@ -44,6 +68,7 @@ namespace drwn {
         game_controller_t* m_game_controller{nullptr};
 
 
+        void check_rate();
     };
 }
 

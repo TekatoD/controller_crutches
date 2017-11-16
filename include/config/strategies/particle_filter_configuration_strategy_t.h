@@ -13,16 +13,16 @@ namespace drwn {
     public:
         static constexpr char DEFAULT_SECTION[] = "particle_filter";
 
-        explicit particle_filter_configuration_strategy_t(localization::particle_filter_t* pf_ptr, std::string section = DEFAULT_SECTION);
+        explicit particle_filter_configuration_strategy_t(drwn::particle_filter_t* pf_ptr = nullptr, std::string section = DEFAULT_SECTION);
 
         void read_config(const boost::property_tree::ptree& prop) override;
         void write_config(boost::property_tree::ptree& prop) const override;
 
-        void set_particle_filter(localization::particle_filter_t* pf_ptr);
-        localization::particle_filter_t* get_particle_filter() const;
+        void set_particle_filter(drwn::particle_filter_t* pf_ptr);
+        drwn::particle_filter_t* get_particle_filter() const;
 
     private:
-        localization::particle_filter_t* m_particle_filter{nullptr};
+        drwn::particle_filter_t* m_particle_filter{nullptr};
     };
 
 }

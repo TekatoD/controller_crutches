@@ -5,7 +5,7 @@
 #include <config/strategies/particle_filter_configuration_strategy_t.h>
 
 using namespace drwn;
-using namespace localization;
+using namespace drwn;
 
 particle_filter_configuration_strategy_t::particle_filter_configuration_strategy_t(particle_filter_t* pf_ptr, std::string section)
 : configuration_strategy_t(section), m_particle_filter(pf_ptr)

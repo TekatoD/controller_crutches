@@ -5,7 +5,7 @@
 #include <config/strategies/localization_field_configuration_strategy_t.h>
 
 using namespace drwn;
-using namespace localization;
+using namespace drwn;
 
 localization_field_configuration_strategy_t::localization_field_configuration_strategy_t(field_map_t* field_ptr, std::string section)
     : configuration_strategy_t(section), m_field_map(field_ptr)
@@ -37,12 +37,12 @@ void localization_field_configuration_strategy_t::write_config(boost::property_t
     //TODO: :^)
 }
 
-void localization_field_configuration_strategy_t::set_field_map(localization::field_map_t* field_ptr)
+void localization_field_configuration_strategy_t::set_field_map(drwn::field_map_t* field_ptr)
 {
     m_field_map = field_ptr;
 }
 
-localization::field_map_t* localization_field_configuration_strategy_t::get_field_map() const
+drwn::field_map_t* localization_field_configuration_strategy_t::get_field_map() const
 {
     return m_field_map;
 }

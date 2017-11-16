@@ -28,7 +28,7 @@ namespace drwn {
 
         void update();
 
-        bool game_controller_not_responding() const;
+        bool not_responding() const;
 
         bool connect();
 
@@ -58,9 +58,9 @@ namespace drwn {
 
 
     public:
-        int player_number;
-        int team_number;
-        robo_cup_game_control_data_t game_ctrl_data;
+        int m_player_number;
+        int m_team_number;
+        robo_cup_game_control_data_t m_game_ctrl_data;
 
     private:
         explicit game_controller_t(int player_num = 0, int team_num = 0);

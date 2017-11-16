@@ -306,7 +306,6 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_leds.set_option("dbg-kicking", "enable debug output for LEDs");
     m_arg_debug_camera.set_option("dbg-camera", "enable debug output for camera");
     m_arg_debug_vision_processor.set_option("dbg-cv", "enable debug output for cv");
-#ifdef CROSSCOMPILE
     m_arg_debug_image_source.set_option("dbg-img-source", "enabled debug output for image source");
     m_arg_debug_ball_searcher.set_option("dbg-ball-searcher", "enable debug output for ball searcher");
     m_arg_debug_ball_tracker.set_option("dbg-ball-tracker", "enable debug output for ball tracker");
@@ -321,7 +320,6 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_config_kicking.set_option("cfg-kicking", "config file for kicking motion module");
     m_arg_config_action.set_option("cfg-action", "path to motion_4096.bin");
     m_arg_config_white_ball_vision_processor.set_option("cfg-cv", "path to cv config");
-#ifdef CROSSCOMPILE
     m_arg_config_image_source.set_option("cfg-image-source", "config file for image source");
     m_arg_config_ball_tracker.set_option("cfg-ball-tracker", "config file for ball tracker");
     m_arg_config_ball_searcher.set_option("cfg-ball-searcher", "config file for ball searcher");

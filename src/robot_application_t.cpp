@@ -165,7 +165,7 @@ void robot_application_t::check_firmware() {
 
 void robot_application_t::init_cv() {
     if (m_debug) LOG_DEBUG << "Initializing camera...";
-#ifdef CROSSCOMPILATION
+#ifdef CROSSCOMPILE
     auto image_source = std::make_unique<robot_image_source_t>(camera_t::WIDTH, camera_t::HEIGHT);
 #else
     auto image_source = std::make_unique<vrep_image_source_t>("camera", camera_t::WIDTH, camera_t::HEIGHT);
@@ -241,7 +241,7 @@ void robot_application_t::init_configuraion_loader() {
     m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy,
                                         m_arg_config_white_ball_vision_processor);
 
-#ifdef CROSSCOMPILATION
+#ifdef CROSSCOMPILE
     m_robot_image_source_configuration_strategy.set_image_source(m_image_source.get());
     m_configuration_loader.add_strategy(m_robot_image_source_configuration_strategy, m_arg_config_image_source);
 #endif
@@ -304,7 +304,7 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_leds.set_option("dbg-kicking", "enable debug output for LEDs");
     m_arg_debug_camera.set_option("dbg-camera", "enable debug output for camera");
     m_arg_debug_vision_processor.set_option("dbg-cv", "enable debug output for cv");
-#ifdef CROSSCOMPILATION
+#ifdef CROSSCOMPILE
     m_arg_debug_image_source.set_option("dbg-img-source", "enabled debug output for image source");
 #endif
 
@@ -318,7 +318,7 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_config_kicking.set_option("cfg-kicking", "config file for kicking motion module");
     m_arg_config_action.set_option("cfg-action", "path to motion_4096.bin");
     m_arg_config_white_ball_vision_processor.set_option("cfg-cv", "path to cv config");
-#ifdef CROSSCOMPILATION
+#ifdef CROSSCOMPILE
     m_arg_config_image_source.set_option("cfg-image-source", "config file for image source");
 #endif
 

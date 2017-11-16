@@ -53,8 +53,8 @@ void head_t::check_limit() {
 
 
 void head_t::initialize() {
-    m_pan_angle = motion_status_t::m_current_joints.set_angle(joint_data_t::ID_HEAD_PAN);
-    m_tilt_angle = -motion_status_t::m_current_joints.set_angle(joint_data_t::ID_HEAD_TILT);
+    m_pan_angle = motion_status_t::current_joints.set_angle(joint_data_t::ID_HEAD_PAN);
+    m_tilt_angle = -motion_status_t::current_joints.set_angle(joint_data_t::ID_HEAD_TILT);
     check_limit();
 
     init_tracking();
@@ -199,7 +199,7 @@ void head_t::init_tracking() {
 }
 
 
-void head_t::move_tracking(point_2D_t err) {
+void head_t::move_tracking(point2d_t err) {
     m_Pan_err_diff = err.X - m_Pan_err;
     m_Pan_err = err.X;
 

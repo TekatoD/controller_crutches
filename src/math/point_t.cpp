@@ -11,141 +11,141 @@
 using namespace drwn;
 
 
-point_2D_t::point_2D_t() {
+point2d_t::point2d_t() {
     X = 0;
     Y = 0;
 }
 
 
-point_2D_t::point_2D_t(float x, float y) {
+point2d_t::point2d_t(float x, float y) {
     X = x;
     Y = y;
 }
 
 
-point_2D_t::point_2D_t(const point_2D_t& point) {
+point2d_t::point2d_t(const point2d_t& point) {
     X = point.X;
     Y = point.Y;
 }
 
 
-point_2D_t::~point_2D_t() {
+point2d_t::~point2d_t() {
 }
 
 
 /*returns the euclidian distance between pt1 and pt2*/
-float point_2D_t::Distance(point_2D_t& pt1, point_2D_t& pt2) {
+float point2d_t::Distance(point2d_t& pt1, point2d_t& pt2) {
     float x = pt1.X - pt2.X;
     float y = pt1.Y - pt2.Y;
     return sqrt(x * x + y * y);
 }
 
 
-point_2D_t& point_2D_t::operator=(const point_2D_t& point) {
+point2d_t& point2d_t::operator=(const point2d_t& point) {
     X = point.X;
     Y = point.Y;
     return *this;
 }
 
 
-point_2D_t& point_2D_t::operator+=(const point_2D_t& point) {
+point2d_t& point2d_t::operator+=(const point2d_t& point) {
     X += point.X;
     Y += point.Y;
     return *this;
 }
 
 
-point_2D_t& point_2D_t::operator-=(const point_2D_t& point) {
+point2d_t& point2d_t::operator-=(const point2d_t& point) {
     X -= point.X;
     Y -= point.Y;
     return *this;
 }
 
 
-point_2D_t& point_2D_t::operator+=(float value) {
+point2d_t& point2d_t::operator+=(float value) {
     X += value;
     Y += value;
     return *this;
 }
 
 
-point_2D_t& point_2D_t::operator-=(float value) {
+point2d_t& point2d_t::operator-=(float value) {
     X -= value;
     Y -= value;
     return *this;
 }
 
 
-point_2D_t& point_2D_t::operator*=(float value) {
+point2d_t& point2d_t::operator*=(float value) {
     X *= value;
     Y *= value;
     return *this;
 }
 
 
-point_2D_t& point_2D_t::operator/=(float value) {
+point2d_t& point2d_t::operator/=(float value) {
     X /= value;
     Y /= value;
     return *this;
 }
 
 
-point_2D_t point_2D_t::operator+(const point_2D_t& point) {
-    return point_2D_t(X + point.X, Y + point.Y);
+point2d_t point2d_t::operator+(const point2d_t& point) {
+    return point2d_t(X + point.X, Y + point.Y);
 }
 
 
-point_2D_t point_2D_t::operator-(const point_2D_t& point) {
-    return point_2D_t(X - point.X, Y - point.Y);
+point2d_t point2d_t::operator-(const point2d_t& point) {
+    return point2d_t(X - point.X, Y - point.Y);
 }
 
 
-point_2D_t point_2D_t::operator+(float value) {
-    return point_2D_t(X + value, Y + value);
+point2d_t point2d_t::operator+(float value) {
+    return point2d_t(X + value, Y + value);
 }
 
 
-point_2D_t point_2D_t::operator-(float value) {
-    return point_2D_t(X - value, Y - value);
+point2d_t point2d_t::operator-(float value) {
+    return point2d_t(X - value, Y - value);
 }
 
 
-point_2D_t point_2D_t::operator*(float value) {
-    return point_2D_t(X * value, Y * value);
+point2d_t point2d_t::operator*(float value) {
+    return point2d_t(X * value, Y * value);
 }
 
 
-point_2D_t point_2D_t::operator/(float value) {
-    return point_2D_t(X / value, Y / value);
+point2d_t point2d_t::operator/(float value) {
+    return point2d_t(X / value, Y / value);
 }
 
 
-point_3D_t::point_3D_t() {
+point3d_t::point3d_t() {
     X = 0;
     Y = 0;
     Z = 0;
 }
 
 
-point_3D_t::point_3D_t(float x, float y, float z) {
+point3d_t::point3d_t(float x, float y, float z) {
     X = x;
     Y = y;
     Z = z;
 }
 
 
-point_3D_t::point_3D_t(const point_3D_t& point) {
+point3d_t::point3d_t(const point3d_t& point) {
     X = point.X;
     Y = point.Y;
     Z = point.Z;
 }
 
 
-point_3D_t::~point_3D_t() {
+point3d_t::~point3d_t() {
 }
 
 
-float point_3D_t::Distance(const point_3D_t& pt1, const point_3D_t& pt2) {
+float point3d_t::Distance(const point3d_t& pt1, const point3d_t& pt2) {
     float x = pt1.X - pt2.X;
     float y = pt1.Y - pt2.Y;
     float z = pt1.Z - pt2.Z;
@@ -153,7 +153,7 @@ float point_3D_t::Distance(const point_3D_t& pt1, const point_3D_t& pt2) {
 }
 
 
-point_3D_t& point_3D_t::operator=(const point_3D_t& point) {
+point3d_t& point3d_t::operator=(const point3d_t& point) {
     X = point.X;
     Y = point.Y;
     Z = point.Z;
@@ -161,7 +161,7 @@ point_3D_t& point_3D_t::operator=(const point_3D_t& point) {
 }
 
 
-point_3D_t& point_3D_t::operator+=(const point_3D_t& point) {
+point3d_t& point3d_t::operator+=(const point3d_t& point) {
     X += point.X;
     Y += point.Y;
     Z += point.Z;
@@ -169,7 +169,7 @@ point_3D_t& point_3D_t::operator+=(const point_3D_t& point) {
 }
 
 
-point_3D_t& point_3D_t::operator-=(const point_3D_t& point) {
+point3d_t& point3d_t::operator-=(const point3d_t& point) {
     X -= point.X;
     Y -= point.Y;
     Z -= point.Z;
@@ -177,7 +177,7 @@ point_3D_t& point_3D_t::operator-=(const point_3D_t& point) {
 }
 
 
-point_3D_t& point_3D_t::operator+=(float value) {
+point3d_t& point3d_t::operator+=(float value) {
     X += value;
     Y += value;
     Z += value;
@@ -185,7 +185,7 @@ point_3D_t& point_3D_t::operator+=(float value) {
 }
 
 
-point_3D_t& point_3D_t::operator-=(float value) {
+point3d_t& point3d_t::operator-=(float value) {
     X -= value;
     Y -= value;
     Z -= value;
@@ -193,7 +193,7 @@ point_3D_t& point_3D_t::operator-=(float value) {
 }
 
 
-point_3D_t& point_3D_t::operator*=(float value) {
+point3d_t& point3d_t::operator*=(float value) {
     X *= value;
     Y *= value;
     Z *= value;
@@ -201,7 +201,7 @@ point_3D_t& point_3D_t::operator*=(float value) {
 }
 
 
-point_3D_t& point_3D_t::operator/=(float value) {
+point3d_t& point3d_t::operator/=(float value) {
     X /= value;
     Y /= value;
     Z /= value;
@@ -209,31 +209,31 @@ point_3D_t& point_3D_t::operator/=(float value) {
 }
 
 
-point_3D_t point_3D_t::operator+(const point_3D_t& point) {
-    return point_3D_t(X + point.X, Y + point.Y, Z + point.Z);
+point3d_t point3d_t::operator+(const point3d_t& point) {
+    return point3d_t(X + point.X, Y + point.Y, Z + point.Z);
 }
 
 
-point_3D_t point_3D_t::operator-(const point_3D_t& point) {
-    return point_3D_t(X - point.X, Y - point.Y, Z - point.Z);
+point3d_t point3d_t::operator-(const point3d_t& point) {
+    return point3d_t(X - point.X, Y - point.Y, Z - point.Z);
 }
 
 
-point_3D_t point_3D_t::operator+(float value) {
-    return point_3D_t(X + value, Y + value, Z + value);
+point3d_t point3d_t::operator+(float value) {
+    return point3d_t(X + value, Y + value, Z + value);
 }
 
 
-point_3D_t point_3D_t::operator-(float value) {
-    return point_3D_t(X - value, Y - value, Z - value);
+point3d_t point3d_t::operator-(float value) {
+    return point3d_t(X - value, Y - value, Z - value);
 }
 
 
-point_3D_t point_3D_t::operator*(float value) {
-    return point_3D_t(X * value, Y * value, Z * value);
+point3d_t point3d_t::operator*(float value) {
+    return point3d_t(X * value, Y * value, Z * value);
 }
 
 
-point_3D_t point_3D_t::operator/(float value) {
-    return point_3D_t(X / value, Y / value, Z / value);
+point3d_t point3d_t::operator/(float value) {
+    return point3d_t(X / value, Y / value, Z / value);
 }

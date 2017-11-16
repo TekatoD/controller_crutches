@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include <ball_tracker_t.h>
+#include <behavior/ball_tracker_t.h>
 #include "config/configuration_strategy_t.h"
 
 namespace drwn {
@@ -14,13 +14,10 @@ namespace drwn {
 
         static constexpr char DEFAULT_SECTION[] = "Ball Tracker";
 
-        explicit ball_tracker_configuration_strategy_t(ball_tracker_t* ball_tracker = nullptr, std::string section = DEFAULT_SECTION);
+        explicit ball_tracker_configuration_strategy_t(std::string section = DEFAULT_SECTION);
 
         void read_config(const boost::property_tree::ptree& prop) override;
 
         void write_config(boost::property_tree::ptree& prop) const override;
-
-    private:
-        ball_tracker_t* m_ball_tracker{nullptr};
     };
 }

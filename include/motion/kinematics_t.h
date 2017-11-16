@@ -17,11 +17,11 @@ namespace drwn {
     public:
         static bool compute_leg_inverse_kinematics(float* out, float x, float y, float z, float a, float b, float c);
 
-        static void compute_leg_forward_kinematics(matrix_4x4f_t& out, float pelvis, float tight_roll,
+        static void compute_leg_forward_kinematics(matrix4x4f_t& out, float pelvis, float tight_roll,
                                                    float tight_pitch,
                                                    float knee_pitch, float ankle_pitch, float ankle_roll);
 
-        static void compute_head_forward_kinematics(matrix_4x4f_t& out, float pan, float tilt);
+        static void compute_head_forward_kinematics(matrix4x4f_t& out, float pan, float tilt);
 
     public:
         static constexpr float CAMERA_OFFSET_X = 33.2f; //mm

@@ -1,12 +1,15 @@
 #pragma once
 
 
+#include <chrono>
+
 namespace drwn {
-    template<class clock>
+    template<class Clock>
     class rate_t {
     public:
-        using duration = typename clock::duration;
-        using time_point = typename clock::time_point;
+        using clock = Clock;
+        using duration = typename Clock::duration;
+        using time_point = typename Clock::time_point;
 
         explicit rate_t(duration dur = duration(),
                       time_point tp = time_point())
@@ -29,17 +32,21 @@ namespace drwn {
         }
 
         void update() {
-            m_next_tp = clock::now() + m_dur;
+            m_next_tp = Clock::now() + m_dur;
         }
 
         bool is_passed() const noexcept {
-            return clock::now() >= m_next_tp;
+            return Clock::now() >= m_next_tp;
         }
 
     private:
         duration m_dur;
         time_point m_next_tp;
     };
+
+    using system_rate_t = rate_t<std::chrono::system_clock>;
+    using steady_rate_t = rate_t<std::chrono::steady_clock>;
+    using high_resolution_rate_t = rate_t<std::chrono::high_resolution_clock>;
 }
 
 

@@ -4,7 +4,7 @@
  * @author Armin Burchardt
  */
 
-#include "udp_comm_t.h"
+#include "game_controller/udp_comm_t.h"
 
 #include <iostream>
 #include <cassert>

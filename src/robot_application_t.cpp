@@ -8,6 +8,7 @@
 #include <vision/vision_t.h>
 #include <behavior/image_processing_behavior_t.h>
 #include <behavior/soccer_behavior_t.h>
+#include <behavior/ball_follower_t.h>
 #include "log/trivial_logger_t.h"
 #include "motion/motion_manager_t.h"
 #include "game_controller/game_controller_t.h"
@@ -232,14 +233,15 @@ void robot_application_t::init_configuraion_loader() {
     //TODO Don't forget uncomment this lines
     m_white_ball_vision_processor_configuration_strategy.set_white_ball_vision_processor(m_vision_processor.get());
     m_configuration_loader.set_default_path(m_arg_config_default);
-//    m_configuration_loader.add_strategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
-//    m_configuration_loader.add_strategy(m_ball_tracker_configuration_strategy, m_arg_config_ball_searcher);
     m_configuration_loader.add_strategy(m_game_controller_configuration_strategy, m_arg_config_game_controller);
     m_configuration_loader.add_strategy(m_head_configuration_strategy, m_arg_config_head);
     m_configuration_loader.add_strategy(m_walking_configuration_strategy, m_arg_config_walking);
     m_configuration_loader.add_strategy(m_motion_manager_configuration_strategy, m_arg_config_motion_manager);
     m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy,
                                         m_arg_config_white_ball_vision_processor);
+    m_configuration_loader.add_strategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
+    m_configuration_loader.add_strategy(m_ball_tracker_configuration_strategy, m_arg_config_ball_searcher);
+    m_configuration_loader.add_strategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
 
 #ifdef CROSSCOMPILE
     m_robot_image_source_configuration_strategy.set_image_source(m_image_source.get());
@@ -260,8 +262,6 @@ void robot_application_t::parse_command_line_arguments() {
 
     parser.add_strategy(m_arg_debug_all);
     parser.add_strategy(m_arg_debug_application);
-    parser.add_strategy(m_arg_debug_ball_searcher);
-    parser.add_strategy(m_arg_debug_ball_tracker);
     parser.add_strategy(m_arg_debug_game_controller);
     parser.add_strategy(m_arg_debug_motion_manager);
     parser.add_strategy(m_arg_debug_head);
@@ -273,6 +273,10 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_debug_image_source);
     parser.add_strategy(m_arg_debug_camera);
     parser.add_strategy(m_arg_debug_vision_processor);
+    parser.add_strategy(m_arg_debug_ball_searcher);
+    parser.add_strategy(m_arg_debug_ball_tracker);
+    parser.add_strategy(m_arg_debug_ball_follower);
+    parser.add_strategy(m_arg_debug_go_to);
 
     parser.add_strategy(m_arg_config_default);
     parser.add_strategy(m_arg_config_ball_searcher);
@@ -292,8 +296,6 @@ void robot_application_t::parse_command_line_arguments() {
 
     m_arg_debug_all.set_option("dbg-all,d", "enable debug output for all components");
     m_arg_debug_application.set_option("dbg-app", "enable debug output for main application");
-    m_arg_debug_ball_searcher.set_option("dbg-ball-searcher", "enable debug output for ball searcher");
-    m_arg_debug_ball_tracker.set_option("dbg-ball-tracker", "enable debug output for ball tracker");
     m_arg_debug_game_controller.set_option("dbg-game-contoller", "enable debug output for game controller");
     m_arg_debug_motion_manager.set_option("dbg-motion-manager", "enable debug output for motion manager");
     m_arg_debug_head.set_option("dbg-head", "enable debug output for head motion module");
@@ -306,11 +308,12 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_vision_processor.set_option("dbg-cv", "enable debug output for cv");
 #ifdef CROSSCOMPILE
     m_arg_debug_image_source.set_option("dbg-img-source", "enabled debug output for image source");
-#endif
+    m_arg_debug_ball_searcher.set_option("dbg-ball-searcher", "enable debug output for ball searcher");
+    m_arg_debug_ball_tracker.set_option("dbg-ball-tracker", "enable debug output for ball tracker");
+    m_arg_debug_ball_follower.set_option("dbg-ball-follower", "enable debug output for ball follower");
+    m_arg_debug_go_to.set_option("dbg-go-to", "enable debug output for go to component");
 
     m_arg_config_default.set_option("cfg,c", "default config file (res/config.ini by default)");
-    m_arg_config_ball_tracker.set_option("cfg-ball-tracker", "config file for ball tracker");
-    m_arg_config_ball_searcher.set_option("cfg-ball-searcher", "config file for ball searcher");
     m_arg_config_game_controller.set_option("cfg-game-controller", "config file for game controller");
     m_arg_config_motion_manager.set_option("cfg-motion-manager", "config file for motion manager");
     m_arg_config_head.set_option("cfg-head", "config file for head motion module");
@@ -320,7 +323,10 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_config_white_ball_vision_processor.set_option("cfg-cv", "path to cv config");
 #ifdef CROSSCOMPILE
     m_arg_config_image_source.set_option("cfg-image-source", "config file for image source");
-#endif
+    m_arg_config_ball_tracker.set_option("cfg-ball-tracker", "config file for ball tracker");
+    m_arg_config_ball_searcher.set_option("cfg-ball-searcher", "config file for ball searcher");
+    m_arg_config_ball_follower.set_option("cfg-ball-follower", "config file for ball follower");
+    m_arg_config_go_to.set_option("cfg-go-to", "config file for go to component");
 
 
     if (!parser.parse() || m_arg_help_requested.is_help_requested()) {
@@ -331,8 +337,6 @@ void robot_application_t::parse_command_line_arguments() {
 void robot_application_t::apply_debug_arguments() {
     if (m_arg_debug_all || m_arg_debug_application)
         enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_ball_searcher); // TODO Enable debug for ball searcher
-    if (m_arg_debug_all || m_arg_debug_ball_tracker); // TODO Setting debug for ball tracker
     if (m_arg_debug_all || m_arg_debug_game_controller)
         game_controller_t::get_instance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_motion_manager)
@@ -351,6 +355,12 @@ void robot_application_t::apply_debug_arguments() {
         LEDs_t::get_instance()->enable_debug(true);
     if (m_arg_debug_all || m_arg_debug_camera)
         camera_t::get_instance()->enable_debug(true);
+    if (m_arg_debug_all || m_arg_debug_ball_searcher)
+        ball_searcher_t::get_instance()->enable_debug(true);
+    if (m_arg_debug_all || m_arg_debug_ball_tracker)
+        ball_tracker_t::get_instance()->enable_debug(true);
+    if (m_arg_debug_all  || m_arg_debug_ball_follower)
+        ball_follower_t::get_instance()->enable_debug(true);
     // Image source debug placed located in init_cv
 }
 

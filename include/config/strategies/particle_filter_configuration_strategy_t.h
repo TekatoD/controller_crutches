@@ -11,7 +11,7 @@ namespace drwn {
 
     class particle_filter_configuration_strategy_t : public configuration_strategy_t {
     public:
-        static constexpr char DEFAULT_SECTION[] = "particle_filter";
+        static constexpr char DEFAULT_SECTION[] = "Particle filter";
 
         explicit particle_filter_configuration_strategy_t(drwn::particle_filter_t* pf_ptr = nullptr, std::string section = DEFAULT_SECTION);
 

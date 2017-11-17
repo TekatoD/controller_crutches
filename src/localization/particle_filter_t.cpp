@@ -4,11 +4,10 @@
 #include "localization/particle_filter_t.h"
 
 using namespace drwn;
-using namespace drwn;
 
 particle_filter_t::particle_filter_t()
 {
-    initialize();
+
 }
 
 void particle_filter_t::initialize()
@@ -41,6 +40,8 @@ void particle_filter_t::initialize()
 
 void particle_filter_t::predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise)
 {
+    assert(m_particle.size() != 0);
+
     for (auto& particle : m_particles) {
         particle.pose = odometry_sample(particle.pose, command, noise);
     }
@@ -65,6 +66,8 @@ std::tuple<field_map_t::line_type_t, point_2D_t> particle_filter_t::calc_expecte
 
 void particle_filter_t::correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise)
 {
+    assert(m_particles.size() != 0);
+
     float weight_normalizer = 0.0f;
     for (auto& particle : m_particles) {
         if (measurements.size() < 1) {
@@ -410,4 +413,6 @@ bool particle_filter_t::is_debug_enabled() const {
 
 void particle_filter_t::enable_debug(bool debug) {
     m_debug = debug;
+    m_fieldWorld.enable_debug(debug);
 }
+

@@ -15,6 +15,7 @@
 #include "motion/modules/walking_t.h"
 #include "motion/modules/head_t.h"
 #include "localization/particle_filter_t.h"
+#include "localization/localization_t.h"
 #include "robot_application_t.h"
 
 #ifdef CROSSCOMPILE
@@ -173,8 +174,9 @@ void robot_application_t::init_localization() {
     auto particle_filter = std::make_unique<particle_filter_t>();
     m_particle_filter = std::move(particle_filter);
 
+    localization_t::get_instance()->set_particle_filter(m_particle_filter.get());
     if (m_arg_debug_all || m_arg_debug_localization) {
-        m_particle_filter->enable_debug(true);
+        localization_t::get_instance()->enable_debug(true);
     }
 
     if (m_debug) LOG_INFO << "Localization is ready";
@@ -187,6 +189,7 @@ void robot_application_t::init_motion_manager() {
     }
     if (m_debug) LOG_INFO << "Motion manager is ready";
 }
+
 
 void robot_application_t::init_motion_modules() {
     if (m_debug) LOG_DEBUG << "Initializing motion modules...";
@@ -310,6 +313,8 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_config_kicking.set_option("cfg-kicking", "config file for kicking motion module");
     m_arg_config_action.set_option("cfg-action", "path to motion_4096.bin");
     m_arg_config_white_ball_vision_processor.set_option("cfg-cv", "path to cv config");
+    m_arg_config_localization_field.set_option("cfg-loc-field", "path to localization field config");
+    m_arg_config_particle_filter.set_option("cfg-pf", "path to particle filter config");
 
 #ifdef CROSSCOMPILATION
     m_arg_debug_image_source.set_option("dbg-img-source", "enabled debut output for image source");
@@ -348,6 +353,7 @@ void robot_application_t::apply_debug_arguments() {
     if (m_arg_debug_all || m_arg_debug_camera)
         camera_t::get_instance()->enable_debug(true);
     // Image source debug placed located in init_cv
+    // Localization debug is in init_localization
 }
 
 void robot_application_t::read_configuration() {

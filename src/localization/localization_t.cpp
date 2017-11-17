@@ -23,7 +23,7 @@ void localization_t::set_pose_shift(pose_2D_t pose_shift)
 
 void localization_t::set_lines(std::vector<cv::Vec4i> lines)
 {
-
+//
 }
 
 void localization_t::update()
@@ -90,6 +90,16 @@ pose_2D_t localization_t::get_calculated_pose_std_dev()
 {
     assert(m_particle_filter != nullptr);
     return m_particle_filter->get_pose_std_dev();
+}
+
+bool localization_t::is_debug_enabled() const {
+    return m_debug;
+}
+
+void localization_t::enable_debug(bool debug) {
+    assert(m_particle_filter != nullptr);
+    m_debug = debug;
+    m_particle_filter->enable_debug(debug);
 }
 
 

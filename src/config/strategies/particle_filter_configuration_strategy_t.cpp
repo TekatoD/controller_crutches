@@ -5,17 +5,18 @@
 #include <config/strategies/particle_filter_configuration_strategy_t.h>
 
 using namespace drwn;
-using namespace drwn;
 
 particle_filter_configuration_strategy_t::particle_filter_configuration_strategy_t(particle_filter_t* pf_ptr, std::string section)
-: configuration_strategy_t(section), m_particle_filter(pf_ptr)
+: configuration_strategy_t(std::move(section)), m_particle_filter(pf_ptr)
 {
 
 }
 
 void particle_filter_configuration_strategy_t::read_config(const boost::property_tree::ptree& prop)
 {
-    if (m_particle_filter == nullptr) { return; }
+    if (m_particle_filter == nullptr) {
+        throw std::runtime_error{"Localization configuration load failure: m_particle_filter nullptr"};
+    }
     if (prop.count(this->get_section()) == 0) { return; }
 
     auto& section = prop.get_child(this->get_section());

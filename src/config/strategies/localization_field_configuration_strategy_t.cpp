@@ -5,16 +5,18 @@
 #include <config/strategies/localization_field_configuration_strategy_t.h>
 
 using namespace drwn;
-using namespace drwn;
 
 localization_field_configuration_strategy_t::localization_field_configuration_strategy_t(field_map_t* field_ptr, std::string section)
-    : configuration_strategy_t(section), m_field_map(field_ptr)
+    : configuration_strategy_t(std::move(section)), m_field_map(field_ptr)
 {
 }
 
 void localization_field_configuration_strategy_t::read_config(const boost::property_tree::ptree& prop)
 {
-    if (m_field_map == nullptr) { return; }
+    if (m_field_map == nullptr) {
+        throw std::runtime_error{"Localization configuration load failure: m_field_map nullptr"};
+    }
+
     if (prop.count(this->get_section()) == 0) { return; }
 
     auto& section = prop.get_child(this->get_section());

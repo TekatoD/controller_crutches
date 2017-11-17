@@ -44,6 +44,13 @@ namespace drwn {
     private:
         localization_t();
 
+        bool m_debug;
+    public:
+        bool is_debug_enabled() const;
+
+        void enable_debug(bool debug);
+
+    private:
         particle_filter_t* m_particle_filter;
 
         // TODO: camera_params move to hw

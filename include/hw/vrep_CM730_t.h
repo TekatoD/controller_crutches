@@ -34,8 +34,6 @@ namespace drwn {
         //Note: This works only with joints
         int sync_write(int start_addr, int each_length, int number, int* pParam);
 
-        void DumpJoints(std::string file_name, int start_addr, int each_length, int number, int *pParam);
-
         int read_word(int id, int address, int* pValue, int* error);
 
         int bulk_read();

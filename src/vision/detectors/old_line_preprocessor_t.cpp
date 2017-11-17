@@ -2,6 +2,7 @@
 /// \date 11/2/17
 
 #include <cv.hpp>
+#include <boost/math/constants/constants.hpp>
 #include "vision/detectors/old_line_preprocessor_t.h"
 
 using namespace drwn;
@@ -13,7 +14,7 @@ cv::Mat old_line_preprocessor_t::preprocess(const cv::Mat& img) const {
     cv::cvtColor(bgr_img, gray_img, CV_BGR2GRAY);
     cv::cvtColor(bgr_img, hsv_img, CV_BGR2HSV);
 
-    const cv::Mat kernel = cv::getGaborKernel(cv::Size(3, 3), 10.0, 4.1, M_PI, 0.0);
+    const cv::Mat kernel = cv::getGaborKernel(cv::Size(3, 3), 10.0, 4.1, boost::math::constants::pi<float>(), 0.0);
     cv::Mat filtred_image, thresh_filt_image;
     cv::filter2D(bgr_img, filtred_image, -1, kernel);
     cv::cvtColor(filtred_image, buffer, CV_BGR2Lab);

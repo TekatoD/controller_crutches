@@ -143,8 +143,8 @@ void soccer_behavior_t::process_decision() {
                 float x_bot = 0; // = x_top - m_Field.GetGateWidth();
 
                 float pan = motion_status_t::current_joints.get_angle(joint_data_t::ID_HEAD_PAN);
-                float angle_top = 0; // = (atan2f(m_Field.GetLength() - Odo.Y(), x_top - Odo.X()) - Odo.Theta()) / M_PI * 180.0;
-                float angle_bot = 0; // = (atan2f(m_Field.GetLength() - Odo.Y(), x_bot - Odo.X()) - Odo.Theta()) / M_PI * 180.0;
+                float angle_top = 0; // = (atan2f(m_Field.GetLength() - Odo.Y(), x_top - Odo.X()) - Odo.Theta()) / boost::math::constants::pi<float>() * 180.0;
+                float angle_bot = 0; // = (atan2f(m_Field.GetLength() - Odo.Y(), x_bot - Odo.X()) - Odo.Theta()) / boost::math::constants::pi<float>() * 180.0;
                 angle_bot -= pan;
                 angle_top -= pan;
 

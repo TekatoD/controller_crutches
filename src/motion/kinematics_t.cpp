@@ -8,6 +8,7 @@
 #include <cmath>
 #include <math/angle_tools.h>
 #include <iostream>
+#include <boost/math/constants/constants.hpp>
 #include "motion/kinematics_t.h"
 
 using namespace drwn;
@@ -51,7 +52,7 @@ bool kinematics_t::compute_leg_inverse_kinematics(float* out, float x, float y, 
             acosf((offset_sqr + THIGH_LENGTH * THIGH_LENGTH - CALF_LENGTH * CALF_LENGTH) /
                           (2.0f * THIGH_LENGTH * offset_dist));
     // Knee pitch
-    out[3] = pi - acosf((THIGH_LENGTH * THIGH_LENGTH + CALF_LENGTH * CALF_LENGTH - offset_sqr) /
+    out[3] = boost::math::constants::pi<float>() - acosf((THIGH_LENGTH * THIGH_LENGTH + CALF_LENGTH * CALF_LENGTH - offset_sqr) /
                               (2.0f * THIGH_LENGTH * CALF_LENGTH));
     // Ankle pitch
     out[4] = -out[3] - out[2] - b;

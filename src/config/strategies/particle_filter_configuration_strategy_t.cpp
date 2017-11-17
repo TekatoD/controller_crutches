@@ -44,6 +44,8 @@ void particle_filter_configuration_strategy_t::read_config(const boost::property
     if (max_x) { m_particle_filter->set_max_x(max_x.get()); }
     if (max_y) { m_particle_filter->set_max_y(max_y.get()); }
     if (max_theta) { m_particle_filter->set_max_theta(max_theta.get()); }
+
+    m_particle_filter->initialize();
 }
 
 void particle_filter_configuration_strategy_t::write_config(boost::property_tree::ptree& prop) const

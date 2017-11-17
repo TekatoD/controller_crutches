@@ -9,6 +9,8 @@
 namespace drwn {
     namespace vision_utils {
         struct camera_parameters_t {
+            float width {320.0f}, height {240.0}, fov {46.0f};
+
             /*
              * Intrinsic calibration parameters (camera to image coordinates transform)
              */
@@ -39,6 +41,13 @@ namespace drwn {
             {
                 set_extrinsic_parameters(R, t);
                 set_intrinsic_parameters(f, a, s, cx, cy);
+            }
+
+            void set_general_parameters(float width, float height, float fov)
+            {
+                this->width = width;
+                this->height = height;
+                this->fov = fov;
             }
 
             void set_intrinsic_parameters(float f, float a = 1.0f, float s = 0.0f, float cx = 0.0f, float cy = 0.0f)

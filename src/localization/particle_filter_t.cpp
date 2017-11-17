@@ -7,7 +7,7 @@ using namespace drwn;
 
 particle_filter_t::particle_filter_t()
 {
-
+    initialize();
 }
 
 void particle_filter_t::initialize()
@@ -40,7 +40,7 @@ void particle_filter_t::initialize()
 
 void particle_filter_t::predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise)
 {
-    assert(m_particle.size() != 0);
+    assert(!m_particles.empty());
 
     for (auto& particle : m_particles) {
         particle.pose = odometry_sample(particle.pose, command, noise);
@@ -66,7 +66,7 @@ std::tuple<field_map_t::line_type_t, point2d_t> particle_filter_t::calc_expected
 
 void particle_filter_t::correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise)
 {
-    assert(m_particles.size() != 0);
+    assert(m_particles.empty());
 
     float weight_normalizer = 0.0f;
     for (auto& particle : m_particles) {
@@ -159,7 +159,7 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
     
     // While debugging
     if (weight_normalizer < 0.00001) {
-        std::cout << "!!! weight normalizer is too close to 0 !!!" << std::endl;
+        if (m_debug) LOG_INFO << "PARTICLE FILTER: Normalizer is close to zero";
     }
     
     float highestWeight = 0.0f;
@@ -302,6 +302,7 @@ void particle_filter_t::calc_pose_mean_cov()
     
     // DEBUG
     // Sometimes reset particles around current mean
+    /*
     pose2d_t nmz;
     if (m_poseDev.x() > 200.0f || m_poseDev.y() > 200.0f || m_poseDev.theta() > 10.0f) {
         std::cout << "======================== REGENERATING PARTICLES ===========================" << std::endl;
@@ -315,8 +316,8 @@ void particle_filter_t::calc_pose_mean_cov()
         nmz.set_theta(m_poseMean.theta() + (m_poseDev.theta() * (M_PI / 180.0f)));
         max_theta = nmz.theta();
         init_particles(min_x, max_x, min_y, max_y, min_theta, max_theta, m_particles.size());
-    }    
-    
+    }
+    */
 }
 
 
@@ -414,5 +415,22 @@ bool particle_filter_t::is_debug_enabled() const {
 void particle_filter_t::enable_debug(bool debug) {
     m_debug = debug;
     m_fieldWorld.enable_debug(debug);
+}
+
+void particle_filter_t::reset_pose(const pose2d_t& pose) {
+    if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: resetting particles to pose = " << pose;
+    init_particles(pose, m_particles.size());
+}
+
+void particle_filter_t::reset_pose(float min_x, float max_x, float min_y, float max_y, float min_theta, float max_theta)
+{
+    if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: resetting particles to area";
+    init_particles(min_x, max_x, min_y, max_y, min_theta, max_theta, m_particles.size());
+}
+
+void particle_filter_t::reset_pose_to_field()
+{
+    if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: resetting particles to field area (set by config)";
+    init_particles(m_config.min_x, m_config.max_x, m_config.min_y, m_config.max_y, m_config.min_theta, m_config.max_theta, m_particles.size());
 }
 

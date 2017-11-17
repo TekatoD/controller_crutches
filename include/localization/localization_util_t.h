@@ -108,7 +108,7 @@ namespace drwn {
             }
         } m_config;
 
-        bool m_debug;
+        bool m_debug {true};
 
         std::map<line_type_t, line_t> m_fieldLines;
 

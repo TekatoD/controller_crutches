@@ -348,7 +348,7 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_config_kicking.set_option("cfg-kicking", "config file for kicking motion module");
     m_arg_config_action.set_option("cfg-action", "path to motion_4096.bin");
     m_arg_config_white_ball_vision_processor.set_option("cfg-cv", "path to cv config");
-    m_arg_config_localization_field.set_option("cfg-loc-field", "path to localization field config");
+    m_arg_config_localization_field.set_option("cfg-field", "path to field config");
     m_arg_config_particle_filter.set_option("cfg-pf", "path to particle filter config");
     m_arg_config_image_source.set_option("cfg-image-source", "config file for image source");
     m_arg_config_ball_tracker.set_option("cfg-ball-tracker", "config file for ball tracker");
@@ -412,6 +412,8 @@ void robot_application_t::start_main_loop() {
     if (m_debug) LOG_INFO << "=== Controller was started ===";
     while (is_running()) {
         m_behavior->process();
+        //TODO:
+        step_localization();
     }
     if (m_debug) LOG_INFO << "=== Controller was finished ===";
 
@@ -423,4 +425,13 @@ bool robot_application_t::is_debug_enabled() const noexcept {
 
 void robot_application_t::enable_debug(bool debug) noexcept {
     m_debug = debug;
+}
+
+void robot_application_t::step_localization()
+{
+    auto loc = localization_t::get_instance();
+    auto curr_lines = vision_t::get_instance()->detect_lines();
+
+    loc->set_lines(curr_lines);
+    loc->update();
 }

@@ -102,6 +102,9 @@ namespace drwn {
 
         void init_behavior();
 
+        //TODO: in behavior
+        void step_localization();
+
     private:
         bool m_debug{false}; // Debug output to console
         bool m_show_help_message{false};

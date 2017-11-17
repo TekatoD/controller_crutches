@@ -64,68 +64,75 @@ namespace drwn {
         // Get pose of the particle with highest weight
         particle_t get_top_particle() const { return m_particles[m_topParticleIndex]; }
 
+
+        void reset_pose(const pose2d_t& pose);
+
+        void reset_pose(float min_x, float max_x, float min_y, float max_y, float min_theta, float max_theta);
+
+        void reset_pose_to_field();
+
         static Eigen::Vector4f get_line_range_bearing(pose2d_t robot_pose, float x1, float y1, float x2, float y2);
 
         void calc_pose_mean_cov();
 
         void set_particle_number(int num_particles) {
-            if (m_debug) LOG_DEBUG << "PARTICLE FILTER: num_particles = " << num_particles;
+            if (m_debug) LOG_INFO << "PARTICLE FILTER: num_particles = " << num_particles;
             m_config.num_particles = num_particles;
         }
 
         int get_particle_number() const { return m_config.num_particles; }
 
         void set_init_x(float init_x) {
-            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: init_x = " << init_x;
+            if (m_debug) LOG_INFO << "PARTICLE_FILTER: init_x = " << init_x;
             m_config.init_x = init_x;
         }
 
         float get_init_x() const { return m_config.init_x; }
 
         void set_init_y(float init_y) {
-            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: init_y = " << init_y;
+            if (m_debug) LOG_INFO << "PARTICLE_FILTER: init_y = " << init_y;
             m_config.init_y = init_y;
         }
 
         float get_init_y() const { return m_config.init_y; }
 
         void set_init_theta(float init_theta) {
-            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER init_theta = " << init_theta;
+            if (m_debug) LOG_INFO << "PARTICLE_FILTER init_theta = " << init_theta;
             m_config.init_theta = init_theta;
         }
 
         float get_init_theta() const { return m_config.init_theta; }
 
         void set_random_particles(int random_particles) {
-            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER random_particles = " << random_particles;
+            if (m_debug) LOG_INFO << "PARTICLE_FILTER random_particles = " << random_particles;
             m_config.random_particles = random_particles;
         }
 
         int get_random_particles() const { return m_config.random_particles; }
 
         void set_min_x(float min_x) {
-            if (m_debug) LOG_DEBUG << "PARTICLE FILTER: min_x = " << min_x;
+            if (m_debug) LOG_INFO << "PARTICLE FILTER: min_x = " << min_x;
             m_config.min_x = min_x;
         }
 
         float get_min_x() const { return m_config.min_x; }
 
         void set_min_y(float min_y) {
-            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: min_y = " << min_y;
+            if (m_debug) LOG_INFO << "PARTICLE_FILTER: min_y = " << min_y;
             m_config.min_y = min_y;
         }
 
         float get_min_y() const { return m_config.min_y; }
 
         void set_min_theta(float min_theta) {
-            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: min_theta = " << min_theta;
+            if (m_debug) LOG_INFO << "PARTICLE_FILTER: min_theta = " << min_theta;
             m_config.min_theta = min_theta;
         }
 
         float get_min_theta() const { return m_config.min_theta; }
 
         void set_max_x(float max_x) {
-            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: max_x = " << max_x;
+            if (m_debug) LOG_INFO << "PARTICLE_FILTER: max_x = " << max_x;
 
             m_config.max_x = max_x;
         }
@@ -133,14 +140,14 @@ namespace drwn {
         float get_max_x() const { return m_config.max_x; }
 
         void set_max_y(float max_y) {
-            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: max_y = " << max_y;
+            if (m_debug) LOG_INFO << "PARTICLE_FILTER: max_y = " << max_y;
             m_config.max_y = max_y;
         }
 
         float get_max_y() const { return m_config.max_y; }
 
         void set_max_theta(float max_theta) {
-            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: max_theta = " << max_theta;
+            if (m_debug) LOG_INFO << "PARTICLE_FILTER: max_theta = " << max_theta;
             m_config.max_theta = max_theta;
         }
 
@@ -162,7 +169,7 @@ namespace drwn {
         void enable_debug(bool debug);
         /* */
     private:
-        bool m_debug;
+        bool m_debug {true};
 
         struct config_t {
             int num_particles;

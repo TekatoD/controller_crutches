@@ -18,6 +18,7 @@ namespace drwn {
         // Sensor data
         void set_lines(std::vector<cv::Vec4i> lines);
 
+        // Update based on motion and sensor data
         void update();
 
         // Resets PF particles to current pose
@@ -44,13 +45,17 @@ namespace drwn {
     private:
         localization_t();
 
-        bool m_debug;
+        bool m_debug {true};
     public:
         bool is_debug_enabled() const;
 
         void enable_debug(bool debug);
 
     private:
+        pose2d_t m_old_pose, m_current_pose;
+        std::vector<cv::Vec4i> m_current_lines;
+        Eigen::Vector3f m_movement_noise, m_measurement_noise;
+
         particle_filter_t* m_particle_filter;
 
         // TODO: camera_params move to hw

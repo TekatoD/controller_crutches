@@ -32,10 +32,9 @@ namespace drwn {
         unsigned char calculate_checksum(unsigned char* packet);
 
     public:
-        bool DEBUG_PRINT;
 //        bulk_read_data_t m_bulk_read_data[ID_BROADCAST];
 
-        robot_CM730_t(platform_CM730_t* platform);
+        explicit robot_CM730_t(platform_CM730_t* platform);
 
         ~robot_CM730_t();
 
@@ -76,5 +75,10 @@ namespace drwn {
         void make_bulk_read_packet();
 
         int bulk_read();
+
+
+
+    private:
+        bool m_debug{false};
     };
 }

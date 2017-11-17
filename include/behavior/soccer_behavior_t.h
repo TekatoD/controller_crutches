@@ -21,6 +21,11 @@ namespace drwn {
     class LEDs_t;
     class game_controller_t;
 
+    class ball_tracker_t;
+    class ball_searcher_t;
+    class ball_follower_t;
+    class go_to_t;
+
     class soccer_behavior_t : public behavior_t {
         enum class state_t {
             UNKNOWN,
@@ -53,6 +58,7 @@ namespace drwn {
         state_t m_state{state_t::UNKNOWN};
 
         bool m_behavior_active{false};
+        bool m_manual_penalised{false};
         steady_rate_t m_rate_processing_behavior{std::chrono::milliseconds(10)};
         steady_rate_t m_rate_buttons_check{std::chrono::milliseconds(100)};
 
@@ -67,8 +73,16 @@ namespace drwn {
         LEDs_t* m_LEDs{nullptr};
         game_controller_t* m_game_controller{nullptr};
 
+        ball_tracker_t* m_tracker{nullptr};
+        ball_searcher_t* m_searcher{nullptr};
+        ball_follower_t* m_follower{nullptr};
+        go_to_t* m_goto{nullptr};
+
 
         void check_rate();
+
+        void process_localization();
+
     };
 }
 

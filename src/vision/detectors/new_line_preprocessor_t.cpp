@@ -2,6 +2,7 @@
 /// \date 11/2/17
 
 #include <cv.hpp>
+#include <boost/math/constants/constants.hpp>
 #include "vision/detectors/new_line_preprocessor_t.h"
 
 using namespace drwn;
@@ -9,7 +10,7 @@ using namespace drwn;
 cv::Mat new_line_preprocessor_t::preprocess(const cv::Mat& img) const {
     constexpr auto kernel_theta = 4.1;
     constexpr auto kernel_sigma = 10.0;
-    constexpr auto kernel_lambda = M_PI;
+    constexpr auto kernel_lambda = boost::math::constants::pi<float>();
     constexpr auto kernel_gamma = 0.0;
 
     cv::Mat hsv_img, gray_img, bgr_img, tmp;

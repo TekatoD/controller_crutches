@@ -6,6 +6,7 @@
 #include <motion/modules/kicking_t.h>
 #include <iostream>
 #include <log/trivial_logger_t.h>
+#include <boost/math/constants/constants.hpp>
 
 
 void drwn::kicking_t::kick() {
@@ -33,6 +34,7 @@ void drwn::kicking_t::initialize() {
 }
 
 void drwn::kicking_t::process() {
+    using namespace boost::math;
     if (m_done) return;
 
     constexpr float TIME_UNIT = motion_module_t::TIME_UNIT;
@@ -128,16 +130,16 @@ void drwn::kicking_t::process() {
         case (PHASE_RESTORING):
             period = m_cur_restoring_duration * 4.0f;
             local_time = m_time - m_cur_kicking_duration - m_cur_shifting_body_duration;
-            leg_x_active = wsin(local_time, period, -half_pi, m_cur_kick_x_offset, 0.0);
-            leg_y_active = wsin(local_time, period, -half_pi, m_cur_kick_y_offset, 0.0);
-            leg_z_active = wsin(local_time, period, -half_pi, m_cur_kick_z_offset, 0.0);
+            leg_x_active = wsin(local_time, period, -constants::pi<float>() / 2.0f, m_cur_kick_x_offset, 0.0);
+            leg_y_active = wsin(local_time, period, -constants::pi<float>() / 2.0f, m_cur_kick_y_offset, 0.0);
+            leg_z_active = wsin(local_time, period, -constants::pi<float>() / 2.0f, m_cur_kick_z_offset, 0.0);
             leg_a_active = 0;
             leg_b_active = 0;
-            leg_c_active = wsin(local_time, period, -half_pi, m_cur_kick_yaw_offset, 0.0);
+            leg_c_active = wsin(local_time, period, -constants::pi<float>() / 2.0f, m_cur_kick_yaw_offset, 0.0);
 
-            body_x = wsin(local_time, period, -half_pi, m_cur_body_x_offset - m_cur_body_init_x_offset, m_cur_body_init_x_offset);
-            body_y = wsin(local_time, period, -half_pi, m_cur_body_y_offset - m_cur_body_init_y_offset, m_cur_body_init_y_offset);
-            body_z = wsin(local_time, period, -half_pi, m_cur_body_z_offset - m_cur_body_init_z_offset, m_cur_body_init_z_offset);
+            body_x = wsin(local_time, period, -constants::pi<float>() / 2.0f, m_cur_body_x_offset - m_cur_body_init_x_offset, m_cur_body_init_x_offset);
+            body_y = wsin(local_time, period, -constants::pi<float>() / 2.0f, m_cur_body_y_offset - m_cur_body_init_y_offset, m_cur_body_init_y_offset);
+            body_z = wsin(local_time, period, -constants::pi<float>() / 2.0f, m_cur_body_z_offset - m_cur_body_init_z_offset, m_cur_body_init_z_offset);
 
             r_shoulder_pitch = 0.0f;
             l_shoulder_pitch = 0.0f;

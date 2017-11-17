@@ -1,8 +1,5 @@
-#include <iostream>
-#include <chrono>
-#include <thread>
-#include <fstream>
 #include "hw/vrep_CM730_t.h"
+#include <boost/math/constants/constants.hpp>
 
 #define MAX_EXT_API_CONNECTIONS 255
 #define NON_MATLAB_PARSING
@@ -74,32 +71,23 @@ int drwn::vrep_CM730_t::connect_device(std::string device_name) {
 }
 
 int drwn::vrep_CM730_t::sync_write(int start_addr, int each_length, int number, int* pParam) {
+    using namespace boost::math;
     simxPauseCommunication(m_client_id, 1);
-//    this->DumpJoints("/home/tekatod/develop/Walking.txt", start_addr, each_length, number, pParam);
     for(size_t i = 0; i < number * each_length; i += each_length) {
         simxSetObjectIntParameter(m_client_id, m_joints[pParam[i] - 1], 2000, 1, simx_opmode_oneshot);
         simxSetObjectIntParameter(m_client_id, m_joints[pParam[i] - 1], 2001, 1, simx_opmode_oneshot);
 //        //TODO: Check PID control (order: D I P)
-//        simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2004, (pParam[i + 1]  * M_PI / MX28_t::MAX_VALUE) * 4 / 1000, simx_opmode_oneshot);
-//        simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2003, (pParam[i + 2]  * M_PI / MX28_t::MAX_VALUE) * 1000 / 2048, simx_opmode_oneshot);
-//        simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2002, (pParam[i + 3]  * M_PI / MX28_t::MAX_VALUE) / 8, simx_opmode_oneshot);
+//        simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2004, (pParam[i + 1]  * constants::pi<float>() / MX28_t::MAX_VALUE) * 4 / 1000, simx_opmode_oneshot);
+//        simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2003, (pParam[i + 2]  * constants::pi<float>() / MX28_t::MAX_VALUE) * 1000 / 2048, simx_opmode_oneshot);
+//        simxSetObjectIntParameter(m_client_id, m_sim_devices[pParam[i]], 2002, (pParam[i + 3]  * constants::pi<float>() / MX28_t::MAX_VALUE) / 8, simx_opmode_oneshot);
 
         simxSetJointTargetPosition(m_client_id, m_joints[pParam[i] - 1],
-                                   ((drwn::MX28_t::value_2_angle(CM730_t::make_word(pParam[i + 5], pParam[i + 6])) * M_PI) / 180),
+                                   ((drwn::MX28_t::value_2_angle(CM730_t::make_word(pParam[i + 5], pParam[i + 6])) * constants::pi<float>()) / 180.0f),
                                    simx_opmode_oneshot);
     }
     simxPauseCommunication(m_client_id, 0);
     simxSynchronousTrigger(m_client_id);
-}
-
-//This method can be used in the sync_write method above for saving the sequence of servos values into the file.
-void drwn::vrep_CM730_t::DumpJoints(std::string file_name, int start_addr, int each_length, int number, int *pParam) {
-    std::ofstream f(file_name, std::ios_base::app);
-    for(size_t i = 0; i < number * each_length; i += each_length) {
-        f << pParam[i] << " " << (drwn::MX28_t::value_2_angle(CM730_t::make_word(pParam[i + 5], pParam[i + 6])) * M_PI) / 180 << std::endl;
-    }
-    f << "END" << std::endl;
-    f.close();
+    return 0; // TODO Crutch
 }
 
 int drwn::vrep_CM730_t::read_word(int id, int address, int* pValue, int* error) {
@@ -145,11 +133,12 @@ int drwn::vrep_CM730_t::read_word(int id, int address, int* pValue, int* error) 
                 if (*error != simx_return_ok) {
                     pos = 0;
                 }
-                pos = (180 * pos) / M_PI;
+                pos = (180 * pos) / boost::math::constants::pi<float>();
 //                std::cout << "Joint " << id << " " << pos << std::endl;
                 *pValue = MX28_t::angle_2_value(pos);
                 return SUCCESS;
     }
+    return 0; // TODO Crutch
 }
 
 int drwn::vrep_CM730_t::bulk_read() {
@@ -173,6 +162,7 @@ int drwn::vrep_CM730_t::bulk_read() {
         }
     }
     m_bulk_read_data[ID_CM].error = 0; //TODO:: crutch
+    return 0; //TODO:: crutch
 }
 
 int drwn::vrep_CM730_t::write_byte(int address, int value, int* error) {
@@ -184,7 +174,7 @@ int drwn::vrep_CM730_t::write_word(int id, int address, int value, int* error) {
         simxSetObjectIntParameter(m_client_id, m_joints[id - 1], 2000, 1, simx_opmode_oneshot);
         simxSetObjectIntParameter(m_client_id, m_joints[id - 1], 2001, 1, simx_opmode_oneshot);
         *error = simxSetJointTargetPosition(m_client_id, m_joints[id - 1],
-                                   (drwn::MX28_t::value_2_angle(value) * M_PI) / 180,
+                                   (drwn::MX28_t::value_2_angle(value) * boost::math::constants::pi<float>()) / 180,
                                    simx_opmode_oneshot);
         return SUCCESS;
     }

@@ -30,8 +30,10 @@ namespace drwn {
           double yj = (lines[j](3) - lines[j](1));
           double angle = acos((xi * xj + yi * yj) / (sqrt(xi * xi + yi * yi) * sqrt(xj * xj + yj * yj)));
 
-          if (angle > 0.15 && angle < 2. * M_PI - 0.15) {
-              angle = ((angle > 2. * M_PI - angle) ? 2. * M_PI - angle : angle);
+          if (angle > 0.15 && angle < 2. * boost::math::constants::pi<float>() - 0.15) {
+              angle = ((angle > 2. * boost::math::constants::pi<float>() - angle)
+                       ? 2. * boost::math::constants::pi<float>() - angle
+                       : angle);
               angles.push_back(cv::Vec3d(x, y, angle));
           }
         }

@@ -4,6 +4,7 @@
  */
 #include "motion/pose2d_t.h"
 #include <math.h>
+#include <boost/math/constants/constants.hpp>
 
 drwn::pose2d_t::pose2d_t() : m_x(0), m_y(0), m_theta(0) { }
 
@@ -37,13 +38,14 @@ void drwn::pose2d_t::set_theta(float theta) {
 }
 
 void drwn::pose2d_t::normalize_theta() {
-//    while (m_theta < 0) m_theta += 2 * M_PI;
-//    m_theta = fmod(m_theta, 2 * M_PI) - M_PI;
-    while (m_theta > M_PI) {
-        m_theta -= 2 * M_PI;
+    using namespace boost::math;
+//    while (m_theta < 0) m_theta += 2 * constants::pi<float>();
+//    m_theta = fmod(m_theta, 2 * constants::pi<float>()) - constants::pi<float>();
+    while (m_theta > constants::pi<float>()) {
+        m_theta -= 2 * constants::pi<float>();
     }
-    while (m_theta < -M_PI) {
-        m_theta += 2 * M_PI;
+    while (m_theta < -constants::pi<float>()) {
+        m_theta += 2 * constants::pi<float>();
     }
 }
 
@@ -87,7 +89,8 @@ void drwn::pose2d_t::rotate_around(const drwn::pose2d_t& pose) {
 
 namespace drwn {
     std::ostream &operator<<(std::ostream &os, const drwn::pose2d_t &data) {
-        os << " " << data.m_x << " " << data.m_y << " " << data.m_theta / M_PI * 180;
+        using namespace boost::math;
+        os << " " << data.m_x << " " << data.m_y << " " << data.m_theta / constants::pi<float>() * 180;
         return os;
     }
 }

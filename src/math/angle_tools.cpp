@@ -18,15 +18,16 @@
  */
 
 #include "math/angle_tools.h"
+#include <boost/math/constants/constants.hpp>
 
 float degrees(float rad) {
-    return rad / pi * 180.0f;
+    return rad / boost::math::constants::pi<float>() * 180.0f;
 }
 
 float radians(float deg) {
-    return deg * pi / 180.0f;
+    return deg * boost::math::constants::pi<float>() / 180.0f;
 }
 
 float wsin(float time, float period, float period_shift, float mag, float mag_shift) {
-    return mag * sinf(2.0f * pi / period * time - period_shift) + mag_shift;
+    return mag * sinf(2.0f * boost::math::constants::pi<float>() / period * time - period_shift) + mag_shift;
 }

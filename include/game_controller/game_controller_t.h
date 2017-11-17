@@ -56,11 +56,7 @@ namespace drwn {
 
         void enable_debug(bool debug);
 
-
-    public:
-        int m_player_number;
-        int m_team_number;
-        robo_cup_game_control_data_t m_game_ctrl_data;
+        const robo_cup_game_control_data_t& get_game_ctrl_data() const noexcept;
 
     private:
         explicit game_controller_t(int player_num = 0, int team_num = 0);
@@ -71,6 +67,10 @@ namespace drwn {
 
 
     private:
+        int m_player_number;
+        int m_team_number;
+        robo_cup_game_control_data_t m_game_ctrl_data;
+
         udp_comm_t* m_udp;
         in_addr m_game_controller_address;
         clock_t m_when_packet_was_received;

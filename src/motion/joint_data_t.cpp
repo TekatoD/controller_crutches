@@ -184,7 +184,7 @@ void joint_data_t::set_angle(int id, float angle) {
 }
 
 
-float joint_data_t::set_angle(int id) {
+float joint_data_t::get_angle(int id) {
     return m_angle[id];
 }
 
@@ -195,6 +195,6 @@ void joint_data_t::set_radian(int id, float radian) {
 
 
 float joint_data_t::get_radian(int id) {
-    return set_angle(id) * (180.0 / 3.141592);
+    return get_angle(id) * (180.0 / 3.141592);
 }
 

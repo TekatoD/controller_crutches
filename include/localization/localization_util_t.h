@@ -16,14 +16,14 @@ using namespace drwn;
 
 namespace drwn {
     struct line_t {
-        point_2D_t p1, p2;
+        point2d_t p1, p2;
 
         line_t(float x1, float y1, float x2, float y2);
-        line_t(const point_2D_t& p1, const point_2D_t& p2);
+        line_t(const point2d_t& p1, const point2d_t& p2);
         
         float length() const;
         bool is_point_on_line(float px, float py, float eps = 0.001) const;
-        static bool intersect_lines(const line_t &l1, const line_t &l2, point_2D_t &intersection, float eps = 0.00001);
+        static bool intersect_lines(const line_t &l1, const line_t &l2, point2d_t &intersection, float eps = 0.00001);
         
         friend std::ostream& operator<<(std::ostream& out, const line_t& l);
     };
@@ -58,7 +58,7 @@ namespace drwn {
         void initialize_field();
         void log_field_lines() const;
 
-        std::tuple<line_type_t, point_2D_t> intersect_with_field(const line_t &l, float minDist = 0.0f);
+        std::tuple<line_type_t, point2d_t> intersect_with_field(const line_t &l, float minDist = 0.0f);
 
         void set_field_width(float field_width) {
             if (m_debug) LOG_DEBUG << "Field width: " << field_width;

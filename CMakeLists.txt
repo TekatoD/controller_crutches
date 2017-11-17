@@ -60,8 +60,8 @@ include_directories( ${EIGEN3_INCLUDE_DIR}) #Eigen doesn't work either way
 # Don't forget include header files
 set(SRC
         include/motion/modules/action_t.h
-        include/ball_follower_t.h
-        #        include/ball_tracker_t.h
+        include/behavior/ball_follower_t.h
+        include/behavior/ball_tracker_t.h
         include/hw/FSR_t.h
         include/motion/modules/head_t.h
         include/motion/joint_data_t.h
@@ -73,12 +73,11 @@ set(SRC
         include/motion/motion_status_t.h
         include/hw/MX28_t.h
         include/math/point_t.h
-        include/state_machine_t.h
-        include/math/vector_3D_t.h
+        include/math/vector3d_t.h
         include/motion/modules/walking_t.h
         src/math/matrix_t.cpp
         src/math/point_t.cpp
-        src/math/vector_3D_t.cpp
+        src/math/vector3d_t.cpp
         src/motion/modules/walking_t.cpp
         src/motion/modules/head_t.cpp
         src/motion/modules/action_t.cpp
@@ -86,37 +85,34 @@ set(SRC
         src/motion/kinematics_t.cpp
         src/motion/motion_manager_t.cpp
         src/motion/motion_status_t.cpp
-        src/ball_follower_t.cpp
-        src/ball_tracker_t.cpp
+        src/behavior/ball_follower_t.cpp
+        src/behavior/ball_tracker_t.cpp
         src/hw/linux_motion_timer_t.cpp
         src/main.cpp
-        src/state_machine_t.cpp
-        include/gamecontroller/robo_cup_game_control_data_t.h
-        include/gamecontroller/spl_coach_message.h
-        include/gamecontroller/spl_standard_message.h
-        src/gamecontroller/game_controller_t.cpp
-        include/gamecontroller/game_controller_t.h
-        include/udp_comm_t.h
-        src/udp_comm_t.cpp
-        src/pose_2D_t.cpp
-        include/pose_2D_t.h
-        src/odometry_collector_t.cpp
-        include/odometry_collector_t.h
-        src/go_to_t.cpp
-        include/go_to_t.h
-        include/soccer_behavior_t.h
-        src/soccer_behavior_t.cpp
+        include/game_controller/robo_cup_game_control_data_t.h
+        include/game_controller/spl_coach_message.h
+        include/game_controller/spl_standard_message.h
+        src/game_controller/game_controller_t.cpp
+        include/game_controller/game_controller_t.h
+        include/game_controller/udp_comm_t.h
+        src/game_controller/udp_comm_t.cpp
+        src/motion/pose2d_t.cpp
+        include/motion/pose2d_t.h
+        src/motion/odometry_collector_t.cpp
+        include/motion/odometry_collector_t.h
+        src/behavior/go_to_t.cpp
+        include/behavior/go_to_t.h
         src/field_t.cpp
         include/field_t.h
-        src/ball_searcher_t.cpp
-        include/ball_searcher_t.h
+        src/behavior/ball_searcher_t.cpp
+        include/behavior/ball_searcher_t.h
         include/hw/CM730_t.h
         src/hw/CM730_t.cpp
         include/math/angle_tools.h
         include/math/eigen.h
         src/math/angle_tools.cpp
-        src/property_reader_t.cpp
-        include/property_reader_t.h
+        src/config/property_reader_t.cpp
+        include/config/property_reader_t.h
         src/motion/modules/kicking_t.cpp
         include/motion/modules/kicking_t.h
         include/log/console.h
@@ -127,8 +123,6 @@ set(SRC
         src/robot_application_t.cpp
         include/robot_application_t.h
         include/behavior/behavior_t.h
-        src/behavior/base_behavior_t.cpp
-        include/behavior/base_behavior_t.h
         src/hw/LEDs_t.cpp
         include/hw/LEDs_t.h
         src/color_t.cpp
@@ -208,8 +202,6 @@ set(SRC
         include/hw/robot_image_source_t.h
         src/config/strategies/robot_image_source_configuration_strategy_t.cpp
         include/config/strategies/robot_image_source_configuration_strategy_t.h
-        src/config/strategies/white_ball_vision_processor_arhuments_parsing_strategy_t.cpp
-        include/config/strategies/white_ball_vision_processor_arhuments_parsing_strategy_t.h
         include/localization/localization_util_t.h
         src/localization/localization_util_t.cpp
         include/localization/particle_filter_t.h
@@ -219,7 +211,16 @@ set(SRC
         include/config/strategies/localization_field_configuration_strategy_t.h
         src/config/strategies/localization_field_configuration_strategy_t.cpp
         include/localization/localization_t.h
-        src/localization/localization_t.cpp)
+        src/localization/localization_t.cpp
+        src/config/strategies/white_ball_vision_processor_arguments_parsing_strategy_t.cpp
+        include/config/strategies/white_ball_vision_processor_arguments_parsing_strategy_t.h
+        src/behavior/image_processing_behavior_t.cpp
+        include/behavior/image_processing_behavior_t.h
+        src/behavior/soccer_behavior_t.cpp
+        include/behavior/soccer_behavior_t.h
+        include/tool/time_based_holder_t.h
+        src/config/strategies/ball_follower_configuration_strategy_t.cpp
+        include/config/strategies/ball_follower_configuration_strategy_t.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

@@ -15,7 +15,7 @@ using namespace drwn;
 /**
 create the identity matrix (of size 4X4)
 */
-matrix_3D_t::matrix_3D_t() {
+matrix3d_t::matrix3d_t() {
     identity();
 }
 
@@ -23,19 +23,19 @@ matrix_3D_t::matrix_3D_t() {
 /**
 TODO: no clear about the side effects
 */
-matrix_3D_t::matrix_3D_t(const matrix_3D_t& mat) {
+matrix3d_t::matrix3d_t(const matrix3d_t& mat) {
     *this = mat;
 }
 
 
-matrix_3D_t::~matrix_3D_t() {
+matrix3d_t::~matrix3d_t() {
 }
 
 
 /*
 set the current matrix to identity
 */
-void matrix_3D_t::identity() {
+void matrix3d_t::identity() {
     m[m00] = 1;
     m[m01] = 0;
     m[m02] = 0;
@@ -59,8 +59,8 @@ void matrix_3D_t::identity() {
 compute the inverse of the matrix
 returns true iff the matrix is invertible
 */
-bool matrix_3D_t::inverse() {
-    matrix_3D_t src, dst, tmp;
+bool matrix3d_t::inverse() {
+    matrix3d_t src, dst, tmp;
     float det;
 
     /* transpose matrix */
@@ -156,8 +156,8 @@ scale.X         0        0        0
 0               0      scale.Z    0
 0               0        0        1
 */
-void matrix_3D_t::scale(vector_3D_t scale) {
-    matrix_3D_t mat;
+void matrix3d_t::scale(vector3d_t scale) {
+    matrix3d_t mat;
     mat.m[m00] = scale.X;
     mat.m[m11] = scale.Y;
     mat.m[m22] = scale.Z;
@@ -167,11 +167,11 @@ void matrix_3D_t::scale(vector_3D_t scale) {
 
 
 /*construct the matrix corresponding to a rotation of angle around the axis*/
-void matrix_3D_t::rotate(float angle, vector_3D_t axis) {
+void matrix3d_t::rotate(float angle, vector3d_t axis) {
     float rad = radians(angle);
     float C = cos(rad);
     float S = sin(rad);
-    matrix_3D_t mat;
+    matrix3d_t mat;
 
     mat.m[m00] = C + axis.X * axis.X * (1 - C);
     mat.m[m01] = axis.X * axis.Y * (1 - C) - axis.Z * S;
@@ -188,8 +188,8 @@ void matrix_3D_t::rotate(float angle, vector_3D_t axis) {
 
 
 /*compute the matrix corresponding to a translation of vector offset*/
-void matrix_3D_t::translate(vector_3D_t offset) {
-    matrix_3D_t mat;
+void matrix3d_t::translate(vector3d_t offset) {
+    matrix3d_t mat;
     mat.m[m03] = offset.X;
     mat.m[m13] = offset.Y;
     mat.m[m23] = offset.Z;
@@ -199,8 +199,8 @@ void matrix_3D_t::translate(vector_3D_t offset) {
 
 
 /*make the product of the current matrix with the point*/
-point_3D_t matrix_3D_t::transform(point_3D_t point) {
-    point_3D_t result;
+point3d_t matrix3d_t::transform(point3d_t point) {
+    point3d_t result;
     result.X = m[m00] * point.X + m[m01] * point.Y + m[m02] * point.Z + m[m03];
     result.Y = m[m10] * point.X + m[m11] * point.Y + m[m12] * point.Z + m[m13];
     result.Z = m[m20] * point.X + m[m21] * point.Y + m[m22] * point.Z + m[m23];
@@ -210,8 +210,8 @@ point_3D_t matrix_3D_t::transform(point_3D_t point) {
 
 
 /*make the product of the current matrix with the point*/
-vector_3D_t matrix_3D_t::transform(vector_3D_t vector) {
-    vector_3D_t result;
+vector3d_t matrix3d_t::transform(vector3d_t vector) {
+    vector3d_t result;
     result.X = m[m00] * vector.X + m[m01] * vector.Y + m[m02] * vector.Z + m[m03];
     result.Y = m[m10] * vector.X + m[m11] * vector.Y + m[m12] * vector.Z + m[m13];
     result.Z = m[m20] * vector.X + m[m21] * vector.Y + m[m22] * vector.Z + m[m23];
@@ -221,7 +221,7 @@ vector_3D_t matrix_3D_t::transform(vector_3D_t vector) {
 
 
 /*?*/
-void matrix_3D_t::set_transform(point_3D_t point, vector_3D_t angle) {
+void matrix3d_t::set_transform(point3d_t point, vector3d_t angle) {
     float Cx = cosf(radians(angle.X));
     float Cy = cosf(radians(angle.Y));
     float Cz = cosf(radians(angle.Z));
@@ -245,22 +245,22 @@ void matrix_3D_t::set_transform(point_3D_t point, vector_3D_t angle) {
 }
 
 
-matrix_3D_t& matrix_3D_t::operator=(const matrix_3D_t& mat) {
+matrix3d_t& matrix3d_t::operator=(const matrix3d_t& mat) {
     for (int i = 0; i < MAXNUM_ELEMENT; i++)
         m[i] = mat.m[i];
     return *this;
 }
 
 
-matrix_3D_t& matrix_3D_t::operator*=(const matrix_3D_t& mat) {
-    matrix_3D_t tmp = *this * mat;
+matrix3d_t& matrix3d_t::operator*=(const matrix3d_t& mat) {
+    matrix3d_t tmp = *this * mat;
     *this = tmp;
     return *this;
 }
 
 
-matrix_3D_t matrix_3D_t::operator*(const matrix_3D_t& mat) {
-    matrix_3D_t result;
+matrix3d_t matrix3d_t::operator*(const matrix3d_t& mat) {
+    matrix3d_t result;
 
     for (int j = 0; j < 4; j++) {
         for (int i = 0; i < 4; i++) {

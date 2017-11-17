@@ -6,9 +6,9 @@
 #pragma once
 
 
-#include "gamecontroller/robo_cup_game_control_data_t.h"
-#include "gamecontroller/spl_standard_message.h"
-#include "gamecontroller/spl_coach_message.h"
+#include "game_controller/robo_cup_game_control_data_t.h"
+#include "game_controller/spl_standard_message.h"
+#include "game_controller/spl_coach_message.h"
 #include "udp_comm_t.h"
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -16,22 +16,19 @@
 #include <cstring>
 #include <stdexcept>
 
-#define GAME_CONTROLLER_SECTION   "Game Controller"
-#define INVALID_VALUE   -1024.0
-
-static const int GAMECONTROLLER_TIMEOUT = 2000000;
-static const int ALIVE_DELAY = 1000000;
-
 namespace drwn {
     class game_controller_t {
     public:
+        static constexpr int GAMECONTROLLER_TIMEOUT = 2000000;
+        static constexpr int ALIVE_DELAY = 1000000;
+
         static game_controller_t* get_instance();
 
         void reset();
 
         void update();
 
-        bool game_controller_not_responding() const;
+        bool not_responding() const;
 
         bool connect();
 
@@ -59,11 +56,7 @@ namespace drwn {
 
         void enable_debug(bool debug);
 
-
-    public:
-        int player_number;
-        int team_number;
-        robo_cup_game_control_data_t game_ctrl_data;
+        const robo_cup_game_control_data_t& get_game_ctrl_data() const noexcept;
 
     private:
         explicit game_controller_t(int player_num = 0, int team_num = 0);
@@ -74,6 +67,10 @@ namespace drwn {
 
 
     private:
+        int m_player_number;
+        int m_team_number;
+        robo_cup_game_control_data_t m_game_ctrl_data;
+
         udp_comm_t* m_udp;
         in_addr m_game_controller_address;
         clock_t m_when_packet_was_received;

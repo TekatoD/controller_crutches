@@ -90,7 +90,7 @@ void action_t::initialize() {
     m_playing = false;
 
     for (int id = joint_data_t::ID_R_SHOULDER_PITCH; id < joint_data_t::NUMBER_OF_JOINTS; id++)
-        joint.set_value(id, motion_status_t::m_current_joints.get_value(id));
+        joint.set_value(id, motion_status_t::current_joints.get_value(id));
 }
 
 
@@ -98,13 +98,13 @@ void action_t::load_file(const char* filename) {
     FILE* action = fopen(filename, "r+b");
 
     if (action == nullptr) {
-        throw std::runtime_error("Can not open action_t file!");
+        throw std::runtime_error("Can not open action file!");
     }
 
     fseek(action, 0, SEEK_END);
     if (ftell(action) != (long) (sizeof(PAGE) * MAXNUM_PAGE)) {
         fclose(action);
-        throw std::runtime_error("It's not an action_t file!");
+        throw std::runtime_error("It's not an action file!");
     }
 
     if (m_action_file != nullptr)
@@ -117,7 +117,7 @@ void action_t::load_file(const char* filename) {
 bool action_t::create_file(char* filename) {
     FILE* action = fopen(filename, "ab");
     if (action == nullptr) {
-        LOG_ERROR << "ACTION: Can not create Action file!";
+        LOG_ERROR << "ACTION: Can not create action file!";
         return false;
     }
 
@@ -321,7 +321,7 @@ void action_t::process() {
 
         for (bID = joint_data_t::ID_R_SHOULDER_PITCH; bID < joint_data_t::NUMBER_OF_JOINTS; bID++) {
             if (joint.get_enable(bID)) {
-                wpTargetAngle1024[bID] = motion_status_t::m_current_joints.get_value(bID);
+                wpTargetAngle1024[bID] = motion_status_t::current_joints.get_value(bID);
                 ipLastOutSpeed1024[bID] = 0;
                 ipMovingAngle1024[bID] = 0;
                 ipGoalSpeed1024[bID] = 0;

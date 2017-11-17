@@ -2,7 +2,7 @@
  *  @autor tekatod
  *  @date 10/25/17
  */
-#include <gamecontroller/game_controller_t.h>
+#include <game_controller/game_controller_t.h>
 #include "config/strategies/game_controller_configuration_strategy_t.h"
 
 using namespace drwn;

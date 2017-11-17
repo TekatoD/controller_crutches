@@ -2,41 +2,41 @@
  *  @autor tekatod
  *  @date 4/28/17
  */
-#include "pose_2D_t.h"
+#include "motion/pose2d_t.h"
 #include <math.h>
 
-drwn::pose_2D_t::pose_2D_t() : m_x(0), m_y(0), m_theta(0) { }
+drwn::pose2d_t::pose2d_t() : m_x(0), m_y(0), m_theta(0) { }
 
-drwn::pose_2D_t::pose_2D_t(float x, float y, float theta) : m_x(x), m_y(y), m_theta(theta) {
+drwn::pose2d_t::pose2d_t(float x, float y, float theta) : m_x(x), m_y(y), m_theta(theta) {
     this->normalize_theta();
 }
 
-float drwn::pose_2D_t::x() const {
+float drwn::pose2d_t::x() const {
     return m_x;
 }
 
-float drwn::pose_2D_t::y() const {
+float drwn::pose2d_t::y() const {
     return m_y;
 }
 
-float drwn::pose_2D_t::theta() const {
+float drwn::pose2d_t::theta() const {
     return m_theta;
 }
 
-void drwn::pose_2D_t::set_x(float x) {
+void drwn::pose2d_t::set_x(float x) {
     m_x = x;
 }
 
-void drwn::pose_2D_t::set_y(float y) {
+void drwn::pose2d_t::set_y(float y) {
     m_y = y;
 }
 
-void drwn::pose_2D_t::set_theta(float theta) {
+void drwn::pose2d_t::set_theta(float theta) {
     m_theta = theta;
     this->normalize_theta();
 }
 
-void drwn::pose_2D_t::normalize_theta() {
+void drwn::pose2d_t::normalize_theta() {
 //    while (m_theta < 0) m_theta += 2 * M_PI;
 //    m_theta = fmod(m_theta, 2 * M_PI) - M_PI;
     while (m_theta > M_PI) {
@@ -47,13 +47,13 @@ void drwn::pose_2D_t::normalize_theta() {
     }
 }
 
-drwn::pose_2D_t drwn::pose_2D_t::operator+(const drwn::pose_2D_t &rhs) const {
-    pose_2D_t result(*this);
+drwn::pose2d_t drwn::pose2d_t::operator+(const drwn::pose2d_t &rhs) const {
+    pose2d_t result(*this);
     result += rhs;
     return result;
 }
 
-drwn::pose_2D_t& drwn::pose_2D_t::operator+=(const drwn::pose_2D_t &rhs) {
+drwn::pose2d_t& drwn::pose2d_t::operator+=(const drwn::pose2d_t &rhs) {
     m_x += rhs.m_x;
     m_y += rhs.m_y;
     m_theta += rhs.m_theta;
@@ -61,13 +61,13 @@ drwn::pose_2D_t& drwn::pose_2D_t::operator+=(const drwn::pose_2D_t &rhs) {
     return *this;
 }
 
-drwn::pose_2D_t drwn::pose_2D_t::operator-(const drwn::pose_2D_t &rhs) const {
-    pose_2D_t result(*this);
+drwn::pose2d_t drwn::pose2d_t::operator-(const drwn::pose2d_t &rhs) const {
+    pose2d_t result(*this);
     result -= rhs;
     return result;
 }
 
-drwn::pose_2D_t& drwn::pose_2D_t::operator-=(const drwn::pose_2D_t &rhs) {
+drwn::pose2d_t& drwn::pose2d_t::operator-=(const drwn::pose2d_t &rhs) {
     m_x -= rhs.m_x;
     m_y -= rhs.m_y;
     m_theta -= rhs.m_theta;
@@ -76,7 +76,7 @@ drwn::pose_2D_t& drwn::pose_2D_t::operator-=(const drwn::pose_2D_t &rhs) {
 }
 
 
-void drwn::pose_2D_t::rotate_around(const drwn::pose_2D_t& pose) {
+void drwn::pose2d_t::rotate_around(const drwn::pose2d_t& pose) {
     float c = cos(pose.theta());
     float s = sin(pose.theta());
     float d_x = m_x - pose.x();
@@ -86,7 +86,7 @@ void drwn::pose_2D_t::rotate_around(const drwn::pose_2D_t& pose) {
 }
 
 namespace drwn {
-    std::ostream &operator<<(std::ostream &os, const drwn::pose_2D_t &data) {
+    std::ostream &operator<<(std::ostream &os, const drwn::pose2d_t &data) {
         os << " " << data.m_x << " " << data.m_y << " " << data.m_theta / M_PI * 180;
         return os;
     }

@@ -16,7 +16,7 @@ localization_t::localization_t()
 
 }
 
-void localization_t::set_pose_shift(pose_2D_t pose_shift)
+void localization_t::set_pose_shift(pose2d_t pose_shift)
 {
 
 }
@@ -31,7 +31,7 @@ void localization_t::update()
 
 }
 
-void localization_t::set_current_pose(pose_2D_t current_pose)
+void localization_t::set_current_pose(pose2d_t current_pose)
 {
     assert(m_particle_filter != nullptr);
 }
@@ -58,7 +58,7 @@ vision_utils::camera_parameters_t localization_t::get_camera_parameters()
     return m_camera_params;
 }
 
-void localization_t::set_pose_approximate_area(pose_2D_t min_pose, pose_2D_t max_pose)
+void localization_t::set_pose_approximate_area(pose2d_t min_pose, pose2d_t max_pose)
 {
 
 }
@@ -80,13 +80,13 @@ particle_filter_t* localization_t::get_particle_filter() const
     return m_particle_filter;
 }
 
-pose_2D_t localization_t::get_calculated_pose_mean()
+pose2d_t localization_t::get_calculated_pose_mean()
 {
     assert(m_particle_filter != nullptr);
     return m_particle_filter->get_pose_mean();
 }
 
-pose_2D_t localization_t::get_calculated_pose_std_dev()
+pose2d_t localization_t::get_calculated_pose_std_dev()
 {
     assert(m_particle_filter != nullptr);
     return m_particle_filter->get_pose_std_dev();

@@ -142,6 +142,15 @@ namespace drwn {
 
         unsigned int get_dump_counter() const;
 
+        void set_ball_detector_type(int detector_type);
+
+        int get_ball_detector_type();
+
+        void set_ball_detector_cascade_config(std::string path);
+
+        const std::string& get_ball_detector_cascade_config() const;
+
+
         void process() override;
 
         ~white_ball_vision_processor_t();

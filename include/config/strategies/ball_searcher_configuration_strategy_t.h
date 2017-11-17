@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include <ball_searcher_t.h>
+#include <behavior/ball_searcher_t.h>
 #include "config/configuration_strategy_t.h"
 
 
@@ -15,13 +15,11 @@ namespace drwn {
 
         static constexpr char DEFAULT_SECTION[] = "Ball Searcher";
 
-        explicit ball_searcher_configuration_strategy_t(ball_searcher_t* ball_searcher = nullptr, std::string section = DEFAULT_SECTION);
+        explicit ball_searcher_configuration_strategy_t(std::string section = DEFAULT_SECTION);
 
         void read_config(const boost::property_tree::ptree& prop) override;
 
         void write_config(boost::property_tree::ptree& prop) const override;
 
-    private:
-        ball_searcher_t* m_ball_searcher{nullptr};
     };
 }

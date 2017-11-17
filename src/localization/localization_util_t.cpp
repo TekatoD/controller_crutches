@@ -8,19 +8,19 @@ drwn::line_t::line_t(float x1, float y1, float x2, float y2)
 {
 }
 
-drwn::line_t::line_t(const point_2D_t& p1, const point_2D_t& p2)
+drwn::line_t::line_t(const point2d_t& p1, const point2d_t& p2)
 : p1(p1), p2(p2)
 {
 }
 
 float drwn::line_t::length() const
 {
-    return point_2D_t::Distance(p1, p2);
+    return point2d_t::Distance(p1, p2);
 }
 
 bool drwn::line_t::is_point_on_line(float px, float py, float eps) const
 {
-    point_2D_t point(px, py);
+    point2d_t point(px, py);
     float LengthTo = line_t(p1, point).length();
     float LengthFrom = line_t(point, p2).length();
     float LineLength = this->length();
@@ -35,7 +35,7 @@ bool drwn::line_t::is_point_on_line(float px, float py, float eps) const
 /*
  * http://www-cs.ccny.cuny.edu/~wolberg/capstone/intersection/Intersection%20point%20of%20two%20lines.html
  */
-bool drwn::line_t::intersect_lines(const line_t &l1, const line_t &l2, point_2D_t &intersection, float eps)
+bool drwn::line_t::intersect_lines(const line_t &l1, const line_t &l2, point2d_t &intersection, float eps)
 {
     float num1, num2, denom, ua, ub;
     float x1, x2, x3, x4, y1, y2, y3, y4;
@@ -111,22 +111,22 @@ void drwn::field_map_t::log_field_lines() const
 }
 
 
-std::tuple<drwn::field_map_t::line_type_t, point_2D_t> drwn::field_map_t::intersect_with_field(
+std::tuple<drwn::field_map_t::line_type_t, point2d_t> drwn::field_map_t::intersect_with_field(
         const line_t &l, float minDist)
 {
     line_type_t type = line_type_t::NONE;
-    point_2D_t isec(0.0f, 0.0f);
+    point2d_t isec(0.0f, 0.0f);
     float dist = MAX_DIST;
     
     for (auto& kv : m_fieldLines) {
         line_type_t temp_type = kv.first;
-        point_2D_t temp_isec;
+        point2d_t temp_isec;
         if (line_t::intersect_lines(l, kv.second, temp_isec)) {
             if (l.is_point_on_line(temp_isec.X, temp_isec.Y)) {
                 // line_t can intersect multiple lines on the field
                 // Find the line with the closest intersection point
                 // If minDist is specified, only accept intersections with this minimum distance
-                float temp_dist = point_2D_t::Distance(l.p1, temp_isec);
+                float temp_dist = point2d_t::Distance(l.p1, temp_isec);
                 if (temp_dist < dist && temp_dist >= minDist) {
                     type = temp_type; 
                     isec = temp_isec;

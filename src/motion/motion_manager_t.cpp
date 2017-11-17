@@ -35,12 +35,12 @@ bool motion_manager_t::initialize(CM730_t* cm730) {
         if (m_debug) LOG_DEBUG << "MOTION_MANAGER: ID: " << id << " initializing...";
 
         if (m_CM730->read_word(id, MX28_t::P_PRESENT_POSITION_L, &value, &error) == CM730_t::SUCCESS) {
-            motion_status_t::m_current_joints.set_value(id, value);
-            motion_status_t::m_current_joints.set_enable(id, true);
+            motion_status_t::current_joints.set_value(id, value);
+            motion_status_t::current_joints.set_enable(id, true);
 
             if (m_debug) LOG_DEBUG << "MOTION MANAGER: [" << value << "] Success";
         } else {
-            motion_status_t::m_current_joints.set_enable(id, false);
+            motion_status_t::current_joints.set_enable(id, false);
 
             if (m_debug) LOG_ERROR << "MOTION MANAGER: Fail";
         }
@@ -64,12 +64,12 @@ bool motion_manager_t::reinitialize() {
         if (m_debug) LOG_DEBUG << "MOTION MANAGER: ID: " << id << " initializing...";
 
         if (m_CM730->read_word(id, MX28_t::P_PRESENT_POSITION_L, &value, &error) == CM730_t::SUCCESS) {
-            motion_status_t::m_current_joints.set_value(id, value);
-            motion_status_t::m_current_joints.set_enable(id, true);
+            motion_status_t::current_joints.set_value(id, value);
+            motion_status_t::current_joints.set_enable(id, true);
 
             if (m_debug) LOG_DEBUG << "MOTION MANAGERL: [" << value << "] Success";
         } else {
-            motion_status_t::m_current_joints.set_enable(id, false);
+            motion_status_t::current_joints.set_enable(id, false);
 
             if (m_debug) LOG_ERROR << "MOTION MANAGER: Fail";
         }
@@ -147,11 +147,11 @@ void motion_manager_t::process() {
         static int fb_array[ACCEL_WINDOW_SIZE] = {512,};
         static int buf_idx = 0;
         if (m_CM730->m_bulk_read_data[CM730_t::ID_CM].error == 0) {
-            motion_status_t::FB_GYRO = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_GYRO_Y_L) - m_fb_gyro_center;
-            motion_status_t::RL_GYRO = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_GYRO_X_L) - m_rl_gyro_center;
-            motion_status_t::RL_ACCEL = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_ACCEL_X_L);
-            motion_status_t::FB_ACCEL = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_ACCEL_Y_L);
-            fb_array[buf_idx] = motion_status_t::FB_ACCEL;
+            motion_status_t::y_gyro = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_GYRO_Y_L) - m_fb_gyro_center;
+            motion_status_t::x_gyro = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_GYRO_X_L) - m_rl_gyro_center;
+            motion_status_t::x_accel = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_ACCEL_X_L);
+            motion_status_t::y_accel = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_word(CM730_t::P_ACCEL_Y_L);
+            fb_array[buf_idx] = motion_status_t::y_accel;
             if (++buf_idx >= ACCEL_WINDOW_SIZE) buf_idx = 0;
         }
 
@@ -161,22 +161,22 @@ void motion_manager_t::process() {
         avr = sum / ACCEL_WINDOW_SIZE;
 
         if (avr < motion_status_t::FALLEN_F_LIMIT)
-            motion_status_t::FALLEN = FORWARD;
+            motion_status_t::fall_type = fall_type_t::FORWARD;
         else if (avr > motion_status_t::FALLEN_B_LIMIT)
-            motion_status_t::FALLEN = BACKWARD;
+            motion_status_t::fall_type = fall_type_t::BACKWARD;
         else
-            motion_status_t::FALLEN = STANDUP;
+            motion_status_t::fall_type = fall_type_t::STANDUP;
 
         if (!m_modules.empty()) {
             for (auto& module : m_modules) {
                 module->process();
                 for (int id = joint_data_t::ID_R_SHOULDER_PITCH; id < joint_data_t::NUMBER_OF_JOINTS; id++) {
                     if (module->joint.get_enable(id)) {
-                        motion_status_t::m_current_joints.set_value(id, module->joint.get_value(id));
+                        motion_status_t::current_joints.set_value(id, module->joint.get_value(id));
 
-                        motion_status_t::m_current_joints.set_p_gain(id, module->joint.get_p_gain(id));
-                        motion_status_t::m_current_joints.set_i_gain(id, module->joint.get_i_gain(id));
-                        motion_status_t::m_current_joints.set_d_gain(id, module->joint.get_d_gain(id));
+                        motion_status_t::current_joints.set_p_gain(id, module->joint.get_p_gain(id));
+                        motion_status_t::current_joints.set_i_gain(id, module->joint.get_i_gain(id));
+                        motion_status_t::current_joints.set_d_gain(id, module->joint.get_d_gain(id));
                     }
                 }
             }
@@ -186,19 +186,19 @@ void motion_manager_t::process() {
         int n = 0;
         int joint_num = 0;
         for (int id = joint_data_t::ID_R_SHOULDER_PITCH; id < joint_data_t::NUMBER_OF_JOINTS; id++) {
-            if (motion_status_t::m_current_joints.get_enable(id)) {
+            if (motion_status_t::current_joints.get_enable(id)) {
                 param[n++] = id;
-                param[n++] = motion_status_t::m_current_joints.get_d_gain(id);
-                param[n++] = motion_status_t::m_current_joints.get_i_gain(id);
-                param[n++] = motion_status_t::m_current_joints.get_p_gain(id);
+                param[n++] = motion_status_t::current_joints.get_d_gain(id);
+                param[n++] = motion_status_t::current_joints.get_i_gain(id);
+                param[n++] = motion_status_t::current_joints.get_p_gain(id);
                 param[n++] = 0;
-                param[n++] = CM730_t::get_low_byte(motion_status_t::m_current_joints.get_value(id) + Offset[id]);
-                param[n++] = CM730_t::get_high_byte(motion_status_t::m_current_joints.get_value(id) + Offset[id]);
+                param[n++] = CM730_t::get_low_byte(motion_status_t::current_joints.get_value(id) + Offset[id]);
+                param[n++] = CM730_t::get_high_byte(motion_status_t::current_joints.get_value(id) + Offset[id]);
                 joint_num++;
             }
 
             if (m_debug)
-                LOG_DEBUG << "MOTION MANAGER: ID[" << id << "] : " << motion_status_t::m_current_joints.get_value(id);
+                LOG_DEBUG << "MOTION MANAGER: ID[" << id << "] : " << motion_status_t::current_joints.get_value(id);
         }
 
         if (joint_num > 0)
@@ -208,7 +208,7 @@ void motion_manager_t::process() {
     m_CM730->bulk_read();
 
     if (m_CM730->m_bulk_read_data[CM730_t::ID_CM].error == 0)
-        motion_status_t::BUTTON = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_byte(CM730_t::P_BUTTON);
+        motion_status_t::button = m_CM730->m_bulk_read_data[CM730_t::ID_CM].read_byte(CM730_t::P_BUTTON);
 
     m_is_running = false;
 }

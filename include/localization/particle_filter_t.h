@@ -7,14 +7,12 @@
 #include <eigen3/Eigen/Dense>
 #include <log/trivial_logger_t.h>
 
-#include "pose_2D_t.h"
+#include "motion/pose2d_t.h"
 #include "localization/localization_util_t.h"
 
 
 
 namespace drwn {
-
-    // TODO: debug log print
     class particle_filter_t {
     public:
         static const int DEFAULT_PARTICLE_NUMBER = 100;
@@ -33,7 +31,7 @@ namespace drwn {
         using measurement_bundle = std::vector<Eigen::Vector4f>;
 
         struct particle_t {
-            pose_2D_t pose;
+            pose2d_t pose;
             float weight;
         };
 
@@ -58,15 +56,15 @@ namespace drwn {
         std::vector<particle_t> get_particles() const { return m_particles; }
 
         // Pose mean
-        pose_2D_t get_pose_mean() const { return m_poseMean; }
+        pose2d_t get_pose_mean() const { return m_poseMean; }
 
         // Pose standard deviation
-        pose_2D_t get_pose_std_dev() const { return m_poseDev; }
+        pose2d_t get_pose_std_dev() const { return m_poseDev; }
 
         // Get pose of the particle with highest weight
         particle_t get_top_particle() const { return m_particles[m_topParticleIndex]; }
 
-        static Eigen::Vector4f get_line_range_bearing(pose_2D_t robot_pose, float x1, float y1, float x2, float y2);
+        static Eigen::Vector4f get_line_range_bearing(pose2d_t robot_pose, float x1, float y1, float x2, float y2);
 
         void calc_pose_mean_cov();
 
@@ -155,9 +153,9 @@ namespace drwn {
         /* Util functions, place in separate class */
         float sample_normal_distribution(float variance);
 
-        pose_2D_t odometry_sample(pose_2D_t pose, Eigen::Vector3f command, Eigen::Vector3f noise);
+        pose2d_t odometry_sample(pose2d_t pose, Eigen::Vector3f command, Eigen::Vector3f noise);
 
-        Eigen::Vector3f get_odometry_command(pose_2D_t prevPose, pose_2D_t currPose);
+        Eigen::Vector3f get_odometry_command(pose2d_t prevPose, pose2d_t currPose);
 
         bool is_debug_enabled() const;
 
@@ -183,18 +181,18 @@ namespace drwn {
         } m_config;
 
         std::vector<particle_t> m_particles;
-        pose_2D_t m_poseMean, m_poseDev;
+        pose2d_t m_poseMean, m_poseDev;
         std::size_t m_topParticleIndex;
         drwn::field_map_t m_fieldWorld;
 
-        void init_particles(const pose_2D_t& pose, int num_particles);
+        void init_particles(const pose2d_t& pose, int num_particles);
 
         void init_particles(float min_x, float max_x, float min_y, float max_y, float min_theta, float max_theta,
                             int num_particles);
 
         void low_variance_resampling();
 
-        std::tuple<field_map_t::line_type_t, point_2D_t>
+        std::tuple<field_map_t::line_type_t, point2d_t>
         calc_expected_measurement(float rx, float ry, float rtheta, float measured_range, float measured_bearing);
     };
 

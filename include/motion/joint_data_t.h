@@ -107,7 +107,7 @@ namespace drwn {
         /*setter/getter angle of articulation id (in degrees)*/
         void set_angle(int id, float angle);
 
-        float set_angle(int id);
+        float get_angle(int id);
 
         void set_radian(int id, float radian);
 

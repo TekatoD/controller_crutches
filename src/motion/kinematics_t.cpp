@@ -60,7 +60,7 @@ bool kinematics_t::compute_leg_inverse_kinematics(float* out, float x, float y, 
     return true;
 }
 
-void kinematics_t::compute_leg_forward_kinematics(matrix_4x4f_t& out, float pelvis, float tight_roll, float tight_pitch,
+void kinematics_t::compute_leg_forward_kinematics(matrix4x4f_t& out, float pelvis, float tight_roll, float tight_pitch,
                                                 float knee_pitch, float ankle_pitch, float ankle_roll) {
     const float s1 = sinf(pelvis);
     const float c1 = cosf(pelvis);
@@ -110,7 +110,7 @@ void kinematics_t::compute_leg_forward_kinematics(matrix_4x4f_t& out, float pelv
            0.0, 0.0, 0.0, 1.0;
 }
 
-void kinematics_t::compute_head_forward_kinematics(matrix_4x4f_t& out, float pan, float tilt) {
+void kinematics_t::compute_head_forward_kinematics(matrix4x4f_t& out, float pan, float tilt) {
     // todo check order of angles
     const float s1 = sinf(pan);
     const float c1 = cosf(pan);

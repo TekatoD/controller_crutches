@@ -22,30 +22,30 @@
 
 #include <Eigen/Dense>
 
-using array_2f_t = Eigen::Array2f;
-using array_3f_t = Eigen::Array3f;
+using array2f_t = Eigen::Array2f;
+using array3f_t = Eigen::Array3f;
 
-using vector_2f_t = Eigen::Vector2f;
-using vector_3f_t = Eigen::Vector3f;
-using vector_4f_t = Eigen::Vector4f;
-using vector_5f_t = Eigen::Matrix<float, 5, 1>;
-using vector_6f_t = Eigen::Matrix<float, 6, 1>;
-using vector_Xf_t = Eigen::VectorXf;
+using vector2f_t = Eigen::Vector2f;
+using vector3f_t = Eigen::Vector3f;
+using vector4f_t = Eigen::Vector4f;
+using vector5f_t = Eigen::Matrix<float, 5, 1>;
+using vector6f_t = Eigen::Matrix<float, 6, 1>;
+using vectorXf_t = Eigen::VectorXf;
 
-using row_vector_2f_t = Eigen::RowVector2f;
-using row_vector_3f_t = Eigen::RowVector3f;
-using row_vector_4f_t = Eigen::RowVector4f;
-using row_vector_xf_t = Eigen::RowVectorXf;
+using row_vector2f_t = Eigen::RowVector2f;
+using row_vector3f_t = Eigen::RowVector3f;
+using row_vector4f_t = Eigen::RowVector4f;
+using row_vectorxf_t = Eigen::RowVectorXf;
 
-using matrix_2x2f_t = Eigen::Matrix2f;
-using matrix_2x3f_t = Eigen::Matrix<float, 2, 3>;
-using matrix_2x4f_t = Eigen::Matrix<float, 2, 4>;
-using matrix_3x2f_t = Eigen::Matrix<float, 3, 2>;
-using matrix_3x3f_t = Eigen::Matrix3f;
-using matrix_4x2f_t = Eigen::Matrix<float, 4, 2>;
-using matrix_4x3f_t = Eigen::Matrix<float, 4, 3>;
-using matrix_4x4f_t = Eigen::Matrix4f;
-using matrix_xf_t = Eigen::MatrixXf;
+using matrix2x2f_t = Eigen::Matrix2f;
+using matrix2x3f_t = Eigen::Matrix<float, 2, 3>;
+using matrix2x4f_t = Eigen::Matrix<float, 2, 4>;
+using matrix3x2f_t = Eigen::Matrix<float, 3, 2>;
+using matrix3x3f_t = Eigen::Matrix3f;
+using matrix4x2f_t = Eigen::Matrix<float, 4, 2>;
+using matrix4x3f_t = Eigen::Matrix<float, 4, 3>;
+using matrix4x4f_t = Eigen::Matrix4f;
+using matrixxf_t = Eigen::MatrixXf;
 
-using quaternion_f_t = Eigen::Quaternionf;
-using angle_axis_f_t = Eigen::AngleAxisf;
+using quaternionf_t = Eigen::Quaternionf;
+using angle_axisf_t = Eigen::AngleAxisf;

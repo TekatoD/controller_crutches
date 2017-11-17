@@ -1,23 +1,9 @@
 /**
- * Copyright 2016 Arseniy Ivin <arssivka@yandex.ru>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
  *  @autor arssivka
  *  @date 5/3/17
  */
 
-#include "go_to_t.h"
+#include "behavior/go_to_t.h"
 #include "motion/modules/walking_t.h"
 
 #define PI (3.14159265)
@@ -27,10 +13,10 @@ bool drwn::go_to_t::is_done() const {
     return m_done;
 }
 
-void drwn::go_to_t::process(drwn::pose_2D_t pos) {
+void drwn::go_to_t::process(drwn::pose2d_t pos) {
     m_done = true;
-    float dist = hypot(pos.x(), pos.y());
-    float angle = atan2(pos.y(), pos.x()) / M_PI * 180.0;
+    float dist = hypotf(pos.x(), pos.y());
+    float angle = atan2f(pos.y(), pos.x()) / M_PI * 180.0;
 
     if (!walking_t::get_instance()->is_running() ||
             walking_t::get_instance()->get_x_move_amplitude() != m_x ||

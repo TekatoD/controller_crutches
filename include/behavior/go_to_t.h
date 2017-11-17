@@ -22,12 +22,24 @@
 
 #include <cmath>
 #include "math/point_t.h"
-#include "pose_2D_t.h"
-
-#define GOTO_SECTION ("Goto")
+#include "motion/pose2d_t.h"
 
 namespace drwn {
     class go_to_t {
+    public:
+        static go_to_t* get_instance() {
+            static go_to_t instance;
+            return &instance;
+        }
+
+        go_to_t();
+
+        ~go_to_t() {}
+
+        bool is_done() const;
+
+        void process(pose2d_t pos);
+
     private:
         float m_max_speed;
         float m_fit_speed;
@@ -48,15 +60,6 @@ namespace drwn {
 
 
         bool m_done;
-    public:
-
-        go_to_t();
-
-        ~go_to_t() {}
-
-        bool is_done() const;
-
-        void process(pose_2D_t pos);
     };
 }
 

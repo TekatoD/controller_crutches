@@ -71,9 +71,9 @@ void white_ball_vision_processor_t::update_members() {
 
     if (m_field_processing_enabled) {
         if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: Processing field";
-        cv::Mat field_prep = m_field_preproc.preprocess(m_src_img);
-        m_field_mask = m_field_detector.detect(field_prep);
-//        m_field_mask = m_field_preproc.preprocess(m_src_img);
+//        cv::Mat field_prep = m_field_preproc.preprocess(m_src_img);
+//        m_field_mask = m_field_detector.detect(field_prep);
+        m_field_mask = m_field_preproc.preprocess(m_src_img);
         cv::Mat tmp;
         cv::cvtColor(m_src_img, tmp, CV_BGR2YUV);
         tmp.copyTo(tmp, m_field_mask);
@@ -432,4 +432,22 @@ void white_ball_vision_processor_t::set_ball_detector_area_low(double low_area) 
 
 double white_ball_vision_processor_t::get_ball_detector_area_low() {
     return m_ball_detector.get_area_low();
+}
+
+void white_ball_vision_processor_t::set_ball_detector_type(int detector_type) {
+    if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: detector_type = " << detector_type;
+    m_ball_detector.set_detector_type(detector_type);
+}
+
+int white_ball_vision_processor_t::get_ball_detector_type() {
+    return m_ball_detector.get_detector_type();
+}
+
+void white_ball_vision_processor_t::set_ball_detector_cascade_config(std::string path) {
+    if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: haar_path = " << path;
+    m_ball_detector.set_cascade_config(path);
+}
+
+const std::string& white_ball_vision_processor_t::get_ball_detector_cascade_config() const {
+    return m_ball_detector.get_cascade_config();
 }

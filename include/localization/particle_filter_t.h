@@ -8,8 +8,8 @@
 #include <log/trivial_logger_t.h>
 
 #include "motion/pose2d_t.h"
-#include "localization/localization_util_t.h"
-
+#include "localization/line_t.h"
+#include "field_map_t.h"
 
 
 namespace drwn {

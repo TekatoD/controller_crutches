@@ -94,6 +94,8 @@ namespace drwn {
 
         void init_configuraion_loader();
 
+        void init_field();
+
         void parse_command_line_arguments();
 
         void apply_debug_arguments();
@@ -104,7 +106,6 @@ namespace drwn {
 
     private:
         bool m_debug{false}; // Debug output to console
-        bool m_show_help_message{false};
 
         command_arguments_t m_arguments;
 
@@ -114,6 +115,7 @@ namespace drwn {
         std::unique_ptr<white_ball_vision_processor_t> m_vision_processor{nullptr};
         std::unique_ptr<particle_filter_t> m_particle_filter{nullptr};
         std::unique_ptr<behavior_t> m_behavior{nullptr};
+        std::unique_ptr<field_map_t> m_field;
 
         //*** Configuration members ***//
         configuration_file_loader_t m_configuration_loader;
@@ -146,6 +148,7 @@ namespace drwn {
         debug_mode_arguments_parsing_strategy_t m_arg_debug_image_source;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_vision_processor;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_localization;
+        debug_mode_arguments_parsing_strategy_t m_arg_debug_field;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_ball_tracker;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_ball_searcher;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_ball_follower;

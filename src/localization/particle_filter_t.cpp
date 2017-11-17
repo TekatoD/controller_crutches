@@ -40,7 +40,7 @@ void particle_filter_t::initialize()
 
 void particle_filter_t::predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise)
 {
-    assert(m_particle.size() != 0);
+    assert(m_particles.size() != 0);
 
     for (auto& particle : m_particles) {
         particle.pose = odometry_sample(particle.pose, command, noise);

@@ -7,7 +7,7 @@
 #include <pose_2D_t.h.h>
 #include <math/Point.h>
 #include <localization/particle_filter_t.h>
-#include <localization/localization_util_t.h>
+#include <localization/line_t.h>
 
 using namespace Eigen;
 using namespace localization;

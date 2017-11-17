@@ -260,6 +260,7 @@ void robot_application_t::init_configuraion_loader() {
     m_configuration_loader.add_strategy(m_motion_manager_configuration_strategy, m_arg_config_motion_manager);
     m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy, m_arg_config_white_ball_vision_processor);
     m_configuration_loader.add_strategy(m_localization_field_configuration_strategy, m_arg_config_localization_field);
+    m_configuration_loader.add_strategy(m_localization_field_configuration_strategy, m_arg_config_localization_field);
     m_configuration_loader.add_strategy(m_particle_filter_configuration_strategy, m_arg_config_particle_filter);
     m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy,
                                         m_arg_config_white_ball_vision_processor);
@@ -302,6 +303,7 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_debug_ball_tracker);
     parser.add_strategy(m_arg_debug_ball_follower);
     parser.add_strategy(m_arg_debug_go_to);
+    parser.add_strategy(m_arg_debug_localization);
 
     parser.add_strategy(m_arg_config_default);
     parser.add_strategy(m_arg_config_ball_searcher);
@@ -334,6 +336,7 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_camera.set_option("dbg-camera", "enable debug output for camera");
     m_arg_debug_vision_processor.set_option("dbg-cv", "enable debug output for cv");
     m_arg_debug_localization.set_option("dbg-localization", "enable debug output for localization module");
+    m_arg_debug_field.set_option("dbg-field", "enable debug for field properties");
     m_arg_debug_image_source.set_option("dbg-img-source", "enabled debug output for image source");
     m_arg_debug_ball_searcher.set_option("dbg-ball-searcher", "enable debug output for ball searcher");
     m_arg_debug_ball_tracker.set_option("dbg-ball-tracker", "enable debug output for ball tracker");
@@ -397,7 +400,7 @@ void robot_application_t::read_configuration() {
     if (m_debug) LOG_DEBUG << "Reading configuration...";
     m_configuration_loader.configure_all();
     m_action_configuration_loader.read_motion_file();
-    if (m_debug) LOG_INFO << "Reading configuration was finished";
+    if (m_debug) LOG_INFO << "Reading configuration has finished";
 }
 
 void robot_application_t::init_behavior() {
@@ -409,11 +412,11 @@ void robot_application_t::init_behavior() {
 }
 
 void robot_application_t::start_main_loop() {
-    if (m_debug) LOG_INFO << "=== Controller was started ===";
+    if (m_debug) LOG_INFO << "=== Controller has started ===";
     while (is_running()) {
         m_behavior->process();
     }
-    if (m_debug) LOG_INFO << "=== Controller was finished ===";
+    if (m_debug) LOG_INFO << "=== Controller has finished ===";
 
 }
 
@@ -423,4 +426,12 @@ bool robot_application_t::is_debug_enabled() const noexcept {
 
 void robot_application_t::enable_debug(bool debug) noexcept {
     m_debug = debug;
+}
+
+void robot_application_t::init_field() {
+    if (m_debug) LOG_DEBUG << "Creating field...";
+    m_field = std::make_unique<field_map_t>();
+    m_localization_field_configuration_strategy.set_field_map(m_field.get());
+    m_field->enable_debug(m_arg_debug_all || m_arg_debug_field);
+    if (m_debug) LOG_INFO << "Field has created";
 }

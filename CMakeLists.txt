@@ -102,8 +102,6 @@ set(SRC
         include/motion/odometry_collector_t.h
         src/behavior/go_to_t.cpp
         include/behavior/go_to_t.h
-        src/field_t.cpp
-        include/field_t.h
         src/behavior/ball_searcher_t.cpp
         include/behavior/ball_searcher_t.h
         include/hw/CM730_t.h
@@ -202,8 +200,8 @@ set(SRC
         include/hw/robot_image_source_t.h
         src/config/strategies/robot_image_source_configuration_strategy_t.cpp
         include/config/strategies/robot_image_source_configuration_strategy_t.h
-        include/localization/localization_util_t.h
-        src/localization/localization_util_t.cpp
+        include/localization/line_t.h
+        src/localization/line_t.cpp
         include/localization/particle_filter_t.h
         src/localization/particle_filter_t.cpp
         include/config/strategies/particle_filter_configuration_strategy_t.h
@@ -220,7 +218,7 @@ set(SRC
         include/behavior/soccer_behavior_t.h
         include/tool/time_based_holder_t.h
         src/config/strategies/ball_follower_configuration_strategy_t.cpp
-        include/config/strategies/ball_follower_configuration_strategy_t.h)
+        include/config/strategies/ball_follower_configuration_strategy_t.h src/localization/field_map_t.cpp include/localization/field_map_t.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

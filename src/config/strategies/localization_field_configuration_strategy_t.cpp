@@ -6,13 +6,12 @@
 
 using namespace drwn;
 
-localization_field_configuration_strategy_t::localization_field_configuration_strategy_t(field_map_t* field_ptr, std::string section)
-    : configuration_strategy_t(std::move(section)), m_field_map(field_ptr)
-{
+localization_field_configuration_strategy_t::localization_field_configuration_strategy_t(field_map_t* field_ptr,
+                                                                                         std::string section)
+        : configuration_strategy_t(std::move(section)), m_field_map(field_ptr) {
 }
 
-void localization_field_configuration_strategy_t::read_config(const boost::property_tree::ptree& prop)
-{
+void localization_field_configuration_strategy_t::read_config(const boost::property_tree::ptree& prop) {
     if (m_field_map == nullptr) {
         throw std::runtime_error{"Localization configuration load failure: m_field_map nullptr"};
     }
@@ -34,18 +33,15 @@ void localization_field_configuration_strategy_t::read_config(const boost::prope
     if (penalty_height) { m_field_map->set_penalty_height(penalty_height.get()); }
 }
 
-void localization_field_configuration_strategy_t::write_config(boost::property_tree::ptree& prop) const
-{
+void localization_field_configuration_strategy_t::write_config(boost::property_tree::ptree& prop) const {
     //TODO: :^)
 }
 
-void localization_field_configuration_strategy_t::set_field_map(drwn::field_map_t* field_ptr)
-{
+void localization_field_configuration_strategy_t::set_field_map(drwn::field_map_t* field_ptr) {
     m_field_map = field_ptr;
 }
 
-drwn::field_map_t* localization_field_configuration_strategy_t::get_field_map() const
-{
+drwn::field_map_t* localization_field_configuration_strategy_t::get_field_map() const {
     return m_field_map;
 }
 

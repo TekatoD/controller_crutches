@@ -17,6 +17,8 @@
 #include <config/strategies/robot_image_source_configuration_strategy_t.h>
 #include <config/strategies/white_ball_vision_processor_arguments_parsing_strategy_t.h>
 #include <config/strategies/white_ball_vision_processor_configuration_strategy_t.h>
+#include <config/strategies/localization_field_configuration_strategy_t.h>
+#include <config/strategies/particle_filter_configuration_strategy_t.h>
 #include <behavior/behavior_t.h>
 #include "config/configuration_file_loader_t.h"
 #include "config/strategies/walking_configuration_strategy_t.h"
@@ -80,6 +82,8 @@ namespace drwn {
 
         void init_cv();
 
+        void init_localization();
+
         void init_motion_manager();
 
         void init_motion_modules();
@@ -108,6 +112,7 @@ namespace drwn {
         std::unique_ptr<CM730_t> m_cm730{nullptr};
         std::unique_ptr<linux_motion_timer_t> m_motion_timer{nullptr};
         std::unique_ptr<white_ball_vision_processor_t> m_vision_processor{nullptr};
+        std::unique_ptr<particle_filter_t> m_particle_filter{nullptr};
         std::unique_ptr<behavior_t> m_behavior{nullptr};
 
         //*** Configuration members ***//
@@ -121,6 +126,8 @@ namespace drwn {
         motion_manager_configuration_strategy_t m_motion_manager_configuration_strategy;
         robot_image_source_configuration_strategy_t m_robot_image_source_configuration_strategy;
         white_ball_vision_processor_configuration_strategy_t m_white_ball_vision_processor_configuration_strategy;
+        localization_field_configuration_strategy_t m_localization_field_configuration_strategy;
+        particle_filter_configuration_strategy_t m_particle_filter_configuration_strategy;
 
         //*** Command line parsing strategies ***//
         help_arguments_parsing_strategy_t m_arg_help_requested;
@@ -138,6 +145,7 @@ namespace drwn {
         debug_mode_arguments_parsing_strategy_t m_arg_debug_camera;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_image_source;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_vision_processor;
+        debug_mode_arguments_parsing_strategy_t m_arg_debug_localization;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_ball_tracker;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_ball_searcher;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_ball_follower;
@@ -152,6 +160,8 @@ namespace drwn {
         config_path_arguments_parsing_strategy_t m_arg_config_kicking;
         config_path_arguments_parsing_strategy_t m_arg_config_image_source;
         config_path_arguments_parsing_strategy_t m_arg_config_white_ball_vision_processor;
+        config_path_arguments_parsing_strategy_t m_arg_config_localization_field;
+        config_path_arguments_parsing_strategy_t m_arg_config_particle_filter;
         config_path_arguments_parsing_strategy_t m_arg_config_ball_searcher;
         config_path_arguments_parsing_strategy_t m_arg_config_ball_tracker;
         config_path_arguments_parsing_strategy_t m_arg_config_ball_follower;

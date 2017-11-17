@@ -202,6 +202,16 @@ set(SRC
         include/hw/robot_image_source_t.h
         src/config/strategies/robot_image_source_configuration_strategy_t.cpp
         include/config/strategies/robot_image_source_configuration_strategy_t.h
+        include/localization/localization_util_t.h
+        src/localization/localization_util_t.cpp
+        include/localization/particle_filter_t.h
+        src/localization/particle_filter_t.cpp
+        include/config/strategies/particle_filter_configuration_strategy_t.h
+        src/config/strategies/particle_filter_configuration_strategy_t.cpp
+        include/config/strategies/localization_field_configuration_strategy_t.h
+        src/config/strategies/localization_field_configuration_strategy_t.cpp
+        include/localization/localization_t.h
+        src/localization/localization_t.cpp
         src/config/strategies/white_ball_vision_processor_arguments_parsing_strategy_t.cpp
         include/config/strategies/white_ball_vision_processor_arguments_parsing_strategy_t.h
         src/behavior/image_processing_behavior_t.cpp

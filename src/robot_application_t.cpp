@@ -16,6 +16,8 @@
 #include "motion/modules/kicking_t.h"
 #include "motion/modules/walking_t.h"
 #include "motion/modules/head_t.h"
+#include "localization/particle_filter_t.h"
+#include "localization/localization_t.h"
 #include "robot_application_t.h"
 
 #ifdef CROSSCOMPILE
@@ -82,6 +84,7 @@ void robot_application_t::initialize() {
     this->check_hw_status();
     this->init_CM730();
     this->init_cv();
+    this->init_localization();
     this->init_motion_manager();
     this->init_motion_modules();
     this->init_motion_timer();
@@ -194,6 +197,20 @@ void robot_application_t::init_cv() {
     if (m_debug) LOG_INFO << "CV pipeline is ready";
 }
 
+void robot_application_t::init_localization() {
+    if (m_debug) LOG_DEBUG << "Initializing localization...";
+
+    auto particle_filter = std::make_unique<particle_filter_t>();
+    m_particle_filter = std::move(particle_filter);
+
+    localization_t::get_instance()->set_particle_filter(m_particle_filter.get());
+    if (m_arg_debug_all || m_arg_debug_localization) {
+        localization_t::get_instance()->enable_debug(true);
+    }
+
+    if (m_debug) LOG_INFO << "Localization is ready";
+}
+
 void robot_application_t::init_motion_manager() {
     if (m_debug) LOG_DEBUG << "Initializing motion manager...";
     if (!motion_manager_t::get_instance()->initialize(m_cm730.get())) {
@@ -201,6 +218,7 @@ void robot_application_t::init_motion_manager() {
     }
     if (m_debug) LOG_INFO << "Motion manager is ready";
 }
+
 
 void robot_application_t::init_motion_modules() {
     if (m_debug) LOG_DEBUG << "Initializing motion modules...";
@@ -232,11 +250,17 @@ void robot_application_t::init_configuraion_loader() {
     if (m_debug) LOG_DEBUG << "Initializing configuration loader...";
     //TODO Don't forget uncomment this lines
     m_white_ball_vision_processor_configuration_strategy.set_white_ball_vision_processor(m_vision_processor.get());
+    m_localization_field_configuration_strategy.set_field_map(m_particle_filter->get_field_map());
+    m_particle_filter_configuration_strategy.set_particle_filter(m_particle_filter.get());
+
     m_configuration_loader.set_default_path(m_arg_config_default);
     m_configuration_loader.add_strategy(m_game_controller_configuration_strategy, m_arg_config_game_controller);
     m_configuration_loader.add_strategy(m_head_configuration_strategy, m_arg_config_head);
     m_configuration_loader.add_strategy(m_walking_configuration_strategy, m_arg_config_walking);
     m_configuration_loader.add_strategy(m_motion_manager_configuration_strategy, m_arg_config_motion_manager);
+    m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy, m_arg_config_white_ball_vision_processor);
+    m_configuration_loader.add_strategy(m_localization_field_configuration_strategy, m_arg_config_localization_field);
+    m_configuration_loader.add_strategy(m_particle_filter_configuration_strategy, m_arg_config_particle_filter);
     m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy,
                                         m_arg_config_white_ball_vision_processor);
     m_configuration_loader.add_strategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
@@ -273,6 +297,7 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_debug_image_source);
     parser.add_strategy(m_arg_debug_camera);
     parser.add_strategy(m_arg_debug_vision_processor);
+    parser.add_strategy(m_arg_debug_localization);
     parser.add_strategy(m_arg_debug_ball_searcher);
     parser.add_strategy(m_arg_debug_ball_tracker);
     parser.add_strategy(m_arg_debug_ball_follower);
@@ -288,6 +313,8 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_config_action);
     parser.add_strategy(m_arg_config_kicking);
     parser.add_strategy(m_arg_config_white_ball_vision_processor);
+    parser.add_strategy(m_arg_config_localization_field);
+    parser.add_strategy(m_arg_config_particle_filter);
 
     parser.add_strategy(m_arg_white_ball_vision_processor);
 
@@ -306,6 +333,7 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_leds.set_option("dbg-kicking", "enable debug output for LEDs");
     m_arg_debug_camera.set_option("dbg-camera", "enable debug output for camera");
     m_arg_debug_vision_processor.set_option("dbg-cv", "enable debug output for cv");
+    m_arg_debug_localization.set_option("dbg-localization", "enable debug output for localization module");
     m_arg_debug_image_source.set_option("dbg-img-source", "enabled debug output for image source");
     m_arg_debug_ball_searcher.set_option("dbg-ball-searcher", "enable debug output for ball searcher");
     m_arg_debug_ball_tracker.set_option("dbg-ball-tracker", "enable debug output for ball tracker");
@@ -320,6 +348,8 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_config_kicking.set_option("cfg-kicking", "config file for kicking motion module");
     m_arg_config_action.set_option("cfg-action", "path to motion_4096.bin");
     m_arg_config_white_ball_vision_processor.set_option("cfg-cv", "path to cv config");
+    m_arg_config_localization_field.set_option("cfg-loc-field", "path to localization field config");
+    m_arg_config_particle_filter.set_option("cfg-pf", "path to particle filter config");
     m_arg_config_image_source.set_option("cfg-image-source", "config file for image source");
     m_arg_config_ball_tracker.set_option("cfg-ball-tracker", "config file for ball tracker");
     m_arg_config_ball_searcher.set_option("cfg-ball-searcher", "config file for ball searcher");
@@ -360,6 +390,7 @@ void robot_application_t::apply_debug_arguments() {
     if (m_arg_debug_all  || m_arg_debug_ball_follower)
         ball_follower_t::get_instance()->enable_debug(true);
     // Image source debug placed located in init_cv
+    // Localization debug is in init_localization
 }
 
 void robot_application_t::read_configuration() {

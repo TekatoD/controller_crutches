@@ -28,6 +28,7 @@ namespace drwn {
 
         /*compute the euclidean distance between pt1 and pt2*/
         static float Distance(point2d_t& pt1, point2d_t& pt2);
+        static float Distance(const point2d_t& pt1, const point2d_t& pt2);
 
         point2d_t& operator=(const point2d_t& point);
 

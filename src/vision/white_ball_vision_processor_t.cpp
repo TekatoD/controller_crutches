@@ -89,58 +89,9 @@ void white_ball_vision_processor_t::update_members() {
     m_line_preproc_img = m_line_preproc.preprocess(img);
     m_lines = m_line_detector.detect(m_line_preproc_img);
     if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: Detecting white ball";
-    m_ball = m_ball_detector.detect(m_line_preproc_img, m_lines);
+    m_ball = m_ball_detector.detect(m_line_preproc_img, m_src_img, m_lines);
     m_img_processed = true;
     if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: Processing has been finished";
-}
-
-const cv::Scalar& white_ball_vision_processor_t::get_ball_preprocessor_threshold_gabor_bgr_min() const {
-    return m_ball_preproc.get_threshold_gabor_bgr_min();
-}
-
-void white_ball_vision_processor_t::set_ball_preprocessor_threshold_gabor_bgr_min(
-        const cv::Scalar& threshold_gabor_bgr_min) {
-    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: ball_preprocessor_threshold_gabor_bgr_min = " << threshold_gabor_bgr_min;
-    m_ball_preproc.set_threshold_gabor_bgr_min(threshold_gabor_bgr_min);
-}
-
-const cv::Scalar& white_ball_vision_processor_t::get_ball_preprocessor_threshold_gabor_bgr_max() const {
-    return m_ball_preproc.get_threshold_gabor_bgr_max();
-}
-
-void white_ball_vision_processor_t::set_ball_preprocessor_threshold_gabor_bgr_max(
-        const cv::Scalar& threshold_gabor_bgr_max) {
-    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: ball_preprocessor_threshold_gabor_bgr_max = " << threshold_gabor_bgr_max;
-    m_ball_preproc.set_threshold_gabor_bgr_max(threshold_gabor_bgr_max);
-}
-
-const cv::Scalar& white_ball_vision_processor_t::get_ball_preprocessor_threshold_color_bgr_min() const {
-    return m_ball_preproc.get_threshold_color_bgr_min();
-}
-
-void white_ball_vision_processor_t::set_ball_preprocessor_threshold_color_bgr_min(
-        const cv::Scalar& threshold_color_bgr_min) {
-    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: ball_preprocessor_threshold_color_bgr_min = " << threshold_color_bgr_min;
-    m_ball_preproc.set_threshold_color_bgr_min(threshold_color_bgr_min);
-}
-
-const cv::Scalar& white_ball_vision_processor_t::get_ball_preprocessor_threshold_color_bgr_max() const {
-    return m_ball_preproc.get_threshold_color_bgr_max();
-}
-
-void white_ball_vision_processor_t::set_ball_preprocessor_threshold_color_bgr_max(
-        const cv::Scalar& threshold_color_bgr_max) {
-    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: ball_preprocessor_threshold_color_bgr_max = " << threshold_color_bgr_max;
-    m_ball_preproc.set_threshold_color_bgr_max(threshold_color_bgr_max);
-}
-
-int white_ball_vision_processor_t::get_ball_preprocessor_median_blur_size() const {
-    return m_ball_preproc.get_median_blur_size();
-}
-
-void white_ball_vision_processor_t::set_ball_preprocessor_median_blur_size(int median_blur_size) {
-    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: ball_preprocessor_median_blur_size = " << median_blur_size;
-    m_ball_preproc.set_median_blur_size(median_blur_size);
 }
 
 const cv::Scalar& white_ball_vision_processor_t::get_field_preprocessor_threshold_gabor_bgr_min() const {
@@ -450,4 +401,45 @@ void white_ball_vision_processor_t::set_ball_detector_cascade_config(std::string
 
 const std::string& white_ball_vision_processor_t::get_ball_detector_cascade_config() const {
     return m_ball_detector.get_cascade_config();
+}
+
+
+const cv::Scalar& white_ball_vision_processor_t::get_ball_detector_threshold_gabor_bgr_min() const {
+    return m_ball_detector.get_threshold_color_bgr_min();
+}
+
+void white_ball_vision_processor_t::set_ball_detector_threshold_gabor_bgr_min(const cv::Scalar& threshold_gabor_bgr_min) {
+    m_ball_detector.set_threshold_color_bgr_min(threshold_gabor_bgr_min);
+}
+
+const cv::Scalar& white_ball_vision_processor_t::get_ball_detector_threshold_gabor_bgr_max() const {
+    return m_ball_detector.get_threshold_color_bgr_max();
+}
+
+void white_ball_vision_processor_t::set_ball_detector_threshold_gabor_bgr_max(const cv::Scalar& threshold_gabor_bgr_max) {
+    m_ball_detector.set_threshold_gabor_bgr_max(threshold_gabor_bgr_max);
+}
+
+const cv::Scalar& white_ball_vision_processor_t::get_ball_detector_threshold_color_bgr_min() const {
+    return m_ball_detector.get_threshold_color_bgr_min();
+}
+
+void white_ball_vision_processor_t::set_ball_detector_threshold_color_bgr_min(const cv::Scalar& threshold_color_bgr_min) {
+    m_ball_detector.set_threshold_color_bgr_min(threshold_color_bgr_min);
+}
+
+const cv::Scalar& white_ball_vision_processor_t::get_ball_detector_threshold_color_bgr_max() const {
+    return m_ball_detector.get_threshold_color_bgr_max();
+}
+
+void white_ball_vision_processor_t::set_ball_detector_threshold_color_bgr_max(const cv::Scalar& threshold_color_bgr_max) {
+    m_ball_detector.set_threshold_gabor_bgr_max(threshold_color_bgr_max);
+}
+
+int white_ball_vision_processor_t::get_ball_detector_median_blur_size() const {
+    return m_ball_detector.get_median_blur_size();
+}
+
+void white_ball_vision_processor_t::set_ball_detector_median_blur_size(int median_blur_size) {
+    m_ball_detector.set_median_blur_size(median_blur_size);
 }

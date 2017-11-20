@@ -169,7 +169,7 @@ void robot_application_t::check_firmware() {
 
 void robot_application_t::init_cv() {
     if (m_debug) LOG_DEBUG << "Initializing camera...";
-#ifdef CROSSCOMPILATION
+#ifdef CROSSCOMPILE
     auto image_source = std::make_unique<robot_image_source_t>(camera_t::WIDTH, camera_t::HEIGHT);
 #else
     auto image_source = std::make_unique<vrep_image_source_t>("camera", camera_t::WIDTH, camera_t::HEIGHT);
@@ -271,7 +271,7 @@ void robot_application_t::init_configuraion_loader() {
     m_configuration_loader.add_strategy(m_ball_tracker_configuration_strategy, m_arg_config_ball_searcher);
     m_configuration_loader.add_strategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
 
-#ifdef CROSSCOMPILATION
+#ifdef CROSSCOMPILE
     m_robot_image_source_configuration_strategy.set_image_source(m_image_source.get());
     m_configuration_loader.add_strategy(m_robot_image_source_configuration_strategy, m_arg_config_image_source);
 #endif

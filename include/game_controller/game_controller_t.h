@@ -71,7 +71,7 @@ namespace drwn {
         int m_team_number;
         robo_cup_game_control_data_t m_game_ctrl_data;
 
-        udp_comm_t* m_udp;
+        udp_comm_t* m_udp{nullptr};
         in_addr m_game_controller_address;
         clock_t m_when_packet_was_received;
         clock_t m_when_packet_was_sent;

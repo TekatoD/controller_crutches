@@ -93,3 +93,11 @@ std::map<std::string, std::list<configuration_strategy_t*>> configuration_file_l
     }
     return result;
 }
+
+bool configuration_file_loader_t::is_debug_enabled() const {
+    return m_debug;
+}
+
+void configuration_file_loader_t::enable_debug(bool debug) {
+    m_debug = debug;
+}

@@ -24,6 +24,10 @@ namespace drwn {
 
         void set_default_path(std::string path);
 
+        bool is_debug_enabled() const;
+
+        void enable_debug(bool debug);
+
     private:
         static boost::property_tree::ptree read_property_from_file(const std::string& path);
 

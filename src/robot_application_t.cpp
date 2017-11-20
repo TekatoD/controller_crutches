@@ -380,6 +380,7 @@ void robot_application_t::apply_debug_arguments() {
     ball_tracker_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_ball_tracker);
     ball_follower_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_ball_follower);
     field_map_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_field);
+    m_configuration_loader.enable_debug(m_arg_debug_all);
     // Image source debug placed located in init_cv
     // Localization debug is in init_localization
 }

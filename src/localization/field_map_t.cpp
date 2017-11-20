@@ -14,27 +14,27 @@ field_map_t* field_map_t::get_instance() {
 }
 
 void field_map_t::set_field_width(float field_width) {
-    if (m_debug) LOG_DEBUG << "Field width: " << field_width;
+    if (m_debug) LOG_DEBUG << "FIELD: width = " << field_width;
     m_config.field_width = field_width;
 }
 
 void field_map_t::set_field_height(float field_height) {
-    if (m_debug) LOG_DEBUG << "Field height: " << field_height;
+    if (m_debug) LOG_DEBUG << "FIELD: height = " << field_height;
     m_config.field_height = field_height;
 }
 
 void field_map_t::set_gate_height(float gate_height) {
-    if (m_debug) LOG_DEBUG << "Gate height: " << gate_height;
+    if (m_debug) LOG_DEBUG << "FIELD: gate_height = " << gate_height;
     m_config.gate_height = gate_height;
 }
 
 void field_map_t::set_penalty_width(float penalty_width) {
-    if (m_debug) LOG_DEBUG << "Penalty width: " << penalty_width;
+    if (m_debug) LOG_DEBUG << "FIELD: penalty_width = " << penalty_width;
     m_config.penalty_width = penalty_width;
 }
 
 void field_map_t::set_penalty_height(float penalty_height) {
-    if (m_debug) LOG_DEBUG << "Penalty height: " << penalty_height;
+    if (m_debug) LOG_DEBUG << "FIELD: penalty_height = " << penalty_height;
     m_config.penalty_height = penalty_height;
 }
 

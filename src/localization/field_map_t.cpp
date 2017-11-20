@@ -56,9 +56,9 @@ void field_map_t::initialize_field() {
 void field_map_t::log_field_lines() const {
     if (!m_debug) return;
 
-    LOG_DEBUG << "Field lines";
+    LOG_DEBUG << "FIELD: Field lines";
     for (auto& kv : m_field_lines) {
-        LOG_DEBUG << (int) kv.first << " : " << kv.second;
+        LOG_DEBUG << "FIELD: " << (int) kv.first << " : " << kv.second;
     }
 }
 

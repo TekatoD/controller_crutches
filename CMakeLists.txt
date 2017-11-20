@@ -49,7 +49,7 @@ find_package(Threads REQUIRED)
 find_package(JPEG REQUIRED) # This lib is used by the linux camera
 find_package(Eigen3 REQUIRED)
 # Path to Boost and OpenCV needs to be set manually when crosscompiling
-find_package(Boost 1.54 COMPONENTS system log_setup log date_time filesystem thread program_options REQUIRED)
+find_package(Boost 1.54 COMPONENTS system log_setup log date_time filesystem thread program_options regex REQUIRED)
 find_package(OpenCV 3.3 REQUIRED)
 find_package(LibXml2)
 
@@ -218,7 +218,9 @@ set(SRC
         include/behavior/soccer_behavior_t.h
         include/tool/time_based_holder_t.h
         src/config/strategies/ball_follower_configuration_strategy_t.cpp
-        include/config/strategies/ball_follower_configuration_strategy_t.h src/localization/field_map_t.cpp include/localization/field_map_t.h)
+        include/config/strategies/ball_follower_configuration_strategy_t.h
+        src/localization/field_map_t.cpp
+        include/localization/field_map_t.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

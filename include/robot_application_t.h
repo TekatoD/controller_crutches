@@ -94,8 +94,6 @@ namespace drwn {
 
         void init_configuraion_loader();
 
-        void init_field();
-
         void parse_command_line_arguments();
 
         void apply_debug_arguments();
@@ -115,7 +113,6 @@ namespace drwn {
         std::unique_ptr<white_ball_vision_processor_t> m_vision_processor{nullptr};
         std::unique_ptr<particle_filter_t> m_particle_filter{nullptr};
         std::unique_ptr<behavior_t> m_behavior{nullptr};
-        std::unique_ptr<field_map_t> m_field;
 
         //*** Configuration members ***//
         configuration_file_loader_t m_configuration_loader;

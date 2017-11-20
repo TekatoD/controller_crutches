@@ -13,19 +13,13 @@ namespace drwn {
     public:
         static constexpr char DEFAULT_SECTION[] = "Localization field";
 
-        explicit localization_field_configuration_strategy_t(field_map_t* field_ptr = nullptr,
-                                                             std::string section = DEFAULT_SECTION);
+        explicit localization_field_configuration_strategy_t(std::string section = DEFAULT_SECTION);
 
         void read_config(const boost::property_tree::ptree& prop) override;
 
         void write_config(boost::property_tree::ptree& prop) const override;
 
-        void set_field_map(field_map_t* field_ptr);
-
-        field_map_t* get_field_map() const;
-
     private:
-        field_map_t* m_field_map;
     };
 }
 

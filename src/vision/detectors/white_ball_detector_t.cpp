@@ -59,7 +59,7 @@ cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const cv::Mat& s
             double max_area = 0;
             int max_area_idx = -1;
 
-            for (int i = 0; i < contours.size(); i++) {
+            for (size_t i = 0; i < contours.size(); i++) {
                 const double area = cv::contourArea(contours[i]);
                 if (area > m_area_low && area < m_area_top && area > max_area) {
                     cv::Mat a_matrix = cv::Mat::zeros(5, 5, CV_64F);
@@ -185,6 +185,7 @@ cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const cv::Mat& s
         const cv::Mat preproc = m_ball_preprocessor.preprocess(src_img);
         return m_coloured_ball_detector.detect(preproc);
     }
+    return cv::Rect();
 }
 
 int white_ball_detector_t::get_area_top() const {

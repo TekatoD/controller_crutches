@@ -68,18 +68,11 @@ namespace drwn {
 
     private:
         struct config_t {
-            float field_width, field_height;
-            float gate_height;
-            float penalty_width, penalty_height;
-
-            config_t()
-                    : field_width(DEFAULT_FIELD_WIDTH),
-                      field_height(DEFAULT_FIELD_HEIGHT),
-                      gate_height(DEFAULT_GATE_HEIGHT),
-                      penalty_width(DEFAULT_PENALTY_WIDTH),
-                      penalty_height(DEFAULT_PENALTY_HEIGHT) {
-
-            }
+            float field_width{DEFAULT_FIELD_WIDTH};
+            float field_height{DEFAULT_FIELD_HEIGHT};
+            float gate_height{DEFAULT_GATE_HEIGHT};
+            float penalty_width{DEFAULT_PENALTY_WIDTH};
+            float penalty_height{DEFAULT_PENALTY_HEIGHT};
         } m_config;
 
         bool m_debug;

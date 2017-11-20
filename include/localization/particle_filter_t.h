@@ -35,15 +35,7 @@ namespace drwn {
             float weight;
         };
 
-        particle_filter_t();
-
-        particle_filter_t(const particle_filter_t& pf) = delete;
-
-        particle_filter_t(particle_filter_t&& pf) = delete;
-
-        particle_filter_t& operator=(const particle_filter_t& pf) = delete;
-
-        particle_filter_t& operator=(particle_filter_t&& pf) = delete;
+        particle_filter_t() = default;
 
         void initialize();
 
@@ -146,10 +138,6 @@ namespace drwn {
 
         float get_max_theta() const { return m_config.max_theta; }
 
-        void set_field_map(drwn::field_map_t field_world) { m_fieldWorld = field_world; }
-
-        drwn::field_map_t* get_field_map() { return &m_fieldWorld; }
-
         /* Util functions, place in separate class */
         float sample_normal_distribution(float variance);
 
@@ -183,7 +171,6 @@ namespace drwn {
         std::vector<particle_t> m_particles;
         pose2d_t m_poseMean, m_poseDev;
         std::size_t m_topParticleIndex;
-        drwn::field_map_t m_fieldWorld;
 
         void init_particles(const pose2d_t& pose, int num_particles);
 

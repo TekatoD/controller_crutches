@@ -36,18 +36,6 @@ void localization_t::set_current_pose(pose2d_t current_pose)
     assert(m_particle_filter != nullptr);
 }
 
-void localization_t::set_field(field_map_t field)
-{
-    assert(m_particle_filter != nullptr);
-    m_particle_filter->set_field_map(field);
-}
-
-field_map_t localization_t::get_field() const
-{
-    assert(m_particle_filter != nullptr);
-    return *(m_particle_filter->get_field_map());
-}
-
 void localization_t::set_camera_parameters(vision_utils::camera_parameters_t camera_params)
 {
 

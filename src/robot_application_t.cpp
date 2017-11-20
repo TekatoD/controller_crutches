@@ -250,7 +250,6 @@ void robot_application_t::init_configuraion_loader() {
     if (m_debug) LOG_DEBUG << "Initializing configuration loader...";
     //TODO Don't forget uncomment this lines
     m_white_ball_vision_processor_configuration_strategy.set_white_ball_vision_processor(m_vision_processor.get());
-    m_localization_field_configuration_strategy.set_field_map(m_particle_filter->get_field_map());
     m_particle_filter_configuration_strategy.set_particle_filter(m_particle_filter.get());
 
     m_configuration_loader.set_default_path(m_arg_config_default);
@@ -258,7 +257,8 @@ void robot_application_t::init_configuraion_loader() {
     m_configuration_loader.add_strategy(m_head_configuration_strategy, m_arg_config_head);
     m_configuration_loader.add_strategy(m_walking_configuration_strategy, m_arg_config_walking);
     m_configuration_loader.add_strategy(m_motion_manager_configuration_strategy, m_arg_config_motion_manager);
-    m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy, m_arg_config_white_ball_vision_processor);
+    m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy,
+                                        m_arg_config_white_ball_vision_processor);
     m_configuration_loader.add_strategy(m_localization_field_configuration_strategy, m_arg_config_localization_field);
     m_configuration_loader.add_strategy(m_localization_field_configuration_strategy, m_arg_config_localization_field);
     m_configuration_loader.add_strategy(m_particle_filter_configuration_strategy, m_arg_config_particle_filter);
@@ -366,32 +366,20 @@ void robot_application_t::parse_command_line_arguments() {
 }
 
 void robot_application_t::apply_debug_arguments() {
-    if (m_arg_debug_all || m_arg_debug_application)
-        enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_game_controller)
-        game_controller_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_motion_manager)
-        motion_manager_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_head)
-        head_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_walking)
-        walking_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_action)
-        action_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_kicking)
-        kicking_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_buttons)
-        buttons_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_leds)
-        LEDs_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_camera)
-        camera_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_ball_searcher)
-        ball_searcher_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_ball_tracker)
-        ball_tracker_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all  || m_arg_debug_ball_follower)
-        ball_follower_t::get_instance()->enable_debug(true);
+    enable_debug(m_arg_debug_all || m_arg_debug_application);
+    game_controller_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_game_controller);
+    motion_manager_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_motion_manager);
+    head_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_head);
+    walking_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_walking);
+    action_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_action);
+    kicking_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_kicking);
+    buttons_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_buttons);
+    LEDs_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_leds);
+    camera_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_camera);
+    ball_searcher_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_ball_searcher);
+    ball_tracker_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_ball_tracker);
+    ball_follower_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_ball_follower);
+    field_map_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_field);
     // Image source debug placed located in init_cv
     // Localization debug is in init_localization
 }
@@ -428,10 +416,3 @@ void robot_application_t::enable_debug(bool debug) noexcept {
     m_debug = debug;
 }
 
-void robot_application_t::init_field() {
-    if (m_debug) LOG_DEBUG << "Creating field...";
-    m_field = std::make_unique<field_map_t>();
-    m_localization_field_configuration_strategy.set_field_map(m_field.get());
-    m_field->enable_debug(m_arg_debug_all || m_arg_debug_field);
-    if (m_debug) LOG_INFO << "Field has created";
-}

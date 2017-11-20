@@ -5,15 +5,9 @@
 
 using namespace drwn;
 
-particle_filter_t::particle_filter_t()
-{
-
-}
-
 void particle_filter_t::initialize()
 {
-    m_fieldWorld.enable_debug(m_debug);
-    m_fieldWorld.initialize_field();
+    field_map_t::get_instance()->initialize_field();
 
     float poseX = m_config.init_x;
     float poseY = m_config.init_y;
@@ -59,7 +53,7 @@ std::tuple<field_map_t::line_type_t, point2d_t> particle_filter_t::calc_expected
     epy = ry + field_map_t::MAX_DIST * sin(normalizer.theta());
     
     // Accept intersections with distance from robot to intersection point greater than minDist 
-    return m_fieldWorld.intersect_with_field(
+    return field_map_t::get_instance()->intersect_with_field(
             line_t(rx, ry, epx, epy), measured_range * 0.7
     );
 }
@@ -413,6 +407,5 @@ bool particle_filter_t::is_debug_enabled() const {
 
 void particle_filter_t::enable_debug(bool debug) {
     m_debug = debug;
-    m_fieldWorld.enable_debug(debug);
 }
 

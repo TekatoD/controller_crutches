@@ -76,7 +76,7 @@ bool game_controller_t::connected() const {
 
 void game_controller_t::send_penalise() {
     if (this->send(GAMECONTROLLER_RETURN_MSG_MAN_PENALISE)) {
-        if (m_debug) LOG_INFO << "GAME CONTROLLER: Sending manual penalise message";
+        if (m_debug) LOG_DEBUG << "GAME CONTROLLER: Sending manual penalise message";
         m_when_packet_was_sent = clock();
     }
 }
@@ -84,7 +84,7 @@ void game_controller_t::send_penalise() {
 
 void game_controller_t::send_unpenalise() {
     if (this->send(GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE)) {
-        if (m_debug) LOG_INFO << "GAME CONTROLLER: Sending manual unpenalise message";
+        if (m_debug) LOG_DEBUG << "GAME CONTROLLER: Sending manual unpenalise message";
         m_when_packet_was_sent = clock();
     }
 }
@@ -92,7 +92,7 @@ void game_controller_t::send_unpenalise() {
 
 void game_controller_t::send_alive() {
     if (this->send(GAMECONTROLLER_RETURN_MSG_ALIVE)) {
-        if (m_debug) LOG_INFO << "GAME CONTROLLER: Sending alive message";
+        if (m_debug) LOG_DEBUG << "GAME CONTROLLER: Sending alive message";
         m_when_packet_was_sent = clock();
     }
 }
@@ -139,8 +139,8 @@ bool game_controller_t::send(uint8_t message) {
     return_packet.player = (uint8_t) m_player_number;
     return_packet.message = message;
     auto result = !m_udp || m_udp->write((const char*) &return_packet, sizeof(return_packet));
-    if (m_debug) {
-        LOG_DEBUG << "GAME CONTROLLER: " << ((result) ? "Message has been sent" : "Can't send message");
+    if (m_debug && !result) {
+        LOG_DEBUG << "GAME CONTROLLER: Can't send message";
     }
     return result;
 }

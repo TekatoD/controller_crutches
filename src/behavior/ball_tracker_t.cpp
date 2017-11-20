@@ -25,6 +25,11 @@ ball_tracker_t::~ball_tracker_t() {
 
 
 void ball_tracker_t::process(point2d_t pos) {
+    if (m_debug) {
+        LOG_DEBUG << "BALL TRACKER: Processing has been started";
+        LOG_DEBUG << "BALL TRACKER: pos = (" << pos.X << ", " << pos.Y << ')';
+    }
+
     if (pos.X < 0 || pos.Y < 0) {
         m_ball_position.X = -1;
         m_ball_position.Y = -1;

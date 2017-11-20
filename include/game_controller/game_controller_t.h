@@ -19,8 +19,8 @@
 namespace drwn {
     class game_controller_t {
     public:
-        static constexpr int GAMECONTROLLER_TIMEOUT = 2000000;
-        static constexpr int ALIVE_DELAY = 1000000;
+        static constexpr int GAMECONTROLLER_TIMEOUT = 200000;
+        static constexpr int ALIVE_DELAY = 100000;
 
         static game_controller_t* get_instance();
 

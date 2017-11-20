@@ -226,6 +226,7 @@ void robot_application_t::init_motion_modules() {
     motion_manager_t::get_instance()->add_module((motion_module_t*) head_t::get_instance());
     motion_manager_t::get_instance()->add_module((motion_module_t*) walking_t::get_instance());
     motion_manager_t::get_instance()->add_module((motion_module_t*) kicking_t::get_instance());
+    motion_manager_t::get_instance()->set_enable(true);
     if (m_debug) LOG_INFO << "Motion modules are ready";
 }
 
@@ -234,6 +235,8 @@ void robot_application_t::init_motion_timer() {
     auto motion_timer = std::make_unique<linux_motion_timer_t>(motion_manager_t::get_instance());
     motion_timer->start();
     m_motion_timer = std::move(motion_timer);
+//    m_motion_timer = std::make_unique<linux_motion_timer_t>(motion_manager_t::get_instance());
+//    m_motion_timer->start();
     if (m_debug) LOG_INFO << "Motion timer is ready";
     check_firmware(); //This was moved here from Cm730 inititialization
 }

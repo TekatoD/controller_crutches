@@ -3,7 +3,6 @@
 
 #include "behavior/soccer_behavior_t.h"
 #include <cv.hpp>
-#include <log/trivial_logger_t.h>
 #include <hw/buttons_t.h>
 #include <hw/LEDs_t.h>
 #include <hw/camera_t.h>
@@ -20,6 +19,7 @@
 #include "behavior/ball_follower_t.h"
 #include "behavior/go_to_t.h"
 #include <thread>
+#include <boost/math/constants/constants.hpp>
 
 using namespace drwn;
 
@@ -59,6 +59,7 @@ void soccer_behavior_t::process_buttons() {
         // Fist button activates and deactivates behavior
         if (m_buttons->is_button_pressed(buttons_t::FIRST_BUTTON)) {
             m_behavior_active = !m_behavior_active;
+            m_action->start(m_behavior_active ? 15 : 9);
             update_rate = true;
         }
 
@@ -91,9 +92,14 @@ void soccer_behavior_t::process_decision() {
         while (theta > 180.0f) theta -= 2.0f * 180.0f;
     };
 
+    if (!m_prepared) {
+        m_action->joint.set_enable_body(true, true);
+        m_action->start(m_behavior_active ? 15 : 9);
+        m_prepared = true;
+    }
+
     if (motion_status_t::fall_type != fall_type_t::STANDUP && !m_action->is_running()) {
         if (m_debug) LOG_INFO << "SOCCER BEHAVIOR: Getting up";
-        m_state = state_t::STANDING_UP;
         m_walking->stop();
         m_kicking->stop();
         // Start standing up motion
@@ -105,11 +111,12 @@ void soccer_behavior_t::process_decision() {
         }
     } else {
         // Wait while robot hasn't got up
-        if (m_state == state_t::STANDING_UP && m_action->is_running()) {
+        if (m_action->is_running()) {
             return;
         }
 
         const auto& gc_data = m_game_controller->get_game_ctrl_data();
+        const auto& odo = m_walking->get_odo();
 
         auto ball = m_vision->detect_ball();
 
@@ -132,46 +139,53 @@ void soccer_behavior_t::process_decision() {
 //                m_PreviousState = STATE_SET;
 //                Walking::GetInstance()->SetOdo(Starting);
 //            }
+            point2d_t ball_point(-1, -1); // No ball
+            if (ball != cv::Rect()) {
+                // Adapt new ball to old tracker
+                ball_point = point2d_t(ball.x + ball.width / 2.0f,
+                                       ball.y + ball.height / 2.0f);
+            }
 
-            if (!m_action->is_running()) {
-                // Switch to head and walking after action
+            // Switch to head and walking after action
+            m_head->joint.set_enable_head_only(true, true);
+            m_walking->joint.set_enable_body_without_head(true, true);
+            m_tracker->process(ball_point);
+
+            // Calculate angles to gate
+            float free_space = (m_field->get_field_height() - m_field->get_gate_height()) / 2.0f;
+            float y_top = m_field->get_field_height() - free_space;
+            float y_bot = y_top - m_field->get_gate_height();
+
+            float pan = motion_status_t::current_joints.get_angle(joint_data_t::ID_HEAD_PAN);
+            float angle_top = degrees(atan2f(m_field->get_field_height() - odo.get_y(), y_top - odo.get_x()) -
+                                      odo.get_theta());
+            float angle_bot = degrees(atan2f(m_field->get_field_height() - odo.get_y(), y_bot - odo.get_x()) -
+                                      odo.get_theta());
+            angle_bot -= pan;
+            angle_top -= pan;
+
+            normalize(angle_bot);
+            normalize(angle_top);
+
+            // Follow the ball
+            m_follower->process(m_tracker->get_ball_position(), angle_top, angle_bot);
+
+            if (m_tracker->is_no_ball()) {
+                m_searcher->process();
+                return;
+            } else {
+                m_searcher->set_last_position(m_tracker->get_ball_position());
+            }
+
+            // Kicking the ball
+            if (m_follower->get_kicking_action() != kicking_action_t::NO_KICKING) {
                 m_head->joint.set_enable_head_only(true, true);
-                m_walking->joint.set_enable_body_without_head(true, true);
-
-                // Calculate angles to gate
-                float free_space = 0; // = (m_Field.GetWidth() - m_Field.GetGateWidth()) / 2.0; TODO Fix
-                float x_top = 0; // = m_Field.GetWidth() - free_space;
-                float x_bot = 0; // = x_top - m_Field.GetGateWidth();
-
-                float pan = motion_status_t::current_joints.get_angle(joint_data_t::ID_HEAD_PAN);
-                float angle_top = 0; // = (atan2f(m_Field.GetLength() - Odo.Y(), x_top - Odo.X()) - Odo.Theta()) / boost::math::constants::pi<float>() * 180.0;
-                float angle_bot = 0; // = (atan2f(m_Field.GetLength() - Odo.Y(), x_bot - Odo.X()) - Odo.Theta()) / boost::math::constants::pi<float>() * 180.0;
-                angle_bot -= pan;
-                angle_top -= pan;
-
-                normalize(angle_bot);
-                normalize(angle_top);
-
-                // Follow the ball
-                m_follower->process(m_tracker->get_ball_position(), angle_top, angle_bot);
-
-                if (m_tracker->is_no_ball()) {
-                    m_searcher->process();
-                    return;
+                m_action->joint.set_enable_body_without_head(true, true);
+                // Kick the ball
+                if (m_follower->get_kicking_action() == kicking_action_t::RIGHT_LEG_KICK) {
+                    m_action->start(12);   // RIGHT KICK
                 } else {
-                    m_searcher->set_last_position(m_tracker->get_ball_position());
-                }
-
-                // Kicking the ball
-                if (m_follower->get_kicking_action() != kicking_action_t::NO_KICKING) {
-                    m_head->joint.set_enable_head_only(true, true);
-                    m_action->joint.set_enable_body_without_head(true, true);
-                    // Kick the ball
-                    if (m_follower->get_kicking_action() == kicking_action_t::RIGHT_LEG_KICK) {
-                        m_action->start(12);   // RIGHT KICK
-                    } else {
-                        m_action->start(13);   // LEFT KICK
-                    }
+                    m_action->start(13);   // LEFT KICK
                 }
             }
         }

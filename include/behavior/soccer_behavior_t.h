@@ -28,16 +28,6 @@ namespace drwn {
     class go_to_t;
 
     class soccer_behavior_t : public behavior_t {
-        enum class state_t {
-            UNKNOWN,
-            DISABLED,
-            IDLE,
-            STANDING_UP,
-            GO_TO_STARTING_POSITION,
-            KICK_OFF,
-            FINDING_BALL
-        };
-
     public:
         explicit soccer_behavior_t();
 
@@ -56,11 +46,14 @@ namespace drwn {
         void process_cv();
 
     private:
-        state_t m_state{state_t::UNKNOWN};
-
+        bool m_prepared{false};
+#ifdef CROSSCOMPILE
         bool m_behavior_active{false};
+#else
+        bool m_behavior_active{true};
+#endif
         bool m_manual_penalised{false};
-        steady_rate_t m_rate_processing_behavior{std::chrono::milliseconds(10)};
+        steady_rate_t m_rate_processing_behavior{std::chrono::milliseconds(100)};
         steady_rate_t m_rate_buttons_check{std::chrono::milliseconds(100)};
 
         camera_t* m_camera{nullptr};

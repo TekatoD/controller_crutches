@@ -27,8 +27,8 @@ namespace drwn {
         void reset();
 
     private:
-        pose2d_t m_pose;
         pose2d_t m_initial;
+        pose2d_t m_pose;
     };
 }
 

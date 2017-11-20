@@ -59,6 +59,9 @@ void soccer_behavior_t::process_buttons() {
         // Fist button activates and deactivates behavior
         if (m_buttons->is_button_pressed(buttons_t::FIRST_BUTTON)) {
             m_behavior_active = !m_behavior_active;
+            m_walking->stop();
+            m_kicking->stop();
+            m_action->joint.set_enable_body(true, true);
             m_action->start(m_behavior_active ? 15 : 9);
             update_rate = true;
         }

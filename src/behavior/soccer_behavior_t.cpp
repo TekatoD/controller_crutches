@@ -144,6 +144,9 @@ void soccer_behavior_t::process_decision() {
                 // Adapt new ball to old tracker
                 ball_point = point2d_t(ball.x + ball.width / 2.0f,
                                        ball.y + ball.height / 2.0f);
+                m_LEDs->set_eye_led(color_t(0, 255, 0));
+            } else {
+                m_LEDs->set_eye_led(color_t(255, 0, 0));
             }
 
             // Switch to head and walking after action

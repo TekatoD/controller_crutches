@@ -29,7 +29,7 @@ namespace drwn {
         static constexpr float DEFAULT_PENALTY_WIDTH = 600.0f;
         static constexpr float DEFAULT_PENALTY_HEIGHT = 2200.0f;
 
-        field_map_t();
+        static field_map_t* get_instance();
 
         ~field_map_t() = default;
 
@@ -62,6 +62,9 @@ namespace drwn {
         bool is_debug_enabled() const;
 
         void enable_debug(bool debug);
+
+    private:
+        field_map_t();
 
     private:
         struct config_t {

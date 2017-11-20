@@ -8,6 +8,11 @@
 
 using namespace drwn;
 
+field_map_t* field_map_t::get_instance() {
+    static field_map_t instance;
+    return &instance;
+}
+
 void field_map_t::set_field_width(float field_width) {
     if (m_debug) LOG_DEBUG << "Field width: " << field_width;
     m_config.field_width = field_width;
@@ -47,6 +52,7 @@ void field_map_t::initialize_field() {
     if (m_debug) log_field_lines();
 }
 
+
 void field_map_t::log_field_lines() const {
     if (!m_debug) return;
 
@@ -55,7 +61,6 @@ void field_map_t::log_field_lines() const {
         LOG_DEBUG << (int) kv.first << " : " << kv.second;
     }
 }
-
 
 std::tuple<field_map_t::line_type_t, point2d_t> field_map_t::intersect_with_field(
         const line_t& l, float min_dist) {

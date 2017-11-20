@@ -34,7 +34,6 @@ using namespace drwn;
 #define INST_BULK_READ      (146)   // 0x92
 
 
-
 robot_CM730_t::robot_CM730_t(platform_CM730_t* platform) {
     m_platform = platform;
     m_bulk_read_tx_packet[LENGTH] = 0;
@@ -236,7 +235,7 @@ int robot_CM730_t::TxRx_packet(unsigned char* txpacket, unsigned char* rxpacket,
                         if (rxpacket[LENGTH + rxpacket[LENGTH]] == checksum) {
                             for (int j = 0; j < (rxpacket[LENGTH] - 2); j++)
                                 m_bulk_read_data[rxpacket[ID]].table[m_bulk_read_data[rxpacket[ID]].start_address +
-                                                                   j] = rxpacket[PARAMETER + j];
+                                                                     j] = rxpacket[PARAMETER + j];
 
                             m_bulk_read_data[rxpacket[ID]].error = (int) rxpacket[ERRBIT];
 
@@ -429,12 +428,9 @@ bool robot_CM730_t::DXL_power_on() {
             fprintf(stdout, " Succeed to change Dynamixel power!\n");
 
         write_word(CM730_t::ID_CM, CM730_t::P_LED_HEAD_L, make_color(255, 128, 0), nullptr);
-	fprintf(stdout, "write word\n");
         m_platform->sleep(300); // about 300msec
-	fprintf(stdout, "sleep\n");
     } else {
-        if (m_debug)
-            fprintf(stdout, " Fail to change Dynamixel power!\n");
+        if (m_debug) fprintf(stdout, " Fail to change Dynamixel power!\n");
         return false;
     }
 
@@ -522,7 +518,8 @@ bool robot_CM730_t::MX28_init_all() {
                    MX28_t::angle_2_value(kinematics_t::CCW_LIMIT_L_HIP_PITCH), 0) != CM730_t::SUCCESS)
         fprintf(stdout, " Fail to change CCW limit of L_HIP_PITCH!\n");
 
-    if (write_word(joint_data_t::ID_R_KNEE, MX28_t::P_CW_ANGLE_LIMIT_L, MX28_t::angle_2_value(kinematics_t::CW_LIMIT_R_KNEE), 0) !=
+    if (write_word(joint_data_t::ID_R_KNEE, MX28_t::P_CW_ANGLE_LIMIT_L,
+                   MX28_t::angle_2_value(kinematics_t::CW_LIMIT_R_KNEE), 0) !=
         CM730_t::SUCCESS)
         fprintf(stdout, " Fail to change CW limit of R_KNEE!\n");
     if (write_word(joint_data_t::ID_R_KNEE, MX28_t::P_CCW_ANGLE_LIMIT_L,
@@ -530,7 +527,8 @@ bool robot_CM730_t::MX28_init_all() {
                    0) != CM730_t::SUCCESS)
         fprintf(stdout, " Fail to change CCW limit of R_KNEE!\n");
 
-    if (write_word(joint_data_t::ID_L_KNEE, MX28_t::P_CW_ANGLE_LIMIT_L, MX28_t::angle_2_value(kinematics_t::CW_LIMIT_L_KNEE), 0) !=
+    if (write_word(joint_data_t::ID_L_KNEE, MX28_t::P_CW_ANGLE_LIMIT_L,
+                   MX28_t::angle_2_value(kinematics_t::CW_LIMIT_L_KNEE), 0) !=
         CM730_t::SUCCESS)
         fprintf(stdout, " Fail to change CW limit of L_KNEE!\n");
     if (write_word(joint_data_t::ID_L_KNEE, MX28_t::P_CCW_ANGLE_LIMIT_L,

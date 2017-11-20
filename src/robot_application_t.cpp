@@ -291,7 +291,7 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_debug_all);
     parser.add_strategy(m_arg_debug_application);
     parser.add_strategy(m_arg_debug_game_controller);
-    parser.add_strategy(m_arg_debug_motion_manager);
+//    parser.add_strategy(m_arg_debug_motion_manager);
     parser.add_strategy(m_arg_debug_head);
     parser.add_strategy(m_arg_debug_walking);
     parser.add_strategy(m_arg_debug_action);
@@ -371,7 +371,8 @@ void robot_application_t::parse_command_line_arguments() {
 void robot_application_t::apply_debug_arguments() {
     enable_debug(m_arg_debug_all || m_arg_debug_application);
     game_controller_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_game_controller);
-    motion_manager_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_motion_manager);
+//    motion_manager_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_motion_manager);
+    motion_manager_t::get_instance()->enable_debug(false);
     head_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_head);
     walking_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_walking);
     action_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_action);

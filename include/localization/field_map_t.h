@@ -4,6 +4,9 @@
 #pragma once
 
 
+#include <math/point_t.h>
+#include <localization/line_t.h>
+
 namespace drwn {
     class field_map_t {
     public:

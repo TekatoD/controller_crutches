@@ -34,6 +34,7 @@ soccer_behavior_t::soccer_behavior_t()
           m_buttons(buttons_t::get_instance()),
           m_LEDs(LEDs_t::get_instance()),
           m_game_controller(game_controller_t::get_instance()),
+          m_field{field_map_t::get_instance()},
           m_tracker{ball_tracker_t::get_instance()},
           m_searcher{ball_searcher_t::get_instance()},
           m_follower{ball_follower_t::get_instance()},

@@ -5,6 +5,7 @@
 
 
 #include <tool/rate_t.h>
+#include <localization/field_map_t.h>
 #include "behavior_t.h"
 
 namespace drwn {
@@ -72,6 +73,7 @@ namespace drwn {
         buttons_t* m_buttons{nullptr};
         LEDs_t* m_LEDs{nullptr};
         game_controller_t* m_game_controller{nullptr};
+        field_map_t* m_field{nullptr};
 
         ball_tracker_t* m_tracker{nullptr};
         ball_searcher_t* m_searcher{nullptr};

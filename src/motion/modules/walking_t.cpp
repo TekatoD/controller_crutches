@@ -631,7 +631,7 @@ float walking_t::get_x_offset() const {
 
 void walking_t::set_x_offset(float x_offset) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: x_offset" << x_offset;
+        LOG_DEBUG << "WALKING: x_offset = " << x_offset;
     }
     walking_t::m_x_offset = x_offset;
 }
@@ -642,7 +642,7 @@ float walking_t::get_y_offset() const {
 
 void walking_t::set_y_offset(float y_offset) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: y_offset" << y_offset;
+        LOG_DEBUG << "WALKING: y_offset = " << y_offset;
     }
     walking_t::m_y_offset = y_offset;
 }
@@ -653,7 +653,7 @@ float walking_t::get_z_offset() const {
 
 void walking_t::set_z_offset(float z_offset) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: z_offset" << z_offset;
+        LOG_DEBUG << "WALKING: z_offset = " << z_offset;
     }
     walking_t::m_z_offset = z_offset;
 }
@@ -664,7 +664,7 @@ float walking_t::get_yaw_offset() const {
 
 void walking_t::set_yaw_offset(float a_offset) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: yaw_offset" << a_offset;
+        LOG_DEBUG << "WALKING: yaw_offset = " << a_offset;
     }
     walking_t::m_a_offset = a_offset;
 }
@@ -675,7 +675,7 @@ float walking_t::get_pitch_offset() const {
 
 void walking_t::set_pitch_offset(float p_offset) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: pitch_offset" << p_offset;
+        LOG_DEBUG << "WALKING: pitch_offset = " << p_offset;
     }
     walking_t::m_p_offset = p_offset;
 }
@@ -686,7 +686,7 @@ float walking_t::get_roll_offset() const {
 
 void walking_t::set_roll_offset(float r_offset) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: roll_offset" << r_offset;
+        LOG_DEBUG << "WALKING: roll_offset = " << r_offset;
     }
     walking_t::m_r_offset = r_offset;
 }
@@ -697,7 +697,7 @@ float walking_t::get_period_time() const {
 
 void walking_t::set_period_time(float period_time) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: period_time" << period_time;
+        LOG_DEBUG << "WALKING: period_time = " << period_time;
     }
     walking_t::m_period_time = period_time;
 }
@@ -708,7 +708,7 @@ float walking_t::get_DSP_ratio() const {
 
 void walking_t::set_DSP_ratio(float dsp_ratio) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: dsp_ratio" << dsp_ratio;
+        LOG_DEBUG << "WALKING: dsp_ratio = " << dsp_ratio;
     }
     walking_t::m_dsp_ratio = dsp_ratio;
 }
@@ -719,7 +719,7 @@ float walking_t::get_step_FB_ratio() const {
 
 void walking_t::set_step_FB_ratio(float step_fb_ratio) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: step_fb_ration" << step_fb_ratio;
+        LOG_DEBUG << "WALKING: step_fb_ration = " << step_fb_ratio;
     }
     walking_t::m_step_fb_ratio = step_fb_ratio;
 }

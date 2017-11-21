@@ -32,6 +32,11 @@ void particle_filter_configuration_strategy_t::read_config(const boost::property
     auto max_x = section.get_optional<float>("max_x");
     auto max_y = section.get_optional<float>("max_y");
     auto max_theta = section.get_optional<float>("max_theta");
+    auto odo_noise_rot1 = section.get_optional<float>("odo_noise_rot1");
+    auto odo_noise_trans = section.get_optional<float>("odo_noise_trans");
+    auto odo_noise_rot2 = section.get_optional<float>("odo_noise_rot2");
+    auto meas_noise_range = section.get_optional<float>("meas_noise_range");
+    auto meas_noise_bearing = section.get_optional<float>("meas_noise_bearing");
 
     if (num_particles) { m_particle_filter->set_particle_number(num_particles.get()); }
     if (init_x) { m_particle_filter->set_init_x(init_x.get()); }
@@ -44,6 +49,11 @@ void particle_filter_configuration_strategy_t::read_config(const boost::property
     if (max_x) { m_particle_filter->set_max_x(max_x.get()); }
     if (max_y) { m_particle_filter->set_max_y(max_y.get()); }
     if (max_theta) { m_particle_filter->set_max_theta(max_theta.get()); }
+    if (odo_noise_rot1) { m_particle_filter->set_odo_noise_rot1(odo_noise_rot1.get()); }
+    if (odo_noise_trans) { m_particle_filter->set_odo_noise_trans(odo_noise_trans.get()); }
+    if (odo_noise_rot2) { m_particle_filter->set_odo_noise_rot2(odo_noise_rot2.get()); }
+    if (meas_noise_range) { m_particle_filter->set_meas_noise_range(meas_noise_range.get()); }
+    if (meas_noise_bearing) { m_particle_filter->set_meas_noise_bearing(meas_noise_bearing.get()); }
 
     m_particle_filter->initialize();
 }
@@ -55,7 +65,7 @@ void particle_filter_configuration_strategy_t::write_config(boost::property_tree
 
 void particle_filter_configuration_strategy_t::set_particle_filter(particle_filter_t* pf_ptr)
 {
-    if (pf_ptr == nullptr) { return;}
+    assert(pf_ptr != nullptr);
     m_particle_filter = pf_ptr;
 }
 

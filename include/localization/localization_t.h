@@ -39,11 +39,17 @@ namespace drwn {
         void set_particle_filter(particle_filter_t* pf_ptr);
         particle_filter_t* get_particle_filter() const;
 
+        // Set movement noise according to odometry motion model
+        void set_movement_noise(float rot1, float trans, float rot2);
+
+        // Set measurement noise according to range-bearing measurement model
+        void set_measurement_noise(float range, float bearing);
+
         pose2d_t get_calculated_pose_mean();
         pose2d_t get_calculated_pose_std_dev();
         //
     private:
-        localization_t();
+        localization_t() = default;
 
         bool m_debug {true};
     public:
@@ -54,7 +60,6 @@ namespace drwn {
     private:
         pose2d_t m_old_pose, m_current_pose;
         std::vector<cv::Vec4i> m_current_lines;
-        Eigen::Vector3f m_movement_noise, m_measurement_noise;
 
         particle_filter_t* m_particle_filter;
 

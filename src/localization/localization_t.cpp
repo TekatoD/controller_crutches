@@ -15,17 +15,6 @@ localization_t* localization_t::get_instance() {
     return &instance;
 }
 
-localization_t::localization_t()
-{
-    // TODO: load init values from config (make particle filter do it)
-    // Odometry command noise:
-    // rotation1, translation, rotation2
-    m_movement_noise = {0.01f, 50.0f, 0.01f};
-    // Range-bearing measurement noise
-    // range, bearing, (3rd not used)
-    m_measurement_noise = {600.0f, 0.05f, 0.0f};
-}
-
 void localization_t::set_pose_shift(pose2d_t pose_shift)
 {
     m_old_pose = m_current_pose;
@@ -45,7 +34,12 @@ void localization_t::update()
     // Calculate odometry command from pose change
     Eigen::Vector3f odometry_command = m_particle_filter->get_odometry_command(m_old_pose, m_current_pose);
     // Move particles according to odometry command with addded noise
-    m_particle_filter->predict(odometry_command, m_movement_noise);
+    Eigen::Vector3f movement_noise = {
+            m_particle_filter->get_odo_noise_rot1(),
+            m_particle_filter->get_odo_noise_trans(),
+            m_particle_filter->get_odo_noise_rot2()
+    };
+    m_particle_filter->predict(odometry_command, movement_noise);
 
     // Forward kinematics for head
     float height_from_ground = kinematics_t::LEG_LENGTH + 122.2f + 50.5f + kinematics_t::CAMERA_OFFSET_Z;
@@ -86,7 +80,7 @@ void localization_t::update()
         float x2 = gp2.at<float>(0, 0);
         float y2 = -1*gp2.at<float>(1, 0);
 
-        // Ignore lines that are projected  too far (Like goal keeper gate lines)
+        // Ignore lines that are projected too far (Like goal keeper gate lines)
         if ((x1 < 0.0f) || (x2 < 0.0f)) {
             continue;
         }
@@ -96,15 +90,18 @@ void localization_t::update()
         rangeBearingData.push_back(lineRangeBearing);
     }
 
-    m_particle_filter->correct(rangeBearingData, m_measurement_noise);
+    Eigen::Vector3f measurement_noise = {
+            m_particle_filter->get_meas_noise_range(),
+            m_particle_filter->get_meas_noise_bearing(),
+            0.0f
+    };
+    m_particle_filter->correct(rangeBearingData, measurement_noise);
     m_particle_filter->resample();
 
     if (m_debug)
     {
-        LOG_INFO << "PARTICLE FILTER: Pose information start";
         LOG_INFO << "PARTICLE FILTER: Pose mean: " << m_particle_filter->get_pose_mean();
         LOG_INFO << "PARTICLE_FILTER: Pose std dev: " << m_particle_filter->get_pose_std_dev();
-        LOG_INFO << "PARTICLE FILTER: Pose information end";
     }
 
     m_old_pose = m_current_pose;
@@ -174,5 +171,22 @@ void localization_t::enable_debug(bool debug) {
     m_debug = debug;
     m_particle_filter->enable_debug(debug);
 }
+
+void localization_t::set_movement_noise(float rot1, float trans, float rot2) {
+    assert(m_particle_filter != nullptr);
+
+    if (m_debug) { LOG_INFO << "LOCALIZATION movement_noise = {" << rot1 << ", " << trans << ", " << rot2 << "}"; }
+    m_particle_filter->set_odo_noise_rot1(rot1);
+    m_particle_filter->set_odo_noise_trans(trans);
+    m_particle_filter->set_odo_noise_rot2(rot2);
+}
+
+void localization_t::set_measurement_noise(float range, float bearing) {
+    assert(m_particle_filter != nullptr);
+    if (m_debug) { LOG_INFO << "LOCALIZATION measurement_noise = {" << range << ", " << bearing << "}"; }
+    m_particle_filter->set_meas_noise_range(range);
+    m_particle_filter->set_meas_noise_bearing(bearing);
+}
+
 
 

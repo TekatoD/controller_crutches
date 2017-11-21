@@ -114,7 +114,7 @@ void soccer_behavior_t::process_decision() {
         }
     } else {
         // Wait while robot hasn't got up
-        if (m_action->is_running()) {
+        if (m_action->is_running() || !m_behavior_active) {
             return;
         }
 

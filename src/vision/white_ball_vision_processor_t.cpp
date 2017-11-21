@@ -15,6 +15,11 @@ const cv::Rect& white_ball_vision_processor_t::detect_ball() {
 
 const std::vector<cv::Vec4i>& white_ball_vision_processor_t::detect_lines() {
     this->process();
+
+    if (!m_lines_detected) {
+        this->update_lines();
+    }
+
     return m_lines;
 }
 
@@ -35,6 +40,7 @@ void white_ball_vision_processor_t::set_frame(cv::Mat frame) {
 
 void white_ball_vision_processor_t::reset() {
     m_img_processed = false;
+    m_lines_detected = false;
     m_lines.clear();
     m_src_img = cv::Mat();
     m_field_img = cv::Mat();
@@ -83,15 +89,20 @@ void white_ball_vision_processor_t::update_members() {
     cv::cvtColor(m_src_img, m_src_img, CV_BGR2YUV);
 
 
-    auto& img = (m_field_processing_enabled) ? m_field_img : m_src_img;
-
-    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: Detecting lines";
-    m_line_preproc_img = m_line_preproc.preprocess(img);
-    m_lines = m_line_detector.detect(m_line_preproc_img);
+    if (!m_lines_detected && m_ball_detector.get_detector_type() == 0) {
+        update_lines();
+    }
     if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: Detecting white ball";
     m_ball = m_ball_detector.detect(m_line_preproc_img, m_src_img, m_lines);
     m_img_processed = true;
     if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: Processing has been finished";
+}
+
+void white_ball_vision_processor_t::update_lines() {
+    if (m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: Detecting lines";
+    m_line_preproc_img = m_line_preproc.preprocess((m_field_processing_enabled) ? m_field_img : m_src_img);
+    m_lines = m_line_detector.detect(m_line_preproc_img);
+    m_lines_detected = true;
 }
 
 const cv::Scalar& white_ball_vision_processor_t::get_field_preprocessor_threshold_gabor_bgr_min() const {

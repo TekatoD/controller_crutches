@@ -14,7 +14,6 @@
 #include <config/strategies/config_path_arguments_parsing_strategy_t.h>
 #include <config/strategies/help_arguments_parsing_strategy_t.h>
 #include <hw/image_source_t.h>
-#include <config/strategies/robot_image_source_configuration_strategy_t.h>
 #include <config/strategies/white_ball_vision_processor_arguments_parsing_strategy_t.h>
 #include <config/strategies/white_ball_vision_processor_configuration_strategy_t.h>
 #include <config/strategies/localization_field_configuration_strategy_t.h>
@@ -29,6 +28,7 @@
 #ifdef CROSSCOMPILE
 #include "hw/linux_CM730_t.h"
 #include <hw/robot_image_source_t.h>
+#include "config/strategies/robot_image_source_configuration_strategy_t.h"
 #else
 #include "hw/vrep_image_source_t.h"
 #include "hw/vrep_connector_t.h"
@@ -123,10 +123,10 @@ namespace drwn {
         head_configuration_strategy_t m_head_configuration_strategy;
         walking_configuration_strategy_t m_walking_configuration_strategy;
         motion_manager_configuration_strategy_t m_motion_manager_configuration_strategy;
-        robot_image_source_configuration_strategy_t m_robot_image_source_configuration_strategy;
         white_ball_vision_processor_configuration_strategy_t m_white_ball_vision_processor_configuration_strategy;
         localization_field_configuration_strategy_t m_localization_field_configuration_strategy;
         particle_filter_configuration_strategy_t m_particle_filter_configuration_strategy;
+
 
         //*** Command line parsing strategies ***//
         help_arguments_parsing_strategy_t m_arg_help_requested;
@@ -175,6 +175,7 @@ namespace drwn {
 #ifdef CROSSCOMPILE
         std::unique_ptr<linux_CM730_t> m_linux_cm730{nullptr};
         std::unique_ptr<robot_image_source_t> m_image_source{nullptr};
+        robot_image_source_configuration_strategy_t m_robot_image_source_configuration_strategy;
 #else
         std::unique_ptr<vrep_image_source_t> m_image_source{nullptr};
         std::unique_ptr<vrep_connector_t> m_vrep_connector{nullptr};

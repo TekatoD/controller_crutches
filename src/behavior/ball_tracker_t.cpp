@@ -22,9 +22,15 @@ void ball_tracker_t::process(point2d_t pos) {
         m_ball_position.X = -1;
         m_ball_position.Y = -1;
         if (!m_no_ball_rate.is_passed()) {
+            if (m_debug) {
+                LOG_DEBUG << "BALL TRACKER: Continues to tracking";
+            }
             head_t::get_instance()->move_tracking();
+        } else if (m_debug) {
+            LOG_DEBUG << "BALL TRACKER: Ball is lost";
         }
     } else {
+        if (m_debug) LOG_DEBUG << "BALL TRACKER: Tracking the ball";
         m_no_ball_rate.update();
         point2d_t center(camera_t::WIDTH / 2, camera_t::HEIGHT / 2);
         point2d_t offset = pos - center;

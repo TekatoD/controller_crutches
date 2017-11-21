@@ -153,20 +153,26 @@ void soccer_behavior_t::process_decision() {
 //                m_PreviousState = STATE_SET;
 //                Walking::GetInstance()->SetOdo(Starting);
 //            }
+            color_t eye_leds{0, 255, 0};
+
             point2d_t ball_point(-1, -1); // No ball
             if (ball != cv::Rect()) {
                 // Adapt new ball to old tracker
                 ball_point = point2d_t(ball.x + ball.width / 2.0f,
                                        ball.y + ball.height / 2.0f);
-                m_LEDs->set_eye_led({0, 255, 0});
             } else {
-                m_LEDs->set_eye_led({255, 0, 0});
+                eye_leds = color_t({255, 255, 0});
             }
 
             // Switch to head and walking after action
             m_head->joint.set_enable_head_only(true, true);
             m_walking->joint.set_enable_body_without_head(true, true);
             m_tracker->process(ball_point);
+
+            if (m_tracker->is_no_ball()) {
+                eye_leds = color_t({255, 0, 0});
+            }
+            m_LEDs->set_eye_led(eye_leds);
 
             // Calculate angles to gate
             float free_space = (m_field->get_field_height() - m_field->get_gate_height()) / 2.0f;

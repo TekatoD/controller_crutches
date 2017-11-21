@@ -62,7 +62,7 @@ void soccer_behavior_t::process_buttons() {
             m_walking->stop();
             m_kicking->stop();
             m_action->joint.set_enable_body(true, true);
-            m_action->start(m_behavior_active ? 9 : 15);
+            m_action->start(m_behavior_active ? 15 : 9);
             update_rate = true;
             if (m_debug) {
                 if (m_behavior_active) {
@@ -105,7 +105,7 @@ void soccer_behavior_t::process_decision() {
     if (!m_prepared) {
         if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Preparing...";
         m_action->joint.set_enable_body(true, true);
-        m_action->start(m_behavior_active ? 9 : 15);
+        m_action->start(m_behavior_active ? 15 : 9);
         m_prepared = true;
     }
 

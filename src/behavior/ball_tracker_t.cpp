@@ -12,18 +12,6 @@
 
 using namespace drwn;
 
-
-ball_tracker_t::ball_tracker_t()
-        : m_ball_position(point2d_t(-1.0, -1.0)) {
-    m_no_ball_count = 0;
-    m_no_ball_max_count = 15;
-}
-
-
-ball_tracker_t::~ball_tracker_t() {
-}
-
-
 void ball_tracker_t::process(point2d_t pos) {
     if (m_debug) {
         LOG_DEBUG << "BALL TRACKER: Processing has been started";

@@ -228,6 +228,9 @@ void robot_application_t::init_motion_modules() {
     motion_manager_t::get_instance()->add_module((motion_module_t*) walking_t::get_instance());
     motion_manager_t::get_instance()->add_module((motion_module_t*) kicking_t::get_instance());
     motion_manager_t::get_instance()->set_enable(true);
+
+    action_t::get_instance()->joint.set_enable_body(true, true);
+    action_t::get_instance()->start(9);
     if (m_debug) LOG_INFO << "Motion modules are ready";
 }
 

@@ -62,7 +62,7 @@ void soccer_behavior_t::process_buttons() {
             m_walking->stop();
             m_kicking->stop();
             m_action->joint.set_enable_body(true, true);
-            m_action->start(m_behavior_active ? 15 : 9);
+            m_action->start(m_behavior_active ? 9 : 15);
             update_rate = true;
             if (m_debug) {
                 if (m_behavior_active) {
@@ -105,7 +105,7 @@ void soccer_behavior_t::process_decision() {
     if (!m_prepared) {
         if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Preparing...";
         m_action->joint.set_enable_body(true, true);
-        m_action->start(m_behavior_active ? 15 : 9);
+        m_action->start(m_behavior_active ? 9 : 15);
         m_prepared = true;
     }
 
@@ -184,27 +184,27 @@ void soccer_behavior_t::process_decision() {
             normalize(angle_bot);
             normalize(angle_top);
 
-            if (m_tracker->is_no_ball()) {
-                m_searcher->process();
-                return;
-            } else {
-                m_searcher->set_last_position(m_tracker->get_ball_position());
-            }
-
-            // Follow the ball
-            m_follower->process(m_tracker->get_ball_position(), angle_top, angle_bot);
-
-            // Kicking the ball
-            if (m_follower->get_kicking_action() != kicking_action_t::NO_KICKING) {
-                m_head->joint.set_enable_head_only(true, true);
-                m_action->joint.set_enable_body_without_head(true, true);
-                // Kick the ball
-                if (m_follower->get_kicking_action() == kicking_action_t::RIGHT_LEG_KICK) {
-                    m_action->start(12);   // RIGHT KICK
-                } else {
-                    m_action->start(13);   // LEFT KICK
-                }
-            }
+//            if (m_tracker->is_no_ball()) {
+//                m_searcher->process();
+//                return;
+//            } else {
+//                m_searcher->set_last_position(m_tracker->get_ball_position());
+//            }
+//
+//            // Follow the ball
+//            m_follower->process(m_tracker->get_ball_position(), angle_top, angle_bot);
+//
+//            // Kicking the ball
+//            if (m_follower->get_kicking_action() != kicking_action_t::NO_KICKING) {
+//                m_head->joint.set_enable_head_only(true, true);
+//                m_action->joint.set_enable_body_without_head(true, true);
+//                // Kick the ball
+//                if (m_follower->get_kicking_action() == kicking_action_t::RIGHT_LEG_KICK) {
+//                    m_action->start(12);   // RIGHT KICK
+//                } else {
+//                    m_action->start(13);   // LEFT KICK
+//                }
+//            }
         }
     }
 }

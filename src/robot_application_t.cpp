@@ -411,7 +411,7 @@ void robot_application_t::init_behavior() {
 void robot_application_t::start_main_loop() {
     if (m_debug) LOG_INFO << "=== Controller has started ===";
     action_t::get_instance()->joint.set_enable_body(true, true);
-    action_t::get_instance()->start(9);
+    action_t::get_instance()->start(15);
     while (is_running()) {
         if (m_debug) LOG_DEBUG << "ROBOT APPLICATION: === Iteration start ===";
         m_behavior->process();

@@ -97,10 +97,7 @@ void soccer_behavior_t::process_game_controller() {
 }
 
 void soccer_behavior_t::process_decision() {
-    auto normalize = [](float& theta) {
-        while (theta < -180.0f) theta += 2.0f * 180.0f;
-        while (theta > 180.0f) theta -= 2.0f * 180.0f;
-    };
+
 
     if (!m_prepared) {
         if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Preparing...";
@@ -174,22 +171,6 @@ void soccer_behavior_t::process_decision() {
             }
             m_LEDs->set_eye_led(eye_leds);
 
-            // Calculate angles to gate
-            float free_space = (m_field->get_field_height() - m_field->get_gate_height()) / 2.0f;
-            float y_top = m_field->get_field_height() - free_space;
-            float y_bot = y_top - m_field->get_gate_height();
-
-            float pan = motion_status_t::current_joints.get_angle(joint_data_t::ID_HEAD_PAN);
-            float angle_top = degrees(atan2f(m_field->get_field_height() - odo.get_y(), y_top - odo.get_x()) -
-                                      odo.get_theta());
-            float angle_bot = degrees(atan2f(m_field->get_field_height() - odo.get_y(), y_bot - odo.get_x()) -
-                                      odo.get_theta());
-            angle_bot -= pan;
-            angle_top -= pan;
-
-            normalize(angle_bot);
-            normalize(angle_top);
-
             if (m_tracker->is_no_ball()) {
                 m_searcher->process();
                 m_LEDs->set_head_led({0, 0, 255});
@@ -199,7 +180,7 @@ void soccer_behavior_t::process_decision() {
             }
 
             // Follow the ball
-            m_follower->process(m_tracker->get_ball_position(), angle_top, angle_bot);
+            m_follower->process(m_tracker->get_ball_position());
 
             // Kicking the ball
             if (m_follower->get_kicking_action() != kicking_action_t::NO_KICKING) {

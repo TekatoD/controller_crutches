@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <tool/rate_t.h>
 #include "hw/MX28_t.h"
 #include "math/point_t.h"
 
@@ -21,7 +22,7 @@ namespace drwn {
     public:
         static ball_follower_t* get_instance();
 
-        void process(point2d_t ball_pos, float angle_top, float angle_bot);
+        void process(point2d_t ball_pos);
 
         bool is_no_ball() const;
 
@@ -129,30 +130,29 @@ namespace drwn {
     private:
         bool m_debug{false};
 
-        int m_no_ball_max_count{10};
-        int m_no_ball_count{m_no_ball_max_count};
-        int m_kick_ball_max_count{0};
-        int m_kick_ball_count{0};
+        steady_rate_t m_no_ball_rate{std::chrono::seconds(2)};
+        steady_rate_t m_kick_ball_rate{std::chrono::milliseconds(500)};
 
-        float m_kick_top_angle{-5.0f};
-        float m_kick_right_angle{-30.0f};
-        float m_kick_left_angle{30.0f};
+        float m_slanting_kick_angle{30.0f};
+        float m_straight_kick_angle{5.0f};
+        float m_kick_tilt_offset{5.0f};
 
-        float m_follow_max_x_step{30.0f};
-        float m_follow_min_x_step{5.0f};
-        float m_follow_max_z_turn{35.0f};
-        float m_fit_x_step{3.0f};
-        float m_fit_max_z_turn{35.0f};
+        float m_follow_max_x_aplitude{30.0f};
+        float m_follow_min_x_amplitude{5.0f};
+        float m_follow_max_a_amplitude{35.0f};
+        float m_fit_x_amplitude{3.0f};
+        float m_fit_a_amplitude{35.0f};
         float m_unit_x_step{0.3f};
         float m_unit_y_step{0.3f};
-        float m_unit_z_turn{1.0f};
+        float m_unit_a_step{1.0f};
 
-        float m_goal_x_step{0.0f};
-        float m_goal_y_step{0.0f};
-        float m_goal_z_turn{0.0f};
-        float m_x_step{0.0f};
-        float m_y_step{0.0f};
-        float m_z_turn{0.0f};
+        float m_cur_goal_x_step{0.0f};
+        float m_cur_goal_y_step{0.0f};
+        float m_cur_goal_z_turn{0.0f};
+        float m_cur_x_amplitude{0.0f};
+        float m_cur_y_amplitude{0.0f};
+        float m_cur_a_amplitude{0.0f};
+
         float m_tilt_offset{MX28_t::RATIO_VALUE2DEGREES};
         kicking_action_t m_kick_ball{kicking_action_t::NO_KICKING};
 

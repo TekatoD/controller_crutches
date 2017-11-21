@@ -2,7 +2,7 @@
 
 #include <cstring>
 #include <memory>
-
+#include "motion/kinematics_t.h"
 #include "motion/motion_module_t.h"
 #include "math/point_t.h"
 

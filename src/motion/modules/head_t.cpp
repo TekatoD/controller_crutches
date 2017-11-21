@@ -7,7 +7,6 @@
 
 #include <log/trivial_logger_t.h>
 #include "hw/MX28_t.h"
-#include "motion/kinematics_t.h"
 #include "motion/motion_status_t.h"
 #include "motion/modules/head_t.h"
 

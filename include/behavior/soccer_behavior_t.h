@@ -43,6 +43,10 @@ namespace drwn {
 
         void process_cv();
 
+        void process_localization();
+
+        void check_rate();
+
     private:
         bool m_prepared{false};
 #ifdef CROSSCOMPILE
@@ -70,11 +74,6 @@ namespace drwn {
         ball_searcher_t* m_searcher{nullptr};
         ball_follower_t* m_follower{nullptr};
         go_to_t* m_goto{nullptr};
-
-
-        void check_rate();
-
-        void process_localization();
 
     };
 }

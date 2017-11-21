@@ -29,7 +29,7 @@ void drwn::LEDs_t::set_head_led(const drwn::color_t& color) {
     int value = CM730_t::make_color(color.get_red(), color.get_green(), color.get_blue());
     if (m_head_color != color) {
         m_head_color = color;
-        m_cm730->write_word(CM730_t::P_LED_EYE_L, value, nullptr);
+        m_cm730->write_word(CM730_t::P_LED_HEAD_L, value, nullptr);
         if (m_debug) {
             LOG_DEBUG << "LEDS: head_t LED color = ("
                       << color.get_red() << ' '

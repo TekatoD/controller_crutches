@@ -22,16 +22,13 @@ namespace drwn {
         void update();
 
         // Resets PF particles to current pose
-        void set_current_pose(pose2d_t current_pose);
-
-        void set_field(field_map_t field);
-        field_map_t get_field() const;
+        void set_current_pose(const pose2d_t& current_pose);
 
         void set_camera_parameters(vision_utils::camera_parameters_t camera_params);
         vision_utils::camera_parameters_t get_camera_parameters();
 
         // Resets PF particles to area
-        void set_pose_approximate_area(pose2d_t min_pose, pose2d_t max_pose);
+        void set_pose_approximate_area(const pose2d_t& min_pose, const pose2d_t& max_pose);
 
         // Resets PF to field area
         void set_pose_approximate_area_to_field();

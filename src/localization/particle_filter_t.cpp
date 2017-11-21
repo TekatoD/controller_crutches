@@ -67,7 +67,7 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
 {
     assert(!m_particles.empty());
 
-    if (m_debug) { LOG_INFO << "PARTICLE_FILTER: Received " << measurements.size() << " measurements"; }
+    if (m_debug) { LOG_DEBUG << "PARTICLE_FILTER: Received " << measurements.size() << " measurements"; }
 
     float weight_normalizer = 0.0f;
     for (auto& particle : m_particles) {
@@ -166,7 +166,7 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
     // While debugging
     //
     if (weight_normalizer < 0.00001) {
-        if (m_debug) LOG_INFO << "PARTICLE FILTER: Normalizer is close to zero";
+        if (m_debug) LOG_DEBUG << "PARTICLE FILTER: Normalizer is close to zero";
     }
 
     // Particle weight normalization

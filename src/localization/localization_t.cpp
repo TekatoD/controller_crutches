@@ -43,6 +43,7 @@ void localization_t::update()
     m_particle_filter->predict(odometry_command, movement_noise);
 
     // Forward kinematics for head
+    // TODO: add  constants to kinemaitcs_t
     float height_from_ground = kinematics_t::LEG_LENGTH + 122.2f + 50.5f + kinematics_t::CAMERA_OFFSET_Z;
     float head_pan = head->get_pan_angle() * (M_PI / 180.0f);
     float head_tilt = head->get_tilt_angle() * (M_PI / 180.0f);
@@ -80,6 +81,8 @@ void localization_t::update()
     cv::Mat leg_translation_vector = left_leg_transform(cv::Range(0, 3), cv::Range(3, 4));
     leg_translation_vector.at<float>(2, 0) += 122.2f + 50.5f + kinematics_t::CAMERA_OFFSET_Z;
     head_translation_vector += leg_translation_vector;
+
+    if (m_debug) LOG_DEBUG << "LOCALIZATION head_translation_vector z = " << head_translation_vector.at<float>(2, 0);
 
     // Collect measurements from lines
     particle_filter_t::measurement_bundle rangeBearingData;
@@ -127,14 +130,14 @@ void localization_t::update()
 
     if (m_debug)
     {
-        LOG_INFO << "PARTICLE FILTER: Pose mean: " << m_particle_filter->get_pose_mean();
-        LOG_INFO << "PARTICLE_FILTER: Pose std dev: " << m_particle_filter->get_pose_std_dev();
+        LOG_DEBUG << "PARTICLE FILTER: Pose mean: " << m_particle_filter->get_pose_mean();
+        LOG_DEBUG << "PARTICLE_FILTER: Pose std dev: " << m_particle_filter->get_pose_std_dev();
     }
 
     m_old_pose = m_current_pose;
 }
 
-void localization_t::set_current_pose(pose2d_t current_pose)
+void localization_t::set_current_pose(const pose2d_t& current_pose)
 {
     assert(m_particle_filter != nullptr);
     m_particle_filter->reset_pose(current_pose);
@@ -150,7 +153,7 @@ vision_utils::camera_parameters_t localization_t::get_camera_parameters()
     return m_camera_params;
 }
 
-void localization_t::set_pose_approximate_area(pose2d_t min_pose, pose2d_t max_pose)
+void localization_t::set_pose_approximate_area(const pose2d_t& min_pose, const pose2d_t& max_pose)
 {
     assert(m_particle_filter != nullptr);
     float min_x, min_y, min_theta, max_x, max_y, max_theta;
@@ -214,6 +217,7 @@ void localization_t::set_measurement_noise(float range, float bearing) {
     m_particle_filter->set_meas_noise_range(range);
     m_particle_filter->set_meas_noise_bearing(bearing);
 }
+
 
 
 

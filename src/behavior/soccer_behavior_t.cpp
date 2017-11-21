@@ -97,7 +97,7 @@ void soccer_behavior_t::process_decision() {
 
     if (!m_prepared) {
         m_action->joint.set_enable_body(true, true);
-        m_action->start(m_behavior_active ? 9 : 15);
+        m_action->start(m_behavior_active ? 15 : 9);
         m_prepared = true;
     }
 
@@ -208,9 +208,6 @@ void soccer_behavior_t::process_cv() {
     } catch (const image_source_failure& e) {
         LOG_WARNING << "SOCCER BEHAVIOR: CV loop iteration failed: " << e.what();
     }
-}
-
-soccer_behavior_t::~soccer_behavior_t() {
 }
 
 void soccer_behavior_t::check_rate() {

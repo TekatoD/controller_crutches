@@ -20,6 +20,10 @@ namespace drwn {
 
         void set_blue(int b) noexcept;
 
+        bool operator==(const color_t& rhs) const;
+
+        bool operator!=(const color_t& rhs) const;
+
     private:
         int m_r{0};
         int m_g{0};

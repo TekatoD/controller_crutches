@@ -29,6 +29,10 @@ namespace drwn {
     private:
         bool m_debug{false};
 
+        color_t m_head_color{-1, -1, -1};
+        color_t m_eye_color{-1, -1, -1};
+        int m_mask = -1;
+
         CM730_t* m_cm730{nullptr};
     };
 }

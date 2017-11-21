@@ -81,6 +81,13 @@ float robot_image_source_t::get_height() const {
 cv::Mat robot_image_source_t::capture_frame() {
     cv::Mat frame;
     m_capture >> frame;
+    if (m_rotate_frame) {
+        if(m_debug) {
+            LOG_TRACE << "ROBOT IMAGE SOURCE: Rotating frame";
+        }
+        cv::rotate(frame, frame, cv::ROTATE_180);
+    }
+
     if(m_debug) {
         LOG_DEBUG << "ROBOT IMAGE SOURCE: Received image";
     }
@@ -93,4 +100,15 @@ bool robot_image_source_t::is_debug_enabled() const noexcept {
 
 void robot_image_source_t::enable_debug(bool debug) noexcept {
     m_debug = debug;
+}
+
+bool robot_image_source_t::is_rotate_frame_enabled() const {
+    return m_rotate_frame;
+}
+
+void robot_image_source_t::enable_rotate_frame(bool rotate_frame) {
+    if(m_debug) {
+        LOG_DEBUG << "ROBOT IMAGE SOURCE: rotate_frame = " << std::boolalpha << rotate_frame;
+    }
+    m_rotate_frame = rotate_frame;
 }

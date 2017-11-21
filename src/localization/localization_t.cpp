@@ -80,7 +80,7 @@ void localization_t::update()
         gp1 = m_camera_projection.image_to_world_explicit(mp1, R, t, m_camera_params.width, m_camera_params.height, m_camera_params.fov);
         gp2 = m_camera_projection.image_to_world_explicit(mp2, R, t, m_camera_params.width, m_camera_params.height, m_camera_params.fov);
         float x1 = gp1.at<float>(0, 0);
-        // change direction of y axis
+        // change direction of get_y axis
         float y1 = -1*gp1.at<float>(1, 0);
 
         float x2 = gp2.at<float>(0, 0);
@@ -116,18 +116,6 @@ void localization_t::set_current_pose(pose2d_t current_pose)
     m_particle_filter->reset_pose(current_pose);
 }
 
-void localization_t::set_field(field_map_t field)
-{
-    assert(m_particle_filter != nullptr);
-    m_particle_filter->set_field_map(field);
-}
-
-field_map_t localization_t::get_field() const
-{
-    assert(m_particle_filter != nullptr);
-    return *(m_particle_filter->get_field_map());
-}
-
 void localization_t::set_camera_parameters(vision_utils::camera_parameters_t camera_params)
 {
     m_camera_params = camera_params;
@@ -142,8 +130,8 @@ void localization_t::set_pose_approximate_area(pose2d_t min_pose, pose2d_t max_p
 {
     assert(m_particle_filter != nullptr);
     float min_x, min_y, min_theta, max_x, max_y, max_theta;
-    min_x = min_pose.x(); min_y = min_pose.y(); min_theta = min_pose.theta();
-    max_x = max_pose.x(); max_y = max_pose.y(); max_theta = max_pose.theta();
+    min_x = min_pose.get_x(); min_y = min_pose.get_y(); min_theta = min_pose.get_theta();
+    max_x = max_pose.get_x(); max_y = max_pose.get_y(); max_theta = max_pose.get_theta();
     m_particle_filter->reset_pose(min_x, max_x, min_y, max_y, min_theta, max_theta);
 }
 

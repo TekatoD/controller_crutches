@@ -15,11 +15,11 @@ drwn::odometry_collector_t::odometry_collector_t(float x, float y, float theta)
         : m_initial(x, y, theta), m_pose(x, y, theta) { }
 
 void drwn::odometry_collector_t::odo_translate(pose2d_t offset) {
-    float dst = hypot(offset.x(), offset.y());
-    float angle = atan2(offset.y(), offset.x());
-    m_pose.set_x(m_pose.x() + (cos(m_pose.theta() + angle) * dst));
-    m_pose.set_y(m_pose.y() + (sin(m_pose.theta() + angle + offset.theta()) * dst));
-    m_pose.set_theta(m_pose.theta() + offset.theta());
+    float dst = hypot(offset.get_x(), offset.get_y());
+    float angle = atan2(offset.get_y(), offset.get_x());
+    m_pose.set_x(m_pose.get_x() + (cos(m_pose.get_theta() + angle) * dst));
+    m_pose.set_y(m_pose.get_y() + (sin(m_pose.get_theta() + angle + offset.get_theta()) * dst));
+    m_pose.set_theta(m_pose.get_theta() + offset.get_theta());
     m_pose.normalize_theta();
 }
 

@@ -20,6 +20,13 @@ using namespace drwn;
 void ball_follower_t::process(point2d_t ball_pos,
                               float angle_top,
                               float angle_bot) {
+    if (m_debug) {
+        LOG_DEBUG << "BALL FOLLOWER: Processing has been started";
+        LOG_DEBUG << "BALL FOLLOWER: ball_pos = (" << ball_pos.X << ", " << ball_pos.Y << ')';
+        LOG_DEBUG << "BALL FOLLOWER: angle_top = " << angle_top;
+        LOG_DEBUG << "BALL FOLLOWER: angle_top = " << angle_bot;
+    }
+
     bool aim = false;
 
     if (ball_pos.X == -1.0 || ball_pos.Y == -1.0) {

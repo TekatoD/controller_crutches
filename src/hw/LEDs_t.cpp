@@ -12,31 +12,45 @@ void drwn::LEDs_t::set_panel_led(bool first, bool second, bool third) {
     if (first) mask |= 0x01;
     if (second) mask |= 0x02;
     if (third) mask |= 0x04;
-    m_cm730->write_byte(CM730_t::P_LED_PANNEL, mask, nullptr);
 
-    if (m_debug) {
-        LOG_DEBUG << "LEDS: LED panel was updated: "
-                  << std::boolalpha << first << ' ' << second << ' ' << third;
+    if (mask != m_mask) {
+        m_cm730->write_byte(CM730_t::P_LED_PANNEL, mask, nullptr);
+        m_mask = mask;
+        if (m_debug) {
+            LOG_DEBUG << "LEDS: LED panel was updated: "
+                      << std::boolalpha << first << ' ' << second << ' ' << third;
+        }
     }
+
 }
 
 void drwn::LEDs_t::set_head_led(const drwn::color_t& color) {
     check_CM730();
     int value = CM730_t::make_color(color.get_red(), color.get_green(), color.get_blue());
-    m_cm730->write_word(CM730_t::P_LED_EYE_L, value, nullptr);
-    if (m_debug) {
-        LOG_DEBUG << "LEDS: head_t LED color = ("
-                  << color.get_red() << ' ' << color.get_green() << ' ' << color.get_blue() << ')';
+    if (m_head_color != color) {
+        m_head_color = color;
+        m_cm730->write_word(CM730_t::P_LED_EYE_L, value, nullptr);
+        if (m_debug) {
+            LOG_DEBUG << "LEDS: head_t LED color = ("
+                      << color.get_red() << ' '
+                      << color.get_green() << ' '
+                      << color.get_blue() << ')';
+        }
     }
 }
 
 void drwn::LEDs_t::set_eye_led(const drwn::color_t& color) {
     check_CM730();
     int value = CM730_t::make_color(color.get_red(), color.get_green(), color.get_blue());
-    m_cm730->write_word(CM730_t::P_LED_EYE_L, value, nullptr);
-    if (m_debug) {
-        LOG_DEBUG << "LEDS: Eye LED color = ("
-                  << color.get_red() << ' ' << color.get_green() << ' ' << color.get_blue() << ')';
+    if (m_eye_color != color) {
+        m_eye_color = color;
+        m_cm730->write_word(CM730_t::P_LED_EYE_L, value, nullptr);
+        if (m_debug) {
+            LOG_DEBUG << "LEDS: Eye LED color = ("
+                      << color.get_red() << ' '
+                      << color.get_green() << ' '
+                      << color.get_blue() << ')';
+        }
     }
 }
 

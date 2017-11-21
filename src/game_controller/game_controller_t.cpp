@@ -62,8 +62,10 @@ bool game_controller_t::connect() {
 
 
 void game_controller_t::disconnect() {
-    if (m_debug) LOG_DEBUG << "GAME CONTROLLER: Game controller disconnected";
-    delete m_udp;
+    if (m_udp != nullptr) {
+        if (m_debug) LOG_DEBUG << "GAME CONTROLLER: Game controller disconnected";
+        delete m_udp;
+    }
 }
 
 
@@ -74,7 +76,7 @@ bool game_controller_t::connected() const {
 
 void game_controller_t::send_penalise() {
     if (this->send(GAMECONTROLLER_RETURN_MSG_MAN_PENALISE)) {
-        if (m_debug) LOG_INFO << "GAME CONTROLLER: Sending manual penalise message";
+        if (m_debug) LOG_DEBUG << "GAME CONTROLLER: Sending manual penalise message";
         m_when_packet_was_sent = clock();
     }
 }
@@ -82,7 +84,7 @@ void game_controller_t::send_penalise() {
 
 void game_controller_t::send_unpenalise() {
     if (this->send(GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE)) {
-        if (m_debug) LOG_INFO << "GAME CONTROLLER: Sending manual unpenalise message";
+        if (m_debug) LOG_DEBUG << "GAME CONTROLLER: Sending manual unpenalise message";
         m_when_packet_was_sent = clock();
     }
 }
@@ -90,7 +92,7 @@ void game_controller_t::send_unpenalise() {
 
 void game_controller_t::send_alive() {
     if (this->send(GAMECONTROLLER_RETURN_MSG_ALIVE)) {
-        if (m_debug) LOG_INFO << "GAME CONTROLLER: Sending alive message";
+        if (m_debug) LOG_DEBUG << "GAME CONTROLLER: Sending alive message";
         m_when_packet_was_sent = clock();
     }
 }
@@ -137,8 +139,8 @@ bool game_controller_t::send(uint8_t message) {
     return_packet.player = (uint8_t) m_player_number;
     return_packet.message = message;
     auto result = !m_udp || m_udp->write((const char*) &return_packet, sizeof(return_packet));
-    if (m_debug) {
-        LOG_DEBUG << "GAME CONTROLLER: " << (result) ? "Message has been sent" : "Can't send message";
+    if (m_debug && !result) {
+        LOG_DEBUG << "GAME CONTROLLER: Can't send message";
     }
     return result;
 }
@@ -148,7 +150,7 @@ bool game_controller_t::receive() {
     bool received = false;
     int size;
     robo_cup_game_control_data_t buffer;
-    struct sockaddr_in from;
+    sockaddr_in from;
     while (m_udp && (size = m_udp->read((char*) &buffer, sizeof(buffer), from)) > 0) {
         if (size == sizeof(buffer) &&
             !std::memcmp(&buffer, GAMECONTROLLER_STRUCT_HEADER, 4) &&

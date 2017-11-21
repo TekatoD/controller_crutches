@@ -159,31 +159,31 @@ void white_ball_vision_processor_configuration_strategy_t::read_config(const boo
         if(ball_detector_haar_config) m_white_ball_vision_processor->set_ball_detector_cascade_config(ball_detector_haar_config.get());
 
         if (ball_median_blur_size)
-            m_white_ball_vision_processor->set_ball_preprocessor_median_blur_size(ball_median_blur_size.get());
+            m_white_ball_vision_processor->set_ball_detector_median_blur_size(ball_median_blur_size.get());
 
         if (ball_detector_color_thresh_min_b && ball_detector_color_thresh_min_g && ball_detector_color_thresh_min_r) {
-            m_white_ball_vision_processor->set_ball_preprocessor_threshold_color_bgr_min(cv::Scalar(
+            m_white_ball_vision_processor->set_ball_detector_threshold_color_bgr_min(cv::Scalar(
                     ball_detector_color_thresh_min_b.get(),
                     ball_detector_color_thresh_min_g.get(),
                     ball_detector_color_thresh_min_r.get()
             ));
         }
         if (ball_detector_color_thresh_max_b && ball_detector_color_thresh_max_g && ball_detector_color_thresh_max_r) {
-            m_white_ball_vision_processor->set_ball_preprocessor_threshold_color_bgr_max(cv::Scalar(
+            m_white_ball_vision_processor->set_ball_detector_threshold_color_bgr_max(cv::Scalar(
                     ball_detector_color_thresh_max_b.get(),
                     ball_detector_color_thresh_max_g.get(),
                     ball_detector_color_thresh_max_r.get()
             ));
         }
         if (ball_detector_gabor_thresh_min_b && ball_detector_gabor_thresh_min_g && ball_detector_gabor_thresh_min_r) {
-            m_white_ball_vision_processor->set_ball_preprocessor_threshold_gabor_bgr_min(cv::Scalar(
+            m_white_ball_vision_processor->set_ball_detector_threshold_gabor_bgr_min(cv::Scalar(
                     ball_detector_gabor_thresh_min_b.get(),
                     ball_detector_gabor_thresh_min_g.get(),
                     ball_detector_gabor_thresh_min_r.get()
             ));
         }
         if (ball_detector_gabor_thresh_max_b && ball_detector_gabor_thresh_max_g && ball_detector_gabor_thresh_max_r) {
-            m_white_ball_vision_processor->set_ball_preprocessor_threshold_gabor_bgr_max(cv::Scalar(
+            m_white_ball_vision_processor->set_ball_detector_threshold_gabor_bgr_max(cv::Scalar(
                     ball_detector_gabor_thresh_max_b.get(),
                     ball_detector_gabor_thresh_max_g.get(),
                     ball_detector_gabor_thresh_max_r.get()
@@ -253,12 +253,12 @@ void white_ball_vision_processor_configuration_strategy_t::write_config(boost::p
         //BALL CONFIGS
 
 //        auto ball_white_ball = ball_section.get_optional<int>("white_ball");
-        section.put("ball_detector_median_blur_size", m_white_ball_vision_processor->get_ball_preprocessor_median_blur_size());
+        section.put("ball_detector_median_blur_size", m_white_ball_vision_processor->get_ball_detector_median_blur_size());
 
-        auto ball_color_max = m_white_ball_vision_processor->get_ball_preprocessor_threshold_color_bgr_max();
-        auto ball_color_min = m_white_ball_vision_processor->get_ball_preprocessor_threshold_color_bgr_min();
-        auto ball_gabor_max = m_white_ball_vision_processor->get_ball_preprocessor_threshold_gabor_bgr_max();
-        auto ball_gabor_min = m_white_ball_vision_processor->get_ball_preprocessor_threshold_gabor_bgr_min();
+        auto ball_color_max = m_white_ball_vision_processor->get_ball_detector_threshold_color_bgr_max();
+        auto ball_color_min = m_white_ball_vision_processor->get_ball_detector_threshold_color_bgr_min();
+        auto ball_gabor_max = m_white_ball_vision_processor->get_ball_detector_threshold_gabor_bgr_max();
+        auto ball_gabor_min = m_white_ball_vision_processor->get_ball_detector_threshold_gabor_bgr_min();
         section.put("ball_detector_color_thresh_min_b", ball_color_min[0]);
         section.put("ball_detector_color_thresh_min_g", ball_color_min[1]);
         section.put("ball_detector_color_thresh_min_r", ball_color_min[2]);

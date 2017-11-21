@@ -19,8 +19,8 @@
 namespace drwn {
     class game_controller_t {
     public:
-        static constexpr int GAMECONTROLLER_TIMEOUT = 2000000;
-        static constexpr int ALIVE_DELAY = 1000000;
+        static constexpr int GAMECONTROLLER_TIMEOUT = 200000;
+        static constexpr int ALIVE_DELAY = 100000;
 
         static game_controller_t* get_instance();
 
@@ -71,7 +71,7 @@ namespace drwn {
         int m_team_number;
         robo_cup_game_control_data_t m_game_ctrl_data;
 
-        udp_comm_t* m_udp;
+        udp_comm_t* m_udp{nullptr};
         in_addr m_game_controller_address;
         clock_t m_when_packet_was_received;
         clock_t m_when_packet_was_sent;

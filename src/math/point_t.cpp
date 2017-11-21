@@ -34,16 +34,16 @@ point2d_t::~point2d_t() {
 
 
 /*returns the euclidian distance between pt1 and pt2*/
-float point2d_t::Distance(point2d_t& pt1, point2d_t& pt2) {
+float point2d_t::distance(point2d_t& pt1, point2d_t& pt2) {
     float x = pt1.X - pt2.X;
     float y = pt1.Y - pt2.Y;
     return sqrt(x * x + y * y);
 }
 
-float point2d_t::Distance(const point2d_t& pt1, const point2d_t& pt2) {
+float point2d_t::distance(const point2d_t& pt1, const point2d_t& pt2) {
     float x = pt1.X - pt2.X;
     float y = pt1.Y - pt2.Y;
-    return sqrt(x * x + y * y);
+    return sqrtf(x * x + y * y);
 }
 
 point2d_t& point2d_t::operator=(const point2d_t& point) {
@@ -150,7 +150,7 @@ point3d_t::~point3d_t() {
 }
 
 
-float point3d_t::Distance(const point3d_t& pt1, const point3d_t& pt2) {
+float point3d_t::distance(const point3d_t& pt1, const point3d_t& pt2) {
     float x = pt1.X - pt2.X;
     float y = pt1.Y - pt2.Y;
     float z = pt1.Z - pt2.Z;

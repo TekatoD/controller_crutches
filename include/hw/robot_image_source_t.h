@@ -44,8 +44,13 @@ namespace drwn {
 
         void enable_debug(bool debug) noexcept;
 
+        bool is_rotate_frame_enabled() const;
+
+        void enable_rotate_frame(bool rotate_frame);
+
     private:
         bool m_debug{false};
+        bool m_rotate_frame{false};
         cv::VideoCapture m_capture{0};
     };
 }

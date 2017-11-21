@@ -3,10 +3,9 @@
  *  @date 5/3/17
  */
 
+#include <math/angle_tools.h>
 #include "behavior/go_to_t.h"
 #include "motion/modules/walking_t.h"
-
-#define PI (3.14159265)
 
 
 bool drwn::go_to_t::is_done() const {
@@ -15,8 +14,8 @@ bool drwn::go_to_t::is_done() const {
 
 void drwn::go_to_t::process(drwn::pose2d_t pos) {
     m_done = true;
-    float dist = hypotf(pos.x(), pos.y());
-    float angle = atan2f(pos.y(), pos.x()) / M_PI * 180.0;
+    float dist = hypotf(pos.get_x(), pos.get_y());
+    float angle = degrees(atan2f(pos.get_y(), pos.get_x()));
 
     if (!walking_t::get_instance()->is_running() ||
             walking_t::get_instance()->get_x_move_amplitude() != m_x ||
@@ -32,18 +31,18 @@ void drwn::go_to_t::process(drwn::pose2d_t pos) {
         m_a = 0;
         m_goal_max_speed = (dist < m_fit_distance) ? m_fit_speed : m_max_speed;
 
-        float x_factor = pos.x() / dist;
+        float x_factor = pos.get_x() / dist;
         float x_speed = x_factor * m_goal_max_speed;
-        float y_factor = pos.y() / dist;
+        float y_factor = pos.get_y() / dist;
         float y_speed = y_factor * m_goal_max_speed;
 
         m_x += m_step_accel * x_factor;
-        if (x_speed > 0 && m_x > x_speed || x_speed <= 0 && m_x < x_speed) {
+        if ((x_speed > 0 && m_x > x_speed) || (x_speed <= 0 && m_x < x_speed)) {
             m_x = x_speed;
         }
 
         m_y += m_step_accel * y_factor;
-        if (y_speed > 0 && m_y > y_speed || y_speed <= 0 && m_y < y_speed) {
+        if ((y_speed > 0 && m_y > y_speed) || (y_speed <= 0 && m_y < y_speed)) {
             m_y = y_speed;
         }
 
@@ -54,8 +53,8 @@ void drwn::go_to_t::process(drwn::pose2d_t pos) {
     }
 
     if (m_done) {
-        float deg = pos.theta() / PI * 180;
-        if (deg > 0 && deg > m_angle_var || deg < 0 && deg < -m_angle_var) {
+        float deg = degrees(pos.get_theta());
+        if ((deg > 0 && deg > m_angle_var) || (deg < 0 && deg < -m_angle_var)) {
             m_goal_turn = m_max_turn;
             if (deg < 0) {
                 m_a -= m_turn_accel;

@@ -4,6 +4,8 @@
  */
 #include "motion/pose2d_t.h"
 #include <math.h>
+#include <boost/math/constants/constants.hpp>
+#include <math/angle_tools.h>
 
 drwn::pose2d_t::pose2d_t() : m_x(0), m_y(0), m_theta(0) { }
 
@@ -11,15 +13,15 @@ drwn::pose2d_t::pose2d_t(float x, float y, float theta) : m_x(x), m_y(y), m_thet
     this->normalize_theta();
 }
 
-float drwn::pose2d_t::x() const {
+float drwn::pose2d_t::get_x() const {
     return m_x;
 }
 
-float drwn::pose2d_t::y() const {
+float drwn::pose2d_t::get_y() const {
     return m_y;
 }
 
-float drwn::pose2d_t::theta() const {
+float drwn::pose2d_t::get_theta() const {
     return m_theta;
 }
 
@@ -37,13 +39,14 @@ void drwn::pose2d_t::set_theta(float theta) {
 }
 
 void drwn::pose2d_t::normalize_theta() {
-//    while (m_theta < 0) m_theta += 2 * M_PI;
-//    m_theta = fmod(m_theta, 2 * M_PI) - M_PI;
-    while (m_theta > M_PI) {
-        m_theta -= 2 * M_PI;
+    using namespace boost::math;
+//    while (m_theta < 0) m_theta += 2 * constants::pi<float>();
+//    m_theta = fmod(m_theta, 2 * constants::pi<float>()) - constants::pi<float>();
+    while (m_theta > constants::pi<float>()) {
+        m_theta -= 2 * constants::pi<float>();
     }
-    while (m_theta < -M_PI) {
-        m_theta += 2 * M_PI;
+    while (m_theta < -constants::pi<float>()) {
+        m_theta += 2 * constants::pi<float>();
     }
 }
 
@@ -77,17 +80,17 @@ drwn::pose2d_t& drwn::pose2d_t::operator-=(const drwn::pose2d_t &rhs) {
 
 
 void drwn::pose2d_t::rotate_around(const drwn::pose2d_t& pose) {
-    float c = cos(pose.theta());
-    float s = sin(pose.theta());
-    float d_x = m_x - pose.x();
-    float d_y = m_y - pose.y();
-    m_x = c * (d_x) - s * (d_y) + pose.x();
-    m_y = s * (d_x) + c * (d_y) + pose.y();
+    float c = cos(pose.get_theta());
+    float s = sin(pose.get_theta());
+    float d_x = m_x - pose.get_x();
+    float d_y = m_y - pose.get_y();
+    m_x = c * (d_x) - s * (d_y) + pose.get_x();
+    m_y = s * (d_x) + c * (d_y) + pose.get_y();
 }
 
 namespace drwn {
-    std::ostream &operator<<(std::ostream &os, const drwn::pose2d_t &data) {
-        os << " " << data.m_x << " " << data.m_y << " " << data.m_theta / M_PI * 180;
+    std::ostream& operator<<(std::ostream &os, const drwn::pose2d_t &data) {
+        os << " " << data.m_x << " " << data.m_y << " " << degrees(data.m_theta);
         return os;
     }
 }

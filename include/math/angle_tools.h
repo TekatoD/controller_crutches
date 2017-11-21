@@ -22,10 +22,6 @@
 
 #include <cmath>
 
-const float pi = (float) M_PI;
-const float half_pi = pi / 2.0f;
-const float two_pi = pi * 2.0f;
-
 float degrees(float rad);
 
 float radians(float deg);

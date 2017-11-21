@@ -32,26 +32,6 @@ namespace drwn {
         bool is_debug_enabled() const noexcept;
 
         void enable_debug(bool debug) noexcept;
-
-        const cv::Scalar& get_ball_preprocessor_threshold_gabor_bgr_min() const;
-
-        void set_ball_preprocessor_threshold_gabor_bgr_min(const cv::Scalar& threshold_gabor_bgr_min);
-
-        const cv::Scalar& get_ball_preprocessor_threshold_gabor_bgr_max() const;
-
-        void set_ball_preprocessor_threshold_gabor_bgr_max(const cv::Scalar& threshold_gabor_bgr_max);
-
-        const cv::Scalar& get_ball_preprocessor_threshold_color_bgr_min() const;
-
-        void set_ball_preprocessor_threshold_color_bgr_min(const cv::Scalar& threshold_color_bgr_min);
-
-        const cv::Scalar& get_ball_preprocessor_threshold_color_bgr_max() const;
-
-        void set_ball_preprocessor_threshold_color_bgr_max(const cv::Scalar& threshold_color_bgr_max);
-
-        int get_ball_preprocessor_median_blur_size() const;
-
-        void set_ball_preprocessor_median_blur_size(int median_blur_size);
         
 
         const cv::Scalar& get_field_preprocessor_threshold_gabor_bgr_min() const;
@@ -151,6 +131,28 @@ namespace drwn {
         const std::string& get_ball_detector_cascade_config() const;
 
 
+        const cv::Scalar& get_ball_detector_threshold_gabor_bgr_min() const;
+
+        void set_ball_detector_threshold_gabor_bgr_min(const cv::Scalar& threshold_gabor_bgr_min);
+
+        const cv::Scalar& get_ball_detector_threshold_gabor_bgr_max() const;
+
+        void set_ball_detector_threshold_gabor_bgr_max(const cv::Scalar& threshold_gabor_bgr_max);
+
+        const cv::Scalar& get_ball_detector_threshold_color_bgr_min() const;
+
+        void set_ball_detector_threshold_color_bgr_min(const cv::Scalar& threshold_color_bgr_min);
+
+        const cv::Scalar& get_ball_detector_threshold_color_bgr_max() const;
+
+        void set_ball_detector_threshold_color_bgr_max(const cv::Scalar& threshold_color_bgr_max);
+
+        int get_ball_detector_median_blur_size() const;
+
+        void set_ball_detector_median_blur_size(int median_blur_size);
+
+
+
         void process() override;
 
         ~white_ball_vision_processor_t();
@@ -196,7 +198,6 @@ namespace drwn {
         std::vector<cv::Vec3d> m_angles{};
 
         bool m_img_processed{false};
-        ball_preprocessor_t m_ball_preproc;
         new_line_preprocessor_t m_line_preproc;
         field_preprocessor_t m_field_preproc;
         white_ball_detector_t m_ball_detector;

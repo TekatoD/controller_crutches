@@ -15,11 +15,11 @@ namespace drwn {
 
         pose2d_t(float x, float y, float theta = 0);
 
-        float x() const;
+        float get_x() const;
 
-        float y() const;
+        float get_y() const;
 
-        float theta() const;
+        float get_theta() const;
 
         void set_x(float x);
 

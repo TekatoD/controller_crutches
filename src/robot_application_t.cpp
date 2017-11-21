@@ -140,7 +140,9 @@ void robot_application_t::init_CM730() {
     vrep_cm730->connect();
     m_vrep_connector = move(vrep_connector);
     m_cm730 = move(vrep_cm730);
+    m_image_source = move(vrep_image_source);
     camera_t::get_instance()->set_image_source(m_image_source.get());
+    m_image_source->enable_debug(m_arg_debug_all || m_arg_debug_image_source);
 
 #endif
 
@@ -169,7 +171,7 @@ void robot_application_t::check_firmware() {
 
 void robot_application_t::init_cv() {
     if (m_debug) LOG_DEBUG << "Initializing camera...";
-#ifdef CROSSCOMPILATION
+#ifdef CROSSCOMPILE
     auto image_source = std::make_unique<robot_image_source_t>(camera_t::WIDTH, camera_t::HEIGHT);
 #else
     auto image_source = std::make_unique<vrep_image_source_t>("camera", camera_t::WIDTH, camera_t::HEIGHT);
@@ -226,6 +228,7 @@ void robot_application_t::init_motion_modules() {
     motion_manager_t::get_instance()->add_module((motion_module_t*) head_t::get_instance());
     motion_manager_t::get_instance()->add_module((motion_module_t*) walking_t::get_instance());
     motion_manager_t::get_instance()->add_module((motion_module_t*) kicking_t::get_instance());
+    motion_manager_t::get_instance()->set_enable(true);
     if (m_debug) LOG_INFO << "Motion modules are ready";
 }
 
@@ -234,6 +237,8 @@ void robot_application_t::init_motion_timer() {
     auto motion_timer = std::make_unique<linux_motion_timer_t>(motion_manager_t::get_instance());
     motion_timer->start();
     m_motion_timer = std::move(motion_timer);
+//    m_motion_timer = std::make_unique<linux_motion_timer_t>(motion_manager_t::get_instance());
+//    m_motion_timer->start();
     if (m_debug) LOG_INFO << "Motion timer is ready";
     check_firmware(); //This was moved here from Cm730 inititialization
 }
@@ -250,7 +255,6 @@ void robot_application_t::init_configuraion_loader() {
     if (m_debug) LOG_DEBUG << "Initializing configuration loader...";
     //TODO Don't forget uncomment this lines
     m_white_ball_vision_processor_configuration_strategy.set_white_ball_vision_processor(m_vision_processor.get());
-    m_localization_field_configuration_strategy.set_field_map(m_particle_filter->get_field_map());
     m_particle_filter_configuration_strategy.set_particle_filter(m_particle_filter.get());
 
     m_configuration_loader.set_default_path(m_arg_config_default);
@@ -258,7 +262,9 @@ void robot_application_t::init_configuraion_loader() {
     m_configuration_loader.add_strategy(m_head_configuration_strategy, m_arg_config_head);
     m_configuration_loader.add_strategy(m_walking_configuration_strategy, m_arg_config_walking);
     m_configuration_loader.add_strategy(m_motion_manager_configuration_strategy, m_arg_config_motion_manager);
-    m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy, m_arg_config_white_ball_vision_processor);
+    m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy,
+                                        m_arg_config_white_ball_vision_processor);
+    m_configuration_loader.add_strategy(m_localization_field_configuration_strategy, m_arg_config_localization_field);
     m_configuration_loader.add_strategy(m_localization_field_configuration_strategy, m_arg_config_localization_field);
     m_configuration_loader.add_strategy(m_particle_filter_configuration_strategy, m_arg_config_particle_filter);
     m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy,
@@ -267,7 +273,7 @@ void robot_application_t::init_configuraion_loader() {
     m_configuration_loader.add_strategy(m_ball_tracker_configuration_strategy, m_arg_config_ball_searcher);
     m_configuration_loader.add_strategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
 
-#ifdef CROSSCOMPILATION
+#ifdef CROSSCOMPILE
     m_robot_image_source_configuration_strategy.set_image_source(m_image_source.get());
     m_configuration_loader.add_strategy(m_robot_image_source_configuration_strategy, m_arg_config_image_source);
 #endif
@@ -287,7 +293,7 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_debug_all);
     parser.add_strategy(m_arg_debug_application);
     parser.add_strategy(m_arg_debug_game_controller);
-    parser.add_strategy(m_arg_debug_motion_manager);
+//    parser.add_strategy(m_arg_debug_motion_manager);
     parser.add_strategy(m_arg_debug_head);
     parser.add_strategy(m_arg_debug_walking);
     parser.add_strategy(m_arg_debug_action);
@@ -302,6 +308,8 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_debug_ball_tracker);
     parser.add_strategy(m_arg_debug_ball_follower);
     parser.add_strategy(m_arg_debug_go_to);
+    parser.add_strategy(m_arg_debug_localization);
+    parser.add_strategy(m_arg_debug_behavior);
 
     parser.add_strategy(m_arg_config_default);
     parser.add_strategy(m_arg_config_ball_searcher);
@@ -334,11 +342,13 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_camera.set_option("dbg-camera", "enable debug output for camera");
     m_arg_debug_vision_processor.set_option("dbg-cv", "enable debug output for cv");
     m_arg_debug_localization.set_option("dbg-localization", "enable debug output for localization module");
+    m_arg_debug_field.set_option("dbg-field", "enable debug for field properties");
     m_arg_debug_image_source.set_option("dbg-img-source", "enabled debug output for image source");
     m_arg_debug_ball_searcher.set_option("dbg-ball-searcher", "enable debug output for ball searcher");
     m_arg_debug_ball_tracker.set_option("dbg-ball-tracker", "enable debug output for ball tracker");
     m_arg_debug_ball_follower.set_option("dbg-ball-follower", "enable debug output for ball follower");
     m_arg_debug_go_to.set_option("dbg-go-to", "enable debug output for go to component");
+    m_arg_debug_behavior.set_option("dbg-bhv", "enable debug output for behavior");
 
     m_arg_config_default.set_option("cfg,c", "default config file (res/config.ini by default)");
     m_arg_config_game_controller.set_option("cfg-game-controller", "config file for game controller");
@@ -363,32 +373,22 @@ void robot_application_t::parse_command_line_arguments() {
 }
 
 void robot_application_t::apply_debug_arguments() {
-    if (m_arg_debug_all || m_arg_debug_application)
-        enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_game_controller)
-        game_controller_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_motion_manager)
-        motion_manager_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_head)
-        head_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_walking)
-        walking_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_action)
-        action_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_kicking)
-        kicking_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_buttons)
-        buttons_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_leds)
-        LEDs_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_camera)
-        camera_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_ball_searcher)
-        ball_searcher_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all || m_arg_debug_ball_tracker)
-        ball_tracker_t::get_instance()->enable_debug(true);
-    if (m_arg_debug_all  || m_arg_debug_ball_follower)
-        ball_follower_t::get_instance()->enable_debug(true);
+    enable_debug(m_arg_debug_all || m_arg_debug_application);
+    game_controller_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_game_controller);
+//    motion_manager_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_motion_manager);
+    motion_manager_t::get_instance()->enable_debug(false);
+    head_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_head);
+    walking_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_walking);
+    action_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_action);
+    kicking_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_kicking);
+    buttons_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_buttons);
+    LEDs_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_leds);
+    camera_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_camera);
+    ball_searcher_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_ball_searcher);
+    ball_tracker_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_ball_tracker);
+    ball_follower_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_ball_follower);
+    field_map_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_field);
+    m_configuration_loader.enable_debug(m_arg_debug_all);
     // Image source debug placed located in init_cv
     // Localization debug is in init_localization
 }
@@ -397,7 +397,7 @@ void robot_application_t::read_configuration() {
     if (m_debug) LOG_DEBUG << "Reading configuration...";
     m_configuration_loader.configure_all();
     m_action_configuration_loader.read_motion_file();
-    if (m_debug) LOG_INFO << "Reading configuration was finished";
+    if (m_debug) LOG_INFO << "Reading configuration has finished";
 }
 
 void robot_application_t::init_behavior() {
@@ -406,16 +406,20 @@ void robot_application_t::init_behavior() {
     } else {
         m_behavior = std::make_unique<soccer_behavior_t>();
     }
+    m_behavior->enable_debug(m_arg_debug_all || m_arg_debug_behavior);
 }
 
 void robot_application_t::start_main_loop() {
-    if (m_debug) LOG_INFO << "=== Controller was started ===";
+    if (m_debug) LOG_INFO << "=== Controller has started ===";
+    action_t::get_instance()->joint.set_enable_body(true, true);
+    action_t::get_instance()->start(15);
     while (is_running()) {
+        if (m_debug) LOG_DEBUG << "ROBOT APPLICATION: === Iteration start ===";
         m_behavior->process();
         //TODO:
         step_localization();
     }
-    if (m_debug) LOG_INFO << "=== Controller was finished ===";
+    if (m_debug) LOG_INFO << "=== Controller has finished ===";
 
 }
 

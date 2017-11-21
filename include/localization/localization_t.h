@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <localization/localization_util_t.h>
+#include <localization/line_t.h>
 #include <localization/particle_filter_t.h>
 #include <vision/vision_utils.h>
 

@@ -26,3 +26,13 @@ int drwn::color_t::get_blue() const noexcept {
 void drwn::color_t::set_blue(int b) noexcept {
     color_t::m_b = b;
 }
+
+bool drwn::color_t::operator==(const drwn::color_t& rhs) const {
+    return m_r == rhs.m_r &&
+           m_g == rhs.m_g &&
+           m_b == rhs.m_b;
+}
+
+bool drwn::color_t::operator!=(const drwn::color_t& rhs) const {
+    return !(rhs == *this);
+}

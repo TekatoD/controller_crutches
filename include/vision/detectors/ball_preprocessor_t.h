@@ -32,12 +32,12 @@ namespace drwn {
         void set_median_blur_size(int median_blur_size);
 
     private:
-        cv::Scalar m_threshold_gabor_bgr_min;
-        cv::Scalar m_threshold_gabor_bgr_max;
-        cv::Scalar m_threshold_color_bgr_min;
-        cv::Scalar m_threshold_color_bgr_max;
+        cv::Scalar m_threshold_gabor_bgr_min{0, 0, 35};
+        cv::Scalar m_threshold_gabor_bgr_max{0, 0, 255};
+        cv::Scalar m_threshold_color_bgr_min{5, 50, 100};
+        cv::Scalar m_threshold_color_bgr_max{100, 18, 255};
 
-        int m_median_blur_size;
+        int m_median_blur_size{7};
     };
 }
 

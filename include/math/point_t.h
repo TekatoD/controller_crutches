@@ -27,8 +27,8 @@ namespace drwn {
         ~point2d_t();
 
         /*compute the euclidean distance between pt1 and pt2*/
-        static float Distance(point2d_t& pt1, point2d_t& pt2);
-        static float Distance(const point2d_t& pt1, const point2d_t& pt2);
+        static float distance(point2d_t& pt1, point2d_t& pt2);
+        static float distance(const point2d_t& pt1, const point2d_t& pt2);
 
         point2d_t& operator=(const point2d_t& point);
 
@@ -76,7 +76,7 @@ namespace drwn {
         ~point3d_t();
 
         /*compute the euclidean distance between pt1 and pt2*/
-        static float Distance(const point3d_t& pt1, const point3d_t& pt2);
+        static float distance(const point3d_t& pt1, const point3d_t& pt2);
 
         point3d_t& operator=(const point3d_t& point);
 

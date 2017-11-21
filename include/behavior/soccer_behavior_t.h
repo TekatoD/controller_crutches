@@ -33,8 +33,6 @@ namespace drwn {
 
         void process() override;
 
-        ~soccer_behavior_t() override;
-
     private:
 
         void process_decision();

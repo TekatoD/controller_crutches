@@ -18,8 +18,6 @@
 #include "behavior/ball_searcher_t.h"
 #include "behavior/ball_follower_t.h"
 #include "behavior/go_to_t.h"
-#include <thread>
-#include <boost/math/constants/constants.hpp>
 
 using namespace drwn;
 
@@ -64,6 +62,13 @@ void soccer_behavior_t::process_buttons() {
             m_action->joint.set_enable_body(true, true);
             m_action->start(m_behavior_active ? 15 : 9);
             update_rate = true;
+            if (m_debug) {
+                if (m_behavior_active) {
+                    LOG_DEBUG << "SOCCER BEHAVIOR: Activating behavior...";
+                } else {
+                    LOG_DEBUG << "SOCCER BEHAVIOR: Deactivating behavior...";
+                }
+            }
         }
 
         // Second button switches penalise state;
@@ -115,6 +120,7 @@ void soccer_behavior_t::process_decision() {
     } else {
         // Wait while robot hasn't got up
         if (m_action->is_running() || !m_behavior_active) {
+            if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Decision making skipped";
             return;
         }
 
@@ -124,6 +130,7 @@ void soccer_behavior_t::process_decision() {
         auto ball = m_vision->detect_ball();
 
         if (gc_data.state == STATE_SET || gc_data.state == STATE_READY || gc_data.state == STATE_INITIAL) {
+            if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Ready state processing...";
             const pose2d_t starnig; // TODO Get starting position
             if (m_tracker->is_no_ball()) {
                 m_head->move_to_home();
@@ -134,6 +141,7 @@ void soccer_behavior_t::process_decision() {
         }
 
         if (gc_data.state == STATE_PLAYING) {
+            if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Playing state processing...";
 //        if (State.kickOffTeam != team) {
 //            // TODO KickOff
 //        }

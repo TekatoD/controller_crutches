@@ -308,6 +308,7 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_debug_ball_follower);
     parser.add_strategy(m_arg_debug_go_to);
     parser.add_strategy(m_arg_debug_localization);
+    parser.add_strategy(m_arg_debug_behavior);
 
     parser.add_strategy(m_arg_config_default);
     parser.add_strategy(m_arg_config_ball_searcher);
@@ -346,6 +347,7 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_ball_tracker.set_option("dbg-ball-tracker", "enable debug output for ball tracker");
     m_arg_debug_ball_follower.set_option("dbg-ball-follower", "enable debug output for ball follower");
     m_arg_debug_go_to.set_option("dbg-go-to", "enable debug output for go to component");
+    m_arg_debug_behavior.set_option("dbg-bhv", "enable debug output for behavior");
 
     m_arg_config_default.set_option("cfg,c", "default config file (res/config.ini by default)");
     m_arg_config_game_controller.set_option("cfg-game-controller", "config file for game controller");
@@ -403,6 +405,7 @@ void robot_application_t::init_behavior() {
     } else {
         m_behavior = std::make_unique<soccer_behavior_t>();
     }
+    m_behavior->enable_debug(m_arg_debug_all || m_arg_debug_behavior);
 }
 
 void robot_application_t::start_main_loop() {

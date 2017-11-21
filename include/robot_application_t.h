@@ -150,6 +150,7 @@ namespace drwn {
         debug_mode_arguments_parsing_strategy_t m_arg_debug_ball_searcher;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_ball_follower;
         debug_mode_arguments_parsing_strategy_t m_arg_debug_go_to;
+        debug_mode_arguments_parsing_strategy_t m_arg_debug_behavior;
 
         config_path_arguments_parsing_strategy_t m_arg_config_default;
         config_path_arguments_parsing_strategy_t m_arg_config_game_controller;

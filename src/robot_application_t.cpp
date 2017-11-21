@@ -30,6 +30,7 @@
 
 using namespace drwn;
 
+#define DEBUG
 
 robot_application_t* robot_application_t::get_instance() {
     static robot_application_t instance;
@@ -140,6 +141,7 @@ void robot_application_t::init_CM730() {
     vrep_cm730->connect();
     m_vrep_connector = move(vrep_connector);
     m_cm730 = move(vrep_cm730);
+    m_image_source = move(vrep_image_source);
     camera_t::get_instance()->set_image_source(m_image_source.get());
     m_image_source->enable_debug(m_arg_debug_all || m_arg_debug_image_source);
 
@@ -357,7 +359,7 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_config_kicking.set_option("cfg-kicking", "config file for kicking motion module");
     m_arg_config_action.set_option("cfg-action", "path to motion_4096.bin");
     m_arg_config_white_ball_vision_processor.set_option("cfg-cv", "path to cv config");
-    m_arg_config_localization_field.set_option("cfg-loc-field", "path to localization field config");
+    m_arg_config_localization_field.set_option("cfg-field", "path to field config");
     m_arg_config_particle_filter.set_option("cfg-pf", "path to particle filter config");
     m_arg_config_image_source.set_option("cfg-image-source", "config file for image source");
     m_arg_config_ball_tracker.set_option("cfg-ball-tracker", "config file for ball tracker");
@@ -415,6 +417,8 @@ void robot_application_t::start_main_loop() {
     while (is_running()) {
         if (m_debug) LOG_DEBUG << "ROBOT APPLICATION: === Iteration start ===";
         m_behavior->process();
+        //TODO:
+        step_localization();
     }
     if (m_debug) LOG_INFO << "=== Controller has finished ===";
 
@@ -428,3 +432,11 @@ void robot_application_t::enable_debug(bool debug) noexcept {
     m_debug = debug;
 }
 
+void robot_application_t::step_localization()
+{
+    auto loc = localization_t::get_instance();
+    auto curr_lines = vision_t::get_instance()->detect_lines();
+
+    loc->set_lines(curr_lines);
+    loc->update();
+}

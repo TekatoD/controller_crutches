@@ -35,7 +35,9 @@ head_t::head_t() {
 }
 
 
-head_t::~head_t() {
+head_t* head_t::get_instance() {
+    static head_t head;
+    return &head;
 }
 
 
@@ -60,7 +62,6 @@ void head_t::initialize() {
     init_tracking();
     move_to_home();
 }
-
 
 float head_t::get_left_limit() const {
     return m_left_limit;
@@ -165,6 +166,7 @@ float head_t::get_tilt_d_gain() const {
     return m_tilt_d_gain;
 }
 
+
 void head_t::set_tilt_d_gain(float tilt_d_gain) {
     if(m_debug) {
         LOG_DEBUG << "HEAD: tilt_d_gain = " << tilt_d_gain;
@@ -235,7 +237,6 @@ void head_t::move_tracking() {
 
     check_limit();
 }
-
 
 void head_t::process() {
     if (joint.get_enable(joint_data_t::ID_HEAD_PAN))

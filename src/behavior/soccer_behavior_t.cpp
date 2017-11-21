@@ -42,10 +42,12 @@ soccer_behavior_t::soccer_behavior_t()
 
 void soccer_behavior_t::process() {
     this->process_buttons();
-    this->process_game_controller();
-    this->process_cv();
-    this->process_localization();
-    this->process_decision();
+    if (m_behavior_active) {
+        this->process_game_controller();
+        this->process_cv();
+        this->process_localization();
+        this->process_decision();
+    }
     this->check_rate();
 }
 
@@ -101,13 +103,14 @@ void soccer_behavior_t::process_decision() {
     };
 
     if (!m_prepared) {
+        if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Preparing...";
         m_action->joint.set_enable_body(true, true);
         m_action->start(m_behavior_active ? 15 : 9);
         m_prepared = true;
     }
 
     if (motion_status_t::fall_type != fall_type_t::STANDUP && !m_action->is_running()) {
-        if (m_debug) LOG_INFO << "SOCCER BEHAVIOR: Getting up";
+        if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Getting up";
         m_walking->stop();
         m_kicking->stop();
         // Start standing up motion
@@ -207,7 +210,7 @@ void soccer_behavior_t::process_decision() {
 }
 
 void soccer_behavior_t::process_cv() {
-    if (m_debug) LOG_INFO << "SOCCER BEHAVIOR: Processing CV...";
+    if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Processing CV...";
     try {
         m_camera->update_image();
         cv::Mat frame = m_camera->get_image();

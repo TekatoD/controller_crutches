@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <tool/rate_t.h>
 #include "math/point_t.h"
 
 namespace drwn {
@@ -14,9 +15,9 @@ namespace drwn {
 
         void process(point2d_t pos);
 
-        int get_no_ball_max_count() const noexcept;
+        std::chrono::duration<int64_t, std::nano> get_no_ball_duration() const noexcept;
 
-        void set_no_ball_max_count(int no_ball_max_count);
+        void set_no_ball_duration(steady_rate_t::duration duration);
 
         bool is_debug_enabled() const noexcept;
 
@@ -26,8 +27,7 @@ namespace drwn {
         ball_tracker_t() = default;
 
     private:
-        int m_no_ball_count{0};
-        int m_no_ball_max_count{15};
+        steady_rate_t m_no_ball_rate{std::chrono::seconds(1)};
         point2d_t m_ball_position{-1, -1};
         bool m_debug{false};
 

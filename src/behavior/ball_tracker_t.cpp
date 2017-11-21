@@ -21,7 +21,8 @@ void ball_tracker_t::process(point2d_t pos) {
     if (pos.X < 0 || pos.Y < 0) {
         m_ball_position.X = -1;
         m_ball_position.Y = -1;
-        if (!m_no_ball_rate.is_passed()) {
+        m_no_ball = m_no_ball_rate.is_passed();
+        if (!m_no_ball) {
             if (m_debug) {
                 LOG_DEBUG << "BALL TRACKER: Continues to tracking";
             }
@@ -32,6 +33,7 @@ void ball_tracker_t::process(point2d_t pos) {
     } else {
         if (m_debug) LOG_DEBUG << "BALL TRACKER: Tracking the ball";
         m_no_ball_rate.update();
+        m_no_ball = false;
         point2d_t center(camera_t::WIDTH / 2, camera_t::HEIGHT / 2);
         point2d_t offset = pos - center;
         offset *= -1; // Inverse X-axis, Y-axis
@@ -47,7 +49,7 @@ const point2d_t& ball_tracker_t::get_ball_position() const noexcept {
 }
 
 bool ball_tracker_t::is_no_ball() const noexcept {
-    return m_no_ball_rate.is_passed();
+    return m_no_ball;
 }
 
 steady_rate_t::duration ball_tracker_t::get_no_ball_duration() const noexcept {

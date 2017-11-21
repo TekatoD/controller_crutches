@@ -32,11 +32,11 @@ namespace drwn {
         }
 
         void update() {
-            m_next_tp = Clock::now() + m_dur;
+            m_next_tp = clock::now() + m_dur;
         }
 
         bool is_passed() const noexcept {
-            return Clock::now() >= m_next_tp;
+            return clock::now() >= m_next_tp;
         }
 
     private:

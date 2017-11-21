@@ -153,20 +153,26 @@ void soccer_behavior_t::process_decision() {
 //                m_PreviousState = STATE_SET;
 //                Walking::GetInstance()->SetOdo(Starting);
 //            }
+            color_t eye_leds{0, 255, 0};
+
             point2d_t ball_point(-1, -1); // No ball
             if (ball != cv::Rect()) {
                 // Adapt new ball to old tracker
                 ball_point = point2d_t(ball.x + ball.width / 2.0f,
                                        ball.y + ball.height / 2.0f);
-                m_LEDs->set_eye_led({0, 255, 0});
             } else {
-                m_LEDs->set_eye_led({255, 0, 0});
+                eye_leds = color_t({255, 255, 0});
             }
 
             // Switch to head and walking after action
             m_head->joint.set_enable_head_only(true, true);
             m_walking->joint.set_enable_body_without_head(true, true);
             m_tracker->process(ball_point);
+
+            if (m_tracker->is_no_ball()) {
+                eye_leds = color_t({255, 0, 0});
+            }
+            m_LEDs->set_eye_led(eye_leds);
 
             // Calculate angles to gate
             float free_space = (m_field->get_field_height() - m_field->get_gate_height()) / 2.0f;
@@ -184,27 +190,31 @@ void soccer_behavior_t::process_decision() {
             normalize(angle_bot);
             normalize(angle_top);
 
-//            if (m_tracker->is_no_ball()) {
-//                m_searcher->process();
-//                return;
-//            } else {
-//                m_searcher->set_last_position(m_tracker->get_ball_position());
-//            }
-//
-//            // Follow the ball
-//            m_follower->process(m_tracker->get_ball_position(), angle_top, angle_bot);
-//
-//            // Kicking the ball
-//            if (m_follower->get_kicking_action() != kicking_action_t::NO_KICKING) {
-//                m_head->joint.set_enable_head_only(true, true);
-//                m_action->joint.set_enable_body_without_head(true, true);
-//                // Kick the ball
-//                if (m_follower->get_kicking_action() == kicking_action_t::RIGHT_LEG_KICK) {
-//                    m_action->start(12);   // RIGHT KICK
-//                } else {
-//                    m_action->start(13);   // LEFT KICK
-//                }
-//            }
+            if (m_tracker->is_no_ball()) {
+                m_searcher->process();
+                m_LEDs->set_head_led({0, 0, 255});
+                return;
+            } else {
+                m_searcher->set_last_position(m_tracker->get_ball_position());
+            }
+
+            // Follow the ball
+            m_follower->process(m_tracker->get_ball_position(), angle_top, angle_bot);
+
+            // Kicking the ball
+            if (m_follower->get_kicking_action() != kicking_action_t::NO_KICKING) {
+                m_head->joint.set_enable_head_only(true, true);
+                m_action->joint.set_enable_body_without_head(true, true);
+                // Kick the ball
+                if (m_follower->get_kicking_action() == kicking_action_t::RIGHT_LEG_KICK) {
+                    m_action->start(12);   // RIGHT KICK
+                } else {
+                    m_action->start(13);   // LEFT KICK
+                }
+                m_LEDs->set_head_led({255, 0, 0});
+            } else {
+                m_LEDs->set_head_led({0, 255, 0});
+            }
         }
     }
 }

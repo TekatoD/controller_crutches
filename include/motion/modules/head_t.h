@@ -2,7 +2,7 @@
 
 #include <cstring>
 #include <memory>
-
+#include "motion/kinematics_t.h"
 #include "motion/motion_module_t.h"
 #include "math/point_t.h"
 
@@ -10,16 +10,11 @@ namespace drwn {
     class head_t
             : public motion_module_t {
     public:
-        static head_t* get_instance() {
-            static head_t head;
-            return &head;
-        }
+        static head_t* get_instance();
 
-        ~head_t();
+        void initialize() override;
 
-        void initialize();
-
-        void process();
+        void process() override;
 
         float get_top_limit_angle() { return m_top_limit; }
 
@@ -89,20 +84,20 @@ namespace drwn {
         void enable_debug(bool debug);
 
     private:
-        float m_left_limit;
-        float m_right_limit;
-        float m_top_limit;
-        float m_bottom_limit;
-        float m_Pan_Home;
-        float m_Tilt_Home;
-        float m_Pan_err;
-        float m_Pan_err_diff;
-        float m_Pan_p_gain;
-        float m_Pan_d_gain;
-        float m_Tilt_err;
-        float m_Tilt_err_diff;
-        float m_Tilt_p_gain;
-        float m_Tilt_d_gain;
+        float m_left_limit{70};
+        float m_right_limit{-70};
+        float m_top_limit{kinematics_t::EYE_TILT_OFFSET_ANGLE};
+        float m_bottom_limit{kinematics_t::EYE_TILT_OFFSET_ANGLE - 65};
+        float m_pan_home{0.0};
+        float m_tilt_home{kinematics_t::EYE_TILT_OFFSET_ANGLE - 30.0};
+        float m_pan_err;
+        float m_pan_err_diff;
+        float m_pan_p_gain{0.1};
+        float m_pan_d_gain{0.22};
+        float m_tilt_err;
+        float m_tilt_err_diff;
+        float m_tilt_p_gain{0.1};
+        float m_tilt_d_gain{0.22};
         float m_pan_angle;
         float m_tilt_angle;
         bool m_debug{false};

@@ -21,13 +21,20 @@ void ball_tracker_t::process(point2d_t pos) {
     if (pos.X < 0 || pos.Y < 0) {
         m_ball_position.X = -1;
         m_ball_position.Y = -1;
-        if (m_no_ball_count < m_no_ball_max_count) {
+        m_no_ball = m_no_ball_rate.is_passed();
+        if (!m_no_ball) {
+            if (m_debug) {
+                LOG_DEBUG << "BALL TRACKER: Continues to tracking";
+            }
             head_t::get_instance()->move_tracking();
-            m_no_ball_count++;
+        } else if (m_debug) {
+            LOG_DEBUG << "BALL TRACKER: Ball is lost";
         }
     } else {
-        m_no_ball_count = 0;
-        point2d_t center = point2d_t(camera_t::WIDTH / 2, camera_t::HEIGHT / 2);
+        if (m_debug) LOG_DEBUG << "BALL TRACKER: Tracking the ball";
+        m_no_ball_rate.update();
+        m_no_ball = false;
+        point2d_t center(camera_t::WIDTH / 2, camera_t::HEIGHT / 2);
         point2d_t offset = pos - center;
         offset *= -1; // Inverse X-axis, Y-axis
         offset.X *= (camera_t::VIEW_H_ANGLE / camera_t::WIDTH); // pixel per angle
@@ -42,18 +49,19 @@ const point2d_t& ball_tracker_t::get_ball_position() const noexcept {
 }
 
 bool ball_tracker_t::is_no_ball() const noexcept {
-    return m_no_ball_count >= m_no_ball_max_count;
+    return m_no_ball;
 }
 
-int ball_tracker_t::get_no_ball_max_count() const noexcept {
-    return m_no_ball_max_count;
+steady_rate_t::duration ball_tracker_t::get_no_ball_duration() const noexcept {
+    return m_no_ball_rate.get_duration();
 }
 
-void ball_tracker_t::set_no_ball_max_count(int no_ball_max_count) {
+void ball_tracker_t::set_no_ball_duration(steady_rate_t::duration duration) {
+    using namespace std::chrono;
     if(m_debug) {
-        LOG_DEBUG << "BALL TRACKER: no_ball_max_count = " << no_ball_max_count;
+        LOG_DEBUG << "BALL TRACKER: no_ball_duration = " << duration_cast<milliseconds>(duration).count();
     }
-    m_no_ball_max_count = no_ball_max_count;
+    m_no_ball_rate.set_duration(duration);
 }
 
 bool ball_tracker_t::is_debug_enabled() const noexcept {

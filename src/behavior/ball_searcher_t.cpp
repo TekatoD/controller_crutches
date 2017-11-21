@@ -46,7 +46,7 @@ void ball_searcher_t::process() {
         m_tilt_phase = 0.0;
 
         m_pan_direction = offset.X > 0 ? 1 : -1;
-        m_turn_direction = offset.Y > 0 ? 1 : -1;
+        m_turn_direction = head_t::get_instance()->get_tilt_angle() > 0 ? 1 : -1;
 
         m_active = true;
     }
@@ -75,8 +75,8 @@ void ball_searcher_t::process() {
         }
 
         walking_t::get_instance()->set_x_move_amplitude(0);
-        walking_t::get_instance()->set_x_move_amplitude(0);
-        walking_t::get_instance()->set_x_move_amplitude(m_turn_speed);
+        walking_t::get_instance()->set_y_move_amplitude(0);
+        walking_t::get_instance()->set_a_move_amplitude(m_turn_speed);
         walking_t::get_instance()->set_move_aim_on(false);
         walking_t::get_instance()->start();
     } else {

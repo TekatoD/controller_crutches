@@ -176,6 +176,7 @@ namespace drwn {
 
     private:
         bool m_debug{false};
+        bool m_lines_detected{false};
         bool m_show_images_enabled{false};
         bool m_dump_images_enabled{false};
         bool m_field_processing_enabled{true};
@@ -205,6 +206,8 @@ namespace drwn {
         line_detector_t m_line_detector;
 
         void destroy_windows() const;
+
+        void update_lines();
     };
 }
 

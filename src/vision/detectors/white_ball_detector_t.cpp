@@ -8,6 +8,7 @@ using namespace drwn;
 
 cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const cv::Mat& src_img, const std::vector<cv::Vec4i>& lines) const {
     if(m_detector_type == 1) {
+        cv::Mat classes(1, 2, CV_32F);
         std::vector<cv::Rect> balls;
         m_ball_cascade.detectMultiScale(src_img, balls, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30));
         if (!balls.empty()) {
@@ -20,11 +21,11 @@ cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const cv::Mat& s
                     cv::cvtColor(rec, rec, cv::COLOR_BGR2GRAY);
                     cv::resize(rec, rec, m_network_window);
                     rec.convertTo(rec, CV_32F);
-                    m_network->predict(rec.reshape(1, 1), m_classes);
-                    if (m_classes.at<float>(0, 0) > m_classes.at<float>(0, 1)) {
+                    m_network->predict(rec.reshape(1, 1), classes);
+                    if (classes.at<float>(0, 0) > classes.at<float>(0, 1)) {
                         found = true;
-                        if (m_classes.at<float>(0, 0) > wieght) {
-                            wieght = m_classes.at<float>(0, 0);
+                        if (classes.at<float>(0, 0) > wieght) {
+                            wieght = classes.at<float>(0, 0);
                             ind = i;
                         }
                     }

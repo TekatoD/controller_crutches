@@ -250,13 +250,19 @@ void drwn::white_ball_vision_processor_t::set_line_detector_line_equality_error_
 }
 
 void white_ball_vision_processor_t::show_windows() {
-    if (m_show_images_enabled && !m_dbg_src_img.empty()) {
-        cv::imshow("source", m_dbg_src_img);
-        if (m_field_processing_enabled) {
+    if (m_show_images_enabled) {
+        if(!m_dbg_src_img.empty()) {
+            cv::imshow("source", m_dbg_src_img);
+        }
+        if (m_field_processing_enabled && !m_field_mask.empty()) {
             cv::imshow("field", m_field_mask);
         }
-        cv::imshow("lines", m_lines_img);
-        cv::imshow("ball", m_ball_img);
+        if(!m_lines_img.empty()) {
+            cv::imshow("lines", m_lines_img);
+        }
+        if(!m_ball_img.empty()) {
+            cv::imshow("ball", m_ball_img);
+        }
         cv::waitKey(5);
     }
 }

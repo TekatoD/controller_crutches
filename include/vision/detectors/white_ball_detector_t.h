@@ -74,7 +74,6 @@ namespace drwn {
         ball_preprocessor_t m_ball_preprocessor;
         coloured_ball_detector_t m_coloured_ball_detector;
         bool m_network_enabled{true};
-        cv::Mat m_classes{1, 2, CV_32F};
         cv::Size m_network_window{30, 30};
     };
 }

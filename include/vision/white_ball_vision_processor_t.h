@@ -151,6 +151,18 @@ namespace drwn {
 
         void set_ball_detector_median_blur_size(int median_blur_size);
 
+        const std::string& get_path_to_ann_config() const;
+
+        void set_path_to_ann_config(const std::string& path_to_ann_config);
+
+        bool is_network_enabled() const;
+
+        void enable_network(bool enable);
+
+        const cv::Size& get_network_window() const;
+
+        void set_network_window(const cv::Size& network_window);
+
 
 
         void process() override;

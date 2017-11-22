@@ -30,8 +30,6 @@
 
 using namespace drwn;
 
-#define DEBUG
-
 robot_application_t* robot_application_t::get_instance() {
     static robot_application_t instance;
     return &instance;

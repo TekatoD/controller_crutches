@@ -53,8 +53,8 @@ void ball_searcher_t::process() {
     }
 
 
-    m_pan_phase += std::fmod(m_pan_phase_step * m_pan_direction, m_phase_size);
-    m_tilt_phase += std::fmod(m_tilt_phase_step * m_turn_direction, m_phase_size);
+    m_pan_phase = std::fmod(m_pan_phase + m_pan_phase_step * m_pan_direction, m_phase_size);
+    m_tilt_phase = std::fmod(m_tilt_phase + m_tilt_phase_step * m_turn_direction, m_phase_size);
     
 
     const float tilt_max = head_t::get_instance()->get_top_limit_angle();

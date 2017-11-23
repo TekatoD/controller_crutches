@@ -123,18 +123,18 @@ void ball_follower_t::process(point2d_t ball_pos) {
                 } else { // Fit
                     m_kick_ball_rate.update();
                     target_x_amplitude = m_fit_x_amplitude;
-                    target_a_amplitude = -m_fit_a_amplitude * pan_percent;
+                    target_a_amplitude = m_fit_a_amplitude * pan_percent;
                 }
             } else {
                 m_kick_ball_rate.update();
                 target_x_amplitude = std::max(m_follow_max_x_amplitude * tilt_percent, // * (1.0f - std::fabs(pan_percent)),
                                               m_follow_min_x_amplitude);
-                target_a_amplitude = -m_follow_max_a_amplitude * pan_percent;
+                target_a_amplitude = m_follow_max_a_amplitude * pan_percent;
             }
         } else { // Out of kicking angles
             m_kick_ball_rate.update();
             target_x_amplitude = 0.0f;
-            target_a_amplitude = -m_follow_max_a_amplitude * pan_percent;
+            target_a_amplitude = m_follow_max_a_amplitude * pan_percent;
         }
     }
 
@@ -148,8 +148,8 @@ void ball_follower_t::process(point2d_t ball_pos) {
         float y_diff = target_y_amplitude - y_amplitude;
         float a_diff = target_a_amplitude - a_amplitude;
         float x_step = std::copysign(std::min(m_x_accel_step, std::abs(x_diff)), x_diff);
-        float y_step = std::copysign(std::min(m_y_accel_step, std::abs(y_diff)), x_diff);
-        float a_step = std::copysign(std::min(m_a_accel_step, std::abs(a_diff)), x_diff);
+        float y_step = std::copysign(std::min(m_y_accel_step, std::abs(y_diff)), y_diff);
+        float a_step = std::copysign(std::min(m_a_accel_step, std::abs(a_diff)), a_diff);
         x_amplitude += x_step;
         y_amplitude += y_step;
         a_amplitude += a_step;

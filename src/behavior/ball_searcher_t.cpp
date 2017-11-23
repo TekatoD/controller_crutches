@@ -64,7 +64,7 @@ void ball_searcher_t::process() {
 
 
     float pan = sinf(m_pan_phase / m_phase_size * constants::pi<float>() * 2.0f) * pan_diff - pan_min;
-    float tilt = sinf(m_tilt_phase / m_phase_size * constants::pi<float>() * 2.0f) * tilt_diff - tilt_min;
+    float tilt = -std::fabs(sinf(m_tilt_phase / m_phase_size * constants::pi<float>() * 2.0f)) * tilt_diff - tilt_min;
     head_t::get_instance()->move_by_angle(pan, tilt);
 
     if (m_walking_enabled) {

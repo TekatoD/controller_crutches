@@ -46,7 +46,7 @@ void ball_searcher_t::process() {
         m_pan_phase = half_phase_size;
         m_tilt_phase = half_phase_size;
 
-        m_pan_direction = offset.X > 0 ? 1 : -1;
+        m_pan_direction = head_t::get_instance()->get_pan_angle() > 0 ? 1 : -1;
         m_turn_direction = head_t::get_instance()->get_tilt_angle() > 0 ? 1 : -1;
 
         m_active = true;
@@ -69,6 +69,13 @@ void ball_searcher_t::process() {
                  ? tilt_min + tilt_diff / 2.0f
                  : tilt_min;
     head_t::get_instance()->move_by_angle(pan, tilt);
+
+    if (m_debug) {
+        LOG_DEBUG << "BALL SEARCHER: pan_phase = " << m_pan_phase;
+        LOG_DEBUG << "BALL SEARCHER: tilt_phase = " << m_tilt_phase;
+        LOG_DEBUG << "BALL SEARCHER: pan = " << pan;
+        LOG_DEBUG << "BALL SEARCHER: tilt = " << tilt;
+    }
 
     if (m_walking_enabled) {
         m_turn_speed = walking_t::get_instance()->get_a_move_amplitude();

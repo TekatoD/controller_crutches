@@ -55,7 +55,8 @@ void ball_searcher_t::process() {
     m_pan_phase += m_pan_phase_step * m_pan_direction;
     m_tilt_phase += m_tilt_phase_step * m_turn_direction;
 
-    const float tilt_max = head_t::get_instance()->get_top_limit_angle();
+//    const float tilt_max = head_t::get_instance()->get_top_limit_angle();
+    const float tilt_max = head_t::get_instance()->get_bottom_limit_angle() + (head_t::get_instance()->get_top_limit_angle() - head_t::get_instance()->get_bottom_limit_angle()) / 2.0f;
     const float tilt_min = head_t::get_instance()->get_bottom_limit_angle();
     const float tilt_diff = tilt_max - tilt_min;
     const float pan_max = head_t::get_instance()->get_left_limit_angle();
@@ -63,8 +64,8 @@ void ball_searcher_t::process() {
     const float pan_diff = pan_max - pan_min;
 
 
-    float pan = sinf(m_pan_phase / m_phase_size * constants::pi<float>() * 2.0f) * pan_diff - pan_min;
-    float tilt = -std::fabs(sinf(m_tilt_phase / m_phase_size * constants::pi<float>() * 2.0f)) * tilt_diff - tilt_min;
+    float pan = std::sin(m_pan_phase / m_phase_size * constants::pi<float>() * 2.0f) * pan_diff - pan_min;
+    float tilt = std::sin(m_tilt_phase / m_phase_size * constants::pi<float>() * 2.0f) * tilt_diff - tilt_min;
     head_t::get_instance()->move_by_angle(pan, tilt);
 
     if (m_walking_enabled) {

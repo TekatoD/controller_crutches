@@ -181,21 +181,6 @@ void soccer_behavior_t::process_decision() {
 
             // Follow the ball
             m_follower->process(m_tracker->get_ball_position());
-
-            // Kicking the ball
-            if (m_follower->get_kicking_action() != kicking_action_t::NO_KICKING) {
-                m_head->joint.set_enable_head_only(true, true);
-                m_action->joint.set_enable_body_without_head(true, true);
-                // Kick the ball
-                if (m_follower->get_kicking_action() == kicking_action_t::RIGHT_LEG_KICK) {
-                    m_action->start(12);   // RIGHT KICK
-                } else {
-                    m_action->start(13);   // LEFT KICK
-                }
-                m_LEDs->set_head_led({255, 0, 0});
-            } else {
-                m_LEDs->set_head_led({0, 255, 0});
-            }
         }
     }
 }

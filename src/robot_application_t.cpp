@@ -227,7 +227,9 @@ void robot_application_t::init_motion_modules() {
     motion_manager_t::get_instance()->add_module((motion_module_t*) head_t::get_instance());
     motion_manager_t::get_instance()->add_module((motion_module_t*) walking_t::get_instance());
     motion_manager_t::get_instance()->add_module((motion_module_t*) kicking_t::get_instance());
+    action_t::get_instance()->joint.set_enable_body(true, true);
     motion_manager_t::get_instance()->set_enable(true);
+    action_t::get_instance()->start(15);
     if (m_debug) LOG_INFO << "Motion modules are ready";
 }
 
@@ -410,8 +412,6 @@ void robot_application_t::init_behavior() {
 
 void robot_application_t::start_main_loop() {
     if (m_debug) LOG_INFO << "=== Controller has started ===";
-    action_t::get_instance()->joint.set_enable_body(true, true);
-    action_t::get_instance()->start(15);
     while (is_running()) {
         if (m_debug) LOG_DEBUG << "ROBOT APPLICATION: === Iteration start ===";
         m_behavior->process();

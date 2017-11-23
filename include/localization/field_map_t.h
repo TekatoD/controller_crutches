@@ -78,7 +78,7 @@ namespace drwn {
             float penalty_height{DEFAULT_PENALTY_HEIGHT};
         } m_config;
 
-        bool m_debug;
+        bool m_debug {false};
 
         std::map<line_type_t, line_t> m_field_lines;
 

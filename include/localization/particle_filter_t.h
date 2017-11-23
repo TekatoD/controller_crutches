@@ -26,6 +26,11 @@ namespace drwn {
         static constexpr float DEFAULT_MAX_X = 3000.0f;
         static constexpr float DEFAULT_MAX_Y = 2000.0f;
         static constexpr float DEFAULT_MAX_THETA = 3.14f;
+        static constexpr float DEFAULT_ODO_NOISE_ROT1 = 0.01f;
+        static constexpr float DEFAULT_ODO_NOISE_TRANS = 50.0f;
+        static constexpr float DEFAULT_ODO_NOISE_ROT2 = 0.01;
+        static constexpr float DEFAULT_MEAS_NOISE_RANGE = 200.0f;
+        static constexpr float DEFAULT_MEAS_NOISE_BEARING = 0.1f;
 
         using control_data = std::vector<Eigen::Vector3f>;
         using measurement_bundle = std::vector<Eigen::Vector4f>;
@@ -35,7 +40,7 @@ namespace drwn {
             float weight;
         };
 
-        particle_filter_t() = default;
+        particle_filter_t();
 
         void initialize();
 
@@ -55,6 +60,13 @@ namespace drwn {
 
         // Get pose of the particle with highest weight
         particle_t get_top_particle() const { return m_particles[m_topParticleIndex]; }
+
+
+        void reset_pose(const pose2d_t& pose);
+
+        void reset_pose(float min_x, float max_x, float min_y, float max_y, float min_theta, float max_theta);
+
+        void reset_pose_to_field();
 
         static Eigen::Vector4f get_line_range_bearing(pose2d_t robot_pose, float x1, float y1, float x2, float y2);
 
@@ -138,7 +150,42 @@ namespace drwn {
 
         float get_max_theta() const { return m_config.max_theta; }
 
-        /* Util functions, place in separate class */
+        void set_odo_noise_rot1(float odo_noise_rot1) {
+            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: odo_noise_rot1 = " << odo_noise_rot1;
+            m_config.odo_noise_rot1 = odo_noise_rot1;
+        }
+
+        float get_odo_noise_rot1() const { return m_config.odo_noise_rot1; }
+
+        void set_odo_noise_trans(float odo_noise_trans) {
+            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: odo_noise_trans = " << odo_noise_trans;
+            m_config.odo_noise_trans = odo_noise_trans;
+        }
+
+        float get_odo_noise_trans() const { return m_config.odo_noise_trans; }
+
+        void set_odo_noise_rot2(float odo_noise_rot2) {
+            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: odo_noise_rot2 = " << odo_noise_rot2;
+            m_config.odo_noise_rot2 = odo_noise_rot2;
+        }
+
+        float get_odo_noise_rot2() const { return m_config.odo_noise_rot2; }
+
+        void set_meas_noise_range(float meas_noise_range) {
+            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: meas_noise_range = " << meas_noise_range;
+            m_config.meas_noise_range = meas_noise_range;
+        }
+
+        float get_meas_noise_range() const { return m_config.meas_noise_range; }
+
+        void set_meas_noise_bearing(float meas_noise_bearing) {
+            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: meas_noise_bearing = " << meas_noise_bearing;
+            m_config.meas_noise_bearing = meas_noise_bearing;
+        }
+
+        float get_meas_noise_bearing() const { return m_config.meas_noise_bearing; }
+
+        /* Util function, place in separate class */
         float sample_normal_distribution(float variance);
 
         pose2d_t odometry_sample(pose2d_t pose, Eigen::Vector3f command, Eigen::Vector3f noise);
@@ -150,7 +197,7 @@ namespace drwn {
         void enable_debug(bool debug);
         /* */
     private:
-        bool m_debug;
+        bool m_debug {true};
 
         struct config_t {
             int num_particles;
@@ -158,19 +205,24 @@ namespace drwn {
             int random_particles;
             float min_x, min_y, min_theta;
             float max_x, max_y, max_theta;
+            float odo_noise_rot1, odo_noise_trans, odo_noise_rot2;
+            float meas_noise_range, meas_noise_bearing;
 
             config_t()
                     : num_particles(DEFAULT_PARTICLE_NUMBER),
                       init_x(DEFAULT_INIT_X), init_y(DEFAULT_INIT_Y), init_theta(DEFAULT_INIT_THETA),
                       random_particles(DEFAULT_RANDOM_PARTICLES),
                       min_x(DEFAULT_MIN_X), min_y(DEFAULT_MIN_Y), min_theta(DEFAULT_MIN_THETA),
-                      max_x(DEFAULT_MAX_X), max_y(DEFAULT_MAX_Y), max_theta(DEFAULT_MAX_THETA) {
+                      max_x(DEFAULT_MAX_X), max_y(DEFAULT_MAX_Y), max_theta(DEFAULT_MAX_THETA),
+                      odo_noise_rot1(DEFAULT_ODO_NOISE_ROT1), odo_noise_trans(DEFAULT_ODO_NOISE_TRANS), odo_noise_rot2(DEFAULT_ODO_NOISE_ROT2),
+                      meas_noise_range(DEFAULT_MEAS_NOISE_RANGE), meas_noise_bearing(DEFAULT_MEAS_NOISE_BEARING)
+            {
             }
         } m_config;
 
         std::vector<particle_t> m_particles;
         pose2d_t m_poseMean, m_poseDev;
-        std::size_t m_topParticleIndex;
+        std::size_t m_topParticleIndex {0};
 
         void init_particles(const pose2d_t& pose, int num_particles);
 

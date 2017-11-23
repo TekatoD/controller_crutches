@@ -5,6 +5,11 @@
 
 using namespace drwn;
 
+particle_filter_t::particle_filter_t()
+{
+    initialize();
+}
+
 void particle_filter_t::initialize()
 {
     field_map_t::get_instance()->initialize_field();
@@ -34,7 +39,7 @@ void particle_filter_t::initialize()
 
 void particle_filter_t::predict(const Eigen::Vector3f& command, const Eigen::Vector3f& noise)
 {
-    assert(m_particles.size() != 0);
+    assert(!m_particles.empty());
 
     for (auto& particle : m_particles) {
         particle.pose = odometry_sample(particle.pose, command, noise);
@@ -60,7 +65,9 @@ std::tuple<field_map_t::line_type_t, point2d_t> particle_filter_t::calc_expected
 
 void particle_filter_t::correct(const measurement_bundle& measurements, const Eigen::Vector3f& noise)
 {
-    assert(m_particles.size() != 0);
+    assert(!m_particles.empty());
+
+    if (m_debug) { LOG_DEBUG << "PARTICLE_FILTER: Received " << measurements.size() << " measurements"; }
 
     float weight_normalizer = 0.0f;
     for (auto& particle : m_particles) {
@@ -71,7 +78,8 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
         
         float rx, ry, rtheta, vrange, vbearing;
         rx = particle.pose.get_x(); ry = particle.pose.get_y(); rtheta = particle.pose.get_theta();
-        
+
+        // Construct noise matrix
         vrange = noise(0); vbearing = noise(1);
         Eigen::MatrixXf Qt(4, 4);
         Qt << vrange, 0.0f, 0.0f, 0.0f,
@@ -89,7 +97,8 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
             // Format: range1, bearing1, range2, bearing2
             range1 = reading(0); bearing1 = reading(1);
             range2 = reading(2); bearing2 = reading(3);
-            
+
+            // Predicted measurments
             auto test_line1 = calc_expected_measurement(rx, ry, rtheta, range1, bearing1);
             field_map_t::line_type_t ret_type1 = std::get<0>(test_line1);
             point2d_t isec_point1 = std::get<1>(test_line1);
@@ -101,7 +110,8 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
             if (ret_type1 == field_map_t::line_type_t::NONE || ret_type2 == field_map_t::line_type_t::NONE) {
                 continue;
             }
-            
+
+            // Computing measurement difference (for weight calculation)
             dx1 = isec_point1.X - rx;
             dy1 = isec_point1.Y - ry;
             float expected_range1 = std::sqrt(dx1*dx1 + dy1*dy1);
@@ -119,7 +129,8 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
             }
             normalizer.set_theta(std::atan2(dy2, dx2) - rtheta);
             float expected_bearing2 = normalizer.get_theta();
-            
+
+            // normalize angles (again) and make diff matrix
             float bdiff1, bdiff2;
             normalizer.set_theta(expected_bearing1 - bearing1);
             bdiff1 = normalizer.get_theta();
@@ -131,7 +142,8 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
                 expected_range2 - range2,
                 bdiff2,
             };
-            
+
+            // Calculate new particle weight
             float det = (2.0f * M_PI * Qt).determinant();
             float temp = (diff.transpose() * Qt.inverse() * diff)(0);
             new_weight *= det * std::exp((-1.0f / 2.0f) * temp);
@@ -152,10 +164,12 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
     }
     
     // While debugging
+    //
     if (weight_normalizer < 0.00001) {
-        std::cout << "!!! weight normalizer is too close to 0 !!!" << std::endl;
+        if (m_debug) LOG_DEBUG << "PARTICLE FILTER: Normalizer is close to zero";
     }
-    
+
+    // Particle weight normalization
     float highestWeight = 0.0f;
     std::size_t highestWeightIndex = 0;
     for (std::size_t index = 0; index < m_particles.size(); index++) {
@@ -164,6 +178,7 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
         if (fabs(weight_normalizer) < 0.00001 || std::isnan(weight_normalizer) || std::isnan(particle.weight)) {
             // Reset all weights
             particle.weight = 1.0f / m_particles.size();
+
         } else {
             particle.weight = particle.weight / weight_normalizer;
             
@@ -208,7 +223,7 @@ void particle_filter_t::low_variance_resampling()
     }
     
     if (new_particles.size() != m_particles.size()) {
-        throw std::length_error("Length error in low_variance_resampling");
+        throw std::length_error("PARTICLE_FILTER: Length error in low_variance_resampling");
     }
     
     m_particles.swap(new_particles);
@@ -296,6 +311,7 @@ void particle_filter_t::calc_pose_mean_cov()
     
     // DEBUG
     // Sometimes reset particles around current mean
+    /*
     pose2d_t nmz;
     if (m_poseDev.get_x() > 200.0f || m_poseDev.get_y() > 200.0f || m_poseDev.get_theta() > 10.0f) {
         std::cout << "======================== REGENERATING PARTICLES ===========================" << std::endl;
@@ -309,8 +325,8 @@ void particle_filter_t::calc_pose_mean_cov()
         nmz.set_theta(m_poseMean.get_theta() + (m_poseDev.get_theta() * (M_PI / 180.0f)));
         max_theta = nmz.get_theta();
         init_particles(min_x, max_x, min_y, max_y, min_theta, max_theta, m_particles.size());
-    }    
-    
+    }
+    */
 }
 
 
@@ -409,3 +425,19 @@ void particle_filter_t::enable_debug(bool debug) {
     m_debug = debug;
 }
 
+void particle_filter_t::reset_pose(const pose2d_t& pose) {
+    if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: resetting particles to pose = " << pose;
+    init_particles(pose, m_particles.size());
+}
+
+void particle_filter_t::reset_pose(float min_x, float max_x, float min_y, float max_y, float min_theta, float max_theta)
+{
+    if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: resetting particles to area";
+    init_particles(min_x, max_x, min_y, max_y, min_theta, max_theta, m_particles.size());
+}
+
+void particle_filter_t::reset_pose_to_field()
+{
+    if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: resetting particles to field area (set by config)";
+    init_particles(m_config.min_x, m_config.max_x, m_config.min_y, m_config.max_y, m_config.min_theta, m_config.max_theta, m_particles.size());
+}

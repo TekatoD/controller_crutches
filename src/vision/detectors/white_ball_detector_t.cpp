@@ -8,10 +8,37 @@ using namespace drwn;
 
 cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const cv::Mat& src_img, const std::vector<cv::Vec4i>& lines) const {
     if(m_detector_type == 1) {
+        cv::Mat classes(1, 2, CV_32F);
         std::vector<cv::Rect> balls;
-        m_ball_cascade.detectMultiScale(src_img, balls, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30));
+        m_ball_cascade.detectMultiScale(src_img, balls, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(15, 15));
         if (!balls.empty()) {
-            return balls[0];
+            if(m_network_enabled) {
+                size_t ind = 0;
+                float wieght = 0;
+                bool found = false;
+                for(size_t i = 0; i < balls.size(); ++i) {
+                    cv::Mat rec = src_img(balls[i]);
+                    cv::cvtColor(rec, rec, cv::COLOR_BGR2GRAY);
+                    cv::resize(rec, rec, m_network_window);
+                    rec.convertTo(rec, CV_32F);
+                    m_network->predict(rec.reshape(1, 1), classes);
+                    if (classes.at<float>(0, 0) > classes.at<float>(0, 1)) {
+                        found = true;
+                        if (classes.at<float>(0, 0) > wieght) {
+                            wieght = classes.at<float>(0, 0);
+                            ind = i;
+                        }
+                    }
+                }
+                if(found) {
+                    return balls[ind];
+                } else {
+                    return cv::Rect{};
+                }
+
+            } else {
+                return balls[0];
+            }
         }
         return cv::Rect{};
     } else if(m_detector_type == 0) {
@@ -259,4 +286,30 @@ int white_ball_detector_t::get_median_blur_size() const {
 
 void white_ball_detector_t::set_median_blur_size(int median_blur_size) {
     m_ball_preprocessor.set_median_blur_size(median_blur_size);
+}
+
+const std::string& white_ball_detector_t::get_path_to_ann_config() const {
+    return m_path_to_ann_config;
+}
+
+void white_ball_detector_t::set_path_to_ann_config(const std::string& path_to_ann_config) {
+    m_path_to_ann_config = path_to_ann_config;
+    m_network = cv::ml::ANN_MLP::load(path_to_ann_config);
+    LOG_INFO << "Artificial neural network loaded";
+}
+
+bool white_ball_detector_t::is_network_enabled() const {
+    return m_network_enabled;
+}
+
+void white_ball_detector_t::enable_network(bool enable) {
+    m_network_enabled = enable;
+}
+
+const cv::Size& white_ball_detector_t::get_network_window() const {
+    return m_network_window;
+}
+
+void white_ball_detector_t::set_network_window(const cv::Size& network_window) {
+    m_network_window = network_window;
 }

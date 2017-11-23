@@ -6,6 +6,7 @@
 
 #include <opencv2/core/mat.hpp>
 #include <cv.hpp>
+#include <opencv/ml.h>
 #include "ball_preprocessor_t.h"
 #include "coloured_ball_detector_t.h"
 
@@ -50,15 +51,30 @@ namespace drwn {
 
         void set_median_blur_size(int median_blur_size);
 
+        const std::string& get_path_to_ann_config() const;
+
+        void set_path_to_ann_config(const std::string& path_to_ann_config);
+
+        bool is_network_enabled() const;
+
+        void enable_network(bool enable);
+
+        const cv::Size& get_network_window() const;
+
+        void set_network_window(const cv::Size& network_window);
+
     private:
         int m_area_top{5000};
         double m_area_low{18.0};
         int m_detector_type{1};// 0 - white, 1 - haar, 2 - colored
         std::string m_path_to_cascade_config{"res/cascade.xml"};
         mutable cv::CascadeClassifier m_ball_cascade{"res/cascade.xml"}; //TODO: May be detect shouldn't be const
+        std::string m_path_to_ann_config;
+        mutable cv::Ptr<cv::ml::ANN_MLP> m_network;
         ball_preprocessor_t m_ball_preprocessor;
         coloured_ball_detector_t m_coloured_ball_detector;
-
+        bool m_network_enabled{true};
+        cv::Size m_network_window{15, 15};
     };
 }
 

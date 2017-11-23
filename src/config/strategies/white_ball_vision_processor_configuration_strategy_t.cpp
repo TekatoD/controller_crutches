@@ -189,6 +189,17 @@ void white_ball_vision_processor_configuration_strategy_t::read_config(const boo
                     ball_detector_gabor_thresh_max_r.get()
             ));
         }
+
+        auto path_to_ann_config = section.get_optional<std::string>("path_to_ann_config");
+        auto enable_network = section.get_optional<int>("enable_network");
+        auto network_window_size_x = section.get_optional<int>("network_window_size_x");
+        auto network_window_size_y = section.get_optional<int>("network_window_size_y");
+
+        if(path_to_ann_config) m_white_ball_vision_processor->set_path_to_ann_config(path_to_ann_config.get());
+        if(enable_network) m_white_ball_vision_processor->enable_network((bool)enable_network.get());
+        if(network_window_size_x && network_window_size_y) m_white_ball_vision_processor->set_network_window(cv::Size{
+                    network_window_size_x.get(), network_window_size_y.get()
+            });
     } else {
         throw std::runtime_error("Vision configuration load fail: m_white_ball_vision_processor nullptr");
     }
@@ -275,6 +286,12 @@ void white_ball_vision_processor_configuration_strategy_t::write_config(boost::p
         section.put("ball_detector_area_top", m_white_ball_vision_processor->get_ball_detector_area_top());
         section.put("ball_detector_type", m_white_ball_vision_processor->get_ball_detector_type());
         section.put("ball_detector_cascade_config", m_white_ball_vision_processor->get_ball_detector_cascade_config());
+
+        section.put("path_to_ann_config", m_white_ball_vision_processor->get_path_to_ann_config());
+        section.put("network_enable", m_white_ball_vision_processor->is_network_enabled());
+        auto network_window_size  = m_white_ball_vision_processor->get_network_window();
+        section.put("network_window_size_x", network_window_size.width);
+        section.put("network_window_size_y", network_window_size.height);
 
     } else {
         throw std::runtime_error("Ball Tracker configuration write fail: BallTracker nullptr");

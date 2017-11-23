@@ -251,13 +251,19 @@ void drwn::white_ball_vision_processor_t::set_line_detector_line_equality_error_
 
 void white_ball_vision_processor_t::show_windows() {
     if (m_show_images_enabled) {
-        cv::imshow("source", m_dbg_src_img);
-        if (m_field_processing_enabled) {
+        if(!m_dbg_src_img.empty()) {
+            cv::imshow("source", m_dbg_src_img);
+        }
+        if (m_field_processing_enabled && !m_field_mask.empty()) {
             cv::imshow("field", m_field_mask);
         }
-        cv::imshow("lines", m_lines_img);
-        cv::imshow("ball", m_ball_img);
-        cv::waitKey(1);
+        if(!m_lines_img.empty()) {
+            cv::imshow("lines", m_lines_img);
+        }
+        if(!m_ball_img.empty()) {
+            cv::imshow("ball", m_ball_img);
+        }
+        cv::waitKey(5);
     }
 }
 
@@ -453,4 +459,31 @@ int white_ball_vision_processor_t::get_ball_detector_median_blur_size() const {
 
 void white_ball_vision_processor_t::set_ball_detector_median_blur_size(int median_blur_size) {
     m_ball_detector.set_median_blur_size(median_blur_size);
+}
+
+const std::string& white_ball_vision_processor_t::get_path_to_ann_config() const {
+    return m_ball_detector.get_path_to_ann_config();
+}
+
+void white_ball_vision_processor_t::set_path_to_ann_config(const std::string& path_to_ann_config) {
+    if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: network_path = " << path_to_ann_config;
+    m_ball_detector.set_path_to_ann_config(path_to_ann_config);
+}
+
+bool white_ball_vision_processor_t::is_network_enabled() const {
+    return m_ball_detector.is_network_enabled();
+}
+
+void white_ball_vision_processor_t::enable_network(bool enable) {
+    if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: enable = " << enable;
+    m_ball_detector.enable_network(enable);
+}
+
+const cv::Size& white_ball_vision_processor_t::get_network_window() const {
+    return m_ball_detector.get_network_window();
+}
+
+void white_ball_vision_processor_t::set_network_window(const cv::Size& network_window) {
+    if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: network_window = " << network_window;
+    m_ball_detector.set_network_window(network_window);
 }

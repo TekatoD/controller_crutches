@@ -10,7 +10,7 @@ cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const cv::Mat& s
     if(m_detector_type == 1) {
         cv::Mat classes(1, 2, CV_32F);
         std::vector<cv::Rect> balls;
-        m_ball_cascade.detectMultiScale(src_img, balls, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30));
+        m_ball_cascade.detectMultiScale(src_img, balls, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(15, 15));
         if (!balls.empty()) {
             if(m_network_enabled) {
                 size_t ind = 0;

@@ -13,9 +13,9 @@ void ball_follower_configuration_strategy_t::read_config(const boost::property_t
 
     auto follower = ball_follower_t::get_instance();
 
-    auto kick_ball_rate = section.get_optional<float>("kick_ball_rate_ms");
+    auto kick_ball_rate = section.get_optional<int>("kick_ball_rate_ms");
     if (kick_ball_rate) follower->set_kick_ball_rate(std::chrono::milliseconds(kick_ball_rate.get()));
-    auto no_ball_rate = section.get_optional<float>("no_ball_rate_ms");
+    auto no_ball_rate = section.get_optional<int>("no_ball_rate_ms");
     if (no_ball_rate) follower->set_no_ball_rate(std::chrono::milliseconds(no_ball_rate.get()));
     auto slanting_kick_angle = section.get_optional<float>("slanting_kick_angle");
     if (slanting_kick_angle) follower->set_slanting_kick_angle(slanting_kick_angle.get());

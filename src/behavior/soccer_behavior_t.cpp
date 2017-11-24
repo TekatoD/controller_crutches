@@ -42,8 +42,8 @@ soccer_behavior_t::soccer_behavior_t()
 
 void soccer_behavior_t::process() {
     this->process_buttons();
+    this->process_game_controller();
     if (m_behavior_active) {
-        this->process_game_controller();
         this->process_cv();
         this->process_localization();
         this->process_decision();
@@ -85,7 +85,6 @@ void soccer_behavior_t::process_buttons() {
             update_rate = true;
         }
     }
-
 
     if (update_rate) {
         m_rate_buttons_check.update();

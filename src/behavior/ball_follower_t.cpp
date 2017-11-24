@@ -101,13 +101,12 @@ void ball_follower_t::process(point2d_t ball_pos) {
         float tilt_min = head_t::get_instance()->get_bottom_limit_angle();
         float tilt_range = head_t::get_instance()->get_top_limit_angle() - tilt_min;
         float tilt_percent = std::fabs((tilt - tilt_min) / tilt_range);
-
         float kicking_angle = std::max(m_slanting_kick_angle, m_straight_kick_angle);
 
         // If pan between kicking angles
         if (std::fabs(pan) < kicking_angle) {
             if (tilt <= (tilt_min + m_fit_tilt_offset)) {
-                if (tilt < (tilt_min + m_kick_tilt_offset)) { // Can kick!
+                if (tilt <= (tilt_min + m_kick_tilt_offset)) { // Can kick!
                     target_x_amplitude = 0;
                     target_a_amplitude = 0;
 

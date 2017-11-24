@@ -108,7 +108,7 @@ namespace drwn {
         float m_y_accel_step{0.3f};
         float m_a_accel_step{1.0f};
 
-        float m_kick_tilt_offset{5.0f};
-        float m_fit_tilt_offset{10.0f};//{MX28_t::RATIO_VALUE2DEGREES};
+        float m_kick_tilt_offset{3.0f};//{MX28_t::RATIO_VALUE2DEGREES};
+        float m_fit_tilt_offset{5.0f};
     };
 }

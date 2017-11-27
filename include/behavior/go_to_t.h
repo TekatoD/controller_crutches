@@ -27,39 +27,36 @@
 namespace drwn {
     class go_to_t {
     public:
-        static go_to_t* get_instance() {
-            static go_to_t instance;
-            return &instance;
-        }
+        static go_to_t* get_instance();
 
-        go_to_t();
-
-        ~go_to_t() {}
+        ~go_to_t() = default;
 
         bool is_done() const;
 
         void process(pose2d_t pos);
 
     private:
-        float m_max_speed;
-        float m_fit_speed;
-        float m_max_turn;
-        float m_step_accel;
-        float m_turn_accel;
-        float m_dode_angle;
+        go_to_t() = default;
 
-        float m_fit_distance;
-        float m_distance_var;
-        float m_angle_var;
+    private:
+        float m_max_speed{7.0f};
+        float m_fit_speed{3.0f};
+        float m_max_turn{7.0f};
+        float m_step_accel{0.3f};
+        float m_turn_accel{0.3f};
 
-        float m_goal_max_speed;
-        float m_goal_turn;
-        float m_x;
-        float m_y;
-        float m_a;
+        float m_fit_distance{200.0f};
+        float m_distance_var{50.0f};
+        float m_angle_var{10.0f};
 
+        float m_goal_max_speed{0.0f};
+        float m_goal_turn{0.0f};
 
-        bool m_done;
+        float m_x{0.0f};
+        float m_y{0.0f};
+        float m_a{0.0f};
+
+        bool m_done{false};
     };
 }
 

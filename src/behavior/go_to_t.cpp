@@ -8,13 +8,18 @@
 #include "motion/modules/walking_t.h"
 
 
+drwn::go_to_t* drwn::go_to_t::get_instance() {
+    static go_to_t instance;
+    return &instance;
+}
+
 bool drwn::go_to_t::is_done() const {
     return m_done;
 }
 
 void drwn::go_to_t::process(drwn::pose2d_t pos) {
     m_done = true;
-    float dist = hypotf(pos.get_x(), pos.get_y());
+    float dist = std::hypot(pos.get_x(), pos.get_y());
     float angle = degrees(atan2f(pos.get_y(), pos.get_x()));
 
     if (!walking_t::get_instance()->is_running() ||
@@ -79,25 +84,4 @@ void drwn::go_to_t::process(drwn::pose2d_t pos) {
     } else {
         walking_t::get_instance()->stop();
     }
-}
-
-drwn::go_to_t::go_to_t() {
-    m_max_speed = 20.0;
-    m_fit_speed = 3.0;
-    m_max_turn = 35.0;
-    m_step_accel = 1.0;
-    m_turn_accel = 1.0;
-
-    m_fit_distance = 200.0;
-    m_distance_var = 50.0;
-    m_angle_var = 10.0;
-
-    m_goal_max_speed = 0.0;
-    m_goal_turn = 0.0;
-
-    m_x = 0.0;
-    m_y = 0.0;
-    m_a = 0.0;
-
-    m_done = false;
 }

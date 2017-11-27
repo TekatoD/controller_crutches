@@ -211,7 +211,7 @@ void soccer_behavior_t::process_cv() {
 void soccer_behavior_t::check_rate() {
     if (!m_rate_processing_behavior.is_passed()) {
         if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Too fast processing. Sleep...";
-        std::this_thread::sleep_until(m_rate_processing_behavior.get_next_time_point());
+//        std::this_thread::sleep_until(m_rate_processing_behavior.get_next_time_point());
         m_rate_processing_behavior.update();
     }
 }

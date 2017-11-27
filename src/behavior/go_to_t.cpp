@@ -158,22 +158,6 @@ void drwn::go_to_t::set_angle_var(float angle_var) {
     m_angle_var = angle_var;
 }
 
-float drwn::go_to_t::get_goal_max_speed() const {
-    return m_goal_max_speed;
-}
-
-void drwn::go_to_t::set_goal_max_speed(float goal_max_speed) {
-    m_goal_max_speed = goal_max_speed;
-}
-
-float drwn::go_to_t::get_goal_turn() const {
-    return m_goal_turn;
-}
-
-void drwn::go_to_t::set_goal_turn(float goal_turn) {
-    m_goal_turn = goal_turn;
-}
-
 bool drwn::go_to_t::is_debug_enabled() const {
     return m_debug;
 }

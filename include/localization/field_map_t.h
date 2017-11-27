@@ -6,6 +6,7 @@
 
 #include <math/point_t.h>
 #include <localization/line_t.h>
+#include <motion/pose2d_t.h>
 
 namespace drwn {
     class field_map_t {
@@ -66,6 +67,14 @@ namespace drwn {
 
         void enable_debug(bool debug);
 
+        const pose2d_t& get_spawn_pose() const;
+
+        void set_spawn_pose(const pose2d_t& spawn_pose);
+
+        const pose2d_t& get_start_pose() const;
+
+        void set_start_pose(const pose2d_t& staring_pose);
+
     private:
         field_map_t();
 
@@ -77,6 +86,9 @@ namespace drwn {
             float penalty_width{DEFAULT_PENALTY_WIDTH};
             float penalty_height{DEFAULT_PENALTY_HEIGHT};
         } m_config;
+
+        pose2d_t m_spawn_pose;
+        pose2d_t m_start_pose;
 
         bool m_debug {false};
 

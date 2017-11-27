@@ -89,6 +89,8 @@ namespace drwn {
     private:
         ball_follower_t() = default;
 
+        void kick_ball();
+
     private:
         bool m_debug{false};
 
@@ -110,5 +112,7 @@ namespace drwn {
 
         float m_kick_tilt_offset{3.0f};//{MX28_t::RATIO_VALUE2DEGREES};
         float m_fit_tilt_offset{5.0f};
+
+        point2d_t m_local_ball;
     };
 }

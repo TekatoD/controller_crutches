@@ -35,10 +35,56 @@ namespace drwn {
 
         void process(pose2d_t pos);
 
+        float get_max_speed() const;
+
+        void set_max_speed(float max_speed);
+
+        float get_fit_speed() const;
+
+        void set_fit_speed(float fit_speed);
+
+        float get_max_turn() const;
+
+        void set_max_turn(float max_turn);
+
+        float get_step_accel() const;
+
+        void set_step_accel(float step_accel);
+
+        float get_turn_accel() const;
+
+        void set_turn_accel(float turn_accel);
+
+        float get_fit_distance() const;
+
+        void set_fit_distance(float fit_distance);
+
+        float get_distance_var() const;
+
+        void set_distance_var(float distance_var);
+
+        float get_angle_var() const;
+
+        void set_angle_var(float angle_var);
+
+        float get_goal_max_speed() const;
+
+        void set_goal_max_speed(float goal_max_speed);
+
+        float get_goal_turn() const;
+
+        void set_goal_turn(float goal_turn);
+
+        bool is_debug_enabled() const;
+
+        void enable_debug(bool debug);
+
     private:
         go_to_t() = default;
 
     private:
+        bool m_debug{false};
+
         float m_max_speed{7.0f};
         float m_fit_speed{3.0f};
         float m_max_turn{7.0f};

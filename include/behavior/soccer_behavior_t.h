@@ -58,6 +58,10 @@ namespace drwn {
         steady_rate_t m_rate_processing_behavior{std::chrono::milliseconds(100)};
         steady_rate_t m_rate_buttons_check{std::chrono::milliseconds(100)};
 
+        steady_rate_t m_rate_process_localization{std::chrono::milliseconds(200)};
+        bool m_avoid_localization{false};
+        bool m_force_localization{false};
+
         camera_t* m_camera{nullptr};
         vision_t* m_vision{nullptr};
         head_t* m_head{nullptr};

@@ -19,7 +19,6 @@
 
 using namespace drwn;
 
-
 ball_follower_t* ball_follower_t::get_instance() {
     static ball_follower_t instance;
     return &instance;

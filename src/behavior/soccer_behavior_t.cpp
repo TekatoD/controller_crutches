@@ -14,6 +14,8 @@
 #include <game_controller/game_controller_t.h>
 #include <motion/motion_status_t.h>
 #include <hw/image_source_failure.h>
+#include <localization/localization_t.h>
+#include <thread>
 #include "behavior/ball_tracker_t.h"
 #include "behavior/ball_searcher_t.h"
 #include "behavior/ball_follower_t.h"
@@ -28,7 +30,7 @@ soccer_behavior_t::soccer_behavior_t()
           m_walking(walking_t::get_instance()),
           m_action(action_t::get_instance()),
           m_kicking(kicking_t::get_instance()),
-          m_localization(nullptr), // TODO Getter for localization!
+          m_localization(localization_t::get_instance()),
           m_buttons(buttons_t::get_instance()),
           m_LEDs(LEDs_t::get_instance()),
           m_game_controller(game_controller_t::get_instance()),
@@ -126,6 +128,11 @@ void soccer_behavior_t::process_decision() {
         const auto& gc_data = m_game_controller->get_game_ctrl_data();
         const auto& odo = m_walking->get_odo();
 
+        if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: odo = ("
+                               << odo.get_x() << ", "
+                               << odo.get_y() << ", "
+                               << degrees(odo.get_theta()) << ')';
+
         auto ball = m_vision->detect_ball();
 
         if (gc_data.state == STATE_SET || gc_data.state == STATE_READY || gc_data.state == STATE_INITIAL) {
@@ -199,7 +206,7 @@ void soccer_behavior_t::process_cv() {
 void soccer_behavior_t::check_rate() {
     if (!m_rate_processing_behavior.is_passed()) {
         if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Too fast processing. Sleep...";
-//        std::this_thread::sleep_until(m_rate_processing_behavior.get_next_time_point());
+        std::this_thread::sleep_until(m_rate_processing_behavior.get_next_time_point());
         m_rate_processing_behavior.update();
     }
 }

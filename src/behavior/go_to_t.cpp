@@ -4,6 +4,7 @@
  */
 
 #include <math/angle_tools.h>
+#include <log/trivial_logger_t.h>
 #include "behavior/go_to_t.h"
 #include "motion/modules/walking_t.h"
 
@@ -18,9 +19,16 @@ bool drwn::go_to_t::is_done() const {
 }
 
 void drwn::go_to_t::process(drwn::pose2d_t pos) {
+    if (m_debug) {
+        LOG_DEBUG << "GO TO: Processing...";
+        LOG_DEBUG << "GO TO: pos = ("
+                  << pos.get_x() << ", "
+                  << pos.get_y() << ", "
+                  << degrees(pos.get_theta()) << ')';
+    }
     m_done = true;
     float dist = std::hypot(pos.get_x(), pos.get_y());
-    float angle = degrees(atan2f(pos.get_y(), pos.get_x()));
+//    float angle = degrees(std::atan2(pos.get_y(), pos.get_x())); // It used when robot goes with turning
 
     if (!walking_t::get_instance()->is_running() ||
             walking_t::get_instance()->get_x_move_amplitude() != m_x ||
@@ -84,4 +92,92 @@ void drwn::go_to_t::process(drwn::pose2d_t pos) {
     } else {
         walking_t::get_instance()->stop();
     }
+}
+
+float drwn::go_to_t::get_max_speed() const {
+    return m_max_speed;
+}
+
+void drwn::go_to_t::set_max_speed(float max_speed) {
+    m_max_speed = max_speed;
+}
+
+float drwn::go_to_t::get_fit_speed() const {
+    return m_fit_speed;
+}
+
+void drwn::go_to_t::set_fit_speed(float fit_speed) {
+    m_fit_speed = fit_speed;
+}
+
+float drwn::go_to_t::get_max_turn() const {
+    return m_max_turn;
+}
+
+void drwn::go_to_t::set_max_turn(float max_turn) {
+    m_max_turn = max_turn;
+}
+
+float drwn::go_to_t::get_step_accel() const {
+    return m_step_accel;
+}
+
+void drwn::go_to_t::set_step_accel(float step_accel) {
+    m_step_accel = step_accel;
+}
+
+float drwn::go_to_t::get_turn_accel() const {
+    return m_turn_accel;
+}
+
+void drwn::go_to_t::set_turn_accel(float turn_accel) {
+    m_turn_accel = turn_accel;
+}
+
+float drwn::go_to_t::get_fit_distance() const {
+    return m_fit_distance;
+}
+
+void drwn::go_to_t::set_fit_distance(float fit_distance) {
+    m_fit_distance = fit_distance;
+}
+
+float drwn::go_to_t::get_distance_var() const {
+    return m_distance_var;
+}
+
+void drwn::go_to_t::set_distance_var(float distance_var) {
+    m_distance_var = distance_var;
+}
+
+float drwn::go_to_t::get_angle_var() const {
+    return m_angle_var;
+}
+
+void drwn::go_to_t::set_angle_var(float angle_var) {
+    m_angle_var = angle_var;
+}
+
+float drwn::go_to_t::get_goal_max_speed() const {
+    return m_goal_max_speed;
+}
+
+void drwn::go_to_t::set_goal_max_speed(float goal_max_speed) {
+    m_goal_max_speed = goal_max_speed;
+}
+
+float drwn::go_to_t::get_goal_turn() const {
+    return m_goal_turn;
+}
+
+void drwn::go_to_t::set_goal_turn(float goal_turn) {
+    m_goal_turn = goal_turn;
+}
+
+bool drwn::go_to_t::is_debug_enabled() const {
+    return m_debug;
+}
+
+void drwn::go_to_t::enable_debug(bool debug) {
+    m_debug = debug;
 }

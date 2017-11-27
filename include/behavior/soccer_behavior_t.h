@@ -79,6 +79,7 @@ namespace drwn {
         ball_follower_t* m_follower{nullptr};
         go_to_t* m_goto{nullptr};
 
+        int m_previous_state{-1};
     };
 }
 

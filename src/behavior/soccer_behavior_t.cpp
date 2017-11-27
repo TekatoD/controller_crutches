@@ -135,18 +135,23 @@ void soccer_behavior_t::process_decision() {
 
         auto ball = m_vision->detect_ball();
 
-        if (gc_data.state == STATE_SET || gc_data.state == STATE_READY || gc_data.state == STATE_INITIAL) {
+        if (gc_data.state == STATE_SET) {
+            if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Set state processing...";
+            if (m_previous_state != STATE_SET) {
+                m_walking->set_odo(m_field->get_spawn_pose());
+                m_previous_state = STATE_SET;
+            }
+            m_goto->process(m_field->get_start_pose() - odo);
+        } else  if (gc_data.state == STATE_READY || gc_data.state == STATE_INITIAL) {
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Ready state processing...";
-            const pose2d_t starnig; // TODO Get starting position
+            const pose2d_t starnig = m_field->get_start_pose();
             if (m_tracker->is_no_ball()) {
                 m_head->move_to_home();
             }
             m_walking->set_odo(starnig);
             m_walking->stop();
             return;
-        }
-
-        if (gc_data.state == STATE_PLAYING) {
+        } else if (gc_data.state == STATE_PLAYING) {
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Playing state processing...";
 //        if (State.kickOffTeam != team) {
 //            // TODO KickOff

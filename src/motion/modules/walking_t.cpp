@@ -604,13 +604,6 @@ pose2d_t walking_t::get_odo() {
     return m_odometry_collector.get_pose();
 }
 
-void walking_t::reset_odo(const pose2d_t& pose) {
-    if (m_debug) {
-        LOG_DEBUG << "WALKING: Odometry has been reset";
-    }
-    m_odometry_collector.reset();
-}
-
 void walking_t::set_odo(const pose2d_t& pose) {
     if (m_debug) {
         LOG_DEBUG << "WALKING: odo_x = " << pose.get_x()
@@ -961,4 +954,5 @@ bool walking_t::is_debug_enabled() const {
 
 void walking_t::enable_debug(bool debug) {
     m_debug = debug;
+    m_odometry_collector.enable_debug(debug);
 }

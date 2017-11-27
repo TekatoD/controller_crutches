@@ -172,8 +172,6 @@ namespace drwn {
 
         pose2d_t get_odo();
 
-        void reset_odo(const pose2d_t& pose);
-
         void set_odo(const pose2d_t& pose);
 
         float get_x_offset() const;

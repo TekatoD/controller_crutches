@@ -67,14 +67,6 @@ namespace drwn {
 
         void set_angle_var(float angle_var);
 
-        float get_goal_max_speed() const;
-
-        void set_goal_max_speed(float goal_max_speed);
-
-        float get_goal_turn() const;
-
-        void set_goal_turn(float goal_turn);
-
         bool is_debug_enabled() const;
 
         void enable_debug(bool debug);

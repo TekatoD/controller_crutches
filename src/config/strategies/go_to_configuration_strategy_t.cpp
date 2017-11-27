@@ -30,11 +30,6 @@ void drwn::go_to_configuration_strategy_t::read_config(const boost::property_tre
     if (distance_var) go_to->set_distance_var(distance_var.get());
     auto angle_var = section.get_optional<float>("angle_var");
     if (angle_var) go_to->set_angle_var(angle_var.get());
-    auto goal_max_speed = section.get_optional<float>("goal_max_speed");
-    if (goal_max_speed) go_to->set_goal_max_speed(goal_max_speed.get());
-    auto goal_turn = section.get_optional<float>("goal_turn");
-    if (goal_turn) go_to->set_goal_turn(goal_turn.get());
-
 }
 
 void drwn::go_to_configuration_strategy_t::write_config(boost::property_tree::ptree& prop) const {

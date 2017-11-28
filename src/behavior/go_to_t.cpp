@@ -41,7 +41,6 @@ void drwn::go_to_t::process(drwn::pose2d_t pos) {
     }
 
     if (dist > m_distance_var) {
-
         float angle_diff = angle - odo.get_theta();
         m_goal_max_speed = std::max(std::cos(angle_diff), 0.0f) * (dist < m_fit_distance ? m_fit_speed : m_max_speed);
         float dir = (std::fabs(angle_diff) > m_angle_var ? 1.0f : -1.0f);
@@ -87,14 +86,12 @@ void drwn::go_to_t::process(drwn::pose2d_t pos) {
 
 
     if (!m_done) {
-        if (!walking_t::get_instance()->is_running() || m_update_rate.is_passed()) {
-            m_update_rate.update();
-            walking_t::get_instance()->joint.set_enable_body_without_head(true, true);
-            walking_t::get_instance()->set_x_move_amplitude(m_x);
-            walking_t::get_instance()->set_y_move_amplitude(m_y);
-            walking_t::get_instance()->set_a_move_amplitude(m_a);
-            walking_t::get_instance()->start();
-        }
+        m_update_rate.update();
+        walking_t::get_instance()->joint.set_enable_body_without_head(true, true);
+        walking_t::get_instance()->set_x_move_amplitude(m_x);
+        walking_t::get_instance()->set_y_move_amplitude(m_y);
+        walking_t::get_instance()->set_a_move_amplitude(m_a);
+        walking_t::get_instance()->start();
     } else {
         walking_t::get_instance()->stop();
     }

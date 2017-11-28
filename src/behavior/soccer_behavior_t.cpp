@@ -217,5 +217,30 @@ void soccer_behavior_t::check_rate() {
 }
 
 void soccer_behavior_t::process_localization() {
+    if (m_avoid_localization) {
+        if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Avoiding localization...";
+        return;
+    }
 
+    if (m_rate_process_localization.is_passed() || m_force_localization) {
+        if (m_debug) {
+            if (m_force_localization) {
+                LOG_DEBUG << "SOCCER BEHAVIOR: Forcing localization...";
+            } else {
+                LOG_DEBUG << "SOCCER BEHAVIOR: Processing localization...";
+            }
+        }
+
+        const auto& odo = m_walking->get_odo();
+        const auto& lines = m_vision->detect_lines();
+        m_localization->set_pose_shift(odo);
+        m_localization->set_lines(lines);
+        m_localization->update();
+
+        if (m_force_localization) {
+            m_force_localization = false;
+        }
+
+        m_rate_process_localization.update();
+    }
 }

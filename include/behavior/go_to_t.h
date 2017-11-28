@@ -21,6 +21,7 @@
 
 
 #include <cmath>
+#include <tool/rate_t.h>
 #include "math/point_t.h"
 #include "motion/pose2d_t.h"
 
@@ -67,6 +68,10 @@ namespace drwn {
 
         void set_angle_var(float angle_var);
 
+        steady_rate_t::duration get_update_rate() const;
+
+        void set_update_rate(const steady_rate_t::duration& duration);
+
         bool is_debug_enabled() const;
 
         void enable_debug(bool debug);
@@ -76,6 +81,8 @@ namespace drwn {
 
     private:
         bool m_debug{false};
+
+        steady_rate_t m_update_rate{std::chrono::milliseconds(500)};
 
         float m_max_speed{7.0f};
         float m_fit_speed{3.0f};

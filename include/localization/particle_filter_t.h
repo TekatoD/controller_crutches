@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/StdVector>
 #include <log/trivial_logger_t.h>
 
 #include "motion/pose2d_t.h"
@@ -13,6 +14,7 @@
 
 
 namespace drwn {
+    // TODO: Refactor
     class particle_filter_t {
     public:
         static const int DEFAULT_PARTICLE_NUMBER = 100;
@@ -32,8 +34,8 @@ namespace drwn {
         static constexpr float DEFAULT_MEAS_NOISE_RANGE = 200.0f;
         static constexpr float DEFAULT_MEAS_NOISE_BEARING = 0.1f;
 
-        using control_data = std::vector<Eigen::Vector3f>;
-        using measurement_bundle = std::vector<Eigen::Vector4f>;
+        using control_data = std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f> >;
+        using measurement_bundle = std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f> >;
 
         struct particle_t {
             pose2d_t pose;

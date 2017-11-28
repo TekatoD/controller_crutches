@@ -31,6 +31,9 @@ namespace drwn {
         static constexpr float DEFAULT_ODO_NOISE_ROT2 = 0.01;
         static constexpr float DEFAULT_MEAS_NOISE_RANGE = 200.0f;
         static constexpr float DEFAULT_MEAS_NOISE_BEARING = 0.1f;
+        static constexpr float DEFAULT_LOC_THRESHOLD_X = 200.0f;
+        static constexpr float DEFAULT_LOC_THRESHOLD_Y = 200.0f;
+        static constexpr float DEFAULT_LOC_THRESHOLD_THETA = 0.1f;
 
         using control_data = std::vector<Eigen::Vector3f>;
         using measurement_bundle = std::vector<Eigen::Vector4f>;
@@ -185,6 +188,27 @@ namespace drwn {
 
         float get_meas_noise_bearing() const { return m_config.meas_noise_bearing; }
 
+        float get_loc_threshold_x() const { return m_config.loc_threshold_x; }
+
+        void set_loc_threshold_x(float x_dev) {
+            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: loc_threshold_x = " << x_dev;
+            m_config.loc_threshold_x = x_dev;
+        }
+
+        float get_loc_threshold_y() const { return m_config.loc_threshold_y; }
+
+        void set_loc_threshold_y(float y_dev) {
+            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: loc_threshold_y = " << y_dev;
+            m_config.loc_threshold_y = y_dev;
+        }
+
+        float get_loc_threshold_theta() const { return m_config.loc_threshold_theta; }
+
+        void set_loc_threshold_theta(float theta_dev) {
+            if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: loc_threshold_theta = " << theta_dev;
+            m_config.loc_threshold_theta = theta_dev;
+        }
+
         /* Util function, place in separate class */
         float sample_normal_distribution(float variance);
 
@@ -207,6 +231,7 @@ namespace drwn {
             float max_x, max_y, max_theta;
             float odo_noise_rot1, odo_noise_trans, odo_noise_rot2;
             float meas_noise_range, meas_noise_bearing;
+            float loc_threshold_x, loc_threshold_y, loc_threshold_theta;
 
             config_t()
                     : num_particles(DEFAULT_PARTICLE_NUMBER),
@@ -215,7 +240,8 @@ namespace drwn {
                       min_x(DEFAULT_MIN_X), min_y(DEFAULT_MIN_Y), min_theta(DEFAULT_MIN_THETA),
                       max_x(DEFAULT_MAX_X), max_y(DEFAULT_MAX_Y), max_theta(DEFAULT_MAX_THETA),
                       odo_noise_rot1(DEFAULT_ODO_NOISE_ROT1), odo_noise_trans(DEFAULT_ODO_NOISE_TRANS), odo_noise_rot2(DEFAULT_ODO_NOISE_ROT2),
-                      meas_noise_range(DEFAULT_MEAS_NOISE_RANGE), meas_noise_bearing(DEFAULT_MEAS_NOISE_BEARING)
+                      meas_noise_range(DEFAULT_MEAS_NOISE_RANGE), meas_noise_bearing(DEFAULT_MEAS_NOISE_BEARING),
+                      loc_threshold_x(DEFAULT_LOC_THRESHOLD_X), loc_threshold_y(DEFAULT_LOC_THRESHOLD_Y), loc_threshold_theta(DEFAULT_LOC_THRESHOLD_THETA)
             {
             }
         } m_config;

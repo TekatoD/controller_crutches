@@ -237,10 +237,18 @@ void soccer_behavior_t::process_localization() {
         m_localization->set_lines(lines);
         m_localization->update();
 
-        if (m_force_localization) {
-            m_force_localization = false;
-        }
+        if (m_localization->is_localized()) {
+            const auto& localized_pose = m_localization->get_particle_filter()->get_pose_mean();
+            if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Successfull localization to pose = " << localized_pose;
 
-        m_rate_process_localization.update();
+            m_walking->set_odo(localized_pose);
+            // set_pose_shift to avoid big jumps
+            m_localization->set_pose_shift(localized_pose);
+            m_rate_process_localization.update();
+
+            m_force_localization = false;
+        } else {
+            m_force_localization = true;
+        }
     }
 }

@@ -20,6 +20,13 @@ bool drwn::go_to_t::is_done() const {
 }
 
 void drwn::go_to_t::process(drwn::pose2d_t pos) {
+    using namespace boost::math;
+
+    auto normalize = [](float& theta) {
+        while (theta < -constants::pi<float>()) theta += 2.0f * constants::pi<float>();
+        while (theta > constants::pi<float>()) theta -= 2.0f * constants::pi<float>();
+    };
+
     if (m_debug) {
         LOG_DEBUG << "GO TO: Processing...";
         LOG_DEBUG << "GO TO: pos = ("
@@ -48,28 +55,22 @@ void drwn::go_to_t::process(drwn::pose2d_t pos) {
 
     if (dist > m_distance_var) {
         float angle_diff = angle - odo.get_theta();
-        auto cangle_diff = std::cos(angle_diff);
-        m_goal_max_speed = (dist < m_fit_distance ? m_fit_speed : m_max_speed);
+        normalize(angle_diff);
+        float cangle_diff = std::cos(angle_diff);
+        float sangle_diff = std::sin(angle_diff);
+        m_goal_max_speed = std::max(cangle_diff, 0.0f) * (dist < m_fit_distance || std::fabs(angle_diff) > radians(m_angle_var)
+                            ? m_fit_speed
+                            : m_max_speed);
+        m_goal_max_speed = (cangle_diff >= 0.0f ? m_goal_max_speed : 0.0f);
+        m_goal_turn = std::max(sangle_diff, 0.0f) * (angle_diff > 0.0f ? m_max_turn : -m_max_turn);
         // Reduce x and y and increase a when diff greater than allowable angle variance
-        m_x += (cangle_diff > 0.0f ? m_step_accel : -m_step_accel);
+        m_x += (m_x < m_goal_max_speed ? m_step_accel : -m_step_accel);
+        if (m_goal_max_speed < m_step_accel) m_x = 0.0f;
         m_y += 0.0f;
-        m_a += (angle_diff > 0.0f ? m_turn_accel : -m_turn_accel);
-        if (std::fabs(angle_diff) > radians(m_angle_var)) {
-            m_a *= std::fabs(angle_diff) / radians(m_angle_var);
-        }
-        // Reset speed when it very small
-        float x_abs = std::fabs(m_x);
-        if (x_abs < m_step_accel * 0.9f) {
-            m_x = 0.0;
-        } else if (x_abs > m_goal_max_speed) {
-            m_x = std::copysign(m_goal_max_speed, m_x);
-        }
-
-        float a_abs = std::fabs(m_a);
-        if (a_abs > m_max_turn) {
-            m_a = std::copysign(m_max_turn, m_a);
-        }
-
+        m_a += (m_a < m_goal_turn ? m_turn_accel : -m_turn_accel);
+//        if (std::fabs(angle_diff) > radians(m_angle_var)) {
+//            m_a *= std::fabs(angle_diff) / radians(m_angle_var);
+//        }
         m_done = false;
     } else {
         m_x = 0;

@@ -606,9 +606,9 @@ pose2d_t walking_t::get_odo() {
 
 void walking_t::set_odo(const pose2d_t& pose) {
     if (m_debug) {
-        LOG_DEBUG << "WALKING: odo_x = " << pose.get_x()
-                  << ", odo_y = " << pose.get_y()
-                  << ", odo_theta = " << pose.get_theta();
+        LOG_DEBUG << "WALKING: odo = (" << pose.get_x()
+                  << ", " << pose.get_y()
+                  << ", " << degrees(pose.get_theta()) << ')';
     }
     m_odometry_collector.set_pose(pose);
 }

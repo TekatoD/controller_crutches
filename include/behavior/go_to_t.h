@@ -92,7 +92,7 @@ namespace drwn {
 
         float m_fit_distance{200.0f};
         float m_distance_var{50.0f};
-        float m_angle_var{10.0f};
+        float m_angle_var{15.0f};
 
         float m_goal_max_speed{0.0f};
         float m_goal_turn{0.0f};

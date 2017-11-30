@@ -47,7 +47,7 @@ void soccer_behavior_t::process() {
     this->process_game_controller();
     if (m_behavior_active) {
         this->process_cv();
-        this->process_localization();
+//        this->process_localization();
         this->process_decision();
     }
     this->check_rate();
@@ -98,8 +98,6 @@ void soccer_behavior_t::process_game_controller() {
 }
 
 void soccer_behavior_t::process_decision() {
-
-
     if (!m_prepared) {
         if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Preparing...";
         m_action->joint.set_enable_body(true, true);
@@ -120,7 +118,7 @@ void soccer_behavior_t::process_decision() {
         }
     } else {
         // Wait while robot hasn't got up
-        if (m_action->is_running() || !m_behavior_active) {
+        if (m_action->is_running() || m_kicking->is_running() || !m_behavior_active) {
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Decision making skipped";
             return;
         }
@@ -135,14 +133,19 @@ void soccer_behavior_t::process_decision() {
 
         auto ball = m_vision->detect_ball();
 
-        if (gc_data.state == STATE_SET) {
-            if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Set state processing...";
-            if (m_previous_state != STATE_SET) {
+        if (gc_data.state == STATE_INITIAL) {
+            if (m_previous_state != STATE_INITIAL) {
                 m_walking->set_odo(m_field->get_spawn_pose());
-                m_previous_state = STATE_SET;
+                m_previous_state = STATE_INITIAL;
+            }
+        } if (gc_data.state == STATE_READY) {
+            if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Set state processing...";
+            if (m_previous_state != STATE_READY) {
+                m_walking->set_odo(m_field->get_spawn_pose());
+                m_previous_state = STATE_READY;
             }
             m_goto->process(m_field->get_start_pose() - odo);
-        } else  if (gc_data.state == STATE_READY || gc_data.state == STATE_INITIAL) {
+        } else  if (gc_data.state == STATE_SET) {
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Ready state processing...";
             const pose2d_t starnig = m_field->get_start_pose();
             if (m_tracker->is_no_ball()) {

@@ -37,23 +37,25 @@ void ball_searcher_t::process() {
 
     if (m_debug) LOG_DEBUG << "BALL SEARCHER: Processing has been started";
 
+    auto half_phase_size = m_phase_size / 2.0f;
     if (!m_active) {
         // TODO Pan checking
         point2d_t center = point2d_t(camera_t::WIDTH / 2, camera_t::HEIGHT / 2);
         point2d_t offset = m_last_position - center;
 
-        m_pan_phase = 0.0;
-        m_tilt_phase = 0.0;
+        m_pan_phase = half_phase_size;
+        m_tilt_phase = half_phase_size;
 
-        m_pan_direction = offset.X > 0 ? 1 : -1;
+        m_pan_direction = head_t::get_instance()->get_pan_angle() > 0 ? 1 : -1;
         m_turn_direction = head_t::get_instance()->get_tilt_angle() > 0 ? 1 : -1;
 
         m_active = true;
     }
 
 
-    m_pan_phase += m_pan_phase_step * m_pan_direction;
-    m_tilt_phase += m_tilt_phase_step * m_turn_direction;
+    m_pan_phase = std::fmod(m_pan_phase + m_pan_phase_step, m_phase_size);
+    m_tilt_phase = std::fmod(m_tilt_phase + m_tilt_phase_step, m_phase_size);
+    
 
     const float tilt_max = head_t::get_instance()->get_top_limit_angle();
     const float tilt_min = head_t::get_instance()->get_bottom_limit_angle();
@@ -61,16 +63,24 @@ void ball_searcher_t::process() {
     const float pan_max = head_t::get_instance()->get_left_limit_angle();
     const float pan_min = head_t::get_instance()->get_right_limit_angle();
     const float pan_diff = pan_max - pan_min;
-
-
-    float pan = sinf(m_pan_phase / m_phase_size * constants::pi<float>() * 2.0f) * pan_diff - pan_min;
-    float tilt = sinf(m_tilt_phase / m_phase_size * constants::pi<float>() * 2.0f) * tilt_diff - tilt_min;
+    
+    float pan = (m_pan_phase - half_phase_size) / half_phase_size * pan_diff / 2.0f * m_pan_direction ;
+    float tilt = m_tilt_phase <= half_phase_size
+                 ? tilt_min + tilt_diff / 2.0f
+                 : tilt_min;
     head_t::get_instance()->move_by_angle(pan, tilt);
+
+    if (m_debug) {
+        LOG_DEBUG << "BALL SEARCHER: pan_phase = " << m_pan_phase;
+        LOG_DEBUG << "BALL SEARCHER: tilt_phase = " << m_tilt_phase;
+        LOG_DEBUG << "BALL SEARCHER: pan = " << pan;
+        LOG_DEBUG << "BALL SEARCHER: tilt = " << tilt;
+    }
 
     if (m_walking_enabled) {
         m_turn_speed = walking_t::get_instance()->get_a_move_amplitude();
         m_turn_speed += m_turn_step * m_turn_direction;
-        if (fabsf(m_turn_speed) > m_max_turn) {
+        if (std::fabs(m_turn_speed) > m_max_turn) {
             m_turn_speed = m_max_turn * m_turn_direction;
         }
 

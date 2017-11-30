@@ -14,6 +14,8 @@
 #include <game_controller/game_controller_t.h>
 #include <motion/motion_status_t.h>
 #include <hw/image_source_failure.h>
+#include <localization/localization_t.h>
+#include <thread>
 #include "behavior/ball_tracker_t.h"
 #include "behavior/ball_searcher_t.h"
 #include "behavior/ball_follower_t.h"
@@ -28,7 +30,7 @@ soccer_behavior_t::soccer_behavior_t()
           m_walking(walking_t::get_instance()),
           m_action(action_t::get_instance()),
           m_kicking(kicking_t::get_instance()),
-          m_localization(nullptr), // TODO Getter for localization!
+          m_localization(localization_t::get_instance()),
           m_buttons(buttons_t::get_instance()),
           m_LEDs(LEDs_t::get_instance()),
           m_game_controller(game_controller_t::get_instance()),
@@ -42,10 +44,10 @@ soccer_behavior_t::soccer_behavior_t()
 
 void soccer_behavior_t::process() {
     this->process_buttons();
+    this->process_game_controller();
     if (m_behavior_active) {
-        this->process_game_controller();
         this->process_cv();
-        this->process_localization();
+//        this->process_localization();
         this->process_decision();
     }
     this->check_rate();
@@ -86,7 +88,6 @@ void soccer_behavior_t::process_buttons() {
         }
     }
 
-
     if (update_rate) {
         m_rate_buttons_check.update();
     }
@@ -97,11 +98,6 @@ void soccer_behavior_t::process_game_controller() {
 }
 
 void soccer_behavior_t::process_decision() {
-    auto normalize = [](float& theta) {
-        while (theta < -180.0f) theta += 2.0f * 180.0f;
-        while (theta > 180.0f) theta -= 2.0f * 180.0f;
-    };
-
     if (!m_prepared) {
         if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Preparing...";
         m_action->joint.set_enable_body(true, true);
@@ -122,7 +118,7 @@ void soccer_behavior_t::process_decision() {
         }
     } else {
         // Wait while robot hasn't got up
-        if (m_action->is_running() || !m_behavior_active) {
+        if (m_action->is_running() || m_kicking->is_running() || !m_behavior_active) {
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Decision making skipped";
             return;
         }
@@ -130,20 +126,35 @@ void soccer_behavior_t::process_decision() {
         const auto& gc_data = m_game_controller->get_game_ctrl_data();
         const auto& odo = m_walking->get_odo();
 
+        if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: odo = ("
+                               << odo.get_x() << ", "
+                               << odo.get_y() << ", "
+                               << degrees(odo.get_theta()) << ')';
+
         auto ball = m_vision->detect_ball();
 
-        if (gc_data.state == STATE_SET || gc_data.state == STATE_READY || gc_data.state == STATE_INITIAL) {
+        if (gc_data.state == STATE_INITIAL) {
+            if (m_previous_state != STATE_INITIAL) {
+                m_walking->set_odo(m_field->get_spawn_pose());
+                m_previous_state = STATE_INITIAL;
+            }
+        } if (gc_data.state == STATE_READY) {
+            if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Set state processing...";
+            if (m_previous_state != STATE_READY) {
+                m_walking->set_odo(m_field->get_spawn_pose());
+                m_previous_state = STATE_READY;
+            }
+            m_goto->process(m_field->get_start_pose() - odo);
+        } else  if (gc_data.state == STATE_SET) {
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Ready state processing...";
-            const pose2d_t starnig; // TODO Get starting position
+            const pose2d_t starnig = m_field->get_start_pose();
             if (m_tracker->is_no_ball()) {
                 m_head->move_to_home();
             }
             m_walking->set_odo(starnig);
             m_walking->stop();
             return;
-        }
-
-        if (gc_data.state == STATE_PLAYING) {
+        } else if (gc_data.state == STATE_PLAYING) {
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Playing state processing...";
 //        if (State.kickOffTeam != team) {
 //            // TODO KickOff
@@ -174,22 +185,6 @@ void soccer_behavior_t::process_decision() {
             }
             m_LEDs->set_eye_led(eye_leds);
 
-            // Calculate angles to gate
-            float free_space = (m_field->get_field_height() - m_field->get_gate_height()) / 2.0f;
-            float y_top = m_field->get_field_height() - free_space;
-            float y_bot = y_top - m_field->get_gate_height();
-
-            float pan = motion_status_t::current_joints.get_angle(joint_data_t::ID_HEAD_PAN);
-            float angle_top = degrees(atan2f(m_field->get_field_height() - odo.get_y(), y_top - odo.get_x()) -
-                                      odo.get_theta());
-            float angle_bot = degrees(atan2f(m_field->get_field_height() - odo.get_y(), y_bot - odo.get_x()) -
-                                      odo.get_theta());
-            angle_bot -= pan;
-            angle_top -= pan;
-
-            normalize(angle_bot);
-            normalize(angle_top);
-
             if (m_tracker->is_no_ball()) {
                 m_searcher->process();
                 m_LEDs->set_head_led({0, 0, 255});
@@ -199,22 +194,7 @@ void soccer_behavior_t::process_decision() {
             }
 
             // Follow the ball
-            m_follower->process(m_tracker->get_ball_position(), angle_top, angle_bot);
-
-            // Kicking the ball
-            if (m_follower->get_kicking_action() != kicking_action_t::NO_KICKING) {
-                m_head->joint.set_enable_head_only(true, true);
-                m_action->joint.set_enable_body_without_head(true, true);
-                // Kick the ball
-                if (m_follower->get_kicking_action() == kicking_action_t::RIGHT_LEG_KICK) {
-                    m_action->start(12);   // RIGHT KICK
-                } else {
-                    m_action->start(13);   // LEFT KICK
-                }
-                m_LEDs->set_head_led({255, 0, 0});
-            } else {
-                m_LEDs->set_head_led({0, 255, 0});
-            }
+            m_follower->process(m_tracker->get_ball_position());
         }
     }
 }
@@ -240,5 +220,30 @@ void soccer_behavior_t::check_rate() {
 }
 
 void soccer_behavior_t::process_localization() {
+    if (m_avoid_localization) {
+        if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Avoiding localization...";
+        return;
+    }
 
+    if (m_rate_process_localization.is_passed() || m_force_localization) {
+        if (m_debug) {
+            if (m_force_localization) {
+                LOG_DEBUG << "SOCCER BEHAVIOR: Forcing localization...";
+            } else {
+                LOG_DEBUG << "SOCCER BEHAVIOR: Processing localization...";
+            }
+        }
+
+        const auto& odo = m_walking->get_odo();
+        const auto& lines = m_vision->detect_lines();
+        m_localization->set_pose_shift(odo);
+        m_localization->set_lines(lines);
+        m_localization->update();
+
+        if (m_force_localization) {
+            m_force_localization = false;
+        }
+
+        m_rate_process_localization.update();
+    }
 }

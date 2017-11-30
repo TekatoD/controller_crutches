@@ -9,6 +9,7 @@
 #include <behavior/image_processing_behavior_t.h>
 #include <behavior/soccer_behavior_t.h>
 #include <behavior/ball_follower_t.h>
+#include <behavior/go_to_t.h>
 #include "log/trivial_logger_t.h"
 #include "motion/motion_manager_t.h"
 #include "game_controller/game_controller_t.h"
@@ -227,7 +228,6 @@ void robot_application_t::init_motion_modules() {
     motion_manager_t::get_instance()->add_module((motion_module_t*) head_t::get_instance());
     motion_manager_t::get_instance()->add_module((motion_module_t*) walking_t::get_instance());
     motion_manager_t::get_instance()->add_module((motion_module_t*) kicking_t::get_instance());
-    motion_manager_t::get_instance()->set_enable(true);
     if (m_debug) LOG_INFO << "Motion modules are ready";
 }
 
@@ -271,6 +271,7 @@ void robot_application_t::init_configuraion_loader() {
     m_configuration_loader.add_strategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
     m_configuration_loader.add_strategy(m_ball_tracker_configuration_strategy, m_arg_config_ball_searcher);
     m_configuration_loader.add_strategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
+    m_configuration_loader.add_strategy(m_go_to_configuration_strategy, m_arg_config_go_to);
 
 #ifdef CROSSCOMPILE
     m_robot_image_source_configuration_strategy.set_image_source(m_image_source.get());
@@ -387,6 +388,7 @@ void robot_application_t::apply_debug_arguments() {
     ball_tracker_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_ball_tracker);
     ball_follower_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_ball_follower);
     field_map_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_field);
+    go_to_t::get_instance()->enable_debug(m_arg_debug_all || m_arg_debug_go_to);
     m_configuration_loader.enable_debug(m_arg_debug_all);
     // Image source debug placed located in init_cv
     // Localization debug is in init_localization
@@ -411,12 +413,13 @@ void robot_application_t::init_behavior() {
 void robot_application_t::start_main_loop() {
     if (m_debug) LOG_INFO << "=== Controller has started ===";
     action_t::get_instance()->joint.set_enable_body(true, true);
+    motion_manager_t::get_instance()->set_enable(true);
     action_t::get_instance()->start(15);
     while (is_running()) {
         if (m_debug) LOG_DEBUG << "ROBOT APPLICATION: === Iteration start ===";
         m_behavior->process();
         //TODO:
-        step_localization();
+//        step_localization();
     }
     if (m_debug) LOG_INFO << "=== Controller has finished ===";
 

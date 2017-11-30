@@ -55,11 +55,7 @@ void init_logger() {
                                 << " [" << logging::trivial::severity
                                 << "] " << expr::smessage);
     logging::core::get()->set_filter(
-#ifdef DEBUG
             logging::trivial::severity >= logging::trivial::debug
-#else
-            logging::trivial::severity >= logging::trivial::info
-#endif
     );
     logging::core::get()->add_sink(std::move(sink));
 }

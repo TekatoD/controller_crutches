@@ -19,6 +19,7 @@
 #include <config/strategies/localization_field_configuration_strategy_t.h>
 #include <config/strategies/particle_filter_configuration_strategy_t.h>
 #include <behavior/behavior_t.h>
+#include <config/strategies/go_to_configuration_strategy_t.h>
 #include "config/configuration_file_loader_t.h"
 #include "config/strategies/walking_configuration_strategy_t.h"
 #include "config/strategies/motion_manager_configuration_strategy_t.h"
@@ -129,6 +130,7 @@ namespace drwn {
         white_ball_vision_processor_configuration_strategy_t m_white_ball_vision_processor_configuration_strategy;
         localization_field_configuration_strategy_t m_localization_field_configuration_strategy;
         particle_filter_configuration_strategy_t m_particle_filter_configuration_strategy;
+        go_to_configuration_strategy_t m_go_to_configuration_strategy;
 
 
         //*** Command line parsing strategies ***//

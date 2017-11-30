@@ -402,7 +402,7 @@ void robot_application_t::read_configuration() {
 }
 
 void robot_application_t::init_behavior() {
-    if (m_vision_processor->is_show_images_enabled() || m_vision_processor->is_dump_images_enabled()) {
+    if (m_vision_processor->is_show_images_enabled()) {
         m_behavior = std::make_unique<image_processing_behavior_t>();
     } else {
         m_behavior = std::make_unique<soccer_behavior_t>();

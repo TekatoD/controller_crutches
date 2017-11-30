@@ -41,10 +41,18 @@ namespace drwn {
 
         friend std::ostream& operator << (std::ostream& os, const pose2d_t& data);
 
-    private:
+    protected:
         float m_x;
         float m_y;
         float m_theta;
+    };
+
+    class loc_pose2d_t : public pose2d_t {
+    public:
+        loc_pose2d_t() : loc_pose2d_t(0.0f, 0.0f, 0.0f) {}
+        loc_pose2d_t(float x, float y, float theta) : pose2d_t(x, y, theta) {}
+
+        void normalize_theta();
     };
 }
 

@@ -88,6 +88,11 @@ void drwn::pose2d_t::rotate_around(const drwn::pose2d_t& pose) {
     m_y = s * (d_x) + c * (d_y) + pose.get_y();
 }
 
+void drwn::loc_pose2d_t::normalize_theta() {
+    float pi = boost::math::constants::pi<float>();
+    m_theta = m_theta-2*pi*std::floor( (m_theta+pi)/(2*pi) );
+}
+
 namespace drwn {
     std::ostream& operator<<(std::ostream &os, const drwn::pose2d_t &data) {
         os << " " << data.m_x << " " << data.m_y << " " << degrees(data.m_theta);

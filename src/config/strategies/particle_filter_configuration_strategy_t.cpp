@@ -37,6 +37,9 @@ void particle_filter_configuration_strategy_t::read_config(const boost::property
     auto odo_noise_rot2 = section.get_optional<float>("odo_noise_rot2");
     auto meas_noise_range = section.get_optional<float>("meas_noise_range");
     auto meas_noise_bearing = section.get_optional<float>("meas_noise_bearing");
+    auto loc_threshold_x = section.get_optional<float>("loc_threshold_x");
+    auto loc_threshold_y = section.get_optional<float>("loc_threshold_y");
+    auto loc_threshold_theta = section.get_optional<float>("loc_threshold_theta");
 
     if (num_particles) { m_particle_filter->set_particle_number(num_particles.get()); }
     if (init_x) { m_particle_filter->set_init_x(init_x.get()); }
@@ -54,6 +57,10 @@ void particle_filter_configuration_strategy_t::read_config(const boost::property
     if (odo_noise_rot2) { m_particle_filter->set_odo_noise_rot2(odo_noise_rot2.get()); }
     if (meas_noise_range) { m_particle_filter->set_meas_noise_range(meas_noise_range.get()); }
     if (meas_noise_bearing) { m_particle_filter->set_meas_noise_bearing(meas_noise_bearing.get()); }
+    if (loc_threshold_x) { m_particle_filter->set_loc_threshold_x(loc_threshold_x.get()); }
+    if (loc_threshold_y) { m_particle_filter->set_loc_threshold_y(loc_threshold_y.get()); }
+    if (loc_threshold_theta) { m_particle_filter->set_loc_threshold_theta(loc_threshold_theta.get()); }
+
 
     m_particle_filter->initialize();
 }

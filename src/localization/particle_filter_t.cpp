@@ -162,11 +162,13 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
         weight_normalizer = weight_normalizer + new_weight;
         particle.weight = new_weight;
     }
-    
+
+    if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: Done processing measurements";
+
     // While debugging
     //
     if (weight_normalizer < 0.00001) {
-        if (m_debug) LOG_DEBUG << "PARTICLE FILTER: Normalizer is close to zero";
+        if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: Normalizer is close to zero";
     }
 
     // Particle weight normalization
@@ -200,6 +202,8 @@ void particle_filter_t::resample()
 
 void particle_filter_t::low_variance_resampling()
 {
+    if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: Start resampling";
+
     std::vector<particle_t> new_particles;
     
     float Jinv = 1.0f / m_particles.size();
@@ -227,6 +231,8 @@ void particle_filter_t::low_variance_resampling()
     }
     
     m_particles.swap(new_particles);
+
+    if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: Finish resampling";
 }
 
 Eigen::Vector4f particle_filter_t::get_line_range_bearing(pose2d_t robotPose, float x1, float y1, float x2, float y2)

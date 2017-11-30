@@ -61,8 +61,7 @@ void drwn::go_to_t::process(drwn::pose2d_t pos) {
         m_goal_max_speed = std::max(cangle_diff, 0.0f) * (dist < m_fit_distance || std::fabs(angle_diff) > radians(m_angle_var)
                             ? m_fit_speed
                             : m_max_speed);
-        m_goal_max_speed = (cangle_diff >= 0.0f ? m_goal_max_speed : 0.0f);
-        m_goal_turn = std::max(sangle_diff, 0.0f) * (angle_diff > 0.0f ? m_max_turn : -m_max_turn);
+        m_goal_turn = sangle_diff * m_max_turn;
         // Reduce x and y and increase a when diff greater than allowable angle variance
         m_x += (m_x < m_goal_max_speed ? m_step_accel : -m_step_accel);
         if (m_goal_max_speed < m_step_accel) m_x = 0.0f;

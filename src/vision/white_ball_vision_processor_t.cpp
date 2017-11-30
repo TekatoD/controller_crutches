@@ -269,6 +269,7 @@ void white_ball_vision_processor_t::show_windows() {
 
 void white_ball_vision_processor_t::prepare_output() {
     if(m_dump_images_enabled || m_show_images_enabled) {
+        this->detect_lines();
         cv::cvtColor(m_src_img, m_dbg_src_img, CV_YUV2BGR);
     }
 }

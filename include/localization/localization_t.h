@@ -36,6 +36,9 @@ namespace drwn {
         void set_particle_filter(particle_filter_t* pf_ptr);
         particle_filter_t* get_particle_filter() const;
 
+        void set_localization_threshold(float x_dev, float y_dev, float theta_dev);
+        bool is_localized() const;
+
         // Set movement noise according to odometry motion model
         void set_movement_noise(float rot1, float trans, float rot2);
 
@@ -49,6 +52,7 @@ namespace drwn {
         localization_t() = default;
 
         bool m_debug {true};
+        bool m_localized {true};
     public:
         bool is_debug_enabled() const;
 

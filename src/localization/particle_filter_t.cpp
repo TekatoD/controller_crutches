@@ -52,7 +52,7 @@ std::tuple<field_map_t::line_type_t, point2d_t> particle_filter_t::calc_expected
     // Cast a line from robot position with same bearing
     float epx, epy;
     // Need to normalize angles everywhere
-    pose2d_t normalizer(0.0, 0.0, measured_bearing + rtheta);
+    loc_pose2d_t normalizer(0.0, 0.0, measured_bearing + rtheta);
 
     epx = rx + field_map_t::MAX_DIST * cos(normalizer.get_theta());
     epy = ry + field_map_t::MAX_DIST * sin(normalizer.get_theta());
@@ -87,7 +87,7 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
               0.0f, 0.0f, vrange, 0.0f,
               0.0f, 0.0f, 0.0f, vbearing;
         
-        pose2d_t normalizer;
+        loc_pose2d_t normalizer;
         float range1, bearing1, range2, bearing2;
         float dx1, dy1, dx2, dy2;
         
@@ -162,11 +162,13 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
         weight_normalizer = weight_normalizer + new_weight;
         particle.weight = new_weight;
     }
-    
+
+    if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: Done processing measurements";
+
     // While debugging
     //
     if (weight_normalizer < 0.00001) {
-        if (m_debug) LOG_DEBUG << "PARTICLE FILTER: Normalizer is close to zero";
+        if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: Normalizer is close to zero";
     }
 
     // Particle weight normalization
@@ -200,6 +202,8 @@ void particle_filter_t::resample()
 
 void particle_filter_t::low_variance_resampling()
 {
+    if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: Start resampling";
+
     std::vector<particle_t> new_particles;
     
     float Jinv = 1.0f / m_particles.size();
@@ -227,6 +231,8 @@ void particle_filter_t::low_variance_resampling()
     }
     
     m_particles.swap(new_particles);
+
+    if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: Finish resampling";
 }
 
 Eigen::Vector4f particle_filter_t::get_line_range_bearing(pose2d_t robotPose, float x1, float y1, float x2, float y2)
@@ -250,7 +256,7 @@ Eigen::Vector4f particle_filter_t::get_line_range_bearing(pose2d_t robotPose, fl
     float range1, range2, bearing1, bearing2;
     dx1 = gx1 - rx;
     dy1 = gy1 - ry;
-    drwn::pose2d_t normalizer(0.0, 0.0, atan2(dy1, dx1) - rtheta);
+    drwn::loc_pose2d_t normalizer(0.0, 0.0, atan2(dy1, dx1) - rtheta);
     range1 = sqrt(dx1*dx1 + dy1*dy1);
     bearing1 = normalizer.get_theta();
 
@@ -284,8 +290,10 @@ void particle_filter_t::calc_pose_mean_cov()
         pw = 1.0 / m_particles.size();
         meanAccum += pose2d_t(px*pw, py*pw, ptheta*pw);
     }
-    
-    pose2d_t devAccum, angleNormalizer;
+
+    pose2d_t devAccum;
+    loc_pose2d_t angleNormalizer;
+
     float mx, my, mtheta;
     mx = meanAccum.get_x();
     my = meanAccum.get_y();
@@ -377,19 +385,19 @@ pose2d_t particle_filter_t::odometry_sample(pose2d_t pose, Eigen::Vector3f comma
     
     float r1_noise, t_noise, r2_noise;
     r1_noise = noise(0); t_noise = noise(1), r2_noise = noise(2);
-    
-    pose.normalize_theta();
+
     float theta_old = pose.get_theta();
     
     float rot1_h, trans_h, rot2_h;
     rot1_h = rot1 - sample_normal_distribution(r1_noise);
     trans_h = trans - sample_normal_distribution(t_noise);
     rot2_h = rot2 - sample_normal_distribution(r2_noise);
-    
+
+    loc_pose2d_t normalizer;
+    normalizer.set_theta(theta_old + rot1_h);
+    float normalized = normalizer.get_theta();
+
     pose2d_t newPose;
-    newPose.set_theta(theta_old + rot1_h);
-    float normalized = newPose.get_theta();
-    
     newPose.set_x(trans_h * std::cos(normalized));
     newPose.set_y(trans_h * std::sin(normalized));
     newPose.set_theta(rot1_h + rot2_h);
@@ -405,7 +413,7 @@ Eigen::Vector3f particle_filter_t::get_odometry_command(pose2d_t prevPose, pose2
     dy = currPose.get_y() - prevPose.get_y();
     
     trans = sqrt(dx*dx + dy*dy);
-    pose2d_t normalizer(0.0f, 0.0f, atan2(dy, dx) - prevPose.get_theta());
+    loc_pose2d_t normalizer(0.0f, 0.0f, atan2(dy, dx) - prevPose.get_theta());
     rot1 = normalizer.get_theta();
     normalizer.set_theta(currPose.get_theta() - prevPose.get_theta() - rot1);
     rot2 = normalizer.get_theta();

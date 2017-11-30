@@ -248,7 +248,8 @@ void soccer_behavior_t::process_localization() {
 
             m_force_localization = false;
         } else {
-            m_force_localization = true;
+            // To test
+            //m_force_localization = true;
         }
     }
 }

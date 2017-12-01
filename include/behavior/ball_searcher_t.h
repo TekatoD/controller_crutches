@@ -48,27 +48,33 @@ namespace drwn {
 
         bool is_debug_enabled() const;
 
+        bool is_pan_enabled() const;
+
+        void enable_pan(bool pan_active);
+
     private:
-        ball_searcher_t();
+        ball_searcher_t() = default;
 
     private:
         bool m_debug{false};
-        bool m_active;
-        point2d_t m_last_position;
+        bool m_active{false};
+        point2d_t m_last_position{camera_t::WIDTH / 2, camera_t::HEIGHT / 2};
 
-        float m_tilt_phase;
-        float m_pan_phase;
-        float m_tilt_phase_step;
-        float m_pan_phase_step;
-        float m_phase_size;
+        float m_tilt_phase{0.0f};
+        float m_pan_phase{0.0f};
+        float m_tilt_phase_step{1.0f};
+        float m_pan_phase_step{2.0f};
+        float m_phase_size{500.0f};
 
-        float m_turn_speed;
-        float m_turn_step;
-        float m_max_turn;
+        float m_turn_speed{0.0f};
+        float m_turn_step{1.0f};
+        float m_max_turn{20.0f};
 
-        int m_turn_direction;
-        int m_pan_direction;
-        bool m_walking_enabled;
+        int m_turn_direction{0};
+        int m_pan_direction{0};
+        bool m_walking_enabled{true};
+        bool m_pan_enabled{true};
+
     };
 }
 

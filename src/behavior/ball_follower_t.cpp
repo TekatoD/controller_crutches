@@ -291,10 +291,10 @@ void ball_follower_t::kick_ball() {
     };
 
     // TODO Check it
-    float angle_to_enemy_gate_top = calc_angle_to_gate(-1, 1);
-    float angle_to_enemy_gate_bot = calc_angle_to_gate(-1, -1);
-    float angle_to_our_gate_top = calc_angle_to_gate(1, 1);
-    float angle_to_our_gate_bot = calc_angle_to_gate(1, -1);
+    float angle_to_enemy_gate_top = calc_angle_to_gate(-1, -1);
+    float angle_to_enemy_gate_bot = calc_angle_to_gate(-1, 1);
+    float angle_to_our_gate_top = calc_angle_to_gate(1, -1);
+    float angle_to_our_gate_bot = calc_angle_to_gate(1, 1);
 
     auto normalize = [](float& theta) {
         while (theta < -180.0f) theta += 2.0f * 180.0f;
@@ -313,8 +313,8 @@ void ball_follower_t::kick_ball() {
         LOG_DEBUG << "BALL FOLLOWER: angle_to_our_gate_bot = " << angle_to_our_gate_top;
     }
 
-    if (angle_to_enemy_gate_bot <= m_straight_kick_angle ||
-            angle_to_enemy_gate_top >= m_straight_kick_angle) {
+    if (angle_to_enemy_gate_bot <= m_straight_kick_angle &&
+            angle_to_enemy_gate_top >= -m_straight_kick_angle) {
         if (m_debug) {
             LOG_DEBUG << "BALL FOLLOWER: Straight kick";
         }

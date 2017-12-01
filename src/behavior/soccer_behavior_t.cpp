@@ -155,6 +155,11 @@ void soccer_behavior_t::process_decision() {
             m_walking->stop();
             return;
         } else if (gc_data.state == STATE_PLAYING) {
+            if (m_previous_state != STATE_PLAYING) {
+                const pose2d_t starnig = m_field->get_start_pose();
+                m_walking->set_odo(starnig);
+                m_previous_state = STATE_PLAYING;
+            }
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Playing state processing...";
 //        if (State.kickOffTeam != team) {
 //            // TODO KickOff

@@ -195,11 +195,33 @@ void white_ball_vision_processor_configuration_strategy_t::read_config(const boo
         auto network_window_size_x = section.get_optional<int>("network_window_size_x");
         auto network_window_size_y = section.get_optional<int>("network_window_size_y");
 
-        if(path_to_ann_config) m_white_ball_vision_processor->set_path_to_ann_config(path_to_ann_config.get());
+        if(path_to_ann_config)
+            m_white_ball_vision_processor->set_ball_detector_path_to_ann_config(path_to_ann_config.get());
         if(enable_network) m_white_ball_vision_processor->enable_network((bool)enable_network.get());
-        if(network_window_size_x && network_window_size_y) m_white_ball_vision_processor->set_network_window(cv::Size{
+        if(network_window_size_x && network_window_size_y)
+            m_white_ball_vision_processor->set_ball_detector_network_window(cv::Size{
                     network_window_size_x.get(), network_window_size_y.get()
             });
+
+        auto haar_max_x = section.get_optional<int>("haar_max_x");
+        auto haar_max_y = section.get_optional<int>("haar_max_y");
+        auto haar_min_x = section.get_optional<int>("haar_min_x");
+        auto haar_min_y = section.get_optional<int>("haar_min_y");
+        auto distance = section.get_optional<float>("haar_distance");
+        if(distance) m_white_ball_vision_processor->set_ball_detector_distance(distance.get());
+
+        if(haar_max_x && haar_max_y)
+            m_white_ball_vision_processor->set_ball_detector_haar_max(cv::Size{
+                    haar_max_x.get(), haar_max_y.get()
+            });
+
+        if(haar_min_x && haar_min_y)
+            m_white_ball_vision_processor->set_ball_detector_haar_min(cv::Size{
+                    haar_min_x.get(), haar_min_y.get()
+            });
+        auto ball_rate = section.get_optional<int>("ball_rate_duration_ms");
+        if(ball_rate) m_white_ball_vision_processor->set_ball_detector_ball_rate_duration(std::chrono::milliseconds(ball_rate.get()));
+
     } else {
         throw std::runtime_error("Vision configuration load fail: m_white_ball_vision_processor nullptr");
     }
@@ -287,11 +309,21 @@ void white_ball_vision_processor_configuration_strategy_t::write_config(boost::p
         section.put("ball_detector_type", m_white_ball_vision_processor->get_ball_detector_type());
         section.put("ball_detector_cascade_config", m_white_ball_vision_processor->get_ball_detector_cascade_config());
 
-        section.put("path_to_ann_config", m_white_ball_vision_processor->get_path_to_ann_config());
+        section.put("path_to_ann_config", m_white_ball_vision_processor->get_ball_detector_path_to_ann_config());
         section.put("network_enable", m_white_ball_vision_processor->is_network_enabled());
-        auto network_window_size  = m_white_ball_vision_processor->get_network_window();
+        auto network_window_size  = m_white_ball_vision_processor->get_ball_detector_network_window();
         section.put("network_window_size_x", network_window_size.width);
         section.put("network_window_size_y", network_window_size.height);
+
+        auto haar_max = m_white_ball_vision_processor->get_ball_detector_haar_max();
+        auto haar_min = m_white_ball_vision_processor->get_ball_detector_haar_min();
+        section.put("haar_max_x", haar_max.width);
+        section.put("haar_max_y", haar_max.height);
+        section.put("haar_min_x", haar_min.width);
+        section.put("haar_min_y", haar_min.height);
+        section.put("haar_distance", m_white_ball_vision_processor->get_ball_detector_distance());
+        auto ball_rate = m_white_ball_vision_processor->get_ball_detector_ball_rate_duration();
+        section.put("ball_rate_duration_ms", std::chrono::duration_cast<std::chrono::milliseconds>(ball_rate).count());
 
     } else {
         throw std::runtime_error("Ball Tracker configuration write fail: BallTracker nullptr");

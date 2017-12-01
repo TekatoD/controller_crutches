@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <math/point_t.h>
+#include <hw/camera_t.h>
 
 namespace drwn {
     class ball_searcher_t {

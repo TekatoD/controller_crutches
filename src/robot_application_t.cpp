@@ -20,6 +20,7 @@
 #include "localization/particle_filter_t.h"
 #include "localization/localization_t.h"
 #include "robot_application_t.h"
+#include <thread>
 
 #ifdef CROSSCOMPILE
 #include "hw/robot_CM730_t.h"
@@ -215,7 +216,19 @@ void robot_application_t::init_localization() {
 
 void robot_application_t::init_motion_manager() {
     if (m_debug) LOG_DEBUG << "Initializing motion manager...";
-    if (!motion_manager_t::get_instance()->initialize(m_cm730.get())) {
+    bool initialized = false;
+    for (int i = 0; i < 3; ++i) {
+        initialized = motion_manager_t::get_instance()->initialize(m_cm730.get());
+        if (initialized) {
+            break;
+        } else {
+            if (m_debug) {
+                LOG_DEBUG << "Can't initialize motion manager. Try again...";
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
+    if (!initialized) {
         throw std::runtime_error("Fail to initialize Motion Manager!");
     }
     if (m_debug) LOG_INFO << "Motion manager is ready";

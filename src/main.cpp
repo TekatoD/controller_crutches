@@ -31,7 +31,7 @@
 #include <log/coloured_sink_t.h>
 #include <log/trivial_logger_t.h>
 
-#include <robot_application_t.h>
+#include <vision_application_t.h>
 
 namespace logging = boost::log;
 namespace src = boost::log::sources;
@@ -62,7 +62,7 @@ void init_logger() {
 
 
 void sighandler(int /*sig*/) {
-    drwn::robot_application_t::get_instance()->stop();
+    drwn::vision_application_t::get_instance()->stop();
 }
 
 
@@ -76,6 +76,6 @@ int main(int argc, char** argv) {
     init_logger();
 
     drwn::command_arguments_t args{argc, argv};
-    drwn::robot_application_t::get_instance()->set_program_arguments(args);
-    return drwn::robot_application_t::get_instance()->exec();
+    drwn::vision_application_t::get_instance()->set_program_arguments(args);
+    return drwn::vision_application_t::get_instance()->exec();
 }

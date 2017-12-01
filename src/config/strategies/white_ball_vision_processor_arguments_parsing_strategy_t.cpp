@@ -14,7 +14,8 @@ void white_ball_vision_processor_arguments_parsing_strategy_t::define_descriptio
     desc.add_options()
             ("display-cv-pipeline", po::value(&m_display_images_enabled)->zero_tokens(), "display results of cv pipeline")
             ("dump-cv-pipeline", po::value(&m_dump_images_enabled)->zero_tokens(), "save state cv pipeline to series of images")
-            ("dump-cv-path", po::value(&m_dump_images_path), "cv pipeline dump directory");
+            ("dump-cv-path", po::value(&m_dump_images_path), "cv pipeline dump directory")
+            ("source-cv-path", po::value(&m_source_images_path), "cv source image directory");
 }
 
 void white_ball_vision_processor_arguments_parsing_strategy_t::apply_variables(
@@ -45,4 +46,12 @@ const std::string& white_ball_vision_processor_arguments_parsing_strategy_t::get
 void
 white_ball_vision_processor_arguments_parsing_strategy_t::set_dump_images_path(const std::string& dump_images_path) {
     m_dump_images_path = dump_images_path;
+}
+
+const std::string &white_ball_vision_processor_arguments_parsing_strategy_t::get_source_images_path() const {
+    return m_source_images_path;
+}
+
+void white_ball_vision_processor_arguments_parsing_strategy_t::set_source_images_path(const std::string& source_images_path) {
+    m_source_images_path = source_images_path;
 }

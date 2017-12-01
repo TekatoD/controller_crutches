@@ -29,10 +29,15 @@ namespace drwn {
 
         void set_dump_images_path(const std::string& dump_images_path);
 
+        const std::string& get_source_images_path() const;
+
+        void set_source_images_path(const std::string& source_images_path);
+
     private:
         bool m_dump_images_enabled{false};
         bool m_display_images_enabled{false};
         std::string m_dump_images_path;
+        std::string m_source_images_path;
     };
 }
 

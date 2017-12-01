@@ -16,6 +16,7 @@ namespace drwn {
     class white_ball_vision_processor_t : public vision_processor_t {
     public:
         static constexpr char DEFAULT_DUMP_DIRECTORY_PATH[] = "./dump/";
+        static constexpr char DEFAULT_SOURCE_DIRECTORY_PATH[] = "./source_images/";
 
         const cv::Rect& detect_ball() override;
 
@@ -120,6 +121,10 @@ namespace drwn {
 
         void set_dump_directory_path(std::string dump_directory_path);
 
+        const std::string& get_source_directory_path() const noexcept;
+
+        void set_source_directory_path(std::string source_directory_path);
+
         unsigned int get_dump_counter() const;
 
         void set_ball_detector_type(int detector_type);
@@ -194,6 +199,7 @@ namespace drwn {
         bool m_field_processing_enabled{true};
 
         std::string m_dump_directory_path{DEFAULT_DUMP_DIRECTORY_PATH};
+        std::string m_source_directory_path{DEFAULT_SOURCE_DIRECTORY_PATH};
         unsigned int m_dump_counter{0};
 
         cv::Mat m_src_img;

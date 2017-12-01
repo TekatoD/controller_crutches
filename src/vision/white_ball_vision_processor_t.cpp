@@ -374,6 +374,14 @@ void white_ball_vision_processor_t::set_dump_directory_path(std::string dump_dir
     m_dump_directory_path = std::move(dump_directory_path);
 }
 
+const std::string& white_ball_vision_processor_t::get_source_directory_path() const noexcept {
+    return m_source_directory_path;
+}
+
+void white_ball_vision_processor_t::set_source_directory_path(std::string source_directory_path) {
+    m_source_directory_path = std::move(source_directory_path);
+}
+
 unsigned int white_ball_vision_processor_t::get_dump_counter() const {
     return m_dump_counter;
 }
@@ -487,3 +495,5 @@ void white_ball_vision_processor_t::set_network_window(const cv::Size& network_w
     if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: network_window = " << network_window;
     m_ball_detector.set_network_window(network_window);
 }
+
+

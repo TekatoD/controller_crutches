@@ -7,7 +7,6 @@
 #include "vision_application_t.h"
 
 using namespace drwn;
-
 namespace fs = boost::filesystem;
 
 vision_application_t* vision_application_t::get_instance() {
@@ -175,28 +174,28 @@ void vision_application_t::start_main_loop() {
     if (m_debug) LOG_INFO << "=== Main loop has started ===";
 
     fs::path path(m_vision_processor->get_source_directory_path());
-    fs::recursive_directory_iterator end;
-
     if (!fs::is_directory(path)) {
-        if (m_debug) {
-            LOG_ERROR << "Please specify a directory as a source for vision processor";
-        }
+        throw std::runtime_error{"Please specify a directory as a source for vision processor"};
     }
 
-    for (fs::recursive_directory_iterator itr(path); itr != end; itr++) {
+    std::vector<fs::path> image_paths;
+    std::copy(fs::directory_iterator(path), fs::directory_iterator(), std::back_inserter(image_paths));
+    // simple sorting
+    std::sort(image_paths.begin(), image_paths.end());
+
+    for (const auto &current_image_path : image_paths) {
         if (!is_running()) { break; }
 
-        const fs::path current_image = (*itr);
-        if (!fs::is_regular_file(current_image)) {
+        if (!fs::is_regular_file(current_image_path)) {
             if (m_debug) {
-                LOG_ERROR << "Error reading file: " << current_image.string();
+                LOG_ERROR << "Error reading file: " << current_image_path.string() << " . Skipping...";
             }
 
             // Skip this image
             continue;
         }
 
-        const std::string image_path_string = current_image.string();
+        const std::string image_path_string = current_image_path.string();
         if (m_debug) LOG_DEBUG << "Current image: " << image_path_string;
 
         cv::Mat frame = cv::imread(image_path_string);
@@ -208,7 +207,6 @@ void vision_application_t::start_main_loop() {
     }
 
     if (m_debug) LOG_INFO << "=== Main loop has finished ===";
-
 }
 
 bool vision_application_t::is_debug_enabled() const noexcept {

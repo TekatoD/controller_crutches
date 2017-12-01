@@ -96,6 +96,6 @@ namespace drwn {
         cv::Size m_haar_min{16, 16};
         float m_distance{100};
         mutable steady_rate_t m_ball_rate{std::chrono::milliseconds{100}};
-        cv::Rect m_ball_pos;
+        mutable cv::Rect m_ball_pos;
     };
 }

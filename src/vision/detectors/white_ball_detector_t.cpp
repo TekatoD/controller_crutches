@@ -363,9 +363,9 @@ void white_ball_detector_t::set_distance(float distance) {
 }
 
 const steady_rate_t::duration& white_ball_detector_t::get_ball_rate_duration() const {
-    return m_ball_rate;
+    return m_ball_rate.get_duration();
 }
 
 void white_ball_detector_t::set_ball_rate_duration(const steady_rate_t::duration& ball_rate) {
-    m_ball_rate = ball_rate;
+    m_ball_rate.set_duration(ball_rate);
 }

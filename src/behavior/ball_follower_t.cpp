@@ -85,13 +85,12 @@ void ball_follower_t::process(point2d_t ball_pos) {
                     }
                 } else { // Fit
                     m_kick_ball_rate.update();
-                    target_x_amplitude = m_fit_x_amplitude;
+                    target_x_amplitude = m_fit_x_amplitude * (1.0f - std::fabs(pan_percent));
                     target_a_amplitude = m_fit_a_amplitude * pan_percent;
                 }
             } else {
                 m_kick_ball_rate.update();
-                target_x_amplitude = std::max(m_follow_max_x_amplitude * tilt_percent, // * (1.0f - std::fabs(pan_percent)),
-                                              m_follow_min_x_amplitude);
+                target_x_amplitude = m_follow_max_x_amplitude * tilt_percent; // * (1.0f - std::fabs(pan_percent)),
                 target_a_amplitude = m_follow_max_a_amplitude * pan_percent;
             }
         } else { // Out of kicking angles
@@ -128,6 +127,70 @@ void ball_follower_t::process(point2d_t ball_pos) {
         walking->set_y_move_amplitude(y_amplitude);
         walking->set_a_move_amplitude(a_amplitude);
         walking->start();
+    }
+}
+
+void ball_follower_t::kick_ball() {
+    if (m_debug) {
+        LOG_DEBUG << "BALL FOLLOWER: kicking the ball...";
+    }
+
+    auto action = action_t::get_instance();
+    auto walking = walking_t::get_instance();
+    auto field = field_map_t::get_instance();
+    const float gate_y_offset = field->get_gate_height() / 2.0f;
+    const float gate_x_offset = field->get_field_width() / 2.0f;
+    auto odo = walking->get_odo();
+    const float pan = motion_status_t::current_joints.get_angle(joint_data_t::ID_HEAD_PAN);
+
+    auto calc_angle_to_gate = [gate_x_offset, gate_y_offset, pan, &odo](float x_dir, float y_dir) {
+        float y_diff = y_dir * gate_y_offset - odo.get_y();
+        float x_diff = x_dir * gate_x_offset - odo.get_x();
+        return degrees(std::atan2(y_diff, x_diff) - odo.get_theta()) - pan;
+    };
+
+    // TODO Check it
+    float angle_to_enemy_gate_top = calc_angle_to_gate(-1, -1);
+    float angle_to_enemy_gate_bot = calc_angle_to_gate(-1, 1);
+    float angle_to_our_gate_top = calc_angle_to_gate(1, -1);
+    float angle_to_our_gate_bot = calc_angle_to_gate(1, 1);
+
+    auto normalize = [](float& theta) {
+        while (theta < -180.0f) theta += 2.0f * 180.0f;
+        while (theta > 180.0f) theta -= 2.0f * 180.0f;
+    };
+
+    normalize(angle_to_enemy_gate_top);
+    normalize(angle_to_enemy_gate_bot);
+    normalize(angle_to_our_gate_top);
+    normalize(angle_to_our_gate_bot);
+
+    if (m_debug) {
+        LOG_DEBUG << "BALL FOLLOWER: angle_to_enemy_gate_top = " << angle_to_enemy_gate_bot;
+        LOG_DEBUG << "BALL FOLLOWER: angle_to_enemy_gate_bot = " << angle_to_enemy_gate_top;
+        LOG_DEBUG << "BALL FOLLOWER: angle_to_our_gate_top = " << angle_to_our_gate_bot;
+        LOG_DEBUG << "BALL FOLLOWER: angle_to_our_gate_bot = " << angle_to_our_gate_top;
+    }
+
+    if (angle_to_enemy_gate_bot <= m_straight_kick_angle &&
+        angle_to_enemy_gate_top >= -m_straight_kick_angle) {
+        if (m_debug) {
+            LOG_DEBUG << "BALL FOLLOWER: Straight kick";
+        }
+        walking->stop();
+        if (!walking->is_running()) {
+            action->joint.set_enable_body_without_head(true, true);
+            if (pan < 0) {
+                action->start(12);   // RIGHT KICK
+            } else {
+                action->start(13);   // LEFT KICK
+            }
+        }
+    } else if (angle_to_enemy_gate_bot <= m_slanting_kick_angle ||
+               angle_to_enemy_gate_top >= -m_slanting_kick_angle) {
+        if (m_debug) {
+            LOG_DEBUG << "BALL FOLLOWER: Slanting kick";
+        }
     }
 }
 
@@ -269,68 +332,4 @@ float ball_follower_t::get_fit_tilt_offset() const {
 void ball_follower_t::set_fit_tilt_offset(float fit_tilt_offset) {
     if (m_debug) LOG_DEBUG << "BALL FOLLOWER: fit_tilt_offset = " << fit_tilt_offset;
     m_fit_tilt_offset = fit_tilt_offset;
-}
-
-void ball_follower_t::kick_ball() {
-    if (m_debug) {
-        LOG_DEBUG << "BALL FOLLOWER: kicking the ball...";
-    }
-
-    auto action = action_t::get_instance();
-    auto walking = walking_t::get_instance();
-    auto field = field_map_t::get_instance();
-    const float gate_y_offset = field->get_gate_height() / 2.0f;
-    const float gate_x_offset = field->get_field_width() / 2.0f;
-    auto odo = walking->get_odo();
-    const float pan = motion_status_t::current_joints.get_angle(joint_data_t::ID_HEAD_PAN);
-
-    auto calc_angle_to_gate = [gate_x_offset, gate_y_offset, pan, &odo](float x_dir, float y_dir) {
-        float y_diff = y_dir * gate_y_offset - odo.get_y();
-        float x_diff = x_dir * gate_x_offset - odo.get_x();
-        return degrees(std::atan2(y_diff, x_diff) - odo.get_theta()) - pan;
-    };
-
-    // TODO Check it
-    float angle_to_enemy_gate_top = calc_angle_to_gate(-1, -1);
-    float angle_to_enemy_gate_bot = calc_angle_to_gate(-1, 1);
-    float angle_to_our_gate_top = calc_angle_to_gate(1, -1);
-    float angle_to_our_gate_bot = calc_angle_to_gate(1, 1);
-
-    auto normalize = [](float& theta) {
-        while (theta < -180.0f) theta += 2.0f * 180.0f;
-        while (theta > 180.0f) theta -= 2.0f * 180.0f;
-    };
-
-    normalize(angle_to_enemy_gate_top);
-    normalize(angle_to_enemy_gate_bot);
-    normalize(angle_to_our_gate_top);
-    normalize(angle_to_our_gate_bot);
-
-    if (m_debug) {
-        LOG_DEBUG << "BALL FOLLOWER: angle_to_enemy_gate_top = " << angle_to_enemy_gate_bot;
-        LOG_DEBUG << "BALL FOLLOWER: angle_to_enemy_gate_bot = " << angle_to_enemy_gate_top;
-        LOG_DEBUG << "BALL FOLLOWER: angle_to_our_gate_top = " << angle_to_our_gate_bot;
-        LOG_DEBUG << "BALL FOLLOWER: angle_to_our_gate_bot = " << angle_to_our_gate_top;
-    }
-
-    if (angle_to_enemy_gate_bot <= m_straight_kick_angle &&
-            angle_to_enemy_gate_top >= -m_straight_kick_angle) {
-        if (m_debug) {
-            LOG_DEBUG << "BALL FOLLOWER: Straight kick";
-        }
-        walking->stop();
-        if (!walking->is_running()) {
-            action->joint.set_enable_body_without_head(true, true);
-            if (pan < 0) {
-                action->start(12);   // RIGHT KICK
-            } else {
-                action->start(13);   // LEFT KICK
-            }
-        }
-    } else if (angle_to_enemy_gate_bot <= m_slanting_kick_angle ||
-               angle_to_enemy_gate_top >= -m_slanting_kick_angle) {
-        if (m_debug) {
-            LOG_DEBUG << "BALL FOLLOWER: Slanting kick";
-        }
-    }
 }

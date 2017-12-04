@@ -47,7 +47,7 @@ void soccer_behavior_t::process() {
     this->process_game_controller();
     if (m_behavior_active) {
         this->process_cv();
-//        this->process_localization();
+        this->process_localization();
         this->process_decision();
     }
     this->check_rate();

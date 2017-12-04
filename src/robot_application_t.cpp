@@ -427,7 +427,11 @@ void robot_application_t::start_main_loop() {
     if (m_debug) LOG_INFO << "=== Controller has started ===";
     action_t::get_instance()->joint.set_enable_body(true, true);
     motion_manager_t::get_instance()->set_enable(true);
+#ifdef  CROSSCOMPILE
+    action_t::get_instance()->start(9);
+#else
     action_t::get_instance()->start(15);
+#endif
     while (is_running()) {
         if (m_debug) LOG_DEBUG << "ROBOT APPLICATION: === Iteration start ===";
         m_behavior->process();

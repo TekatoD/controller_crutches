@@ -41,6 +41,12 @@ void ball_follower_configuration_strategy_t::read_config(const boost::property_t
     if (kick_tilt_offset) follower->set_kick_tilt_offset(kick_tilt_offset.get());
     auto fit_tilt_offset = section.get_optional<float>("fit_tilt_offset");
     if (fit_tilt_offset) follower->set_fit_tilt_offset(fit_tilt_offset.get());
+    auto aim_y_amplitude = section.get_optional<float>("aim_y_amplitude");
+    if (aim_y_amplitude) follower->set_aim_y_amplitude(aim_y_amplitude.get());
+    auto aim_a_amplitude = section.get_optional<float>("aim_a_amplitude");
+    if (aim_a_amplitude) follower->set_aim_a_amplitude(aim_a_amplitude.get());
+    auto aim_kick_offset = section.get_optional<float>("aim_kick_offset");
+    if (aim_kick_offset) follower->set_aim_tilt_offset(aim_kick_offset.get());
     
 }
 
@@ -64,4 +70,7 @@ void ball_follower_configuration_strategy_t::write_config(boost::property_tree::
     section.put("a_accel_step", follower->get_a_accel_step());
     section.put("kick_tilt_offset", follower->get_kick_tilt_offset());
     section.put("fit_tilt_offset", follower->get_fit_tilt_offset());
+    section.put("aim_y_amplitude",m follower->get_aim_y_amplitude());
+    section.put("aim_a_amplitude", follower->get_aim_a_amplitude());
+    section.put("aim_tilt_offset", follower->get_aim_tilt_offset());
 }

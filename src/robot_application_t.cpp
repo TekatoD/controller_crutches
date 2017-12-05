@@ -285,6 +285,8 @@ void robot_application_t::init_configuraion_loader() {
     m_configuration_loader.add_strategy(m_ball_tracker_configuration_strategy, m_arg_config_ball_searcher);
     m_configuration_loader.add_strategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
     m_configuration_loader.add_strategy(m_go_to_configuration_strategy, m_arg_config_go_to);
+    m_configuration_loader.add_strategy(m_kicking_configuration_strategy, m_arg_config_kicking);
+    m_configuration_loader.add_strategy(m_ball_follower_configuration_stratey, m_arg_config_ball_follower);
 
 #ifdef CROSSCOMPILE
     m_robot_image_source_configuration_strategy.set_image_source(m_image_source.get());
@@ -350,7 +352,7 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_walking.set_option("dbg-walking", "enable debug output for walking motion module");
     m_arg_debug_action.set_option("dbg-action", "enable debug output for action motion module");
     m_arg_debug_kicking.set_option("dbg-kicking", "enable debug output for kicking motion module");
-    m_arg_debug_buttons.set_option("dbg-kicking", "enable debug output for buttons");
+    m_arg_debug_buttons.set_option("dbg-buttons", "enable debug output for buttons");
     m_arg_debug_leds.set_option("dbg-kicking", "enable debug output for LEDs");
     m_arg_debug_camera.set_option("dbg-camera", "enable debug output for camera");
     m_arg_debug_vision_processor.set_option("dbg-cv", "enable debug output for cv");
@@ -427,7 +429,7 @@ void robot_application_t::start_main_loop() {
     if (m_debug) LOG_INFO << "=== Controller has started ===";
     action_t::get_instance()->joint.set_enable_body(true, true);
     motion_manager_t::get_instance()->set_enable(true);
-#ifdef  CROSSCOMPILE
+#ifndef  CROSSCOMPILE
     action_t::get_instance()->start(9);
 #else
     action_t::get_instance()->start(15);

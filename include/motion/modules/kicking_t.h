@@ -113,9 +113,9 @@ namespace drwn {
 
         void set_body_z_offset(float body_z_offset) noexcept;
 
-        float get_arm_swing_gain() const noexcept;
+        float get_arm_swing_amplitude() const noexcept;
 
-        void set_arm_swing_gain(float arm_swing_gain) noexcept;
+        void set_arm_swing_amplitude(float arm_swing_amplitude) noexcept;
 
         float get_balance_roll_gain() const noexcept;
 
@@ -163,9 +163,9 @@ namespace drwn {
         float m_kick_z_offset{5.0f};
         float m_kick_yaw_offset{0.0f};
 
-        float m_shifting_body_duration{45.0f};
-        float m_kicking_duration{30.0f};
-        float m_restoring_duration{45.0f};
+        float m_shifting_body_duration{450.0f};
+        float m_kicking_duration{300.0f};
+        float m_restoring_duration{450.0f};
 
         float m_body_init_x_offset{-10.0f};
         float m_body_init_y_offset{0.0f}; // Unused

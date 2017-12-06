@@ -7,6 +7,7 @@
 #include <opencv2/core/mat.hpp>
 #include <cv.hpp>
 #include <opencv/ml.h>
+#include <tool/rate_t.h>
 #include "ball_preprocessor_t.h"
 #include "coloured_ball_detector_t.h"
 
@@ -63,6 +64,22 @@ namespace drwn {
 
         void set_network_window(const cv::Size& network_window);
 
+        const cv::Size& get_haar_max() const;
+
+        void set_haar_max(const cv::Size& haar_max);
+
+        const cv::Size& get_haar_min() const;
+
+        void set_haar_min(const cv::Size& haar_min);
+
+        float get_distance() const;
+
+        void set_distance(float distance);
+
+        const steady_rate_t::duration& get_ball_rate_duration() const;
+
+        void set_ball_rate_duration(const steady_rate_t::duration& ball_rate);
+
     private:
         int m_area_top{5000};
         double m_area_low{18.0};
@@ -75,8 +92,10 @@ namespace drwn {
         coloured_ball_detector_t m_coloured_ball_detector;
         bool m_network_enabled{true};
         cv::Size m_network_window{15, 15};
+        cv::Size m_haar_max{80, 80};
+        cv::Size m_haar_min{16, 16};
+        float m_distance{100};
+        mutable steady_rate_t m_ball_rate{std::chrono::milliseconds{100}};
+        mutable cv::Rect m_ball_pos;
     };
 }
-
-
-

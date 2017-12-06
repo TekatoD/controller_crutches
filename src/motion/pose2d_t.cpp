@@ -38,16 +38,24 @@ void drwn::pose2d_t::set_theta(float theta) {
     this->normalize_theta();
 }
 
+bool drwn::pose2d_t::is_nan() const {
+    return std::isnan(m_x) || std::isnan(m_y) || std::isnan(m_theta);
+}
+
 void drwn::pose2d_t::normalize_theta() {
     using namespace boost::math;
 //    while (m_theta < 0) m_theta += 2 * constants::pi<float>();
 //    m_theta = fmod(m_theta, 2 * constants::pi<float>()) - constants::pi<float>();
-    while (m_theta > constants::pi<float>()) {
-        m_theta -= 2 * constants::pi<float>();
-    }
-    while (m_theta < -constants::pi<float>()) {
-        m_theta += 2 * constants::pi<float>();
-    }
+
+//    while (m_theta > constants::pi<float>()) {
+//        m_theta -= 2 * constants::pi<float>();
+//    }
+//    while (m_theta < -constants::pi<float>()) {
+//        m_theta += 2 * constants::pi<float>();
+//    }
+
+    constexpr float pi = constants::pi<float>();
+    m_theta = m_theta-2*pi*std::floor( (m_theta+pi)/(2*pi) );
 }
 
 drwn::pose2d_t drwn::pose2d_t::operator+(const drwn::pose2d_t &rhs) const {
@@ -94,3 +102,4 @@ namespace drwn {
         return os;
     }
 }
+

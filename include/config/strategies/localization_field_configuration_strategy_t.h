@@ -11,7 +11,7 @@
 namespace drwn {
     class localization_field_configuration_strategy_t : public configuration_strategy_t {
     public:
-        static constexpr char DEFAULT_SECTION[] = "Localization field";
+        static constexpr char DEFAULT_SECTION[] = "Field";
 
         explicit localization_field_configuration_strategy_t(std::string section = DEFAULT_SECTION);
 

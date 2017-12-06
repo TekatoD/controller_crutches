@@ -55,18 +55,19 @@ void init_logger() {
                                 << " [" << logging::trivial::severity
                                 << "] " << expr::smessage);
     logging::core::get()->set_filter(
-#ifdef DEBUG
             logging::trivial::severity >= logging::trivial::debug
-#else
-            logging::trivial::severity >= logging::trivial::info
-#endif
     );
     logging::core::get()->add_sink(std::move(sink));
 }
 
 
 void sighandler(int /*sig*/) {
-    drwn::robot_application_t::get_instance()->stop();
+    auto app = drwn::robot_application_t::get_instance();
+    if (app->is_running()) {
+        app->stop();
+    } else {
+        std::terminate();
+    }
 }
 
 

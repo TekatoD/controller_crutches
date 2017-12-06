@@ -9,26 +9,25 @@
 namespace drwn {
     class odometry_collector_t {
     public:
+        odometry_collector_t() = default;
 
-        odometry_collector_t();
-
-        odometry_collector_t(pose2d_t initial);
+        explicit odometry_collector_t(const pose2d_t& initial);
 
         odometry_collector_t(float x, float y, float theta);
 
-        void odo_translate(pose2d_t offset);
+        void odo_translate(const pose2d_t& offset);
 
-        pose2d_t get_pose() const;
+        const pose2d_t& get_pose() const;
 
-        void set_pose(pose2d_t offset);
+        void set_pose(const pose2d_t& offset);
 
-        void set_initial(pose2d_t offset);
+        bool is_debug_enabled() const;
 
-        void reset();
+        void enable_debug(bool debug);
 
     private:
-        pose2d_t m_initial;
-        pose2d_t m_pose;
+        bool m_debug{false};
+        pose2d_t m_pose{0, 0, 0};
     };
 }
 

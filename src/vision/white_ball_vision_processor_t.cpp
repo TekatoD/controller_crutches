@@ -269,6 +269,7 @@ void white_ball_vision_processor_t::show_windows() {
 
 void white_ball_vision_processor_t::prepare_output() {
     if(m_dump_images_enabled || m_show_images_enabled) {
+        this->detect_lines();
         cv::cvtColor(m_src_img, m_dbg_src_img, CV_YUV2BGR);
     }
 }
@@ -461,11 +462,11 @@ void white_ball_vision_processor_t::set_ball_detector_median_blur_size(int media
     m_ball_detector.set_median_blur_size(median_blur_size);
 }
 
-const std::string& white_ball_vision_processor_t::get_path_to_ann_config() const {
+const std::string& white_ball_vision_processor_t::get_ball_detector_path_to_ann_config() const {
     return m_ball_detector.get_path_to_ann_config();
 }
 
-void white_ball_vision_processor_t::set_path_to_ann_config(const std::string& path_to_ann_config) {
+void white_ball_vision_processor_t::set_ball_detector_path_to_ann_config(const std::string& path_to_ann_config) {
     if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: network_path = " << path_to_ann_config;
     m_ball_detector.set_path_to_ann_config(path_to_ann_config);
 }
@@ -479,11 +480,48 @@ void white_ball_vision_processor_t::enable_network(bool enable) {
     m_ball_detector.enable_network(enable);
 }
 
-const cv::Size& white_ball_vision_processor_t::get_network_window() const {
+const cv::Size& white_ball_vision_processor_t::get_ball_detector_network_window() const {
     return m_ball_detector.get_network_window();
 }
 
-void white_ball_vision_processor_t::set_network_window(const cv::Size& network_window) {
+void white_ball_vision_processor_t::set_ball_detector_network_window(const cv::Size& network_window) {
     if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: network_window = " << network_window;
     m_ball_detector.set_network_window(network_window);
+}
+
+const cv::Size& white_ball_vision_processor_t::get_ball_detector_haar_max() const {
+    return m_ball_detector.get_haar_max();
+}
+
+void white_ball_vision_processor_t::set_ball_detector_haar_max(const cv::Size& haar_max) {
+    if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: haar_max = " << haar_max;
+    m_ball_detector.set_haar_max(haar_max);
+}
+
+const cv::Size& white_ball_vision_processor_t::get_ball_detector_haar_min() const {
+    return m_ball_detector.get_haar_min();
+}
+
+void white_ball_vision_processor_t::set_ball_detector_haar_min(const cv::Size& haar_min) {
+    if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: haar_min = " << haar_min;
+    m_ball_detector.set_haar_min(haar_min);
+}
+
+float white_ball_vision_processor_t::get_ball_detector_distance() const {
+    return m_ball_detector.get_distance();
+}
+
+void white_ball_vision_processor_t::set_ball_detector_distance(float distance) {
+    if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: distance = " << distance;
+    m_ball_detector.set_distance(distance);
+}
+
+const steady_rate_t::duration& white_ball_vision_processor_t::get_ball_detector_ball_rate_duration() const {
+    return m_ball_detector.get_ball_rate_duration();
+}
+
+void white_ball_vision_processor_t::set_ball_detector_ball_rate_duration(const steady_rate_t::duration& ball_rate) {
+    if(m_debug) LOG_DEBUG << "WHITE BALL VISION PROCESSOR: ball_rate_duration = "
+                          << std::chrono::duration_cast<std::chrono::milliseconds>(ball_rate).count();
+    m_ball_detector.set_ball_rate_duration(ball_rate);
 }

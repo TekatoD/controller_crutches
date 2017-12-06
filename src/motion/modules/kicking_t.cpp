@@ -39,7 +39,7 @@ void drwn::kicking_t::process() {
 
     constexpr float TIME_UNIT = motion_module_t::TIME_UNIT;
     //                     R_HIP_YAW, R_HIP_ROLL, R_HIP_PITCH, R_KNEE, R_ANKLE_PITCH, R_ANKLE_ROLL, L_HIP_YAW, L_HIP_ROLL, L_HIP_PITCH, L_KNEE, L_ANKLE_PITCH, L_ANKLE_ROLL, R_SHOULDER_PITCH, L_SHOULDER_PITCH, R_SHOULDER_ROLL, L_SHOULDER_ROLL, R_ELBOW_PITCH, L_ELBOW_PITCH
-    constexpr int dir[18] = {-1, -1, 1, 1, -1, 1, -1, -1, -1, -1, 1, 1, 1, -1, 1, -1, 1, -1};
+    constexpr int dir[18] = {-1, -1, 1, 1, -1, 1, -1, -1, -1, -1, 1, 1, 1, -1, -1, 1, 1, -1};
 
     constexpr float init_angle[18] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -48.345f, 41.313f, -17.873f, 17.580f, 29.300f, -29.593f};
     int out_value[18] = {};
@@ -534,15 +534,15 @@ void drwn::kicking_t::set_body_z_offset(float body_z_offset) noexcept {
     m_body_z_offset = body_z_offset;
 }
 
-float drwn::kicking_t::get_arm_swing_gain() const noexcept {
+float drwn::kicking_t::get_arm_swing_amplitude() const noexcept {
     return m_arm_swing_amplitude;
 }
 
-void drwn::kicking_t::set_arm_swing_gain(float arm_swing_gain) noexcept {
+void drwn::kicking_t::set_arm_swing_amplitude(float arm_swing_amplitude) noexcept {
     if (m_debug) {
-        LOG_DEBUG << "KICKING: arm_swing_gain = " << arm_swing_gain;
+        LOG_DEBUG << "KICKING: arm_swing_amplitude = " << arm_swing_amplitude;
     }
-    m_arm_swing_amplitude = arm_swing_gain;
+    m_arm_swing_amplitude = arm_swing_amplitude;
 }
 
 float drwn::kicking_t::get_balance_roll_gain() const noexcept {

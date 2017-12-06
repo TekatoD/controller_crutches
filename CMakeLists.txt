@@ -220,7 +220,9 @@ set(SRC
         src/config/strategies/ball_follower_configuration_strategy_t.cpp
         include/config/strategies/ball_follower_configuration_strategy_t.h
         src/localization/field_map_t.cpp
-        include/localization/field_map_t.h)
+        include/localization/field_map_t.h
+        src/config/strategies/go_to_configuration_strategy_t.cpp
+        include/config/strategies/go_to_configuration_strategy_t.h src/config/strategies/kicking_configuration_strategy_t.cpp include/config/strategies/kicking_configuration_strategy_t.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

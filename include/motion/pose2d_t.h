@@ -27,6 +27,8 @@ namespace drwn {
 
         void set_theta(float theta);
 
+        bool is_nan() const;
+
         void normalize_theta();
 
         void rotate_around(const pose2d_t& pose);
@@ -41,7 +43,7 @@ namespace drwn {
 
         friend std::ostream& operator << (std::ostream& os, const pose2d_t& data);
 
-    private:
+    protected:
         float m_x;
         float m_y;
         float m_theta;

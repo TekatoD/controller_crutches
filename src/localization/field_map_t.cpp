@@ -4,6 +4,8 @@
 #include <log/trivial_logger_t.h>
 #include <math/point_t.h>
 #include <localization/line_t.h>
+#include <motion/pose2d_t.h>
+#include <math/angle_tools.h>
 #include "localization/field_map_t.h"
 
 using namespace drwn;
@@ -122,3 +124,27 @@ float field_map_t::get_gate_height() const { return m_config.gate_height; }
 float field_map_t::get_penalty_width() const { return m_config.penalty_width; }
 
 float field_map_t::get_penalty_height() const { return m_config.penalty_height; }
+
+const pose2d_t& field_map_t::get_spawn_pose() const { ;
+    return m_spawn_pose;
+}
+
+void field_map_t::set_spawn_pose(const pose2d_t& spawn_pose) {
+    if (m_debug) LOG_DEBUG << "FIELD: spawn_pose = ("
+                           << spawn_pose.get_x() << ", "
+                           << spawn_pose.get_y() << ", "
+                           << degrees(spawn_pose.get_theta()) << ')';
+    m_spawn_pose = spawn_pose;
+}
+
+const pose2d_t& field_map_t::get_start_pose() const {
+    return m_start_pose;
+}
+
+void field_map_t::set_start_pose(const pose2d_t& start_pose) {
+    if (m_debug) LOG_DEBUG << "FIELD: starting_pose = ("
+                           << start_pose.get_x() << ", "
+                           << start_pose.get_y() << ", "
+                           << degrees(start_pose.get_theta()) << ')';
+    m_start_pose = start_pose;
+}

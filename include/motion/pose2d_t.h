@@ -27,6 +27,8 @@ namespace drwn {
 
         void set_theta(float theta);
 
+        bool is_nan() const;
+
         void normalize_theta();
 
         void rotate_around(const pose2d_t& pose);
@@ -45,14 +47,6 @@ namespace drwn {
         float m_x;
         float m_y;
         float m_theta;
-    };
-
-    class loc_pose2d_t : public pose2d_t {
-    public:
-        loc_pose2d_t() : loc_pose2d_t(0.0f, 0.0f, 0.0f) {}
-        loc_pose2d_t(float x, float y, float theta) : pose2d_t(x, y, theta) {}
-
-        void normalize_theta();
     };
 }
 

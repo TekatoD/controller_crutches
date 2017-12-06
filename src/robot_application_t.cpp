@@ -277,7 +277,6 @@ void robot_application_t::init_configuraion_loader() {
     m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy,
                                         m_arg_config_white_ball_vision_processor);
     m_configuration_loader.add_strategy(m_localization_field_configuration_strategy, m_arg_config_localization_field);
-    m_configuration_loader.add_strategy(m_localization_field_configuration_strategy, m_arg_config_localization_field);
     m_configuration_loader.add_strategy(m_particle_filter_configuration_strategy, m_arg_config_particle_filter);
     m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy,
                                         m_arg_config_white_ball_vision_processor);
@@ -323,7 +322,6 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_debug_ball_tracker);
     parser.add_strategy(m_arg_debug_ball_follower);
     parser.add_strategy(m_arg_debug_go_to);
-    parser.add_strategy(m_arg_debug_localization);
     parser.add_strategy(m_arg_debug_behavior);
 
     parser.add_strategy(m_arg_config_default);

@@ -70,7 +70,7 @@ void ball_follower_configuration_strategy_t::write_config(boost::property_tree::
     section.put("a_accel_step", follower->get_a_accel_step());
     section.put("kick_tilt_offset", follower->get_kick_tilt_offset());
     section.put("fit_tilt_offset", follower->get_fit_tilt_offset());
-    section.put("aim_y_amplitude",m follower->get_aim_y_amplitude());
+    section.put("aim_y_amplitude", follower->get_aim_y_amplitude());
     section.put("aim_a_amplitude", follower->get_aim_a_amplitude());
     section.put("aim_tilt_offset", follower->get_aim_tilt_offset());
 }

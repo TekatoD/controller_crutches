@@ -62,7 +62,12 @@ void init_logger() {
 
 
 void sighandler(int /*sig*/) {
-    drwn::robot_application_t::get_instance()->stop();
+    auto app = drwn::robot_application_t::get_instance();
+    if (app->is_running()) {
+        app->stop();
+    } else {
+        std::terminate();
+    }
 }
 
 

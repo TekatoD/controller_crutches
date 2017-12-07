@@ -7,6 +7,7 @@
 #include <tool/rate_t.h>
 #include <localization/field_map_t.h>
 #include "behavior_t.h"
+#include "ball_filter.h"
 
 namespace drwn {
     class camera_t;
@@ -58,7 +59,7 @@ namespace drwn {
         steady_rate_t m_rate_processing_behavior{std::chrono::milliseconds(100)};
         steady_rate_t m_rate_buttons_check{std::chrono::milliseconds(100)};
 
-        steady_rate_t m_rate_process_localization{std::chrono::milliseconds(200)};
+        steady_rate_t m_rate_process_localization{std::chrono::milliseconds(1000)};
         bool m_avoid_localization{false};
         bool m_force_localization{false};
 
@@ -80,6 +81,7 @@ namespace drwn {
         go_to_t* m_goto{nullptr};
 
         int m_previous_state{-1};
+        ball_filter m_ball_filter;
     };
 }
 

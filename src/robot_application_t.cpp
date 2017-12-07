@@ -20,6 +20,7 @@
 #include "localization/particle_filter_t.h"
 #include "localization/localization_t.h"
 #include "robot_application_t.h"
+#include <thread>
 
 #ifdef CROSSCOMPILE
 #include "hw/robot_CM730_t.h"
@@ -215,7 +216,19 @@ void robot_application_t::init_localization() {
 
 void robot_application_t::init_motion_manager() {
     if (m_debug) LOG_DEBUG << "Initializing motion manager...";
-    if (!motion_manager_t::get_instance()->initialize(m_cm730.get())) {
+    bool initialized = false;
+    for (int i = 0; i < 3; ++i) {
+        initialized = motion_manager_t::get_instance()->initialize(m_cm730.get());
+        if (initialized) {
+            break;
+        } else {
+            if (m_debug) {
+                LOG_DEBUG << "Can't initialize motion manager. Try again...";
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
+    if (!initialized) {
         throw std::runtime_error("Fail to initialize Motion Manager!");
     }
     if (m_debug) LOG_INFO << "Motion manager is ready";
@@ -264,7 +277,6 @@ void robot_application_t::init_configuraion_loader() {
     m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy,
                                         m_arg_config_white_ball_vision_processor);
     m_configuration_loader.add_strategy(m_localization_field_configuration_strategy, m_arg_config_localization_field);
-    m_configuration_loader.add_strategy(m_localization_field_configuration_strategy, m_arg_config_localization_field);
     m_configuration_loader.add_strategy(m_particle_filter_configuration_strategy, m_arg_config_particle_filter);
     m_configuration_loader.add_strategy(m_white_ball_vision_processor_configuration_strategy,
                                         m_arg_config_white_ball_vision_processor);
@@ -272,6 +284,8 @@ void robot_application_t::init_configuraion_loader() {
     m_configuration_loader.add_strategy(m_ball_tracker_configuration_strategy, m_arg_config_ball_searcher);
     m_configuration_loader.add_strategy(m_ball_searcher_configuration_strategy, m_arg_config_ball_searcher);
     m_configuration_loader.add_strategy(m_go_to_configuration_strategy, m_arg_config_go_to);
+    m_configuration_loader.add_strategy(m_kicking_configuration_strategy, m_arg_config_kicking);
+    m_configuration_loader.add_strategy(m_ball_follower_configuration_stratey, m_arg_config_ball_follower);
 
 #ifdef CROSSCOMPILE
     m_robot_image_source_configuration_strategy.set_image_source(m_image_source.get());
@@ -308,7 +322,6 @@ void robot_application_t::parse_command_line_arguments() {
     parser.add_strategy(m_arg_debug_ball_tracker);
     parser.add_strategy(m_arg_debug_ball_follower);
     parser.add_strategy(m_arg_debug_go_to);
-    parser.add_strategy(m_arg_debug_localization);
     parser.add_strategy(m_arg_debug_behavior);
 
     parser.add_strategy(m_arg_config_default);
@@ -337,7 +350,7 @@ void robot_application_t::parse_command_line_arguments() {
     m_arg_debug_walking.set_option("dbg-walking", "enable debug output for walking motion module");
     m_arg_debug_action.set_option("dbg-action", "enable debug output for action motion module");
     m_arg_debug_kicking.set_option("dbg-kicking", "enable debug output for kicking motion module");
-    m_arg_debug_buttons.set_option("dbg-kicking", "enable debug output for buttons");
+    m_arg_debug_buttons.set_option("dbg-buttons", "enable debug output for buttons");
     m_arg_debug_leds.set_option("dbg-kicking", "enable debug output for LEDs");
     m_arg_debug_camera.set_option("dbg-camera", "enable debug output for camera");
     m_arg_debug_vision_processor.set_option("dbg-cv", "enable debug output for cv");
@@ -402,7 +415,7 @@ void robot_application_t::read_configuration() {
 }
 
 void robot_application_t::init_behavior() {
-    if (m_vision_processor->is_show_images_enabled() || m_vision_processor->is_dump_images_enabled()) {
+    if (m_vision_processor->is_show_images_enabled()) {
         m_behavior = std::make_unique<image_processing_behavior_t>();
     } else {
         m_behavior = std::make_unique<soccer_behavior_t>();
@@ -414,7 +427,11 @@ void robot_application_t::start_main_loop() {
     if (m_debug) LOG_INFO << "=== Controller has started ===";
     action_t::get_instance()->joint.set_enable_body(true, true);
     motion_manager_t::get_instance()->set_enable(true);
+#ifndef  CROSSCOMPILE
+    action_t::get_instance()->start(9);
+#else
     action_t::get_instance()->start(15);
+#endif
     while (is_running()) {
         if (m_debug) LOG_DEBUG << "ROBOT APPLICATION: === Iteration start ===";
         m_behavior->process();

@@ -6,17 +6,18 @@
 
 using namespace drwn;
 
-cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const cv::Mat& src_img, const std::vector<cv::Vec4i>& lines) const {
-    if(m_detector_type == 1) {
+cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const cv::Mat& src_img,
+                                       const std::vector<cv::Vec4i>& lines) const {
+    if (m_detector_type == 1) {
         cv::Mat classes(1, 2, CV_32F);
         std::vector<cv::Rect> balls;
-        m_ball_cascade.detectMultiScale(src_img, balls, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(15, 15));
+        m_ball_cascade.detectMultiScale(src_img, balls, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, m_haar_min, m_haar_max);
         if (!balls.empty()) {
-            if(m_network_enabled) {
+            if (m_network_enabled) {
                 size_t ind = 0;
                 float wieght = 0;
                 bool found = false;
-                for(size_t i = 0; i < balls.size(); ++i) {
+                for (size_t i = 0; i < balls.size(); ++i) {
                     cv::Mat rec = src_img(balls[i]);
                     cv::cvtColor(rec, rec, cv::COLOR_BGR2GRAY);
                     cv::resize(rec, rec, m_network_window);
@@ -30,18 +31,41 @@ cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const cv::Mat& s
                         }
                     }
                 }
-                if(found) {
+                if (found) {
                     return balls[ind];
                 } else {
                     return cv::Rect{};
                 }
 
             } else {
-                return balls[0];
+                bool ball_wasnt_found = m_ball_pos == cv::Rect{};
+                if (ball_wasnt_found) {
+                    m_ball_rate.update();
+                    m_ball_pos = balls[0];
+                } else {
+                    bool reset = true;
+                    for (auto& ball : balls) {
+                        float tmp_x = (m_ball_pos.x + m_ball_pos.width / 2) - (ball.x + ball.width / 2);
+                        float tmp_y = (m_ball_pos.y + m_ball_pos.height / 2) - (ball.y + ball.height / 2);
+                        if (m_ball_pos == cv::Rect{} ||
+                                m_ball_rate.is_passed() ||
+                                (std::hypot(tmp_x, tmp_y) <= m_distance && !m_ball_rate.is_passed())) {
+                            m_ball_rate.update();
+                            m_ball_pos = ball;
+                            reset = false;
+                            break;
+                        }
+                    }
+                    if(reset) {
+                        m_ball_pos = cv::Rect{};
+                    }
+                }
             }
+        } else { //if balls not found
+            m_ball_pos = cv::Rect{};
         }
-        return cv::Rect{};
-    } else if(m_detector_type == 0) {
+        return m_ball_pos;
+    } else if (m_detector_type == 0) {
         cv::Mat preproc = prep_img;
         for (auto&& line : lines) {
             double x0 = line(0);
@@ -168,7 +192,7 @@ cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const cv::Mat& s
                         if (std::abs(lam.at<double>(0)) < 0.0001) {
                             lam.at<double>(0) = -std::abs(lam.at<double>(0));
                         }
-                        if(std::abs(lam.at<double>(1)) < 0.0001){
+                        if (std::abs(lam.at<double>(1)) < 0.0001) {
                             lam.at<double>(1) = -std::abs(lam.at<double>(1));
                         }
                         double a_2 = -1.0 / lam.at<double>(0) * delta_det / d_det;
@@ -179,7 +203,7 @@ cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const cv::Mat& s
                         if (a != a || b != b) {
                             c = 0.0;
                         } else {
-                            if(a > 50 || b > 50){
+                            if (a > 50 || b > 50) {
                                 c = 0.0;
                             } else {
                                 if (a < b) {
@@ -187,7 +211,7 @@ cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const cv::Mat& s
                                 } else {
                                     c = b / a;
                                 }
-                                if(c >= min_c && c <= max_c) {
+                                if (c >= min_c && c <= max_c) {
                                     if ((std::abs(1 - c) < cur_c || cur_c == 0.0) && area >= max_area) {
                                         max_area_idx = i;
                                         max_area = area;
@@ -206,7 +230,7 @@ cv::Rect white_ball_detector_t::detect(const cv::Mat& prep_img, const cv::Mat& s
             }
         }
         return result;
-    } else if(m_detector_type == 2) {
+    } else if (m_detector_type == 2) {
 //        cv::Mat src = src_img.clone(); //TODO: Is it needed?
 //        cv::cvtColor(src_img, src, CV_YUV2BGR);
         const cv::Mat preproc = m_ball_preprocessor.preprocess(src_img);
@@ -312,4 +336,36 @@ const cv::Size& white_ball_detector_t::get_network_window() const {
 
 void white_ball_detector_t::set_network_window(const cv::Size& network_window) {
     m_network_window = network_window;
+}
+
+const cv::Size& white_ball_detector_t::get_haar_max() const {
+    return m_haar_max;
+}
+
+void white_ball_detector_t::set_haar_max(const cv::Size& haar_max) {
+    m_haar_max = haar_max;
+}
+
+const cv::Size& white_ball_detector_t::get_haar_min() const {
+    return m_haar_min;
+}
+
+void white_ball_detector_t::set_haar_min(const cv::Size& haar_min) {
+    m_haar_min = haar_min;
+}
+
+float white_ball_detector_t::get_distance() const {
+    return m_distance;
+}
+
+void white_ball_detector_t::set_distance(float distance) {
+    m_distance = distance;
+}
+
+const steady_rate_t::duration& white_ball_detector_t::get_ball_rate_duration() const {
+    return m_ball_rate.get_duration();
+}
+
+void white_ball_detector_t::set_ball_rate_duration(const steady_rate_t::duration& ball_rate) {
+    m_ball_rate.set_duration(ball_rate);
 }

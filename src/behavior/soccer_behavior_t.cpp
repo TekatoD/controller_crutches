@@ -47,7 +47,7 @@ void soccer_behavior_t::process() {
     this->process_game_controller();
     if (m_behavior_active) {
         this->process_cv();
-//        this->process_localization();
+        this->process_localization();
         this->process_decision();
     }
     this->check_rate();
@@ -98,6 +98,8 @@ void soccer_behavior_t::process_game_controller() {
 }
 
 void soccer_behavior_t::process_decision() {
+    m_avoid_localization = false;
+
     if (!m_prepared) {
         if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Preparing...";
         m_action->joint.set_enable_body(true, true);
@@ -106,6 +108,27 @@ void soccer_behavior_t::process_decision() {
     }
 
     if (motion_status_t::fall_type != fall_type_t::STANDUP && !m_action->is_running()) {
+        m_force_localization = true;
+
+        auto last_pose = m_walking->get_odo();
+        auto pose_dev = m_localization->get_calculated_pose_std_dev();
+
+        pose2d_t nmz;
+        float min_x, min_y, min_theta, max_x, max_y, max_theta;
+
+        min_x = last_pose.get_x() - pose_dev.get_x();
+        max_x = last_pose.get_x() + pose_dev.get_x();
+        min_y = last_pose.get_y() - pose_dev.get_y();
+        max_y = last_pose.get_y() + pose_dev.get_y();
+        nmz.set_theta(last_pose.get_theta() - pose_dev.get_theta());
+        min_theta = nmz.get_theta();
+        nmz.set_theta(last_pose.get_theta() + pose_dev.get_theta());
+        max_theta = nmz.get_theta();
+
+        pose2d_t min_pose(min_x, min_y, min_theta);
+        pose2d_t max_pose(max_x, max_y, max_theta);
+        m_localization->set_pose_approximate_area(min_pose, max_pose);
+
         if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Getting up";
         m_walking->stop();
         m_kicking->stop();
@@ -120,41 +143,60 @@ void soccer_behavior_t::process_decision() {
         // Wait while robot hasn't got up
         if (m_action->is_running() || m_kicking->is_running() || !m_behavior_active) {
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Decision making skipped";
+            m_avoid_localization = true;
             return;
         }
 
         const auto& gc_data = m_game_controller->get_game_ctrl_data();
         const auto& odo = m_walking->get_odo();
 
-        if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: odo = ("
-                               << odo.get_x() << ", "
-                               << odo.get_y() << ", "
-                               << degrees(odo.get_theta()) << ')';
+        if (m_debug)
+            LOG_DEBUG << "SOCCER BEHAVIOR: odo = ("
+                      << odo.get_x() << ", "
+                      << odo.get_y() << ", "
+                      << degrees(odo.get_theta()) << ')';
 
         auto ball = m_vision->detect_ball();
+//        m_ball_filter.set_ball(ball);
+//        ball = m_ball_filter.get_ball();
 
         if (gc_data.state == STATE_INITIAL) {
             if (m_previous_state != STATE_INITIAL) {
                 m_walking->set_odo(m_field->get_spawn_pose());
+                m_localization->set_current_pose(m_field->get_spawn_pose());
                 m_previous_state = STATE_INITIAL;
             }
-        } if (gc_data.state == STATE_READY) {
+        }
+        if (gc_data.state == STATE_READY) {
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Set state processing...";
             if (m_previous_state != STATE_READY) {
                 m_walking->set_odo(m_field->get_spawn_pose());
+                m_localization->set_current_pose(m_field->get_spawn_pose());
                 m_previous_state = STATE_READY;
             }
             m_goto->process(m_field->get_start_pose() - odo);
-        } else  if (gc_data.state == STATE_SET) {
+        } else if (gc_data.state == STATE_SET) {
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Ready state processing...";
-            const pose2d_t starnig = m_field->get_start_pose();
+            const pose2d_t starting = m_field->get_start_pose();
             if (m_tracker->is_no_ball()) {
                 m_head->move_to_home();
             }
-            m_walking->set_odo(starnig);
+            if (m_previous_state != STATE_SET) {
+                m_previous_state = STATE_SET;
+                m_walking->set_odo(starting);
+                m_localization->set_current_pose(starting);
+            }
+
             m_walking->stop();
             return;
         } else if (gc_data.state == STATE_PLAYING) {
+            if (m_previous_state != STATE_PLAYING) {
+                const pose2d_t starting = m_field->get_start_pose();
+                m_walking->set_odo(starting);
+                m_localization->set_current_pose(starting);
+                m_previous_state = STATE_PLAYING;
+                m_ball_filter.reset();
+            }
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Playing state processing...";
 //        if (State.kickOffTeam != team) {
 //            // TODO KickOff
@@ -167,13 +209,21 @@ void soccer_behavior_t::process_decision() {
             color_t eye_leds{0, 255, 0};
 
             point2d_t ball_point(-1, -1); // No ball
+            const float tilt = m_head->get_tilt_angle();
+            const float tilt_max = head_t::get_instance()->get_top_limit_angle();
+            const float tilt_min = head_t::get_instance()->get_bottom_limit_angle();
+            const float tilt_diff = tilt_max - tilt_min;
+            const float tilt_thresh = tilt_min + tilt_diff / 5.0f;
+
             if (ball != cv::Rect()) {
                 // Adapt new ball to old tracker
                 ball_point = point2d_t(ball.x + ball.width / 2.0f,
-                                       ball.y + ball.height / 2.0f);
+                                       ball.y + ball.height);
             } else {
                 eye_leds = color_t({255, 255, 0});
             }
+
+
 
             // Switch to head and walking after action
             m_head->joint.set_enable_head_only(true, true);
@@ -185,7 +235,7 @@ void soccer_behavior_t::process_decision() {
             }
             m_LEDs->set_eye_led(eye_leds);
 
-            if (m_tracker->is_no_ball()) {
+            if (m_tracker->is_no_ball() && m_follower->is_no_ball()) {
                 m_searcher->process();
                 m_LEDs->set_head_led({0, 0, 255});
                 return;
@@ -240,19 +290,19 @@ void soccer_behavior_t::process_localization() {
         m_localization->set_lines(lines);
         m_localization->update();
 
-        if (m_localization->is_localized()) {
+        if (m_localization->is_localized() &&
+                m_walking->get_a_move_amplitude() == 0.0f &&
+                m_walking->get_y_move_amplitude() == 0.0f &&
+                m_walking->get_x_move_amplitude() <= 4.0f
+                ) {
             const auto& localized_pose = m_localization->get_particle_filter()->get_pose_mean();
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Successfull localization to pose = " << localized_pose;
-
             m_walking->set_odo(localized_pose);
+            m_rate_process_localization.update();
             // set_pose_shift to avoid big jumps
             m_localization->set_pose_shift(localized_pose);
-            m_rate_process_localization.update();
 
             m_force_localization = false;
-        } else {
-            // To test
-            //m_force_localization = true;
         }
     }
 }

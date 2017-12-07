@@ -20,6 +20,8 @@
 #include <config/strategies/particle_filter_configuration_strategy_t.h>
 #include <behavior/behavior_t.h>
 #include <config/strategies/go_to_configuration_strategy_t.h>
+#include <config/strategies/kicking_configuration_strategy_t.h>
+#include <config/strategies/ball_follower_configuration_strategy_t.h>
 #include "config/configuration_file_loader_t.h"
 #include "config/strategies/walking_configuration_strategy_t.h"
 #include "config/strategies/motion_manager_configuration_strategy_t.h"
@@ -123,6 +125,7 @@ namespace drwn {
 
         ball_searcher_configuration_strategy_t m_ball_searcher_configuration_strategy;
         ball_tracker_configuration_strategy_t m_ball_tracker_configuration_strategy;
+        ball_follower_configuration_strategy_t m_ball_follower_configuration_stratey;
         game_controller_configuration_strategy_t m_game_controller_configuration_strategy;
         head_configuration_strategy_t m_head_configuration_strategy;
         walking_configuration_strategy_t m_walking_configuration_strategy;
@@ -131,6 +134,7 @@ namespace drwn {
         localization_field_configuration_strategy_t m_localization_field_configuration_strategy;
         particle_filter_configuration_strategy_t m_particle_filter_configuration_strategy;
         go_to_configuration_strategy_t m_go_to_configuration_strategy;
+        kicking_configuration_strategy_t m_kicking_configuration_strategy;
 
 
         //*** Command line parsing strategies ***//

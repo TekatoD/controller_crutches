@@ -38,10 +38,6 @@ namespace drwn {
 
         void set_kick_ball_rate(steady_rate_t::duration kick_ball_rate);
 
-        float get_slanting_kick_angle() const;
-
-        void set_slanting_kick_angle(float slanting_kick_angle);
-
         float get_straight_kick_angle() const;
 
         void set_straight_kick_angle(float straight_kick_angle);
@@ -86,10 +82,24 @@ namespace drwn {
 
         void set_fit_tilt_offset(float fit_tilt_offset);
 
+        float get_aim_y_amplitude() const;
+
+        void set_aim_y_amplitude(float aim_y_amplitude);
+
+        float get_aim_a_amplitude() const;
+
+        void set_aim_a_amplitude(float aim_a_amplitude);
+
+        float get_aim_tilt_offset() const;
+
+        void set_aim_tilt_offset(float aim_kick_offset);
+
     private:
         ball_follower_t() = default;
 
         void kick_ball();
+
+        void calculate_angles_to_gait();
 
     private:
         bool m_debug{false};
@@ -97,7 +107,6 @@ namespace drwn {
         steady_rate_t m_no_ball_rate{std::chrono::seconds(2)};
         steady_rate_t m_kick_ball_rate{std::chrono::milliseconds(500)};
 
-        float m_slanting_kick_angle{30.0f};
         float m_straight_kick_angle{5.0f};
 
         float m_follow_max_x_amplitude{7.0f};
@@ -105,6 +114,8 @@ namespace drwn {
         float m_follow_max_a_amplitude{5.0f};
         float m_fit_x_amplitude{3.0f};
         float m_fit_a_amplitude{3.0f};
+        float m_aim_y_amplitude{7.0f};
+        float m_aim_a_amplitude{7.0f};
 
         float m_x_accel_step{0.3f};
         float m_y_accel_step{0.3f};
@@ -112,7 +123,15 @@ namespace drwn {
 
         float m_kick_tilt_offset{3.0f};//{MX28_t::RATIO_VALUE2DEGREES};
         float m_fit_tilt_offset{5.0f};
+        float m_aim_tilt_offset{6.0f};
 
         point2d_t m_local_ball;
+
+        float m_angle_to_enemy_gate_top{0.0f};
+        float m_angle_to_enemy_gate_bot{0.0f};
+        float m_angle_to_our_gate_top{0.0f};
+        float m_angle_to_our_gate_bot{0.0f};
+        float m_angle_to_enemy_gate_center{0.0f};
+//        float m_angle_to_enemy__center{0.0f};
     };
 }

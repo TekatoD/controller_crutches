@@ -23,12 +23,17 @@ namespace drwn {
 
         void enable_debug(bool debug) noexcept;
 
+        float get_distance_threshold() const;
+
+        void set_distance_threshold(float distance_threshold);
+
     private:
         ball_tracker_t() = default;
 
     private:
         steady_rate_t m_no_ball_rate{std::chrono::seconds(1)};
         point2d_t m_ball_position{-1, -1};
+        float m_distance_threshold{80.0f};
         bool m_debug{false};
         bool m_no_ball{true};
 

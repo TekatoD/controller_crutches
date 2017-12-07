@@ -12,26 +12,6 @@
 
 using namespace drwn;
 
-ball_searcher_t::ball_searcher_t() {
-    m_active = false;
-
-    m_tilt_phase = 0.0;
-    m_pan_phase = 0.0;
-    m_tilt_phase_step = 1.0;
-    m_pan_phase_step = 2.0;
-    m_phase_size = 500.0;
-
-    m_turn_speed = 0.0;
-    m_turn_step = 1.0;
-    m_max_turn = 20.0;
-
-    m_turn_direction = 0;
-    m_pan_direction = 0;
-
-    m_walking_enabled = true;
-    m_last_position = point2d_t(camera_t::WIDTH / 2, camera_t::HEIGHT / 2);
-}
-
 void ball_searcher_t::process() {
     using namespace boost::math;
 
@@ -63,11 +43,14 @@ void ball_searcher_t::process() {
     const float pan_max = head_t::get_instance()->get_left_limit_angle();
     const float pan_min = head_t::get_instance()->get_right_limit_angle();
     const float pan_diff = pan_max - pan_min;
-    
-    float pan = (m_pan_phase - half_phase_size) / half_phase_size * pan_diff / 2.0f * m_pan_direction ;
-    float tilt = m_tilt_phase <= half_phase_size
+
+    float pan = 0.0f;
+    if (m_pan_enabled) {
+        pan = (m_pan_phase - half_phase_size) / half_phase_size * pan_diff / 2.0f * m_pan_direction;
+    }
+    float tilt = m_tilt_phase > half_phase_size
                  ? tilt_min + tilt_diff / 2.0f
-                 : tilt_min;
+                 : tilt_min + tilt_diff / 4.0f;
     head_t::get_instance()->move_by_angle(pan, tilt);
 
     if (m_debug) {
@@ -179,4 +162,12 @@ bool ball_searcher_t::is_debug_enabled() const { return m_debug; }
 ball_searcher_t* ball_searcher_t::get_instance() {
     static ball_searcher_t instance;
     return &instance;
+}
+
+bool ball_searcher_t::is_pan_enabled() const {
+    return m_pan_enabled;
+}
+
+void ball_searcher_t::enable_pan(bool pan_active) {
+    m_pan_enabled = pan_active;
 }

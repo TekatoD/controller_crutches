@@ -17,8 +17,6 @@ void ball_follower_configuration_strategy_t::read_config(const boost::property_t
     if (kick_ball_rate) follower->set_kick_ball_rate(std::chrono::milliseconds(kick_ball_rate.get()));
     auto no_ball_rate = section.get_optional<int>("no_ball_rate_ms");
     if (no_ball_rate) follower->set_no_ball_rate(std::chrono::milliseconds(no_ball_rate.get()));
-    auto slanting_kick_angle = section.get_optional<float>("slanting_kick_angle");
-    if (slanting_kick_angle) follower->set_slanting_kick_angle(slanting_kick_angle.get());
     auto straight_kick_angle = section.get_optional<float>("straight_kick_angle");
     if (straight_kick_angle) follower->set_straight_kick_angle(straight_kick_angle.get());
     auto follow_max_x_amplitude = section.get_optional<float>("follow_max_x_amplitude");
@@ -41,6 +39,12 @@ void ball_follower_configuration_strategy_t::read_config(const boost::property_t
     if (kick_tilt_offset) follower->set_kick_tilt_offset(kick_tilt_offset.get());
     auto fit_tilt_offset = section.get_optional<float>("fit_tilt_offset");
     if (fit_tilt_offset) follower->set_fit_tilt_offset(fit_tilt_offset.get());
+    auto aim_y_amplitude = section.get_optional<float>("aim_y_amplitude");
+    if (aim_y_amplitude) follower->set_aim_y_amplitude(aim_y_amplitude.get());
+    auto aim_a_amplitude = section.get_optional<float>("aim_a_amplitude");
+    if (aim_a_amplitude) follower->set_aim_a_amplitude(aim_a_amplitude.get());
+    auto aim_kick_offset = section.get_optional<float>("aim_kick_offset");
+    if (aim_kick_offset) follower->set_aim_tilt_offset(aim_kick_offset.get());
     
 }
 
@@ -52,7 +56,6 @@ void ball_follower_configuration_strategy_t::write_config(boost::property_tree::
 
     section.put("kick_ball_rate_ms", duration_cast<milliseconds>(follower->get_kick_ball_rate()).count());
     section.put("no_ball_rate_ms", duration_cast<milliseconds>(follower->get_no_ball_rate()).count());
-    section.put("slanting_kick_angle", follower->get_slanting_kick_angle());
     section.put("straight_kick_angle", follower->get_straight_kick_angle());
     section.put("follow_max_x_amplitude", follower->get_follow_max_x_amplitude());
     section.put("follow_min_x_amplitude", follower->get_follow_min_x_amplitude());
@@ -64,4 +67,12 @@ void ball_follower_configuration_strategy_t::write_config(boost::property_tree::
     section.put("a_accel_step", follower->get_a_accel_step());
     section.put("kick_tilt_offset", follower->get_kick_tilt_offset());
     section.put("fit_tilt_offset", follower->get_fit_tilt_offset());
+    section.put("aim_y_amplitude", follower->get_aim_y_amplitude());
+    section.put("aim_a_amplitude", follower->get_aim_a_amplitude());
+    section.put("aim_tilt_offset", follower->get_aim_tilt_offset());
+}
+
+ball_follower_configuration_strategy_t::ball_follower_configuration_strategy_t(std::string section)
+        : configuration_strategy_t(section) {
+
 }

@@ -160,7 +160,11 @@ void localization_t::update()
 void localization_t::set_current_pose(const pose2d_t& current_pose)
 {
     assert(m_particle_filter != nullptr);
+
     m_particle_filter->reset_pose(current_pose);
+
+    m_current_pose = m_particle_filter->get_pose_mean();
+    m_old_pose = m_particle_filter->get_pose_mean();
 }
 
 void localization_t::set_camera_parameters(vision_utils::camera_parameters_t camera_params)
@@ -180,12 +184,16 @@ void localization_t::set_pose_approximate_area(const pose2d_t& min_pose, const p
     min_x = min_pose.get_x(); min_y = min_pose.get_y(); min_theta = min_pose.get_theta();
     max_x = max_pose.get_x(); max_y = max_pose.get_y(); max_theta = max_pose.get_theta();
     m_particle_filter->reset_pose(min_x, max_x, min_y, max_y, min_theta, max_theta);
+    m_current_pose = m_particle_filter->get_pose_mean();
+    m_old_pose = m_particle_filter->get_pose_mean();
 }
 
 void localization_t::set_pose_approximate_area_to_field()
 {
     assert(m_particle_filter != nullptr);
     m_particle_filter->reset_pose_to_field();
+    m_current_pose = m_particle_filter->get_pose_mean();
+    m_old_pose = m_particle_filter->get_pose_mean();
 }
 
 void localization_t::set_particle_filter(particle_filter_t* pf_ptr)

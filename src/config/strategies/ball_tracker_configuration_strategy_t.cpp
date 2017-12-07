@@ -17,8 +17,10 @@ void ball_tracker_configuration_strategy_t::read_config(const boost::property_tr
 
     auto& tracker_section = prop.get_child(this->get_section());
     auto no_ball_max_count = tracker_section.get_optional<int>("no_ball_duration_ms");
+    auto distance_threshold = tracker_section.get_optional<float>("distance_threshold");
 
     if (no_ball_max_count) ball_tracker_t::get_instance()->set_no_ball_duration(milliseconds(no_ball_max_count.get()));
+    if (distance_threshold) ball_tracker_t::get_instance()->set_distance_threshold(distance_threshold.get());
 }
 
 void ball_tracker_configuration_strategy_t::write_config(boost::property_tree::ptree& prop) const {
@@ -26,6 +28,7 @@ void ball_tracker_configuration_strategy_t::write_config(boost::property_tree::p
     if (prop.count(get_section()) == 0) prop.add_child(get_section(), {});
 
     auto& tracker_section = prop.get_child(this->get_section());
-    auto duartion = ball_tracker_t::get_instance()->get_no_ball_duration();
-    tracker_section.put("no_ball_duration_ms", duration_cast<milliseconds>(duartion).count());
+    auto duration = ball_tracker_t::get_instance()->get_no_ball_duration();
+    tracker_section.put("no_ball_duration_ms", duration_cast<milliseconds>(duration).count());
+    tracker_section.put("distance_threshold", ball_tracker_t::get_instance()->get_distance_threshold());
 }

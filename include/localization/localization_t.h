@@ -51,7 +51,7 @@ namespace drwn {
     private:
         localization_t() = default;
 
-        bool m_debug {true};
+        bool m_debug {false};
         bool m_localized {true};
     public:
         bool is_debug_enabled() const;

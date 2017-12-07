@@ -149,6 +149,11 @@ void soccer_behavior_t::process_decision() {
 
         const auto& gc_data = m_game_controller->get_game_ctrl_data();
         const auto& odo = m_walking->get_odo();
+        
+        // Update penalized flag
+        int team_index = gc_data.teams[0].team_number == m_game_controller->get_team_number() ? 0 : 1;
+        auto penalized = gc_data.teams[team_index].players[m_game_controller->get_team_number()].penalty;
+        m_penalized = m_penalized || penalized;
 
         if (m_debug)
             LOG_DEBUG << "SOCCER BEHAVIOR: odo = ("
@@ -197,6 +202,7 @@ void soccer_behavior_t::process_decision() {
                 m_previous_state = STATE_PLAYING;
                 m_ball_filter.reset();
             }
+            
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Playing state processing...";
 //        if (State.kickOffTeam != team) {
 //            // TODO KickOff
@@ -209,18 +215,33 @@ void soccer_behavior_t::process_decision() {
             color_t eye_leds{0, 255, 0};
 
             point2d_t ball_point(-1, -1); // No ball
-            const float tilt = m_head->get_tilt_angle();
-            const float tilt_max = head_t::get_instance()->get_top_limit_angle();
-            const float tilt_min = head_t::get_instance()->get_bottom_limit_angle();
-            const float tilt_diff = tilt_max - tilt_min;
-            const float tilt_thresh = tilt_min + tilt_diff / 5.0f;
-
             if (ball != cv::Rect()) {
                 // Adapt new ball to old tracker
                 ball_point = point2d_t(ball.x + ball.width / 2.0f,
                                        ball.y + ball.height);
             } else {
-                eye_leds = color_t({255, 255, 0});
+                eye_leds = color_t{255, 255, 0};
+            }
+
+            if (m_penalized) {
+                if (!penalized) {
+                    m_restored_from_penalized = false;
+                    m_penalized = false;
+                    m_goto->process(m_field->get_start_pose() - odo);
+                    if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Robot is unpenalized";
+                } else {
+                    if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Robot is penalized";
+                    return;
+                }
+            }
+
+            if (!m_restored_from_penalized) {
+                if (ball != cv::Rect()) {
+                    m_restored_from_penalized = true;
+                } else if (m_goto->is_done()) {
+                    m_goto->process(m_field->get_start_pose() - odo);
+                    return;
+                }
             }
 
 

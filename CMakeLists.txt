@@ -224,7 +224,9 @@ set(SRC
         src/config/strategies/go_to_configuration_strategy_t.cpp
         include/config/strategies/go_to_configuration_strategy_t.h
         src/config/strategies/kicking_configuration_strategy_t.cpp
-        include/config/strategies/kicking_configuration_strategy_t.h src/behavior/ball_filter.cpp include/behavior/ball_filter.h)
+        include/config/strategies/kicking_configuration_strategy_t.h
+        src/behavior/ball_filter.cpp
+        include/behavior/ball_filter.h)
 
 #### Build targets #####
 add_executable(controller ${SRC})

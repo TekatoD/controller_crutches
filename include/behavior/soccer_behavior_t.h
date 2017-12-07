@@ -82,6 +82,8 @@ namespace drwn {
 
         int m_previous_state{-1};
         ball_filter m_ball_filter;
+        bool m_penalized{false};
+        bool m_restored_from_penalized{true};
     };
 }
 

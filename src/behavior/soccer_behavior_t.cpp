@@ -138,17 +138,18 @@ void soccer_behavior_t::process_decision() {
         
         // Update penalized flag
         int team_index = gc_data.teams[0].team_number == m_game_controller->get_team_number() ? 0 : 1;
-        auto penalized = gc_data.teams[team_index].players[m_game_controller->get_team_number()].penalty;
+        auto penalized = gc_data.teams[team_index].players[m_game_controller->get_player_number() - 1].penalty;
 
         if (penalized && !m_penalized) {
-            m_action->joint.set_enable_body(true, true);
-            m_action->start(9);
             m_walking->set_x_move_amplitude(0.0f);
             m_walking->set_y_move_amplitude(0.0f);
             m_walking->set_a_move_amplitude(0.0f);
             m_walking->stop();
-            m_penalized = true;
 
+            m_action->joint.set_enable_body_without_head(true, true);
+            m_action->start(9);
+            m_penalized = true;
+            return;
         }
 
         if (m_debug)
@@ -197,6 +198,7 @@ void soccer_behavior_t::process_decision() {
                 m_localization->reset_current_pose(starting);
                 m_previous_state = STATE_PLAYING;
                 m_ball_filter.reset();
+                m_rate_kickoff.update();
             }
             
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Playing state processing...";
@@ -223,7 +225,9 @@ void soccer_behavior_t::process_decision() {
                 if (!penalized) {
                     m_restored_from_penalized = false;
                     m_penalized = false;
-                    m_goto->process(m_field->get_start_pose() - odo);
+                    m_walking->set_odo(m_field->get_spawn_pose());
+                    m_localization->reset_current_pose(m_field->get_spawn_pose());
+                    m_goto->process(m_field->get_start_pose() - m_field->get_spawn_pose());
                     if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Robot is unpenalized";
                 } else {
                     if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Robot is penalized";
@@ -234,9 +238,11 @@ void soccer_behavior_t::process_decision() {
             if (!m_restored_from_penalized) {
                 if (ball != cv::Rect()) {
                     m_restored_from_penalized = true;
-                } else if (m_goto->is_done()) {
+                } else if (!m_goto->is_done()) {
                     m_goto->process(m_field->get_start_pose() - odo);
                     return;
+                } else {
+                    m_restored_from_penalized = true;
                 }
             }
 
@@ -249,6 +255,11 @@ void soccer_behavior_t::process_decision() {
                 eye_leds = color_t({255, 0, 0});
             }
             m_LEDs->set_eye_led(eye_leds);
+
+            if (!m_rate_kickoff.is_passed() && m_game_controller->get_team_number() != gc_data.kick_off_team) {
+                if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Kickoff waiting...";
+                return;
+            }
 
             if (m_tracker->is_no_ball() && m_follower->is_no_ball()) {
                 m_searcher->process();
@@ -308,9 +319,18 @@ void soccer_behavior_t::process_localization() {
         const auto& loc_pose_mean = m_localization->get_calculated_pose_mean();
         const auto& loc_pose_dev = m_localization->get_calculated_pose_std_dev();
 
-        if (loc_pose_mean.is_nan() || loc_pose_dev.is_nan()) {
+        std::stringstream crutch;
+        crutch << loc_pose_mean.get_x() << loc_pose_mean.get_y() << loc_pose_mean.get_theta();
+        auto crutch_str = crutch.str();
+        bool dode = std::find(crutch_str.begin(), crutch_str.end(), 'n') != crutch_str.end();
+
+        if (loc_pose_mean.is_nan() || loc_pose_dev.is_nan() || dode) {
+            if (dode) {
+                LOG_WARNING << "SOCCER BEHAVIOR: Crutches is saving us!";
+            }
+
             if (m_debug) {
-                LOG_WARNING << "SOCCER BEHAVIOUR: NaNs detected in particle filter. Resetting...";
+                LOG_DEBUG << "SOCCER BEHAVIOR: NaNs detected in particle filter. Resetting...";
             }
 
             const particle_filter_t* pf = m_localization->get_particle_filter();

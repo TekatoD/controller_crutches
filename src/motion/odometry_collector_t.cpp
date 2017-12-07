@@ -33,7 +33,7 @@ const pose2d_t& odometry_collector_t::get_pose() const {
 }
 
 void odometry_collector_t::set_pose(const pose2d_t& offset) {
-    if (m_debug) LOG_DEBUG << "ODOMETRY COLLECTOR: pose = ("
+    if (m_debug && offset != m_pose) LOG_DEBUG << "ODOMETRY COLLECTOR: pose = ("
                            << offset.get_x() << ", "
                            << offset.get_y() << ", "
                            << degrees(offset.get_theta()) << ')';

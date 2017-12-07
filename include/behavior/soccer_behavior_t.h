@@ -60,6 +60,7 @@ namespace drwn {
         steady_rate_t m_rate_buttons_check{std::chrono::milliseconds(100)};
 
         steady_rate_t m_rate_process_localization{std::chrono::milliseconds(1000)};
+        steady_rate_t m_rate_kickoff{std::chrono::seconds(10)};
         bool m_avoid_localization{false};
         bool m_force_localization{false};
 

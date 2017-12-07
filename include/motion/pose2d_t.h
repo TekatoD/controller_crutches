@@ -41,6 +41,10 @@ namespace drwn {
 
         pose2d_t& operator-=(const pose2d_t& rhs);
 
+        bool operator==(const pose2d_t& rhs) const;
+
+        bool operator!=(const pose2d_t& rhs) const;
+
         friend std::ostream& operator << (std::ostream& os, const pose2d_t& data);
 
     protected:

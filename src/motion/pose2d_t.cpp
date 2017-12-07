@@ -39,7 +39,7 @@ void drwn::pose2d_t::set_theta(float theta) {
 }
 
 bool drwn::pose2d_t::is_nan() const {
-    return std::isnan(m_x) || std::isnan(m_y) || std::isnan(m_theta);
+    return m_x != m_x || m_y != m_y || m_theta != m_theta;
 }
 
 void drwn::pose2d_t::normalize_theta() {
@@ -100,6 +100,16 @@ namespace drwn {
     std::ostream& operator<<(std::ostream &os, const drwn::pose2d_t &data) {
         os << " " << data.m_x << " " << data.m_y << " " << degrees(data.m_theta);
         return os;
+    }
+
+    bool pose2d_t::operator==(const pose2d_t& rhs) const {
+        return m_x == rhs.m_x &&
+               m_y == rhs.m_y &&
+               m_theta == rhs.m_theta;
+    }
+
+    bool pose2d_t::operator!=(const pose2d_t& rhs) const {
+        return !(rhs == *this);
     }
 }
 

@@ -35,8 +35,8 @@ void localization_t::update()
     Eigen::Vector3f odometry_command = m_particle_filter->get_odometry_command(m_old_pose, m_current_pose);
 
     if (m_debug) {
-        LOG_DEBUG << "LOCALIZATION: m_old_pose = " << m_old_pose;
-        LOG_DEBUG << "LOCALIZATION: m_current_pose = " << m_current_pose;
+        LOG_DEBUG << "LOCALIZATION: old_pose = " << m_old_pose;
+        LOG_DEBUG << "LOCALIZATION: current_pose = " << m_current_pose;
         LOG_DEBUG << "LOCALIZATION: odometry_command_rot1 = " << odometry_command(0);
         LOG_DEBUG << "LOCALIZATION: odometry_command_trans = " << odometry_command(1);
         LOG_DEBUG << "LOCALIZATION: odometry_command_rot2 = " << odometry_command(2);

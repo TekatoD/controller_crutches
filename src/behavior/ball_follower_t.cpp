@@ -54,21 +54,16 @@ void ball_follower_t::process(point2d_t ball_pos) {
     float target_a_amplitude = 0.0f;
     bool aim = false;
 
-    if (ball_pos.X == -1.0 || ball_pos.Y == -1.0) {
-        if (m_no_ball_rate.is_passed()) {
-            // can not find a ball
-            target_x_amplitude = 0.0f;
-            target_y_amplitude = 0.0f;
-            target_a_amplitude = 0.0f;
-//            head_t::get_instance()->move_to_home();
-        } else { // Save speed
-            target_x_amplitude = x_amplitude;
-            target_y_amplitude = y_amplitude;
-            target_a_amplitude = a_amplitude;
-        }
-    } else { // Ball found
+    if (ball_pos.X != -1.0 && ball_pos.Y != -1.0) {
         m_no_ball_rate.update();
+    }
 
+    if (m_no_ball_rate.is_passed()) {
+        // can not find a ball
+        target_x_amplitude = 0.0f;
+        target_y_amplitude = 0.0f;
+        target_a_amplitude = 0.0f;
+    } else { // Ball found
         float pan_range = head_t::get_instance()->get_left_limit_angle();
         float pan_percent = pan / pan_range;
         float tilt = motion_status_t::current_joints.get_angle(joint_data_t::ID_HEAD_TILT);
@@ -211,8 +206,8 @@ void ball_follower_t::kick_ball() {
 
 //    if (m_angle_to_enemy_gate_bot <= m_straight_kick_angle &&
 //        m_angle_to_enemy_gate_top >= -m_straight_kick_angle) {
-    if (m_angle_to_enemy_gate_center <= m_straight_kick_angle &&
-            m_angle_to_enemy_gate_center >= -m_straight_kick_angle) {
+//    if (m_angle_to_enemy_gate_center <= m_straight_kick_angle &&
+//            m_angle_to_enemy_gate_center >= -m_straight_kick_angle) {
         if (m_debug) {
             LOG_DEBUG << "BALL FOLLOWER: Straight kick";
         }
@@ -225,9 +220,9 @@ void ball_follower_t::kick_ball() {
                 action->start(13);   // LEFT KICK
             }
         }
-    } else {
-        if (m_debug) LOG_DEBUG << "BALL FOLLOWER: I'm like fucking astronaut";
-    }
+//    } else {
+//        if (m_debug) LOG_DEBUG << "BALL FOLLOWER: I'm like fucking astronaut";
+//    }
 }
 
 bool ball_follower_t::is_no_ball() const {

@@ -14,6 +14,7 @@ void particle_filter_t::initialize()
 {
     field_map_t::get_instance()->initialize_field();
 
+    m_localized = false;
     float poseX = m_config.init_x;
     float poseY = m_config.init_y;
     float poseTheta = m_config.init_theta;
@@ -174,6 +175,7 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
     //
     if (weight_normalizer < 0.00001) {
         if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: Normalizer is close to zero";
+        weight_normalizer = 1.0f;
     }
 
     // Particle weight normalization
@@ -203,6 +205,7 @@ void particle_filter_t::resample()
 {
     low_variance_resampling();
     calc_pose_mean_cov();
+    check_if_localized();
 }
 
 void particle_filter_t::low_variance_resampling()
@@ -345,25 +348,6 @@ void particle_filter_t::calc_pose_mean_cov()
 
     m_poseMean = meanAccum;
     m_poseDev = devAccum;
-
-    // DEBUG
-    // Sometimes reset particles around current mean
-    /*
-    pose2d_t nmz;
-    if (m_poseDev.get_x() > 200.0f || m_poseDev.get_y() > 200.0f || m_poseDev.get_theta() > 10.0f) {
-        std::cout << "======================== REGENERATING PARTICLES ===========================" << std::endl;
-        float min_x, min_y, min_theta, max_x, max_y, max_theta;
-        min_x = m_poseMean.get_x() - m_poseDev.get_x();
-        max_x = m_poseMean.get_x() + m_poseDev.get_x();
-        min_y = m_poseMean.get_y() - m_poseDev.get_y();
-        max_y = m_poseMean.get_y() + m_poseDev.get_y();
-        nmz.set_theta(m_poseMean.get_theta() - (m_poseDev.get_theta() * (M_PI / 180.0f)));
-        min_theta = nmz.get_theta();
-        nmz.set_theta(m_poseMean.get_theta() + (m_poseDev.get_theta() * (M_PI / 180.0f)));
-        max_theta = nmz.get_theta();
-        init_particles(min_x, max_x, min_y, max_y, min_theta, max_theta, m_particles.size());
-    }
-    */
 }
 
 
@@ -371,6 +355,7 @@ void particle_filter_t::init_particles(const pose2d_t& pose, int num_particles)
 {
     float defaultWeight = 1.0f / num_particles;
     m_topParticleIndex = 0;
+    m_localized = false;
 
     m_particles.resize(num_particles);
     for (auto& particle : m_particles) {
@@ -385,6 +370,7 @@ void particle_filter_t::init_particles(float min_x, float max_x, float min_y, fl
 {
     float defaultWeight = 1.0f / num_particles;
     m_topParticleIndex = 0;
+    m_localized = false;
 
     m_particles.resize(num_particles);
 
@@ -456,6 +442,23 @@ Eigen::Vector3f particle_filter_t::get_odometry_command(pose2d_t prevPose, pose2
         trans,
         rot2
     };
+}
+
+void particle_filter_t::check_if_localized() {
+    auto const& pose_mean = this->get_pose_mean();
+    auto const& pose_deviation = this->get_pose_std_dev();
+
+    float x_dev = pose_deviation.get_x();
+    float y_dev = pose_deviation.get_y();
+    float theta_dev = pose_deviation.get_theta();
+
+    m_localized = x_dev <= this->get_loc_threshold_x() &&
+                  y_dev <= this->get_loc_threshold_y() &&
+                  theta_dev <= this->get_loc_threshold_theta();
+}
+
+bool particle_filter_t::is_localized() const {
+    return m_localized;
 }
 
 bool particle_filter_t::is_debug_enabled() const {

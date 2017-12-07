@@ -211,20 +211,21 @@ namespace drwn {
             m_config.loc_threshold_theta = theta_dev;
         }
 
-        /* Util function, place in separate class */
+        bool is_localized() const;
+
+        bool is_debug_enabled() const;
+
+        void enable_debug(bool debug);
+
         float sample_normal_distribution(float variance);
 
         pose2d_t odometry_sample(pose2d_t pose, Eigen::Vector3f command, Eigen::Vector3f noise);
 
         Eigen::Vector3f get_odometry_command(pose2d_t prevPose, pose2d_t currPose);
 
-        bool is_debug_enabled() const;
-
-        void enable_debug(bool debug);
-        /* */
     private:
         bool m_debug {false};
-
+        bool m_localized {false};
         struct config_t {
             int num_particles;
             float init_x, init_y, init_theta;
@@ -249,15 +250,17 @@ namespace drwn {
         } m_config;
 
         std::vector<particle_t> m_particles;
+
         pose2d_t m_poseMean, m_poseDev;
         std::size_t m_topParticleIndex {0};
-
         void init_particles(const pose2d_t& pose, int num_particles);
 
         void init_particles(float min_x, float max_x, float min_y, float max_y, float min_theta, float max_theta,
                             int num_particles);
 
         void low_variance_resampling();
+
+        void check_if_localized();
 
         std::tuple<field_map_t::line_type_t, point2d_t>
         calc_expected_measurement(float rx, float ry, float rtheta, float measured_range, float measured_bearing);

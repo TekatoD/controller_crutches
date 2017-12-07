@@ -21,17 +21,21 @@ namespace drwn {
         // Update based on motion and sensor data
         void update();
 
-        // Resets PF particles to current pose
-        void set_current_pose(const pose2d_t& current_pose);
-
         void set_camera_parameters(vision_utils::camera_parameters_t camera_params);
+
         vision_utils::camera_parameters_t get_camera_parameters();
 
+        // Resets PF particles to current pose
+        void reset_current_pose(const pose2d_t &current_pose);
+
         // Resets PF particles to area
-        void set_pose_approximate_area(const pose2d_t& min_pose, const pose2d_t& max_pose);
+        void reset_pose_approximate_area(const pose2d_t &min_pose, const pose2d_t &max_pose);
+
+        // Resets PF particles to area around pose with radius
+        void reset_pose_approximate_area_around(const pose2d_t &pose, const pose2d_t &radius);
 
         // Resets PF to field area
-        void set_pose_approximate_area_to_field();
+        void reset_pose_approximate_area_to_field();
 
         void set_particle_filter(particle_filter_t* pf_ptr);
         particle_filter_t* get_particle_filter() const;
@@ -52,7 +56,6 @@ namespace drwn {
         localization_t() = default;
 
         bool m_debug {false};
-        bool m_localized {true};
     public:
         bool is_debug_enabled() const;
 

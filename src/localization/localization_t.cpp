@@ -4,7 +4,6 @@
 
 #include <localization/localization_t.h>
 #include <opencv2/core/eigen.hpp>
-// TODO: getter setter for head
 #include <motion/modules/head_t.h>
 #include <motion/kinematics_t.h>
 #include <motion/motion_status_t.h>
@@ -140,14 +139,6 @@ void localization_t::update()
     auto const& pose_mean = m_particle_filter->get_pose_mean();
     auto const& pose_deviation = m_particle_filter->get_pose_std_dev();
 
-    float x_dev = pose_deviation.get_x();
-    float y_dev = pose_deviation.get_y();
-    float theta_dev = pose_deviation.get_theta();
-
-    m_localized = x_dev <= m_particle_filter->get_loc_threshold_x() &&
-                  y_dev <= m_particle_filter->get_loc_threshold_y() &&
-                  theta_dev <= m_particle_filter->get_loc_threshold_theta();
-
     if (m_debug)
     {
         LOG_DEBUG << "PARTICLE FILTER: Pose mean: " << pose_mean;
@@ -157,7 +148,7 @@ void localization_t::update()
     m_old_pose = m_current_pose;
 }
 
-void localization_t::set_current_pose(const pose2d_t& current_pose)
+void localization_t::reset_current_pose(const pose2d_t &current_pose)
 {
     assert(m_particle_filter != nullptr);
 
@@ -177,9 +168,10 @@ vision_utils::camera_parameters_t localization_t::get_camera_parameters()
     return m_camera_params;
 }
 
-void localization_t::set_pose_approximate_area(const pose2d_t& min_pose, const pose2d_t& max_pose)
+void localization_t::reset_pose_approximate_area(const pose2d_t &min_pose, const pose2d_t &max_pose)
 {
     assert(m_particle_filter != nullptr);
+
     float min_x, min_y, min_theta, max_x, max_y, max_theta;
     min_x = min_pose.get_x(); min_y = min_pose.get_y(); min_theta = min_pose.get_theta();
     max_x = max_pose.get_x(); max_y = max_pose.get_y(); max_theta = max_pose.get_theta();
@@ -188,9 +180,29 @@ void localization_t::set_pose_approximate_area(const pose2d_t& min_pose, const p
     m_old_pose = m_particle_filter->get_pose_mean();
 }
 
-void localization_t::set_pose_approximate_area_to_field()
+void localization_t::reset_pose_approximate_area_around(const pose2d_t &pose, const pose2d_t &radius) {
+    pose2d_t last_pose = pose, pose_dev = radius;
+    pose2d_t nmz;
+    float min_x, min_y, min_theta, max_x, max_y, max_theta;
+
+    min_x = last_pose.get_x() - pose_dev.get_x();
+    max_x = last_pose.get_x() + pose_dev.get_x();
+    min_y = last_pose.get_y() - pose_dev.get_y();
+    max_y = last_pose.get_y() + pose_dev.get_y();
+    nmz.set_theta(last_pose.get_theta() - pose_dev.get_theta());
+    min_theta = nmz.get_theta();
+    nmz.set_theta(last_pose.get_theta() + pose_dev.get_theta());
+    max_theta = nmz.get_theta();
+
+    pose2d_t min_pose(min_x, min_y, min_theta);
+    pose2d_t max_pose(max_x, max_y, max_theta);
+    this->reset_pose_approximate_area(min_pose, max_pose);
+}
+
+void localization_t::reset_pose_approximate_area_to_field()
 {
     assert(m_particle_filter != nullptr);
+
     m_particle_filter->reset_pose_to_field();
     m_current_pose = m_particle_filter->get_pose_mean();
     m_old_pose = m_particle_filter->get_pose_mean();
@@ -255,9 +267,7 @@ void localization_t::set_localization_threshold(float x_dev, float y_dev, float 
 }
 
 bool localization_t::is_localized() const {
-    return m_localized;
+    assert(m_particle_filter != nullptr);
+
+    return m_particle_filter->is_localized();
 }
-
-
-
-

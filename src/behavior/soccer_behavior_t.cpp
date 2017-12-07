@@ -113,21 +113,7 @@ void soccer_behavior_t::process_decision() {
         auto last_pose = m_walking->get_odo();
         auto pose_dev = m_localization->get_calculated_pose_std_dev();
 
-        pose2d_t nmz;
-        float min_x, min_y, min_theta, max_x, max_y, max_theta;
-
-        min_x = last_pose.get_x() - pose_dev.get_x();
-        max_x = last_pose.get_x() + pose_dev.get_x();
-        min_y = last_pose.get_y() - pose_dev.get_y();
-        max_y = last_pose.get_y() + pose_dev.get_y();
-        nmz.set_theta(last_pose.get_theta() - pose_dev.get_theta());
-        min_theta = nmz.get_theta();
-        nmz.set_theta(last_pose.get_theta() + pose_dev.get_theta());
-        max_theta = nmz.get_theta();
-
-        pose2d_t min_pose(min_x, min_y, min_theta);
-        pose2d_t max_pose(max_x, max_y, max_theta);
-        m_localization->set_pose_approximate_area(min_pose, max_pose);
+        m_localization->reset_pose_approximate_area_around(last_pose, pose_dev);
 
         if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Getting up";
         m_walking->stop();
@@ -163,7 +149,7 @@ void soccer_behavior_t::process_decision() {
         if (gc_data.state == STATE_INITIAL) {
             if (m_previous_state != STATE_INITIAL) {
                 m_walking->set_odo(m_field->get_spawn_pose());
-                m_localization->set_current_pose(m_field->get_spawn_pose());
+                m_localization->reset_current_pose(m_field->get_spawn_pose());
                 m_previous_state = STATE_INITIAL;
             }
         }
@@ -171,7 +157,7 @@ void soccer_behavior_t::process_decision() {
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Set state processing...";
             if (m_previous_state != STATE_READY) {
                 m_walking->set_odo(m_field->get_spawn_pose());
-                m_localization->set_current_pose(m_field->get_spawn_pose());
+                m_localization->reset_current_pose(m_field->get_spawn_pose());
                 m_previous_state = STATE_READY;
             }
             m_goto->process(m_field->get_start_pose() - odo);
@@ -184,7 +170,7 @@ void soccer_behavior_t::process_decision() {
             if (m_previous_state != STATE_SET) {
                 m_previous_state = STATE_SET;
                 m_walking->set_odo(starting);
-                m_localization->set_current_pose(starting);
+                m_localization->reset_current_pose(starting);
             }
 
             m_walking->stop();
@@ -193,7 +179,7 @@ void soccer_behavior_t::process_decision() {
             if (m_previous_state != STATE_PLAYING) {
                 const pose2d_t starting = m_field->get_start_pose();
                 m_walking->set_odo(starting);
-                m_localization->set_current_pose(starting);
+                m_localization->reset_current_pose(starting);
                 m_previous_state = STATE_PLAYING;
                 m_ball_filter.reset();
             }
@@ -290,18 +276,39 @@ void soccer_behavior_t::process_localization() {
         m_localization->set_lines(lines);
         m_localization->update();
 
-        if (m_localization->is_localized() &&
+        const auto& loc_pose_mean = m_localization->get_calculated_pose_mean();
+        const auto& loc_pose_dev = m_localization->get_calculated_pose_std_dev();
+
+        if (loc_pose_mean.is_nan() || loc_pose_dev.is_nan()) {
+            if (m_debug) {
+                LOG_DEBUG << "SOCCER BEHAVIOUR: NaNs detected in particle filter. Resetting...";
+            }
+
+            const particle_filter_t* pf = m_localization->get_particle_filter();
+            pose2d_t last_pose = m_walking->get_odo();
+            pose2d_t pose_dev(
+                pf->get_loc_threshold_x(),
+                pf->get_loc_threshold_y(),
+                pf->get_loc_threshold_theta()
+            );
+
+            m_localization->set_pose_shift(last_pose);
+            m_localization->reset_pose_approximate_area_around(last_pose, pose_dev);
+        } else if (m_localization->is_localized() &&
                 m_walking->get_a_move_amplitude() == 0.0f &&
                 m_walking->get_y_move_amplitude() == 0.0f &&
                 m_walking->get_x_move_amplitude() <= 4.0f
                 ) {
-            const auto& localized_pose = m_localization->get_particle_filter()->get_pose_mean();
+
+            const auto& localized_pose = m_localization->get_calculated_pose_mean();
+
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Successfull localization to pose = " << localized_pose;
+
             m_walking->set_odo(localized_pose);
-            m_rate_process_localization.update();
             // set_pose_shift to avoid big jumps
             m_localization->set_pose_shift(localized_pose);
 
+            m_rate_process_localization.update();
             m_force_localization = false;
         }
     }

@@ -75,7 +75,6 @@ void ball_follower_t::process(point2d_t ball_pos) {
         float tilt_min = head_t::get_instance()->get_bottom_limit_angle();
         float tilt_range = head_t::get_instance()->get_top_limit_angle() - tilt_min;
         float tilt_percent = std::fabs((tilt - tilt_min) / tilt_range);
-        float kicking_angle = std::max(m_slanting_kick_angle, m_straight_kick_angle);
 
         // If pan between kicking angles
         if (tilt <= (tilt_min + m_aim_tilt_offset) &&
@@ -87,11 +86,10 @@ void ball_follower_t::process(point2d_t ball_pos) {
 //            float direction = m_angle_to_enemy_gate_bot > m_straight_kick_angle ? -1.0f : 1.0f;
             float direction = m_angle_to_enemy_gate_center > m_straight_kick_angle ? -1.0f : 1.0f;
             target_x_amplitude = 0.0f;
-
             target_y_amplitude = direction * m_aim_y_amplitude;
             target_a_amplitude = direction * m_aim_a_amplitude;
             aim = true;
-        } else if (std::fabs(pan) < kicking_angle) {
+        } else if (std::fabs(pan) < m_straight_kick_angle) {
             if (tilt <= (tilt_min + m_fit_tilt_offset)) {
                 if (tilt <= (tilt_min + m_kick_tilt_offset)) { // Can kick!
                     target_x_amplitude = 0.0f;
@@ -109,13 +107,16 @@ void ball_follower_t::process(point2d_t ball_pos) {
                     target_x_amplitude = m_fit_x_amplitude * (1.0f - std::fabs(pan_percent));
                     target_y_amplitude = 0.0f;
                     target_a_amplitude = m_fit_a_amplitude * pan_percent;
+                    if (std::fabs(target_a_amplitude) < 1.0f) target_a_amplitude = 0.0f;
                 }
             } else {
                 if (m_debug) LOG_DEBUG << "BALL FOLLOWER: Following...";
                 m_kick_ball_rate.update();
                 target_x_amplitude = m_follow_max_x_amplitude * tilt_percent; // * (1.0f - std::fabs(pan_percent)),
+                target_x_amplitude = std::max(target_x_amplitude, m_follow_min_x_amplitude);
                 target_y_amplitude = 0.0f;
                 target_a_amplitude = m_follow_max_a_amplitude * pan_percent;
+                if (std::fabs(target_a_amplitude) < 1.0f) target_a_amplitude = 0.0f;
             }
         } else { // Out of kicking angles
             if (m_debug) LOG_DEBUG << "BALL FOLLOWER: Rotating...";
@@ -171,10 +172,10 @@ void ball_follower_t::calculate_angles_to_gait() {
         return degrees(std::atan2(y_diff, x_diff) - odo.get_theta()) - pan;
     };
 
-    m_angle_to_enemy_gate_top = calc_angle_to_gate(-1, -1);
-    m_angle_to_enemy_gate_bot = calc_angle_to_gate(-1, 1);
-    m_angle_to_our_gate_top = calc_angle_to_gate(1, -1);
-    m_angle_to_our_gate_bot = calc_angle_to_gate(1, 1);
+//    m_angle_to_enemy_gate_top = calc_angle_to_gate(-1, -1);
+//    m_angle_to_enemy_gate_bot = calc_angle_to_gate(-1, 1);
+//    m_angle_to_our_gate_top = calc_angle_to_gate(1, -1);
+//    m_angle_to_our_gate_bot = calc_angle_to_gate(1, 1);
 
     m_angle_to_enemy_gate_center = degrees(std::atan2(-odo.get_y(), -gate_x_offset - odo.get_x())
                                            - odo.get_theta()) - pan;
@@ -191,11 +192,11 @@ void ball_follower_t::calculate_angles_to_gait() {
     normalize(m_angle_to_enemy_gate_center);
 
     if (m_debug) {
-        LOG_DEBUG << "BALL FOLLOWER: angle_to_enemy_gate_top = " << m_angle_to_enemy_gate_bot;
-        LOG_DEBUG << "BALL FOLLOWER: angle_to_enemy_gate_bot = " << m_angle_to_enemy_gate_top;
-        LOG_DEBUG << "BALL FOLLOWER: angle_to_our_gate_top = " << m_angle_to_our_gate_bot;
-        LOG_DEBUG << "BALL FOLLOWER: angle_to_our_gate_bot = " << m_angle_to_our_gate_top;
-        LOG_DEBUG << "BALL FOLLOWER: angle_to_our_gate_center = " << m_angle_to_enemy_gate_center;
+//        LOG_DEBUG << "BALL FOLLOWER: angle_to_enemy_gate_top = " << m_angle_to_enemy_gate_bot;
+//        LOG_DEBUG << "BALL FOLLOWER: angle_to_enemy_gate_bot = " << m_angle_to_enemy_gate_top;
+//        LOG_DEBUG << "BALL FOLLOWER: angle_to_our_gate_top = " << m_angle_to_our_gate_bot;
+//        LOG_DEBUG << "BALL FOLLOWER: angle_to_our_gate_bot = " << m_angle_to_our_gate_top;
+        LOG_DEBUG << "BALL FOLLOWER: angle_to_enemy_gate_center = " << m_angle_to_enemy_gate_center;
     }
 }
 
@@ -259,15 +260,6 @@ void ball_follower_t::set_kick_ball_rate(steady_rate_t::duration kick_ball_rate)
     using namespace std::chrono;
     if (m_debug) LOG_DEBUG << "BALL FOLLOWER: kick_ball_rate = " << duration_cast<milliseconds>(kick_ball_rate).count() << "ms";
     m_kick_ball_rate.set_duration(kick_ball_rate);
-}
-
-float ball_follower_t::get_slanting_kick_angle() const {
-    return m_slanting_kick_angle;
-}
-
-void ball_follower_t::set_slanting_kick_angle(float slanting_kick_angle) {
-    if (m_debug) LOG_DEBUG << "BALL FOLLOWER: slanting_kick_angle = " << slanting_kick_angle;
-    m_slanting_kick_angle = slanting_kick_angle;
 }
 
 float ball_follower_t::get_straight_kick_angle() const {

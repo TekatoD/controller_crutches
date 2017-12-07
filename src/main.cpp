@@ -55,7 +55,7 @@ void init_logger() {
                                 << " [" << logging::trivial::severity
                                 << "] " << expr::smessage);
     logging::core::get()->set_filter(
-            logging::trivial::severity >= logging::trivial::debug
+            logrging::trivial::severity >= logging::trivial::debug
     );
     logging::core::get()->add_sink(std::move(sink));
 }
@@ -66,7 +66,7 @@ void sighandler(int /*sig*/) {
     if (app->is_running()) {
         app->stop();
     } else {
-        std::terminate();
+        std::exit(1);
     }
 }
 

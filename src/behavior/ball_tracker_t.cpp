@@ -19,16 +19,16 @@ void ball_tracker_t::process(point2d_t pos) {
     }
 
     if (pos.X < 0 || pos.Y < 0) {
-        m_ball_position.X = -1;
-        m_ball_position.Y = -1;
         m_no_ball = m_no_ball_rate.is_passed();
         if (!m_no_ball) {
             if (m_debug) {
                 LOG_DEBUG << "BALL TRACKER: Continues to tracking";
             }
             head_t::get_instance()->move_tracking();
-        } else if (m_debug) {
-            LOG_DEBUG << "BALL TRACKER: Ball is lost";
+        } else {
+            m_ball_position.X = -1;
+            m_ball_position.Y = -1;
+            if (m_debug) LOG_DEBUG << "BALL TRACKER: Ball is lost";
         }
     } else {
         if (m_debug) LOG_DEBUG << "BALL TRACKER: Tracking the ball";

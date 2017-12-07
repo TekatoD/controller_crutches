@@ -38,10 +38,6 @@ namespace drwn {
 
         void set_kick_ball_rate(steady_rate_t::duration kick_ball_rate);
 
-        float get_slanting_kick_angle() const;
-
-        void set_slanting_kick_angle(float slanting_kick_angle);
-
         float get_straight_kick_angle() const;
 
         void set_straight_kick_angle(float straight_kick_angle);
@@ -111,7 +107,6 @@ namespace drwn {
         steady_rate_t m_no_ball_rate{std::chrono::seconds(2)};
         steady_rate_t m_kick_ball_rate{std::chrono::milliseconds(500)};
 
-        float m_slanting_kick_angle{30.0f};
         float m_straight_kick_angle{5.0f};
 
         float m_follow_max_x_amplitude{7.0f};

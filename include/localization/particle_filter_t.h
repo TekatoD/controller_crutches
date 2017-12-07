@@ -223,7 +223,7 @@ namespace drwn {
         void enable_debug(bool debug);
         /* */
     private:
-        bool m_debug {true};
+        bool m_debug {false};
 
         struct config_t {
             int num_particles;

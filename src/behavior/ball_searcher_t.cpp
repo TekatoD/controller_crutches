@@ -48,9 +48,9 @@ void ball_searcher_t::process() {
     if (m_pan_enabled) {
         pan = (m_pan_phase - half_phase_size) / half_phase_size * pan_diff / 2.0f * m_pan_direction;
     }
-    float tilt = m_tilt_phase <= half_phase_size
+    float tilt = m_tilt_phase > half_phase_size
                  ? tilt_min + tilt_diff / 2.0f
-                 : tilt_min;
+                 : tilt_min + tilt_diff / 4.0f;
     head_t::get_instance()->move_by_angle(pan, tilt);
 
     if (m_debug) {

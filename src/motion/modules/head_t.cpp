@@ -212,7 +212,15 @@ void head_t::move_tracking(point2d_t err) {
 
 
 void head_t::move_tracking() {
-    float p_offset, d_offset;
+    float p_offset, d_offset, offset;
+
+    const float pan = motion_status_t::current_joints.get_angle(joint_data_t::ID_HEAD_PAN);
+    const float pan_range = head_t::get_instance()->get_left_limit_angle();
+    const float pan_percent = std::fabs(pan / pan_range);
+    const float tilt = motion_status_t::current_joints.get_angle(joint_data_t::ID_HEAD_TILT);
+    const float tilt_min = head_t::get_instance()->get_bottom_limit_angle();
+    const float tilt_range = head_t::get_instance()->get_top_limit_angle() - tilt_min;
+    const float tilt_percent = std::fabs((tilt - tilt_min) / tilt_range);
 
     p_offset = m_pan_err * m_pan_p_gain;
     p_offset *= p_offset;
@@ -222,7 +230,10 @@ void head_t::move_tracking() {
     d_offset *= d_offset;
     if (m_pan_err_diff < 0)
         d_offset = -d_offset;
-    m_pan_angle += (p_offset + d_offset);
+    offset = p_offset + d_offset;
+    if (std::fabs(m_pan_angle + offset) > std::fabs(m_pan_angle))
+        offset *= (1.0 - pan_percent);
+    m_pan_angle += offset;
 
     p_offset = m_tilt_err * m_tilt_p_gain;
     p_offset *= p_offset;
@@ -232,7 +243,13 @@ void head_t::move_tracking() {
     d_offset *= d_offset;
     if (m_tilt_err_diff < 0)
         d_offset = -d_offset;
-    m_tilt_angle += (p_offset + d_offset);
+    offset = p_offset + d_offset;
+    if (std::fabs(m_tilt_angle + offset) > std::fabs(m_tilt_angle))
+        offset *= (1.0 - tilt_percent);
+    m_tilt_angle += offset;
+
+    m_tilt_err_diff /= 2.0f;
+    m_pan_err_diff /= 2.0f;
 
     check_limit();
 }

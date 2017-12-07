@@ -173,7 +173,7 @@ void particle_filter_t::correct(const measurement_bundle& measurements, const Ei
 
     // While debugging
     //
-    if (weight_normalizer < 0.00001) {
+    if (std::fabs(weight_normalizer) < 0.00001) {
         if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: Normalizer is close to zero";
         weight_normalizer = 1.0f;
     }
@@ -308,14 +308,14 @@ void particle_filter_t::calc_pose_mean_cov()
     meanAccum.set_y(pw * meanAccum.get_y());
     //meanAccum.set_theta(pw * meanAccum.get_theta());
 
+    if (meanAccum.is_nan()) {
+        if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: Calculated mean_pose is NaN. Ignoring...";
+        m_poseMean = this->get_top_particle().pose;
+        return;
+    }
 
     angleNormalizer.set_theta(std::atan2(avg_y, avg_x));
     meanAccum.set_theta(angleNormalizer.get_theta());
-
-    if (meanAccum.is_nan()) {
-        if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: Calculated mean_pose is NAN. Ignoring...";
-        return;
-    }
 
     pose2d_t devAccum;
     float mx, my, mtheta;
@@ -331,7 +331,7 @@ void particle_filter_t::calc_pose_mean_cov()
         // for correct stddev calculation
         // square root of mean of (xi-x.mean)**2 for all i
         angleNormalizer.set_theta(ptheta-mtheta);
-        devAccum += pose2d_t(std::pow(px-mx, 2.0f), std::pow(py-my, 2.0f), std::pow(angleNormalizer.get_theta(), 2.0f));
+        devAccum += pose2d_t(std::pow(px-mx, 2), std::pow(py-my, 2), std::pow(angleNormalizer.get_theta(), 2));
     }
     devAccum.set_x(pw * devAccum.get_x());
     devAccum.set_y(pw * devAccum.get_y());
@@ -343,6 +343,9 @@ void particle_filter_t::calc_pose_mean_cov()
 
     if (devAccum.is_nan()) {
         if (m_debug) LOG_DEBUG << "PARTICLE_FILTER: Calculated pose_std_dev is NAN. Ignoring...";
+        m_poseDev.set_x(this->get_loc_threshold_x() * 2.0f);
+        m_poseDev.set_y(this->get_loc_threshold_y() * 2.0f);
+        m_poseDev.set_theta(this->get_loc_threshold_theta() * 2.0f);
         return;
     }
 

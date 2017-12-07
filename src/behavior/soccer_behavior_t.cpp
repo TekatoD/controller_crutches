@@ -293,7 +293,9 @@ void soccer_behavior_t::process_localization() {
             );
 
             m_localization->set_pose_shift(last_pose);
+            m_localization->set_pose_shift(last_pose);
             m_localization->reset_pose_approximate_area_around(last_pose, pose_dev);
+
         } else if (m_localization->is_localized() &&
                 m_walking->get_a_move_amplitude() == 0.0f &&
                 m_walking->get_y_move_amplitude() == 0.0f &&

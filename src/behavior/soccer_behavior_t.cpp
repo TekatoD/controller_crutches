@@ -310,7 +310,7 @@ void soccer_behavior_t::process_localization() {
 
         if (loc_pose_mean.is_nan() || loc_pose_dev.is_nan()) {
             if (m_debug) {
-                LOG_DEBUG << "SOCCER BEHAVIOUR: NaNs detected in particle filter. Resetting...";
+                LOG_WARNING << "SOCCER BEHAVIOUR: NaNs detected in particle filter. Resetting...";
             }
 
             const particle_filter_t* pf = m_localization->get_particle_filter();

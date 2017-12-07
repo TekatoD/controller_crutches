@@ -42,7 +42,7 @@ namespace drwn {
 
         struct particle_t {
             pose2d_t pose;
-            float weight;
+            float weight{1.0f};
         };
 
         particle_filter_t();

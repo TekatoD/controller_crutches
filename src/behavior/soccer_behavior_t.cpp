@@ -153,7 +153,17 @@ void soccer_behavior_t::process_decision() {
         // Update penalized flag
         int team_index = gc_data.teams[0].team_number == m_game_controller->get_team_number() ? 0 : 1;
         auto penalized = gc_data.teams[team_index].players[m_game_controller->get_team_number()].penalty;
-        m_penalized = m_penalized || penalized;
+
+        if (penalized && !m_penalized) {
+            m_action->joint.set_enable_body(true, true);
+            m_action->start(9);
+            m_walking->set_x_move_amplitude(0.0f);
+            m_walking->set_y_move_amplitude(0.0f);
+            m_walking->set_a_move_amplitude(0.0f);
+            m_walking->stop();
+            m_penalized = true;
+
+        }
 
         if (m_debug)
             LOG_DEBUG << "SOCCER BEHAVIOR: odo = ("
@@ -243,8 +253,6 @@ void soccer_behavior_t::process_decision() {
                     return;
                 }
             }
-
-
 
             // Switch to head and walking after action
             m_head->joint.set_enable_head_only(true, true);

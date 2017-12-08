@@ -39,6 +39,8 @@ void ball_follower_configuration_strategy_t::read_config(const boost::property_t
     if (kick_tilt_offset) follower->set_kick_tilt_offset(kick_tilt_offset.get());
     auto fit_tilt_offset = section.get_optional<float>("fit_tilt_offset");
     if (fit_tilt_offset) follower->set_fit_tilt_offset(fit_tilt_offset.get());
+    auto aim_x_amplitude = section.get_optional<float>("aim_x_amplitude");
+    if (aim_x_amplitude) follower->set_aim_x_amplitude(aim_x_amplitude.get());
     auto aim_y_amplitude = section.get_optional<float>("aim_y_amplitude");
     if (aim_y_amplitude) follower->set_aim_y_amplitude(aim_y_amplitude.get());
     auto aim_a_amplitude = section.get_optional<float>("aim_a_amplitude");

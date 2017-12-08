@@ -80,7 +80,7 @@ void ball_follower_t::process(point2d_t ball_pos) {
             if (m_debug) LOG_DEBUG << "BALL FOLLOWER: Aiming...";
 //            float direction = m_angle_to_enemy_gate_bot > m_straight_kick_angle ? -1.0f : 1.0f;
             float direction = m_angle_to_enemy_gate_center > m_straight_kick_angle ? -1.0f : 1.0f;
-            target_x_amplitude = 0.0f;
+            target_x_amplitude = m_aim_x_amplitude;
             target_y_amplitude = direction * m_aim_y_amplitude;
             target_a_amplitude = direction * m_aim_a_amplitude;
             aim = true;
@@ -381,4 +381,13 @@ float ball_follower_t::get_aim_tilt_offset() const {
 void ball_follower_t::set_aim_tilt_offset(float aim_kick_offset) {
     if (m_debug) LOG_DEBUG << "BALL FOLLOWER: aim_tilt_offset = " << aim_kick_offset;
     m_aim_tilt_offset = aim_kick_offset;
+}
+
+float ball_follower_t::get_aim_x_amplitude() const {
+    return m_aim_x_amplitude;
+}
+
+void ball_follower_t::set_aim_x_amplitude(float aim_x_amplitude) {
+    if (m_debug) LOG_DEBUG << "BALL FOLLOWER: aim_x_amplitude = " << aim_x_amplitude;
+    m_aim_x_amplitude = aim_x_amplitude;
 }

@@ -101,6 +101,11 @@ namespace drwn {
 
         void calculate_angles_to_gait();
 
+    public:
+        float get_aim_x_amplitude() const;
+
+        void set_aim_x_amplitude(float aim_x_amplitude);
+
     private:
         bool m_debug{false};
 
@@ -114,6 +119,7 @@ namespace drwn {
         float m_follow_max_a_amplitude{5.0f};
         float m_fit_x_amplitude{3.0f};
         float m_fit_a_amplitude{3.0f};
+        float m_aim_x_amplitude{0.0f};
         float m_aim_y_amplitude{7.0f};
         float m_aim_a_amplitude{7.0f};
 

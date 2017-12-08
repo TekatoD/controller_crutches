@@ -301,7 +301,8 @@ void soccer_behavior_t::process_localization() {
         return;
     }
 
-    if (m_rate_process_localization.is_passed() || m_force_localization) {
+    if ((m_rate_process_localization.is_passed() || m_force_localization) &&
+            !m_action->is_running()) {
         if (m_debug) {
             if (m_force_localization) {
                 LOG_DEBUG << "SOCCER BEHAVIOR: Forcing localization...";
@@ -346,10 +347,9 @@ void soccer_behavior_t::process_localization() {
             m_localization->reset_pose_approximate_area_around(last_pose, pose_dev);
 
         } else if (m_localization->is_localized() &&
-                m_walking->get_a_move_amplitude() == 0.0f &&
+                (m_walking->get_a_move_amplitude() == 0.0f &&
                 m_walking->get_y_move_amplitude() == 0.0f &&
-                m_walking->get_x_move_amplitude() <= 4.0f
-                ) {
+                m_walking->get_x_move_amplitude() <= 4.0f || m_rate_ignore_walking_speed.is_passed())) {
 
             const auto& localized_pose = m_localization->get_calculated_pose_mean();
 
@@ -360,6 +360,7 @@ void soccer_behavior_t::process_localization() {
             m_localization->set_pose_shift(localized_pose);
 
             m_rate_process_localization.update();
+            m_rate_ignore_walking_speed.update();
             m_force_localization = false;
         }
     }

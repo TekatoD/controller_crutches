@@ -169,8 +169,7 @@ void soccer_behavior_t::process_decision() {
                 m_localization->reset_current_pose(m_field->get_spawn_pose());
                 m_previous_state = gc_data.state;
             }
-        }
-        if (gc_data.state == STATE_READY) {
+        } else if (gc_data.state == STATE_READY) {
             if (m_debug) LOG_DEBUG << "SOCCER BEHAVIOR: Set state processing...";
             if (m_previous_state != STATE_READY) {
                 m_walking->set_odo(m_field->get_spawn_pose());

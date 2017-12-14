@@ -1,7 +1,7 @@
 #ifndef SPLCOACHMESSAGE_H
 #define SPLCOACHMESSAGE_H
 
-#include <stdint.h>
+#include <cstdint>
 #ifdef __cplusplus
 #endif
 
@@ -13,22 +13,22 @@
 
 struct spl_coach_message
 {
-  char header[4];        // "SPLC"
-  uint8_t version;       // SPL_COACH_MESSAGE_STRUCT_VERSION
-  uint8_t team;          // team number
-  uint8_t sequence;      // sequence number of this message
+    char header[4];        // "SPLC"
+    uint8_t version;       // SPL_COACH_MESSAGE_STRUCT_VERSION
+    uint8_t team;          // team number
+    uint8_t sequence;      // sequence number of this message
 
-  // buffer for message
-  uint8_t message[SPL_COACH_MESSAGE_SIZE];
+    // buffer for message
+    uint8_t message[SPL_COACH_MESSAGE_SIZE];
 
 #ifdef __cplusplus
-  // constructor
-  spl_coach_message() : version(SPL_COACH_MESSAGE_STRUCT_VERSION)
-  {
-    const char* init = SPL_COACH_MESSAGE_STRUCT_HEADER;
-    for(unsigned int i = 0; i < sizeof(header); ++i)
-      header[i] = init[i];
-  }
+    // constructor
+    spl_coach_message() : version(SPL_COACH_MESSAGE_STRUCT_VERSION)
+    {
+      const char* init = SPL_COACH_MESSAGE_STRUCT_HEADER;
+      for(unsigned int i = 0; i < sizeof(header); ++i)
+        header[i] = init[i];
+    }
 #endif
 };
 

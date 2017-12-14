@@ -163,10 +163,11 @@ void soccer_behavior_t::process_decision() {
 //        ball = m_ball_filter.get_ball();
 
         if (gc_data.state == STATE_INITIAL || gc_data.state == STATE_FINISHED) {
-            if (m_previous_state != STATE_INITIAL) {
+            if (m_previous_state != gc_data.state) {
                 m_walking->set_odo(m_field->get_spawn_pose());
+                m_walking->stop();
                 m_localization->reset_current_pose(m_field->get_spawn_pose());
-                m_previous_state = STATE_INITIAL;
+                m_previous_state = gc_data.state;
             }
         }
         if (gc_data.state == STATE_READY) {

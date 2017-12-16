@@ -321,11 +321,15 @@ void soccer_behavior_t::process_localization() {
         const auto& loc_pose_dev = m_localization->get_calculated_pose_std_dev();
 
         std::stringstream crutch;
+        std::stringstream crutch1;
         crutch << loc_pose_mean.get_x() << loc_pose_mean.get_y() << loc_pose_mean.get_theta();
+        crutch1 << loc_pose_dev.get_x() << loc_pose_dev.get_y() << loc_pose_dev.get_theta();
         auto crutch_str = crutch.str();
+        auto crutch_str1 = crutch1.str();
         bool dode = std::find(crutch_str.begin(), crutch_str.end(), 'n') != crutch_str.end();
+        bool dode1 = std::find(crutch_str1.begin(), crutch_str1.end(), 'n') != crutch_str1.end();
 
-        if (loc_pose_mean.is_nan() || loc_pose_dev.is_nan() || dode) {
+        if (loc_pose_mean.is_nan() || loc_pose_dev.is_nan() || dode || dode1) {
             if (dode) {
                 LOG_WARNING << "SOCCER BEHAVIOR: Crutches is saving us!";
             }

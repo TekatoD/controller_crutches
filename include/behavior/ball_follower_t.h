@@ -112,7 +112,7 @@ namespace drwn {
         steady_rate_t m_no_ball_rate{std::chrono::seconds(2)};
         steady_rate_t m_kick_ball_rate{std::chrono::milliseconds(500)};
 
-        float m_straight_kick_angle{5.0f};
+        float m_straight_kick_angle{90.0f};
 
         float m_follow_max_x_amplitude{7.0f};
         float m_follow_min_x_amplitude{5.0f};
